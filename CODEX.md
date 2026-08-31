@@ -16,10 +16,19 @@ High-level context:
 
 Start here:
 1. Clone or pull the repo (git clone https://github.com/OkVurb/hand-off.git).
-2. Verify Java 21 JDK and the Gradle wrapper.
-3. Run .\gradlew build. It should pass with only this-escape warnings.
-4. Read HANDOFF.md sections 3.-5 through 3.0 first — they describe everything changed in the last session and, importantly, what the build checks can and cannot catch.
-5. Read AGENTS.md for conventions and the invariants each build check enforces.
+2. **Read PROGRESS.md FIRST** — it tells you exactly where the last session stopped and what to do next.
+3. Verify Java 21 JDK and the Gradle wrapper.
+4. Run .\gradlew build. It should pass with only this-escape warnings.
+5. Read HANDOFF.md sections 3.-5 through 3.0 first — they describe everything changed in the last session and, importantly, what the build checks can and cannot catch.
+6. Read AGENTS.md for conventions and the invariants each build check enforces.
+
+**CRITICAL — before ending your session, you MUST update PROGRESS.md** with:
+- What you did this session
+- What is in progress (if anything)
+- What the next session should do
+- Build status (green/red)
+
+This is the survival mechanism so the next session knows where you stopped if tokens run out.
 
 STATE: all previously-tracked P0/P1/P2 issues are closed. The build is green, CI runs it on every push, and the mod launches cleanly on both client and dedicated server. This is a working vertical slice with placeholder art and audio, not a finished game.
 
@@ -63,4 +72,4 @@ Rules:
 - When unsure of a Minecraft API, read the decompiled source in .mcsources/ rather than guessing. The 1.21.11 schemas for dimension types, pack metadata and item models all changed recently and guessing costs more than looking.
 - Verify a new build check by deliberately breaking the thing it guards and confirming it fails. Every check in this repo was validated that way.
 
-Goal for this session: pick one item above, implement it, run .\gradlew build AND .\gradlew runServer, and update HANDOFF.md with what you did and what you verified.
+Goal for this session: pick one item above, implement it, run .\gradlew build AND .\gradlew runServer, update PROGRESS.md with what you did and what's next, then update HANDOFF.md.
