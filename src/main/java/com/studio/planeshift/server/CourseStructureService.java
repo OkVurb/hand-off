@@ -99,6 +99,8 @@ public final class CourseStructureService {
         buildNoteBlockRun(level, start, plan);
         buildSecretVine(level, start, plan);
         buildCoinHeaven(level, start, plan, palette);
+        buildVerticalClimb(level, start, plan);
+        buildConveyorGauntlet(level, start, plan);
         buildFinish(level, start, plan, palette);
         spawnRewards(level, start, plan);
         spawnCast(level, start, plan, course.theme());
@@ -250,14 +252,41 @@ public final class CourseStructureService {
      * <p>Placed over an existing planned gap rather than a new one: the layout already guarantees
      * the pit is survivable, so the bridge adds pressure without changing the course's shape.
      */
+    private static void buildVerticalClimb(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
+        int base = plan.midpoint() + 20;
+        set(level, start.offset(base, 1, 0), ModBlocks.NOTE_BLOCK.get().defaultBlockState());
+        spawnPlatform(level, start, base + 2, 6, MovingPlatformEntity.AXIS_Y, 4.0F);
+        platform(level, start, base + 5, 10, 3, ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState());
+        set(level, start.offset(base + 6, 11, 0), ModBlocks.NOTE_BLOCK.get().defaultBlockState());
+        platform(level, start, base + 9, 16, 5, ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState());
+    }
+
+    private static void buildConveyorGauntlet(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
+        int base = plan.midpoint() + 32; 
+        BlockState forward = ModBlocks.CONVEYOR_BELT.get().defaultBlockState()
+            .setValue(com.studio.planeshift.common.block.ConveyorBlock.FACING, net.minecraft.core.Direction.EAST);
+        BlockState backward = ModBlocks.CONVEYOR_BELT.get().defaultBlockState()
+            .setValue(com.studio.planeshift.common.block.ConveyorBlock.FACING, net.minecraft.core.Direction.WEST);
+            
+        for (int x = 0; x < 12; x++) {
+            BlockState state = ((x / 3) % 2 == 0) ? backward : forward;
+            set(level, start.offset(base + x, 1, 0), state);
+        }
+    }
+
     private static void buildDonutBridge(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
         int[][] gaps = plan.gaps();
-        if (gaps.length < 2) {
-            return;
+        if (gaps.length > 1) {
+            int[] gap = gaps[1];
+            for (int x = gap[0]; x <= gap[1]; x++) {
+                set(level, start.offset(x, 1, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+            }
         }
-        int[] gap = gaps[1];
-        for (int x = gap[0]; x <= gap[1]; x++) {
-            set(level, start.offset(x, 1, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+        if (gaps.length > 3) {
+            int[] gap2 = gaps[3];
+            for (int x = gap2[0]; x <= gap2[1]; x++) {
+                set(level, start.offset(x, (x % 2 == 0) ? 2 : 1, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+            }
         }
     }
 
@@ -475,3 +504,4 @@ public final class CourseStructureService {
         }
     }
 }
+
