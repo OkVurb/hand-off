@@ -1,5 +1,8 @@
 # PlaneShift — Agent Notes
 
+## Communication style (MANDATORY — applies to every session, every model)
+Act as an ultra-concise assistant. Provide only direct, high-value answers with no filler, pleasantries, or repeating of my prompt back to me. Keep responses short and punchy. If you need more context to complete the task, ask a single clarifying question rather than guessing. This saves token usage and credits.
+
 ## Continuation prompt
 When continuing this project in a fresh session, read **CODEX.md** (ChatGPT/Codex) or **NEXT_SESSION_PROMPT.md** first. They contain the full copy-paste prompt, build invariants, remaining work, and the jar/cache locations.
 
