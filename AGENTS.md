@@ -1,5 +1,8 @@
 # PlaneShift — Agent Notes
 
+## Continuation prompt
+When continuing this project in a fresh session, read **CODEX.md** (ChatGPT/Codex) or **NEXT_SESSION_PROMPT.md** first. They contain the full copy-paste prompt, build invariants, remaining work, and the jar/cache locations.
+
 ## Project
 - Minecraft mod built from the NeoForge 1.21.11 MDK (NeoForge 21.11.45, MDG 2.0.144, Java 21).
 - Root: `C:\Dev\PlaneShift`.
