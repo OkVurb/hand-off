@@ -23,3 +23,6 @@ tmp
 
 # Windows
 *.log
+
+# MCP decompiled sources cache
+.mcsources
