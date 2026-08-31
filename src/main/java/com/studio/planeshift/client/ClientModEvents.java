@@ -9,6 +9,7 @@ import com.studio.planeshift.client.render.CourseEnemyRenderer;
 import com.studio.planeshift.client.render.CourseSkyboxRenderer;
 import com.studio.planeshift.client.render.AnimatedCourseEnemyModel;
 import com.studio.planeshift.client.render.EnemyRigProfile;
+import com.studio.planeshift.client.render.FirebarRenderer;
 import com.studio.planeshift.client.render.MovingPlatformRenderer;
 import com.studio.planeshift.client.render.PlaceholderRigModel;
 import com.studio.planeshift.client.render.ToadRenderer;
@@ -142,6 +143,7 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.BOWSER_FIRE.get(),
                 context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 2.0F, true));
         event.registerEntityRenderer(ModEntities.MOVING_PLATFORM.get(), MovingPlatformRenderer::new);
+        event.registerEntityRenderer(ModEntities.FIREBAR.get(), FirebarRenderer::new);
     }
 
     @SubscribeEvent

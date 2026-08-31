@@ -515,12 +515,13 @@ public final class TextureGen {
             "brick_block", "checkpoint_beacon", "coin_block", "coin_ring_block", "conveyor_belt",
             "flag_pole", "hidden_question_block", "music_block", "note_block", "on_off_block",
             "on_off_switch", "p_switch", "prize_cache", "question_block", "secret_passage",
-            "shift_gate", "spike_block", "spring_pad", "warp_pipe");
+            "shift_gate", "spike_block", "spring_pad", "warp_pipe",
+            "donut_block", "axe_block", "secret_vine", "course_vine");
 
     private static final List<String> ENTITIES = List.of(
             "boo", "boomerang", "bowser", "bowser_fire", "bullet_bill", "buzzy_beetle",
             "ember_bolt", "fireball", "goomba", "hammer", "hammer_bro", "iceball", "koopa",
-            "lakitu", "moving_platform", "piranha_plant", "spiny", "thwomp", "toad");
+            "lakitu", "moving_platform", "piranha_plant", "spiny", "thwomp", "toad", "firebar");
 
     /**
      * Textures referenced by a blockstate variant rather than by a registered block, so they
@@ -528,7 +529,8 @@ public final class TextureGen {
      */
     private static final List<String> BLOCK_VARIANTS = List.of(
             "on_off_block_off", "p_switch_pressed", "prize_cache_opened", "question_block_used",
-            "checkpoint_beacon_lit", "coin_ring_block_used", "on_off_switch_powered");
+            "checkpoint_beacon_lit", "coin_ring_block_used", "on_off_switch_powered",
+            "donut_block_shaking", "axe_block_taken");
 
     private static final List<String> PARTICLES = List.of(
             "coin_sparkle", "hit_burst", "pickup_glow", "respawn_warp", "theme_dust");

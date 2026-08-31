@@ -7,6 +7,10 @@ import com.studio.planeshift.common.block.CoinBlock;
 import com.studio.planeshift.common.block.CoinRingBlock;
 import com.studio.planeshift.common.block.ConveyorBlock;
 import com.studio.planeshift.common.block.FlagPoleBlock;
+import com.studio.planeshift.common.block.AxeBlock;
+import com.studio.planeshift.common.block.CourseVineBlock;
+import com.studio.planeshift.common.block.DonutBlock;
+import com.studio.planeshift.common.block.SecretVineBlock;
 import com.studio.planeshift.common.block.HiddenQuestionBlock;
 import com.studio.planeshift.common.block.MusicBlock;
 import com.studio.planeshift.common.block.OnOffBlock;
@@ -148,6 +152,37 @@ public final class ModBlocks {
                     .sound(SoundType.STONE));
 
     /** Hidden question block - invisible until hit from below. */
+    /** Falls away shortly after the player stands on it, then returns. */
+    public static final DeferredBlock<DonutBlock> DONUT_BLOCK =
+            BLOCKS.registerBlock("donut_block", DonutBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_BROWN)
+                    .strength(1.0F)
+                    .sound(SoundType.WOOD));
+
+    /** Taking it collapses the castle bridge tile by tile. */
+    public static final DeferredBlock<AxeBlock> AXE_BLOCK =
+            BLOCKS.registerBlock("axe_block", AxeBlock::new, p -> p
+                    .mapColor(MapColor.METAL)
+                    .strength(2.0F)
+                    .noOcclusion()
+                    .sound(SoundType.METAL));
+
+    /** Hidden until hit from below, then grows a climbable vine upward. */
+    public static final DeferredBlock<SecretVineBlock> SECRET_VINE =
+            BLOCKS.registerBlock("secret_vine", SecretVineBlock::new, p -> p
+                    .mapColor(MapColor.PLANT)
+                    .strength(0.8F)
+                    .noOcclusion()
+                    .sound(SoundType.GRASS));
+
+    /** The climbable stalk grown by SECRET_VINE. */
+    public static final DeferredBlock<CourseVineBlock> COURSE_VINE =
+            BLOCKS.registerBlock("course_vine", CourseVineBlock::new, p -> p
+                    .mapColor(MapColor.PLANT)
+                    .strength(0.2F)
+                    .noOcclusion()
+                    .sound(SoundType.VINE));
+
     public static final DeferredBlock<HiddenQuestionBlock> HIDDEN_QUESTION_BLOCK =
             BLOCKS.registerBlock("hidden_question_block", HiddenQuestionBlock::new, p -> p
                     .mapColor(MapColor.COLOR_YELLOW)

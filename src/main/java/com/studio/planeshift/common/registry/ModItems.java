@@ -121,6 +121,14 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_SNOW_BLOCK);
     public static final DeferredItem<?> COURSE_CASTLE_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_CASTLE_BLOCK);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> DONUT_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.DONUT_BLOCK);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> AXE_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.AXE_BLOCK);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> SECRET_VINE_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.SECRET_VINE);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> COURSE_VINE_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_VINE);
     public static final DeferredItem<?> COURSE_MAGMA_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_MAGMA_BLOCK);
 

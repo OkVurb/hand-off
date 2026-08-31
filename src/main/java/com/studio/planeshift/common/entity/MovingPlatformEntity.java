@@ -121,6 +121,10 @@ public class MovingPlatformEntity extends Mob {
     public void push(Entity entity) {
     }
 
+    /** Axis 0: travels along the lane. Axis 1: rises and falls. */
+    public static final int AXIS_X = 0;
+    public static final int AXIS_Y = 1;
+
     public int getAxis() {
         return this.entityData.get(DATA_AXIS);
     }

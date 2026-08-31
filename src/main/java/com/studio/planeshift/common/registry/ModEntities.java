@@ -9,6 +9,7 @@ import com.studio.planeshift.common.entity.BulletBillEntity;
 import com.studio.planeshift.common.entity.BuzzyBeetleEntity;
 import com.studio.planeshift.common.entity.EmberBoltEntity;
 import com.studio.planeshift.common.entity.FireballProjectile;
+import com.studio.planeshift.common.entity.FirebarEntity;
 import com.studio.planeshift.common.entity.GoombaEntity;
 import com.studio.planeshift.common.entity.IceballProjectile;
 import com.studio.planeshift.common.entity.HammerBroEntity;
@@ -170,6 +171,15 @@ public final class ModEntities {
                     .clientTrackingRange(8)
                     .updateInterval(2)
                     .build(key("bowser_fire")));
+
+    /** Rotating castle hazard. MISC because it is a moving obstacle, not an AI mob. */
+    public static final DeferredHolder<EntityType<?>, EntityType<FirebarEntity>> FIREBAR =
+            ENTITY_TYPES.register("firebar", () -> EntityType.Builder
+                    .<FirebarEntity>of(FirebarEntity::new, MobCategory.MISC)
+                    .sized(0.4F, 0.4F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .build(key("firebar")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MovingPlatformEntity>> MOVING_PLATFORM =
             ENTITY_TYPES.register("moving_platform", () -> EntityType.Builder

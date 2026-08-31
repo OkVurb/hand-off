@@ -15,6 +15,34 @@
 
 ## What Was Done This Session
 
+### Claude session — Phase 5 batch (63-69, 73, 74)
+
+Hard items first again.
+
+- Task 65 — `DonutBlock`: idle, shaking, then gone, all driven by scheduled ticks so nothing has
+  to be scanned per tick. It **restores** after a delay rather than dropping a falling block; a
+  player who misses the jump respawns at a checkpoint and would otherwise find the bridge
+  permanently destroyed, soft-locking the course.
+- Task 69 — `FirebarEntity`: one entity owns the whole rotating bar rather than one entity per
+  flame, so a castle room with several bars stays cheap. Contact is tested per segment against a
+  line, and it is indestructible on purpose — the player is meant to dodge it, not delete it.
+- Task 64 — `AxeBlock` collapses the bridge one tile per scheduled tick, walking back from the
+  axe. The scan is bounded and stops at the first non-bridge block, so a collapse cannot escape
+  into arbitrary terrain.
+- Tasks 73/74 — `SecretVineBlock` grows a climbable `CourseVineBlock` one segment at a time when
+  hit from below, leading to a Coin Heaven cloud platform placed directly above it. Growth stops
+  at any obstruction instead of carving through it.
+- Task 63 — castle finale with a lava pit, bridge and two counter-rotating firebars. Lava theme
+  only; a castle in a meadow reads as a mistake.
+- Task 66 — a note-block run whose payoff is a ledge only reachable by bouncing off them.
+- Tasks 67/68 — moving platforms on both axes over existing planned gaps. Two axes because they
+  ask different things: a horizontal track is a timing problem, a vertical one is patience.
+
+Still open in Phase 5: 61 (pipe sub-rooms), 62 (warp transition animation), 70 (underwater
+physics), 71/72 (Cheep-Cheep, Blooper), 75 (ghost-house looping maze).
+
+`runServer` reaches `Done (0.418s)` with zero registry errors. 111 textures, all distinct.
+
 ### Claude session — Phase 2/3 batch (18, 25, 27-29, 32-34, 42-45)
 
 Hard items first, at the user's request.

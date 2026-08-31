@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "planeshift:block/course_vine",
+    "particle": "planeshift:block/course_vine"
+  }
+}

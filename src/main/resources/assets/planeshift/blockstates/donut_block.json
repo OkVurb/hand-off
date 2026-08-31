@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "phase=0,shaking=false": { "model": "planeshift:block/donut_block" },
+    "phase=0,shaking=true": { "model": "planeshift:block/donut_block_shaking" },
+    "phase=1,shaking=false": { "model": "planeshift:block/donut_block_open" },
+    "phase=1,shaking=true": { "model": "planeshift:block/donut_block_open" }
+  }
+}
