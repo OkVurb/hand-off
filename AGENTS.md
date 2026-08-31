@@ -45,7 +45,7 @@
   `MovementInputUpdateEvent` (game bus, client only).
 - Run client: `.\gradlew runClient`.
 - Run server: `.\gradlew runServer`.
-- No CI workflow exists yet.
+- CI: `.github/workflows/build.yml` runs `./gradlew build` on push/PR to main, so every `check*` task and the unit tests run automatically.
 - Runtime smoke test: `.gradlew runServer` (headless, loads all registries) and `.gradlew runClient`.
 
 ## Generated Artifacts & Jar Locations

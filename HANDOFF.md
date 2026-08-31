@@ -373,24 +373,69 @@ If a future course feature legitimately needs raw cuboid iteration, add the clas
 ### P2 — Medium
 *(None outstanding.)*
 
-### Warnings
-- `this-escape` warnings in constructors.
-- Test coverage is thin: JUnit 5 is now wired up (`src/test/java`) but only the 2.5D input
+### Warnings / smaller known issues
+- `this-escape` warnings in block constructors. Cosmetic.
+- Test coverage is thin: JUnit 5 is wired up (`src/test/java`, 31 cases) but only the 2.5D input
   projection geometry is covered. Everything else is guarded by the `check*` build tasks.
-- Git has a repo but no remote configured; commits are local only.
+- **Zero GameTests exist** despite `build.gradle` configuring a `gameTestServer` run and setting
+  `neoforge.enabledGameTestNamespaces`. 1.21.11 uses the data-driven `test_instance` registry;
+  NeoForge bridges to Java through `RegisterGameTestsEvent` on the mod bus. This is the largest
+  automated-testing gap.
+- **Play-testing has never been done.** The mod launches clean on client and server, but nobody
+  has walked the course flow. See §5.
+- `src/generated/resources/` is **empty**, yet `build.gradle`'s comment claims datagen output is
+  checked in so a clean clone builds without running the game. Either run `runClientData` and
+  commit the result, or correct the comment.
+- The built jar ships `src/generated/resources/.cache/` because that whole directory is a
+  resource root. Harmless, but dead weight in the artifact.
+- `ModEffects` gives `ice_aura` and `mini_aura` the same colour (`0x88CCFF`), so their HUD icons
+  are identical. Registry-level, not a texture-generator bug.
+- All art and audio are generated placeholders. Original and license-clean (see
+  `ASSET_LICENSES.md`), replaceable in place at the same paths and sizes.
+
+### Repository
+- Remote: `https://github.com/OkVurb/hand-off`, branch `main`.
+- CI: `.github/workflows/build.yml` runs `./gradlew build` on push and PR to `main`, so every
+  `check*` task and the unit tests run automatically.
 
 ---
 
 ## 5. How to Continue
 
-1. **Build:** `.\gradlew build`
-2. **Run client:** `.\gradlew runClient`
-3. **Run server:** `.\gradlew runServer`
-4. **Add missing assets:**
-   - Create `.ogg` sound files under `assets/planeshift/sounds/` and update `sounds.json`.
-   - Add missing mob-effect PNGs under `assets/planeshift/textures/mob_effect/`.
-   - Add state-aware block models for `on_off_block` and `hidden_question_block`.
-5. **Test gameplay:** load a course, use shift gates, die/fall, complete course, leave, buy from Toad.
+1. **Build:** `.\gradlew build` — includes the unit tests and all five `check*` tasks.
+2. **After touching `src/main/resources/data/`:** `.\gradlew runServer`. The build cannot catch
+   data-pack schema errors (see §3.-5); this loads every registry headlessly in about a minute.
+   Look for `Done (Xs)! For help, type "help"` and zero `ERROR` lines.
+3. **Run client:** `.\gradlew runClient`.
+4. **Regenerate assets** (see `tools/README.md`): `java tools/SoundGen.java <wavDir>` then encode
+   to OGG (needs ffmpeg with libvorbis), and
+   `java tools/TextureGen.java src/main/resources/assets/planeshift/textures`.
+
+### The play-test that has not been done
+
+Everything below loads without error, but none of it has been played. Launch `runClient`, make a
+Creative world, then:
+
+| Step | Command / action | What to watch |
+|---|---|---|
+| 1 | `/planeshift role planeshift:balanced` | Role accepted |
+| 2 | `/planeshift course course_1` | Teleport to `planeshift:course` at 0,64,0 in side-on. This is the path that threw before the §3.-5 dimension fix |
+| 3 | — | HUD cluster top-left: pips, timer, lives, coins, star coins all inside the panel |
+| 4 | A / D, then turn the mouse while holding D | Rail movement. W/S must do nothing. **Direction must not change as you look around** — that is the §3.-1 refactor |
+| 5 | Walk off a ledge, jump ~2 ticks late | Coyote time |
+| 6 | `/planeshift role planeshift:float_glide`, hold jump falling | Glider float, ~1.25 s |
+| 7 | `/planeshift mode free_3d` / `side_on` | Camera blend, mode badge |
+| 8 | `/planeshift checkpoint` | Beacon must visibly light — both states looked identical before §3.-4 |
+| 9 | Jump into a `?` block from below | Pickup pops; the used block must look distinct from a brick |
+| 10 | Brick + P-switch, then blow one up with TNT | Bricks→coins, revert after 10 s, and the revert must survive an explosion (§3.-4) |
+| 11 | ON/OFF switch + ON/OFF block | Off state renders inset and is walk-through |
+| 12 | `/planeshift coins 100`, Toad shop **at GUI Scale 4 in a small window** | All ten offers and Close must stay on screen (§3.-4) |
+| 13 | Fall below `kill_y` (-50) | Death and checkpoint respawn |
+| 14 | `/planeshift map`, `/planeshift leave` | Map screen, return to hub |
+
+Also worth judging by ear and eye: the audio is synthesised chiptune, and the textures are flat
+colours with 2-4 letter labels. Both are placeholders — the question is whether cues are audible
+and whether blocks are tellable apart, not whether they are pretty.
 
 ---
 
