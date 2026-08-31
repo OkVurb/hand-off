@@ -1,0 +1,9 @@
+{
+  "category": "offense",
+  "action": "fire_shot",
+  "max_charges": 20,
+  "cooldown_ticks": 8,
+  "action_power": 1.0,
+  "reserve_eligible": true,
+  "accent_color": 4294934528
+}

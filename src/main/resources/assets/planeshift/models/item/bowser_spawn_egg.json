@@ -1,0 +1,6 @@
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "planeshift:item/bowser_spawn_egg"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "category": "defense",
+  "action": "barrier",
+  "max_charges": 1,
+  "cooldown_ticks": 200,
+  "action_power": 0.0,
+  "reserve_eligible": false,
+  "accent_color": 4294967295
+}

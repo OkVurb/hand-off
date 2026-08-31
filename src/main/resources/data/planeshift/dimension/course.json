@@ -1,0 +1,16 @@
+{
+  "type": "planeshift:course",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:plains",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        { "block": "minecraft:bedrock", "height": 1 },
+        { "block": "minecraft:stone", "height": 5 }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

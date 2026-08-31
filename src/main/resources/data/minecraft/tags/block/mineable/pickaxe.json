@@ -1,0 +1,24 @@
+{
+  "replace": false,
+  "values": [
+    "planeshift:checkpoint_beacon",
+    "planeshift:spring_pad",
+    "planeshift:prize_cache",
+    "planeshift:question_block",
+    "planeshift:brick_block",
+    "planeshift:conveyor_belt",
+    "planeshift:note_block",
+    "planeshift:music_block",
+    "planeshift:on_off_block",
+    "planeshift:on_off_switch",
+    "planeshift:p_switch",
+    "planeshift:spike_block",
+    "planeshift:hidden_question_block",
+    "planeshift:flag_pole",
+    "planeshift:warp_pipe",
+    "planeshift:coin_block",
+    "planeshift:coin_ring_block",
+    "planeshift:secret_passage",
+    "planeshift:shift_gate"
+  ]
+}

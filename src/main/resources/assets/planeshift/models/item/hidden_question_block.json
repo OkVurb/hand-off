@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "planeshift:item/hidden_question_block"
+  }
+}

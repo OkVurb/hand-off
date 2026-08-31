@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "planeshift:block/hidden_question_block" }
+  }
+}

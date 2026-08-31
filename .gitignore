@@ -1,0 +1,25 @@
+# Gradle
+build
+.gradle
+out
+
+# IDE
+.idea
+*.iml
+*.ipr
+*.iws
+.vscode
+
+# MDG runs
+run
+run-data
+
+# Generated sources
+src/generated/resources
+
+# Temporary tooling
+tmp
+*.class
+
+# Windows
+*.log

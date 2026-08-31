@@ -1,0 +1,48 @@
+{
+  "music.course_2_5d": {
+    "category": "music",
+    "sounds": []
+  },
+  "music.course_3d": {
+    "category": "music",
+    "sounds": []
+  },
+  "music.hub": {
+    "category": "music",
+    "sounds": []
+  },
+  "music.combat": {
+    "category": "music",
+    "sounds": []
+  },
+  "sound.coin": {
+    "category": "player",
+    "sounds": []
+  },
+  "sound.power_up": {
+    "category": "player",
+    "sounds": []
+  },
+  "sound.brick_break": {
+    "category": "block",
+    "sounds": []
+  },
+  "sound.question_bump": {
+    "category": "block",
+    "sounds": []
+  },
+  "sound.stomp": {"category": "player", "sounds": []},
+  "sound.enemy_defeat": {"category": "player", "sounds": []},
+  "sound.fireball": {"category": "player", "sounds": []},
+  "sound.iceshot": {"category": "player", "sounds": []},
+  "sound.hammer_throw": {"category": "player", "sounds": []},
+  "sound.boomerang_throw": {"category": "player", "sounds": []},
+  "sound.game_over": {"category": "music", "sounds": []},
+  "sound.course_clear": {"category": "music", "sounds": []},
+  "sound.checkpoint": {"category": "block", "sounds": []},
+  "sound.damage": {"category": "player", "sounds": []},
+  "sound.1up": {"category": "player", "sounds": []},
+  "sound.spring": {"category": "block", "sounds": []},
+  "sound.warp": {"category": "block", "sounds": []},
+  "sound.bowser_roar": {"category": "hostile", "sounds": []}
+}

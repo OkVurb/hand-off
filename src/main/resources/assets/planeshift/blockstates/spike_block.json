@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "planeshift:block/spike_block" }
+  }
+}

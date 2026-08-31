@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "planeshift:conveyor_belt",
+    "planeshift:note_block",
+    "planeshift:music_block",
+    "planeshift:on_off_block",
+    "planeshift:on_off_switch",
+    "planeshift:p_switch",
+    "planeshift:spike_block",
+    "planeshift:warp_pipe"
+  ]
+}

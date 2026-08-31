@@ -1,0 +1,193 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.144'
+}
+
+version = mod_version
+group = mod_group_id
+base.archivesName = mod_id
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    // Include resources produced by `runClientData` in the built jar.
+    // Datagen output is checked in so a clean clone builds without running the game.
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+
+        // Client-dev: fast iteration world with the debug HUD and camera overlays available.
+        client {
+            client()
+        }
+
+        // Dedicated-server profile. Must load with zero net.minecraft.client resolution.
+        server {
+            server()
+            programArgument '--nogui'
+        }
+
+        // Isolated structures for movement state, Form lifecycle, packets, saves and course objects.
+        gameTestServer {
+            type = 'gameTestServer'
+        }
+
+        // Produces tags, models, loot, language stubs and validation reports.
+        clientData {
+            clientData()
+            programArguments.addAll '--mod', project.mod_id,
+                    '--all',
+                    '--output', file('src/generated/resources/').absolutePath,
+                    '--existing', file('src/main/resources/').absolutePath
+        }
+    }
+
+    mods {
+        "$mod_id" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    mavenCentral()
+    // Player Animation Library. Declared but NOT depended on: see docs/ANIMATION_ADAPTER.md.
+    // PAL has no 1.21.11 artifact yet, so PlaneShift ships a built-in fallback pose driver.
+    maven {
+        name = 'KosmX'
+        url = 'https://maven.kosmx.dev/'
+        content { includeGroupByRegex 'dev\\.kosmx.*' }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    // No third-party runtime dependencies. See docs/DEPENDENCY_POLICY.md.
+    // Sodium / Lithium / Iris are compatibility *test targets* installed into a run
+    // profile by hand -- never compile or runtime dependencies of this mod.
+}
+
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+            mod_issue_url          : mod_issue_url
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+    options.compilerArgs << '-Xlint:all,-processing,-serial' << '-parameters'
+}
+
+/*
+ * Design Bible, "Repository and module layout":
+ *   "A dedicated server must load the mod without resolving any net.minecraft.client
+ *    class. Enforce this in CI."
+ *
+ * Scans compiled class constant pools for client-only references originating from
+ * packages that are not client-side by contract.
+ */
+tasks.register('checkClientClassLeak') {
+    group = 'verification'
+    description = 'Fails if a common/server class references net.minecraft.client.'
+    dependsOn tasks.named('classes')
+
+    // Packages that are permitted to touch client classes.
+    def allowedPrefixes = [
+            'com/studio/planeshift/client/',
+            'com/studio/planeshift/datagen/'
+    ]
+    def classesDir = layout.buildDirectory.dir('classes/java/main')
+    inputs.dir(classesDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/client-leak.txt'))
+
+    doLast {
+        def root = classesDir.get().asFile
+        if (!root.exists()) return
+        def offenders = []
+
+        root.eachFileRecurse { f ->
+            if (!f.name.endsWith('.class')) return
+            def rel = root.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+            if (allowedPrefixes.any { rel.startsWith(it) }) return
+            // ISO-8859-1 maps bytes 1:1, so this is an exact search over the constant pool.
+            def text = new String(f.bytes, java.nio.charset.StandardCharsets.ISO_8859_1)
+            if (text.contains('net/minecraft/client')) {
+                offenders << rel
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/client-leak.txt'))
+        report.parentFile.mkdirs()
+        report.text = offenders.isEmpty()
+                ? "OK: no client class references outside ${allowedPrefixes}\n"
+                : "LEAKED:\n" + offenders.join('\n') + '\n'
+
+        if (!offenders.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    "Dedicated-server safety violated. These classes reference net.minecraft.client " +
+                            "but are not in a client-only package:\n  " + offenders.join('\n  ') +
+                            "\nMove the code into com.studio.planeshift.client, or gate it behind a " +
+                            "FMLEnvironment.dist check in a separate client class.")
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkClientClassLeak' }
+
+tasks.named('jar', Jar) {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_name,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : mod_name,
+                'Implementation-Version'  : mod_version,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) { from components.java }
+    }
+    repositories {
+        maven { url = "file://${project.projectDir}/repo" }
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}

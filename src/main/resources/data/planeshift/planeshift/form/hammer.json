@@ -1,0 +1,9 @@
+{
+  "category": "offense",
+  "action": "hammer_throw",
+  "max_charges": 15,
+  "cooldown_ticks": 12,
+  "action_power": 1.2,
+  "reserve_eligible": true,
+  "accent_color": 4294947328
+}

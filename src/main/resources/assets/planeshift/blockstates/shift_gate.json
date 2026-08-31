@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,target=side_on": { "model": "planeshift:block/shift_gate" },
+    "facing=east,target=side_on": { "model": "planeshift:block/shift_gate", "y": 90 },
+    "facing=south,target=side_on": { "model": "planeshift:block/shift_gate", "y": 180 },
+    "facing=west,target=side_on": { "model": "planeshift:block/shift_gate", "y": 270 },
+    "facing=north,target=free_3d": { "model": "planeshift:block/shift_gate" },
+    "facing=east,target=free_3d": { "model": "planeshift:block/shift_gate", "y": 90 },
+    "facing=south,target=free_3d": { "model": "planeshift:block/shift_gate", "y": 180 },
+    "facing=west,target=free_3d": { "model": "planeshift:block/shift_gate", "y": 270 }
+  }
+}

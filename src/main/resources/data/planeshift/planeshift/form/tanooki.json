@@ -1,0 +1,9 @@
+{
+  "category": "offense",
+  "action": "tail_whack",
+  "max_charges": 30,
+  "cooldown_ticks": 6,
+  "action_power": 1.0,
+  "reserve_eligible": true,
+  "accent_color": 4294097152
+}

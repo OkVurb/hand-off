@@ -1,0 +1,8 @@
+{
+  "mode": "free_3d",
+  "fov_degrees": 70.0,
+  "distance": 9.0,
+  "pitch_degrees": 35.0,
+  "look_ahead": 0.0,
+  "damping": 0.25
+}

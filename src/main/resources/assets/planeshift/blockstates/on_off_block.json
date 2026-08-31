@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "on=false": { "model": "planeshift:block/on_off_block" },
+    "on=true": { "model": "planeshift:block/on_off_block" }
+  }
+}

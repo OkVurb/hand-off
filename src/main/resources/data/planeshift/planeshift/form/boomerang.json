@@ -1,0 +1,9 @@
+{
+  "category": "offense",
+  "action": "boomerang_throw",
+  "max_charges": 10,
+  "cooldown_ticks": 12,
+  "action_power": 1.0,
+  "reserve_eligible": true,
+  "accent_color": 4294953216
+}

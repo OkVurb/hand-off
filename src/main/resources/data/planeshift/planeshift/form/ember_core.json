@@ -1,0 +1,9 @@
+{
+  "category": "offense",
+  "action": "ember_shot",
+  "max_charges": 2,
+  "cooldown_ticks": 20,
+  "action_power": 1.0,
+  "reserve_eligible": true,
+  "accent_color": 4294942720
+}

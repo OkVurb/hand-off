@@ -1,0 +1,9 @@
+{
+  "category": "utility",
+  "action": "magnet_pulse",
+  "max_charges": 3,
+  "cooldown_ticks": 40,
+  "action_power": 0.0,
+  "reserve_eligible": true,
+  "accent_color": 4294967295
+}

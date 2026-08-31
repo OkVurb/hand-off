@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "planeshift:item/bullet_bill_spawn_egg"
+  }
+}

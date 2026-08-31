@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "coins=0": { "model": "planeshift:block/brick_block" },
+    "coins=1": { "model": "planeshift:block/coin_block" },
+    "coins=2": { "model": "planeshift:block/coin_block" },
+    "coins=3": { "model": "planeshift:block/coin_block" },
+    "coins=4": { "model": "planeshift:block/coin_block" },
+    "coins=5": { "model": "planeshift:block/coin_block" }
+  }
+}

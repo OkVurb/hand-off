@@ -1,0 +1,9 @@
+{
+  "category": "traversal",
+  "action": "gale_dash",
+  "max_charges": 1,
+  "cooldown_ticks": 10,
+  "action_power": 0.9,
+  "reserve_eligible": true,
+  "accent_color": 4278255615
+}

@@ -1,0 +1,8 @@
+{
+  "run_multiplier": 0.95,
+  "jump_multiplier": 1.12,
+  "traction_multiplier": 0.95,
+  "signature": "sky_arc",
+  "float_ticks": 0,
+  "accent_color": 4294967295
+}

@@ -1,0 +1,9 @@
+{
+  "category": "traversal",
+  "action": "acorn_glide",
+  "max_charges": 20,
+  "cooldown_ticks": 8,
+  "action_power": 1.1,
+  "reserve_eligible": true,
+  "accent_color": 4294942464
+}

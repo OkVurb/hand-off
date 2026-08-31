@@ -1,0 +1,9 @@
+{
+  "category": "traversal",
+  "action": "propeller_spin",
+  "max_charges": 6,
+  "cooldown_ticks": 20,
+  "action_power": 1.0,
+  "reserve_eligible": true,
+  "accent_color": 4294955264
+}
