@@ -4,7 +4,11 @@
 Act as an ultra-concise assistant. Provide only direct, high-value answers with no filler, pleasantries, or repeating of my prompt back to me. Keep responses short and punchy. If you need more context to complete the task, ask a single clarifying question rather than guessing. This saves token usage and credits.
 
 ## Continuation prompt
-When continuing this project in a fresh session, read **CODEX.md** (ChatGPT/Codex) or **NEXT_SESSION_PROMPT.md** first. They contain the full copy-paste prompt, build invariants, remaining work, and the jar/cache locations.
+When continuing this project in a fresh session, read **PROGRESS.md** first (where the last session stopped), then read the prompt file for your tool:
+- **Claude** (Claude.ai, Claude Code, Claude in Antigravity): `CLAUDE.md`
+- **ChatGPT/Codex**: `CODEX.md`
+- **Google Antigravity** (Gemini, Claude, GPT-OSS): `AGENTS.md` (this file) — Antigravity auto-reads it
+- **Any other agent**: `NEXT_SESSION_PROMPT.md`
 
 ## Project
 - Minecraft mod built from the NeoForge 1.21.11 MDK (NeoForge 21.11.45, MDG 2.0.144, Java 21).
@@ -89,8 +93,11 @@ Loaded from `data/planeshift/planeshift/<registry>/`:
 ## Handoff Files
 - `README.md` — quick project overview and build instructions.
 - `HANDOFF.md` — full continuation handoff with current state, recent changes, known issues, and file inventory.
+- `PROGRESS.md` — **READ THIS FIRST** every session. Where the last session stopped. Update before ending.
+- `CLAUDE.md` — copy-paste prompt for Claude sessions (Claude.ai, Claude Code, Claude in Antigravity).
+- `CODEX.md` — copy-paste prompt for ChatGPT/Codex sessions.
+- `NEXT_SESSION_PROMPT.md` — generic copy-paste prompt for any agent.
 - `MCP_TOOLS.md` — auto-generated registry of all available MCP tools.
-- `NEXT_SESSION_PROMPT.md` — copy-paste prompt for the next Claude/Devin session.
 
 ## Notes
 - The `plumberplatformer` project at `C:\Users\cr0od\OneDrive\Documents\Minecraft Mod` is a separate mod and should not be mixed with PlaneShift.
