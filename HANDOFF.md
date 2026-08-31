@@ -1,8 +1,8 @@
 ﻿# PlaneShift — Continuation Handoff
 
 **Project root:** `C:\Dev\PlaneShift`  
-**Date:** 2026-08-30  
-**Status:** `BUILD SUCCESSFUL` — `compileJava`, `checkClientClassLeak`, and `build` all pass.
+**Date:** 2026-08-31  
+**Status:** `BUILD SUCCESSFUL` — `compileJava`, `test` (31 cases), `checkClientClassLeak`, `checkNoRawCuboidScan`, `checkSoundAssets`, and `build` all pass.
 
 This document is a complete handoff for the PlaneShift NeoForge 1.21.11 mod. It contains the current state, what was just changed, how to build it, the full source/resource inventory, and the remaining known issues. Use it to continue work from another session or tool.
 
@@ -26,13 +26,21 @@ Run from `C:\Dev\PlaneShift`:
 
 - Full build: `.\gradlew build`
 - Fast compile: `.\gradlew compileJava`
+- Unit tests: `.\gradlew test`
 - Client class leak check: `.\gradlew checkClientClassLeak`
+- Raw cuboid scan check: `.\gradlew checkNoRawCuboidScan`
+- Sound asset check: `.\gradlew checkSoundAssets`
+
+All `check*` tasks and `test` are wired into `check`, so `.\gradlew build` runs them.
 
 Current results:
 
 ```
-> Task :compileJava — 9 this-escape warnings only, no errors.
+> Task :compileJava — this-escape warnings only, no errors.
 > Task :checkClientClassLeak — PASSED
+> Task :checkNoRawCuboidScan — PASSED
+> Task :checkSoundAssets — PASSED (22 events, all backed by an OGG)
+> Task :test — PASSED (31 cases)
 > Task :build — BUILD SUCCESSFUL
 ```
 
@@ -41,6 +49,129 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 ---
 
 ## 3. What Was Just Done
+
+### 3.-2 Session 2026-08-31 — sound assets (P0, resolved)
+
+All 22 registered sound events now ship with real audio. Previously `sounds.json` held empty
+arrays and `assets/planeshift/sounds/` did not exist, so every cue was a silent no-op that
+failed nothing.
+
+**New:** `tools/SoundGen.java` — a standalone generator (not compiled into the mod; the build
+only sources `src/main/java`). It synthesises all 22 sounds from pulse / NES-stepped triangle /
+LFSR noise / saw oscillators with envelopes, pitch sweeps and vibrato, plus a small step
+sequencer for the four music tracks.
+
+- **Everything is original.** Nothing is sampled from or transcribed from an existing recording
+  or composition. The melodies and effect gestures were written for this project; the NES
+  four-voice palette is a synthesis technique, not borrowed content. See `ASSET_LICENSES.md`.
+- **Reproducible:** re-running the generator reproduces the same audio. `tools/README.md` has
+  the regeneration and encoding commands.
+- **SFX are mono, music is stereo.** Minecraft only attenuates and positions mono sources, so a
+  stereo SFX would play at full volume everywhere in the world. The four music tracks go through
+  `SimpleSoundInstance.forMusic`, which is non-positional, so stereo is free there.
+- Music entries carry `"stream": true` (they run 23-37 s each).
+- 18 SFX + 4 music tracks, ~1.8 MB of OGG Vorbis total, all verified present in the built jar.
+
+Also added `subtitles.planeshift.*` keys in `en_us.json` and wired them into `sounds.json`, so
+the cues caption correctly for players using subtitles.
+
+**New build check:** `checkSoundAssets`. Parses the `register(...)` calls out of `ModSounds`
+and fails if any registered event is missing from `sounds.json`, has an empty `sounds` array,
+names an OGG that does not exist or is zero-length, or declares a subtitle key absent from
+`en_us.json`. It also flags `sounds.json` entries that no longer match a registered event.
+Wired into `check`. Verified non-vacuous: deleting one OGG, emptying one `sounds` array and
+corrupting one subtitle key produced exactly those three failures, and restoring them passed.
+
+Requires `ffmpeg` with `libvorbis` to regenerate (installed via `winget install Gyan.FFmpeg`).
+
+### 3.-1 Session 2026-08-31 — client movement refactor (P1, resolved)
+
+`PlaneConstrainedInput` no longer mutates `LocalPlayer` at all. It is now purely an input
+projection, which is what its name always claimed.
+
+**The key change** is in `PlaneConstrainedInput.railProjection(playerYaw, travelYaw)`.
+`moveVector` is interpreted *relative to the player's own yaw* — `Entity#getInputVector` rotates
+it by `getYRot()` before adding it to velocity — so the old approach of forcing
+`setYRot(travelYaw)` and pushing a constant `(0, 1)` was really just a way of making that
+rotation the identity. Cancelling the yaw arithmetically instead gives identical world-space
+motion with no writes to the player:
+
+```
+delta      = playerYaw - travelYaw
+moveVector = (sin delta, cos delta)
+```
+
+Substituting into the engine's rotation collapses to `(-sin travelYaw, cos travelYaw)` — the
+unit vector along the rail, independent of where the player looks.
+
+**Side benefit:** the look direction is now free. `ClientEvents` sends `player.getLookAngle()`
+in `FormActionPayload`, so previously you could only ever aim a Form action along the rail.
+
+**New:** `client/input/PlaneMovementAssists.java` holds coyote time, jump buffering and the
+Glider float — the parts that genuinely must change velocity. They now run from
+`MovementInputUpdateEvent`, which NeoForge fires inside `LocalPlayer#aiStep` right after
+`input.tick()` and before the tick's movement is applied. That is the correct point for them,
+and it keeps velocity changes out of an `Input` implementation.
+
+- Fixed a real bug moved across in the process: the Glider float read a *stale* velocity that
+  the coyote branch may have just replaced, so a coyote jump by a Glider was immediately
+  cancelled back to `-0.06` on the same tick. The float now re-reads, and skips entirely on a
+  tick where coyote fired.
+- Assist state is static now, so `ClientEvents.installInput` calls `PlaneMovementAssists.reset()`
+  to stop a half-spent coyote or float budget carrying across a respawn.
+- Avatar facing moved to `tickBodyFacing`, called from `ClientTickEvent.Post` (after entities
+  tick, so `LivingEntity#tickHeadTurn` cannot drag it back within the same tick). It writes
+  `yBodyRot`/`yBodyRotO` — presentation only — not `yRot`.
+
+**New: the project now has unit tests.** `build.gradle` enables MDG's `neoForge.unitTest` with
+JUnit 5, and `src/test/java/.../PlaneConstrainedInputTest.java` covers the projection geometry.
+The tests re-implement `Entity#getInputVector` exactly as the engine applies it and assert on
+the resulting **world-space** direction, so they verify the projection survives the engine's own
+rotation rather than just checking the raw numbers. 31 cases, all passing. Verified non-vacuous:
+flipping the sign on the sine term failed 12 of them.
+
+Run with `.\gradlew test`; `build` runs them.
+
+### 3.0 Session 2026-08-31 — block scan optimization (P1)
+
+Fixed the "brute-force block scans" P1 issue.
+
+**New:** `src/main/java/com/studio/planeshift/common/block/BlockAreaScan.java`
+
+`BlockAreaScan.findMatching(level, center, radiusXZ, radiusY, predicate)` replaces
+`BlockPos.betweenClosed(...)` + a `Level.getBlockState` per position. It walks loaded chunk
+sections and uses `LevelChunkSection.maybeHas(Predicate<BlockState>)` to reject a whole
+4096-block section from its palette in one call, so the per-block loop only runs in sections
+that could actually contain a match. `maybeHas` is conservative — a global-palette section
+always answers yes — so it can cost a wasted section scan but never misses a block.
+
+- Chunks are fetched with `level.getChunk(cx, cz, ChunkStatus.FULL, false)`, so unloaded chunks
+  are skipped and terrain is never generated to satisfy a search. This replaces the old
+  per-position `level.isLoaded(target)` guard.
+- Y is clamped to `level.getMinY()` / `level.getMaxY()`.
+- Matches are **collected and returned**, not passed to a callback. Both callers mutate the
+  blocks they find, and writing into a section while iterating its palette is exactly the
+  aliasing this avoids. Returned positions are already immutable.
+
+**Changed:**
+- `OnOffSwitchBlock.toggle` — was 49x17x49 = ~40.8k `getBlockState` calls per toggle. The
+  predicate now also filters on `OnOffBlock.ON != next`, so sections holding only
+  already-correct ON/OFF blocks are rejected too.
+- `PSwitchBlock.activate` — was 49x25x49 = ~60k `getBlockState` calls per activation. Now
+  collects the brick positions first, then converts them.
+
+Behaviour is unchanged: neither operation creates new blocks of the type being searched for, so
+collect-then-write is equivalent to the old interleaved read/write.
+
+**New build check:** `checkNoRawCuboidScan` in `build.gradle`, modelled on `checkClientClassLeak`.
+It scans compiled constant pools and fails if any class other than `BlockAreaScan` references both
+`net/minecraft/core/BlockPos` and `betweenClosed`/`betweenClosedStream`. Wired into `check`, so
+`.\gradlew build` enforces it. Verified non-vacuous: reintroducing a `BlockPos.betweenClosed` loop
+in a throwaway class made the task fail with the offending class name, and removing it made it
+pass again. Report is written to `build/reports/planeshift/raw-cuboid-scan.txt`.
+
+If a future course feature legitimately needs raw cuboid iteration, add the class to the
+`allowedClasses` list in the task rather than deleting the check.
 
 ### 3.1 Event-bus split / client registration
 - Split `ClientEvents` into game-bus only and `ClientModEvents` for mod-bus registration.
@@ -89,13 +220,16 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 ## 4. Known Remaining Issues
 
 ### P0 — Critical
-- **Sound events are empty.** `assets/planeshift/sounds.json` lists sounds with empty arrays and there are no `.ogg` files in `assets/planeshift/sounds/`. All audio is currently silent.
+*(None outstanding.)*
 
 ### P1 — High
 - **GUI overflow on small screens.** `ToadShopScreen` uses a fixed layout that can fall off the bottom. `CourseHud` uses a fixed panel and pips may overflow.
-- **Client-side player mutation.** `PlaneConstrainedInput` directly mutates `LocalPlayer` motion/rotation, which will be overwritten by the server and may rubber-band.
-- **Brute-force block scans.** `OnOffSwitchBlock` and `PSwitchBlock` scan large `BlockPos` ranges every activation. This can stall the server tick in large courses.
 - **Projectile-only entity textures missing.** Some projectiles have no dedicated textures.
+
+**Resolved 2026-08-31:**
+- ~~Sound events are empty~~ (P0) — 22 original OGGs now ship, see §3.-2.
+- ~~Client-side player mutation in `PlaneConstrainedInput`~~ — see §3.-1.
+- ~~Brute-force block scans in `OnOffSwitchBlock` / `PSwitchBlock`~~ — see §3.0.
 
 ### P2 — Medium
 - **Mob effect icons missing.** `assets/planeshift/textures/mob_effect/*.png` are absent for the mod effects.
@@ -106,8 +240,9 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 
 ### Warnings
 - `this-escape` warnings in constructors.
-- No tests exist.
-- Git is not initialized in this workspace.
+- Test coverage is thin: JUnit 5 is now wired up (`src/test/java`) but only the 2.5D input
+  projection geometry is covered. Everything else is guarded by the `check*` build tasks.
+- Git has a repo but no remote configured; commits are local only.
 
 ---
 
@@ -145,6 +280,12 @@ C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\client\render\PlaceholderR
 C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\client\render\ToadRenderer.java
 C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\client\screen\CourseMapScreen.java
 C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\client\screen\ToadShopScreen.java
+C:\Dev\PlaneShift\tools\SoundGen.java                       (asset generator, not compiled into the mod)
+C:\Dev\PlaneShift\tools\README.md
+C:\Dev\PlaneShift\src\test\java\com\studio\planeshift\client\input\PlaneConstrainedInputTest.java
+C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\client\input\PlaneMovementAssists.java
+C:\Dev\PlaneShift\src\main\resources\assets\planeshift\sounds\  (22 OGG files, see tools/README.md)
+C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\common\block\BlockAreaScan.java
 C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\common\block\BrickBlock.java
 C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\common\block\CheckpointBeaconBlock.java
 C:\Dev\PlaneShift\src\main\java\com\studio\planeshift\common\block\CoinBlock.java
@@ -498,8 +639,9 @@ C:\Dev\PlaneShift\src\main\resources\pack.mcmeta
 
 ## 8. Next Actions (Suggested)
 
-1. Generate or source the missing sound files and update `sounds.json`.
+1. ~~Generate the missing sound files~~ — done 2026-08-31, see section 3.-2. Regenerate via `tools/README.md`.
 2. Add mob effect textures in `assets/planeshift/textures/mob_effect/`.
-3. Improve `PlaneConstrainedInput` so it only modifies `Input`/`moveVector` and does not set `LocalPlayer` motion directly.
-4. Optimize `OnOffSwitchBlock` and `PSwitchBlock` scans with chunk or tag-based lookups.
+3. ~~Improve `PlaneConstrainedInput`~~ — done 2026-08-31, see section 3.-1.
+4. ~~Optimize `OnOffSwitchBlock` and `PSwitchBlock` scans~~ — done 2026-08-31, see §3.0.
 5. Play-test the course flow: start, checkpoint, respawn, complete, leave, Toad shop.
+6. Reuse `BlockAreaScan` if any new course block needs an area search — the `checkNoRawCuboidScan` build check will reject a raw cuboid loop.

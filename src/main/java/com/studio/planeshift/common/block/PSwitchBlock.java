@@ -2,7 +2,6 @@ package com.studio.planeshift.common.block;
 
 import com.mojang.serialization.MapCodec;
 import com.studio.planeshift.common.registry.ModBlocks;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -97,17 +96,10 @@ public class PSwitchBlock extends Block implements HitFromBelowBlock {
 
         // Remember exactly which bricks we converted so the effect can be undone. Without
         // this the "short duration" swap would be permanent.
-        List<BlockPos> converted = new ArrayList<>();
-        BlockPos min = pos.offset(-RADIUS_XZ, -RADIUS_Y, -RADIUS_XZ);
-        BlockPos max = pos.offset(RADIUS_XZ, RADIUS_Y, RADIUS_XZ);
-        for (BlockPos target : BlockPos.betweenClosed(min, max)) {
-            if (!level.isLoaded(target)) {
-                continue;
-            }
-            if (level.getBlockState(target).getBlock() instanceof BrickBlock) {
-                level.setBlock(target, ModBlocks.COIN_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
-                converted.add(target.immutable());
-            }
+        List<BlockPos> converted = BlockAreaScan.findMatching(level, pos, RADIUS_XZ, RADIUS_Y,
+                target -> target.getBlock() instanceof BrickBlock);
+        for (BlockPos target : converted) {
+            level.setBlock(target, ModBlocks.COIN_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
         }
         if (!converted.isEmpty()) {
             CONVERTED.put(GlobalPos.of(level.dimension(), pos.immutable()), converted);

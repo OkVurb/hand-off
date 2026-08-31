@@ -12,9 +12,8 @@ import net.minecraft.sounds.SoundEvent;
 /**
  * Client-side adaptive music (Design Bible, "Music and audio").
  *
- * <p>Tracks are chosen from the current {@link CourseState} and randomized. The mod
- * only provides the plumbing; the actual OGG files are supplied by the player via
- * resource pack. Without sounds, the manager is silent but still functional.
+ * <p>Tracks are chosen from the current {@link CourseState}. The four looping OGGs ship
+ * with the mod (see {@code tools/README.md}); a resource pack can override any of them.
  */
 public final class CourseMusicManager {
 

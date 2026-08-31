@@ -1,48 +1,108 @@
 {
   "music.course_2_5d": {
     "category": "music",
-    "sounds": []
+    "sounds": [{ "name": "planeshift:music_course_2_5d", "stream": true }]
   },
   "music.course_3d": {
     "category": "music",
-    "sounds": []
+    "sounds": [{ "name": "planeshift:music_course_3d", "stream": true }]
   },
   "music.hub": {
     "category": "music",
-    "sounds": []
+    "sounds": [{ "name": "planeshift:music_hub", "stream": true }]
   },
   "music.combat": {
     "category": "music",
-    "sounds": []
+    "sounds": [{ "name": "planeshift:music_combat", "stream": true }]
   },
   "sound.coin": {
     "category": "player",
-    "sounds": []
+    "subtitle": "subtitles.planeshift.coin",
+    "sounds": ["planeshift:coin"]
   },
   "sound.power_up": {
     "category": "player",
-    "sounds": []
+    "subtitle": "subtitles.planeshift.power_up",
+    "sounds": ["planeshift:power_up"]
   },
   "sound.brick_break": {
     "category": "block",
-    "sounds": []
+    "subtitle": "subtitles.planeshift.brick_break",
+    "sounds": ["planeshift:brick_break"]
   },
   "sound.question_bump": {
     "category": "block",
-    "sounds": []
+    "subtitle": "subtitles.planeshift.question_bump",
+    "sounds": ["planeshift:question_bump"]
   },
-  "sound.stomp": {"category": "player", "sounds": []},
-  "sound.enemy_defeat": {"category": "player", "sounds": []},
-  "sound.fireball": {"category": "player", "sounds": []},
-  "sound.iceshot": {"category": "player", "sounds": []},
-  "sound.hammer_throw": {"category": "player", "sounds": []},
-  "sound.boomerang_throw": {"category": "player", "sounds": []},
-  "sound.game_over": {"category": "music", "sounds": []},
-  "sound.course_clear": {"category": "music", "sounds": []},
-  "sound.checkpoint": {"category": "block", "sounds": []},
-  "sound.damage": {"category": "player", "sounds": []},
-  "sound.1up": {"category": "player", "sounds": []},
-  "sound.spring": {"category": "block", "sounds": []},
-  "sound.warp": {"category": "block", "sounds": []},
-  "sound.bowser_roar": {"category": "hostile", "sounds": []}
+  "sound.stomp": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.stomp",
+    "sounds": ["planeshift:stomp"]
+  },
+  "sound.enemy_defeat": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.enemy_defeat",
+    "sounds": ["planeshift:enemy_defeat"]
+  },
+  "sound.fireball": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.fireball",
+    "sounds": ["planeshift:fireball"]
+  },
+  "sound.iceshot": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.iceshot",
+    "sounds": ["planeshift:iceshot"]
+  },
+  "sound.hammer_throw": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.hammer_throw",
+    "sounds": ["planeshift:hammer_throw"]
+  },
+  "sound.boomerang_throw": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.boomerang_throw",
+    "sounds": ["planeshift:boomerang_throw"]
+  },
+  "sound.game_over": {
+    "category": "music",
+    "subtitle": "subtitles.planeshift.game_over",
+    "sounds": ["planeshift:game_over"]
+  },
+  "sound.course_clear": {
+    "category": "music",
+    "subtitle": "subtitles.planeshift.course_clear",
+    "sounds": ["planeshift:course_clear"]
+  },
+  "sound.checkpoint": {
+    "category": "block",
+    "subtitle": "subtitles.planeshift.checkpoint",
+    "sounds": ["planeshift:checkpoint"]
+  },
+  "sound.damage": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.damage",
+    "sounds": ["planeshift:damage"]
+  },
+  "sound.1up": {
+    "category": "player",
+    "subtitle": "subtitles.planeshift.1up",
+    "sounds": ["planeshift:1up"]
+  },
+  "sound.spring": {
+    "category": "block",
+    "subtitle": "subtitles.planeshift.spring",
+    "sounds": ["planeshift:spring"]
+  },
+  "sound.warp": {
+    "category": "block",
+    "subtitle": "subtitles.planeshift.warp",
+    "sounds": ["planeshift:warp"]
+  },
+  "sound.bowser_roar": {
+    "category": "hostile",
+    "subtitle": "subtitles.planeshift.bowser_roar",
+    "sounds": ["planeshift:bowser_roar"]
+  }
 }

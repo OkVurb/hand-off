@@ -3,6 +3,7 @@ package com.studio.planeshift.client;
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.client.camera.CameraDirector;
 import com.studio.planeshift.client.input.PlaneConstrainedInput;
+import com.studio.planeshift.client.input.PlaneMovementAssists;
 import com.studio.planeshift.client.music.CourseMusicManager;
 import com.studio.planeshift.common.network.FormActionPayload;
 import com.studio.planeshift.common.network.ReserveSwapPayload;
@@ -15,6 +16,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -49,6 +51,9 @@ public final class ClientEvents {
             while (PlaneShiftKeybinds.SWAP_RESERVE.consumeClick()) {
                 ClientPacketDistributor.sendToServer(ReserveSwapPayload.INSTANCE);
             }
+
+            // After the entities have ticked, so tickHeadTurn does not undo it this frame.
+            PlaneMovementAssists.tickBodyFacing(player);
         }
 
         CameraDirector.tickCameraType();
@@ -70,6 +75,17 @@ public final class ClientEvents {
         CameraDirector.onCameraDistance(event);
     }
 
+    /**
+     * Fired inside {@code LocalPlayer#aiStep} right after the input is projected and before the
+     * movement for the tick is applied — the correct point for the coyote/float assists.
+     */
+    @SubscribeEvent
+    public static void onMovementInputUpdate(MovementInputUpdateEvent event) {
+        if (event.getEntity() instanceof LocalPlayer player) {
+            PlaneMovementAssists.tick(player);
+        }
+    }
+
     @SubscribeEvent
     public static void onPlayerLogin(ClientPlayerNetworkEvent.LoggingIn event) {
         installInput(event.getPlayer());
@@ -84,6 +100,9 @@ public final class ClientEvents {
         if (player != null) {
             Minecraft minecraft = Minecraft.getInstance();
             player.input = new PlaneConstrainedInput(minecraft.options);
+            // The assists hold their budgets statically now, so a respawn or dimension change
+            // must not carry a half-spent coyote or float window across.
+            PlaneMovementAssists.reset();
         }
     }
 }

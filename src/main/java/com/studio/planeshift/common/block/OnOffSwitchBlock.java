@@ -1,6 +1,7 @@
 package com.studio.planeshift.common.block;
 
 import com.mojang.serialization.MapCodec;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -25,7 +26,8 @@ public class OnOffSwitchBlock extends Block implements HitFromBelowBlock {
 
     /**
      * Search box for linked ON/OFF blocks. Kept deliberately flat: a symmetric ±48 cube
-     * is ~912k block lookups per toggle, which stalls the server tick noticeably.
+     * covers ~912k blocks, and even a palette-skipping scan has to walk every section it
+     * cannot reject. See {@link BlockAreaScan} for how the box is searched.
      */
     private static final int RANGE_XZ = 24;
     private static final int RANGE_Y = 8;
@@ -72,15 +74,13 @@ public class OnOffSwitchBlock extends Block implements HitFromBelowBlock {
         level.setBlock(pos, state.setValue(POWERED, next), Block.UPDATE_ALL);
         level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.8F, next ? 1.2F : 0.8F);
 
-        BlockPos min = pos.offset(-RANGE_XZ, -RANGE_Y, -RANGE_XZ);
-        BlockPos max = pos.offset(RANGE_XZ, RANGE_Y, RANGE_XZ);
-        for (BlockPos target : BlockPos.betweenClosed(min, max)) {
-            if (!level.isLoaded(target)) {
-                continue;
-            }
+        // Only the blocks that actually need flipping, so the palette filter can reject whole
+        // sections that hold no ON/OFF block in the wrong state.
+        List<BlockPos> targets = BlockAreaScan.findMatching(level, pos, RANGE_XZ, RANGE_Y,
+                target -> target.getBlock() instanceof OnOffBlock && target.getValue(OnOffBlock.ON) != next);
+        for (BlockPos target : targets) {
             BlockState targetState = level.getBlockState(target);
-            if (targetState.getBlock() instanceof OnOffBlock onOff
-                    && targetState.getValue(OnOffBlock.ON) != next) {
+            if (targetState.getBlock() instanceof OnOffBlock onOff) {
                 onOff.setState(level, target, next);
             }
         }

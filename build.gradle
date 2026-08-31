@@ -162,6 +162,158 @@ tasks.register('checkClientClassLeak') {
 
 tasks.named('check') { dependsOn 'checkClientClassLeak' }
 
+/*
+ * Guards the P-switch / ON-OFF-switch tick regression.
+ *
+ * `BlockPos.betweenClosed` over a course-sized box plus a `Level.getBlockState` per position is
+ * ~60k chunk+section+palette lookups on a single block activation, which is measurable in the
+ * server tick. `BlockAreaScan` does the same search per chunk section and rejects whole sections
+ * from the palette, so it is the only place allowed to iterate a raw cuboid.
+ */
+tasks.register('checkNoRawCuboidScan') {
+    group = 'verification'
+    description = 'Fails if a class other than BlockAreaScan iterates a raw BlockPos cuboid.'
+    dependsOn tasks.named('classes')
+
+    // The scan helper is the sanctioned home for whole-box iteration.
+    def allowedClasses = [
+            'com/studio/planeshift/common/block/BlockAreaScan.class'
+    ]
+    def bannedMethods = ['betweenClosed', 'betweenClosedStream']
+    def classesDir = layout.buildDirectory.dir('classes/java/main')
+    inputs.dir(classesDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/raw-cuboid-scan.txt'))
+
+    doLast {
+        def root = classesDir.get().asFile
+        if (!root.exists()) return
+        def offenders = []
+
+        root.eachFileRecurse { f ->
+            if (!f.name.endsWith('.class')) return
+            def rel = root.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+            if (allowedClasses.contains(rel)) return
+            // ISO-8859-1 maps bytes 1:1, so this is an exact search over the constant pool.
+            def text = new String(f.bytes, java.nio.charset.StandardCharsets.ISO_8859_1)
+            if (!text.contains('net/minecraft/core/BlockPos')) return
+            def hit = bannedMethods.find { text.contains(it) }
+            if (hit != null) {
+                offenders << "${rel} (${hit})".toString()
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/raw-cuboid-scan.txt'))
+        report.parentFile.mkdirs()
+        report.text = offenders.isEmpty()
+                ? "OK: no raw BlockPos cuboid iteration outside ${allowedClasses}\n"
+                : "RAW SCAN:\n" + offenders.join('\n') + '\n'
+
+        if (!offenders.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    "Raw BlockPos cuboid iteration found outside BlockAreaScan:\n  " + offenders.join('\n  ') +
+                            "\nUse com.studio.planeshift.common.block.BlockAreaScan#findMatching, which skips " +
+                            "unloaded chunks and rejects non-matching chunk sections from the palette instead of " +
+                            "doing a Level.getBlockState lookup per block.")
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkNoRawCuboidScan' }
+
+/*
+ * Design Bible, "Music and audio". The mod previously registered 22 sound events against a
+ * sounds.json of empty arrays with no OGG files on disk, so every cue was silently a no-op:
+ * nothing failed, nothing played. This makes that state a build failure instead.
+ *
+ * Checks, for every event registered in ModSounds:
+ *   - sounds.json declares it
+ *   - its "sounds" array is non-empty
+ *   - every file it names exists under assets/planeshift/sounds/
+ *   - its subtitle key, if declared, is present in en_us.json
+ * and flags sounds.json entries that no longer correspond to a registered event.
+ */
+tasks.register('checkSoundAssets') {
+    group = 'verification'
+    description = 'Fails if a registered sound event has no playable OGG behind it.'
+
+    def modSources = file('src/main/java/com/studio/planeshift/common/registry/ModSounds.java')
+    def soundsJson = file('src/main/resources/assets/planeshift/sounds.json')
+    def langJson = file('src/main/resources/assets/planeshift/lang/en_us.json')
+    def soundsDir = file('src/main/resources/assets/planeshift/sounds')
+
+    inputs.file(modSources)
+    inputs.file(soundsJson)
+    inputs.file(langJson)
+    inputs.dir(soundsDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/sound-assets.txt'))
+
+    doLast {
+        def problems = []
+
+        // register("sound.coin") -> sound.coin
+        def registered = (modSources.text =~ /register\(\s*"([^"]+)"\s*\)/)
+                .collect { it[1] } as Set
+
+        def declared = new groovy.json.JsonSlurper().parse(soundsJson) as Map
+
+        registered.each { event ->
+            def entry = declared[event]
+            if (entry == null) {
+                problems << "event '${event}' is registered in ModSounds but missing from sounds.json"
+                return
+            }
+            def entries = entry.sounds
+            if (!entries) {
+                problems << "event '${event}' has an empty \"sounds\" array, so it will never play"
+                return
+            }
+            entries.each { s ->
+                // An entry is either "namespace:path" or { "name": "namespace:path", ... }.
+                def name = (s instanceof Map) ? s.name : s
+                if (name == null) {
+                    problems << "event '${event}' has a sound entry with no name"
+                    return
+                }
+                def path = name.contains(':') ? name.substring(name.indexOf(':') + 1) : name
+                def ogg = new File(soundsDir, "${path}.ogg")
+                if (!ogg.isFile()) {
+                    problems << "event '${event}' references '${name}' but ${ogg.name} does not exist"
+                } else if (ogg.length() == 0L) {
+                    problems << "event '${event}' references '${name}' but ${ogg.name} is empty"
+                }
+            }
+        }
+
+        declared.keySet().findAll { !registered.contains(it) }.each {
+            problems << "sounds.json declares '${it}', which no longer matches a registered event"
+        }
+
+        // Subtitles are the accessibility surface for these cues; a missing key renders raw.
+        def lang = new groovy.json.JsonSlurper().parse(langJson) as Map
+        declared.each { event, entry ->
+            def subtitle = entry.subtitle
+            if (subtitle != null && !lang.containsKey(subtitle)) {
+                problems << "event '${event}' declares subtitle '${subtitle}', absent from en_us.json"
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/sound-assets.txt'))
+        report.parentFile.mkdirs()
+        report.text = problems.isEmpty()
+                ? "OK: ${registered.size()} registered sound events, all backed by an OGG file\n"
+                : "SOUND ASSET PROBLEMS:\n" + problems.join('\n') + '\n'
+
+        if (!problems.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    "Registered sound events have nothing to play:\n  " + problems.join('\n  ') +
+                            "\nRegenerate with: java tools/SoundGen.java <wavDir> then encode to OGG " +
+                            "into src/main/resources/assets/planeshift/sounds/ (see tools/README.md).")
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkSoundAssets' }
+
 tasks.named('jar', Jar) {
     manifest {
         attributes([
@@ -190,4 +342,27 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+/*
+ * Unit tests. The geometry in the client input projection is pure trigonometry that can be
+ * checked without launching the game, so it gets a real test rather than a bytecode scan.
+ * MDG puts the Minecraft/NeoForge classes on the test classpath via `unitTest`.
+ */
+neoForge {
+    unitTest {
+        enable()
+        testedMod = mods."$mod_id"
+    }
+}
+
+dependencies {
+    testImplementation platform("org.junit:junit-bom:5.13.4")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    testLogging { events 'passed', 'failed', 'skipped' }
 }

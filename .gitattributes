@@ -1,0 +1,15 @@
+# Normalise line endings for text so Windows and Linux checkouts agree.
+* text=auto
+
+# Binary assets. Git's heuristics already detect these, but say it explicitly: a CRLF
+# translation pass over an OGG or PNG corrupts it silently, and broken audio is not
+# obvious until someone plays the game.
+*.ogg  binary
+*.png  binary
+*.jar  binary
+*.zip  binary
+
+# Keep the wrapper byte-for-byte and executable-friendly.
+gradlew      text eol=lf
+*.sh         text eol=lf
+gradlew.bat  text eol=crlf
