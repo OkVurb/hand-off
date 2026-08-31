@@ -162,6 +162,7 @@ public final class ServerEvents {
         CourseThemeService.clear(playerId);
         CourseScoringService.clear(playerId);
         FlagPoleBlock.clear(playerId);
+        PayloadRateLimiter.forget(playerId);
     }
 
     /** Power-up items pop out of blocks and float; mobs in courses become Mario enemies. */

@@ -64,7 +64,8 @@ public class PrizeCacheBlock extends Block implements HitFromBelowBlock {
     /** Also opens when struck from below — the classic stomp-from-underneath read. */
     @Override
     protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
-        if (!state.getValue(OPENED) && !level.isClientSide() && player.getY() < pos.getY()) {
+        if (!state.getValue(OPENED) && !level.isClientSide()
+                && HitFromBelowBlock.isHeadContact(player, pos)) {
             level.setBlock(pos, state.setValue(OPENED, true), Block.UPDATE_ALL);
             popCoins(level, pos);
             level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.8F, 1.3F);

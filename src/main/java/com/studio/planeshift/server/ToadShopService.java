@@ -44,6 +44,11 @@ public final class ToadShopService {
         if (slot < 0 || slot >= offers.length) {
             return;
         }
+        // Reached from a C2S payload and moves currency, so it must not be callable at packet
+        // rate. Checked before the coin balance is read, so a spammed handler cannot race it.
+        if (!PayloadRateLimiter.allow(player, PayloadRateLimiter.Action.SHOP_PURCHASE)) {
+            return;
+        }
         Offer offer = offers[slot];
         if (!nearToad(player)) {
             return;

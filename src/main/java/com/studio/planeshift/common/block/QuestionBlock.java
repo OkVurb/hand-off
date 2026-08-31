@@ -47,7 +47,7 @@ public class QuestionBlock extends Block implements HitFromBelowBlock {
         if (level.isClientSide() || state.getValue(USED) || !(player instanceof ServerPlayer)) {
             return;
         }
-        if (player.getY() < pos.getY()) {
+        if (HitFromBelowBlock.isHeadContact(player, pos)) {
             level.setBlock(pos, state.setValue(USED, true), Block.UPDATE_ALL);
             popPickup(level, pos);
             level.playSound(null, pos, ModSounds.QUESTION_BUMP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);

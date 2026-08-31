@@ -1,6 +1,6 @@
 {
   "variants": {
     "pressed=false": { "model": "planeshift:block/p_switch" },
-    "pressed=true": { "model": "planeshift:block/p_switch" }
+    "pressed=true": { "model": "planeshift:block/p_switch_pressed" }
   }
 }

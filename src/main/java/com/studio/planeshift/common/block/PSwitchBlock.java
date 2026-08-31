@@ -54,19 +54,37 @@ public class PSwitchBlock extends Block implements HitFromBelowBlock {
         builder.add(PRESSED);
     }
 
+    /**
+     * Puts the bricks back when the switch stops existing, however it went.
+     *
+     * <p>This used to hang off {@code playerWillDestroy}, which only covers a player breaking
+     * the block by hand. An explosion, a piston, or {@code /setblock} left the switch's entry in
+     * {@link #CONVERTED} with no scheduled tick to consume it, so the map leaked and the coins
+     * stayed coins forever. {@code affectNeighborsAfterRemoval} is the hook vanilla's own
+     * buttons and pressure plates use to undo their effect, and it runs on every removal path.
+     *
+     * <p>It fires only when the block *type* changes ({@code LevelChunk} gates it on
+     * {@code !oldState.is(newBlock)}), so pressing and releasing the switch does not trip it.
+     */
     @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide()) {
-            List<BlockPos> converted = CONVERTED.remove(GlobalPos.of(level.dimension(), pos.immutable()));
-            if (converted != null) {
-                for (BlockPos target : converted) {
-                    if (level.getBlockState(target).getBlock() instanceof CoinBlock) {
-                        level.setBlock(target, ModBlocks.BRICK_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
-                    }
-                }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos,
+                                               boolean movedByPiston) {
+        revertConverted(level, pos);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+    }
+
+    /** Turns this switch's coins back into bricks and forgets them. */
+    private static void revertConverted(Level level, BlockPos pos) {
+        List<BlockPos> converted = CONVERTED.remove(GlobalPos.of(level.dimension(), pos.immutable()));
+        if (converted == null) {
+            return;
+        }
+        for (BlockPos target : converted) {
+            // Only revert blocks the player has not already consumed or replaced.
+            if (level.getBlockState(target).getBlock() instanceof CoinBlock) {
+                level.setBlock(target, ModBlocks.BRICK_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
             }
         }
-        return super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override
@@ -113,16 +131,6 @@ public class PSwitchBlock extends Block implements HitFromBelowBlock {
         }
         level.setBlock(pos, state.setValue(PRESSED, false), Block.UPDATE_ALL);
         level.playSound(null, pos, SoundEvents.STONE_PRESSURE_PLATE_CLICK_OFF, SoundSource.BLOCKS, 1.0F, 0.8F);
-
-        List<BlockPos> converted = CONVERTED.remove(GlobalPos.of(level.dimension(), pos.immutable()));
-        if (converted == null) {
-            return;
-        }
-        for (BlockPos target : converted) {
-            // Only revert blocks the player has not already consumed or replaced.
-            if (level.getBlockState(target).getBlock() instanceof CoinBlock) {
-                level.setBlock(target, ModBlocks.BRICK_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
-            }
-        }
+        revertConverted(level, pos);
     }
 }

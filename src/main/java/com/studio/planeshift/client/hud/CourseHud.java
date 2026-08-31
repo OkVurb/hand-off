@@ -29,6 +29,11 @@ public final class CourseHud {
     private static final int BADGE_FREE = 0xFFE7B54A;   // gold
     private static final int BAR_BACK = 0xB0101418;
 
+    /** Top-left cluster panel. Height covers the star-coin line at y+64 plus its descender. */
+    private static final int PANEL_WIDTH = 200;
+    private static final int PANEL_HEIGHT = 86;
+    private static final int PANEL_INSET = 2;
+
     private static long courseStartTicks = -1L;
 
     private CourseHud() {
@@ -51,32 +56,45 @@ public final class CourseHud {
         int x = 8;
         int y = 8;
 
-        // Draw a themed backing panel behind the top-left HUD cluster.
-        PlaneShiftGui.renderPanel(graphics, 2, 2, 200, 76);
+        // Panel sized to the window, not fixed: at a large GUI scale the usable width can be
+        // narrower than the 200px this used to assume, and the old 76px height cut off the
+        // star-coin line that sits at y+64.
+        int panelWidth = Math.min(PANEL_WIDTH, graphics.guiWidth() - 2 * PANEL_INSET);
+        int panelHeight = Math.min(PANEL_HEIGHT, graphics.guiHeight() - 2 * PANEL_INSET);
+        PlaneShiftGui.renderPanel(graphics, PANEL_INSET, PANEL_INSET, panelWidth, panelHeight);
+        int panelRight = PANEL_INSET + panelWidth;
+        int panelBottom = PANEL_INSET + panelHeight;
 
         // Health pips + Form buffer.
         for (int i = 0; i < CourseState.MAX_PIPS; i++) {
             int color = i < state.pips() ? PIP_FULL : PIP_EMPTY;
-            graphics.fill(x + i * 14, y, x + i * 14 + 12, y + 12, color);
+            int pipLeft = x + i * 14;
+            if (pipLeft + 12 > panelRight) {
+                break;   // never spill pips past the panel edge
+            }
+            graphics.fill(pipLeft, y, pipLeft + 12, y + 12, color);
         }
         FormSlot slot = state.formSlot();
         if (slot.hasActive()) {
             Identifier form = slot.active().get();
             int accent = 0xFFFFFFFF;
             graphics.fill(x + CourseState.MAX_PIPS * 14 + 2, y, x + CourseState.MAX_PIPS * 14 + 14, y + 12, accent & 0x50FFFFFF);
-            graphics.drawString(font,
-                    Component.translatableWithFallback(
-                                    "form." + form.getNamespace() + "." + form.getPath(), form.getPath())
-                            .append(" x" + slot.charges()),
-                    x + CourseState.MAX_PIPS * 14 + 18, y + 2, 0xFFFFFFFF);
+            int labelX = x + CourseState.MAX_PIPS * 14 + 18;
+            graphics.drawString(font, clip(font,
+                            Component.translatableWithFallback(
+                                            "form." + form.getNamespace() + "." + form.getPath(), form.getPath())
+                                    .append(" x" + slot.charges()),
+                            panelRight - labelX),
+                    labelX, y + 2, 0xFFFFFFFF);
         }
         if (slot.reserve().isPresent()) {
             Identifier reserve = slot.reserve().get();
-            graphics.drawString(font,
-                    Component.translatable("hud.planeshift.reserve",
-                            Component.translatableWithFallback(
-                                    "form." + reserve.getNamespace() + "." + reserve.getPath(),
-                                    reserve.getPath())),
+            graphics.drawString(font, clip(font,
+                            Component.translatable("hud.planeshift.reserve",
+                                    Component.translatableWithFallback(
+                                            "form." + reserve.getNamespace() + "." + reserve.getPath(),
+                                            reserve.getPath())),
+                            panelRight - x),
                     x, y + 16, 0xFF9DA8B5);
         }
 
@@ -106,8 +124,14 @@ public final class CourseHud {
         }
 
         if (PlaneShiftConfig.CLIENT.showDebugHud.get()) {
-            renderDebug(graphics, font, state);
+            renderDebug(graphics, font, state, panelBottom + 6);
         }
+    }
+
+    /** Trims {@code text} to {@code maxWidth} so a long form name cannot run past the panel. */
+    private static String clip(Font font, Component text, int maxWidth) {
+        String plain = text.getString();
+        return font.width(plain) <= maxWidth ? plain : font.plainSubstrByWidth(plain, maxWidth);
     }
 
     private static void renderModeBadge(GuiGraphics graphics, Font font, CourseState state) {
@@ -133,9 +157,12 @@ public final class CourseHud {
         graphics.drawCenteredString(font, label, screenWidth / 2, y, color);
     }
 
-    private static void renderDebug(GuiGraphics graphics, Font font, CourseState state) {
+    /**
+     * Debug lines used to start at a fixed y=48, drawing straight over the lives, coins and
+     * star-coin readouts at y+40..y+64. They now start below the panel.
+     */
+    private static void renderDebug(GuiGraphics graphics, Font font, CourseState state, int y) {
         Minecraft minecraft = Minecraft.getInstance();
-        int y = 48;
         graphics.drawString(font, "state: " + state.state().getSerializedName()
                 + "  mode: " + state.mode().getSerializedName(), 8, y, 0xFFAAAAAA);
         if (state.rail().isPresent() && minecraft.player != null) {

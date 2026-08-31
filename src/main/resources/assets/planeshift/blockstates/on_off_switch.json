@@ -1,6 +1,6 @@
 {
   "variants": {
     "powered=false": { "model": "planeshift:block/on_off_switch" },
-    "powered=true": { "model": "planeshift:block/on_off_switch" }
+    "powered=true": { "model": "planeshift:block/on_off_switch_powered" }
   }
 }

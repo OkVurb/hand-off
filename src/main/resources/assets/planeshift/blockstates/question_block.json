@@ -1,6 +1,6 @@
 {
   "variants": {
     "used=false": { "model": "planeshift:block/question_block" },
-    "used=true": { "model": "planeshift:block/brick_block" }
+    "used=true": { "model": "planeshift:block/question_block_used" }
   }
 }

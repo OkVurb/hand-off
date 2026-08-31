@@ -1,6 +1,6 @@
 {
   "variants": {
     "opened=false": { "model": "planeshift:block/prize_cache" },
-    "opened=true": { "model": "planeshift:block/prize_cache" }
+    "opened=true": { "model": "planeshift:block/prize_cache_opened" }
   }
 }

@@ -1,6 +1,6 @@
 {
   "variants": {
     "lit=false": { "model": "planeshift:block/checkpoint_beacon" },
-    "lit=true": { "model": "planeshift:block/checkpoint_beacon" }
+    "lit=true": { "model": "planeshift:block/checkpoint_beacon_lit" }
   }
 }

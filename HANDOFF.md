@@ -2,7 +2,7 @@
 
 **Project root:** `C:\Dev\PlaneShift`  
 **Date:** 2026-08-31  
-**Status:** `BUILD SUCCESSFUL` — `compileJava`, `test` (31 cases), `checkClientClassLeak`, `checkNoRawCuboidScan`, `checkSoundAssets`, `checkTextureAssets`, and `build` all pass.
+**Status:** `BUILD SUCCESSFUL` — `compileJava`, `test` (31 cases), `checkClientClassLeak`, `checkNoRawCuboidScan`, `checkSoundAssets`, `checkTextureAssets`, `checkBlockModels`, and `build` all pass.
 
 This document is a complete handoff for the PlaneShift NeoForge 1.21.11 mod. It contains the current state, what was just changed, how to build it, the full source/resource inventory, and the remaining known issues. Use it to continue work from another session or tool.
 
@@ -31,6 +31,7 @@ Run from `C:\Dev\PlaneShift`:
 - Raw cuboid scan check: `.\gradlew checkNoRawCuboidScan`
 - Sound asset check: `.\gradlew checkSoundAssets`
 - Texture asset check: `.\gradlew checkTextureAssets`
+- Block model check: `.\gradlew checkBlockModels`
 
 All `check*` tasks and `test` are wired into `check`, so `.\gradlew build` runs them.
 
@@ -41,7 +42,8 @@ Current results:
 > Task :checkClientClassLeak — PASSED
 > Task :checkNoRawCuboidScan — PASSED
 > Task :checkSoundAssets — PASSED (22 events, all backed by an OGG)
-> Task :checkTextureAssets — PASSED (89 textures, present and distinct)
+> Task :checkTextureAssets — PASSED (96 textures, present and distinct)
+> Task :checkBlockModels — PASSED
 > Task :test — PASSED (31 cases)
 > Task :build — BUILD SUCCESSFUL
 ```
@@ -51,6 +53,61 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 ---
 
 ## 3. What Was Just Done
+
+### 3.-4 Session 2026-08-31 — remaining P1/P2 sweep
+
+Cleared every outstanding item from section 4 except play-testing.
+
+**GUI overflow (P1).** `ToadShopScreen` started at `height / 4` and stepped 24px per offer, so
+ten offers plus the close button needed 270px below the quarter mark. At GUI scale 4 on a 1080p
+window there are about 200, and the last offers and the close button fell off the bottom with no
+way to reach them. The layout now derives column count, row spacing and button width from the
+space actually available, pins the header to the top instead of `height / 4`, and clamps the
+close button so it can never leave the window.
+
+`CourseHud` had a fixed 200x76 panel. Two real bugs: the star-coin line sits at `y+64` and ran
+past the 76px panel, and the debug overlay drew at a fixed `y=48`, directly on top of the lives,
+coins and star-coin readouts. The panel is now sized against `guiWidth`/`guiHeight`, the debug
+block starts below it, long form names are trimmed to the panel, and pips stop at the panel edge.
+
+**Head contact (P2).** `BrickBlock`, `QuestionBlock`, `HiddenQuestionBlock` and `PrizeCacheBlock`
+tested `player.getY() < pos.getY()` — whether the player was *somewhere* below. Left-click reaches
+about 4.5 blocks, so standing well underneath, or off to the side looking at the block edge,
+triggered a block that was never touched. `HitFromBelowBlock.isHeadContact` now uses the player
+bounding box: the top of it must sit at the block underside, within one block, and overlap the
+block column. Sized to cover both callers — `AirMoveService` fires on the block a rising player is
+*about* to enter, a left-click fires while standing still, and a crouched head sits lower again.
+
+**PSwitch map leak (P2).** The revert hung off `playerWillDestroy`, which only covers a player
+breaking the block by hand. An explosion, piston or `/setblock` left the entry in `CONVERTED` with
+no scheduled tick to consume it, so the map leaked and the coins stayed coins. Moved to
+`affectNeighborsAfterRemoval`, the hook vanilla buttons and pressure plates use, which runs on
+every removal path. It fires only on block-type change (`LevelChunk` gates it on
+`!oldState.is(newBlock)`), so pressing and releasing the switch does not trip it.
+
+**Rate limiting (P2).** New `PayloadRateLimiter`. `CourseService.loadCourse` resolves a definition
+and teleports across dimensions; `ToadShopService.purchase` moves currency. Neither should be
+reachable at packet rate. Cooldowns are counted in server ticks from
+`MinecraftServer.getTickCount()` — monotonic, shared across dimensions so the cooldown survives
+the teleport `loadCourse` performs, and it stops advancing when the server does. Cleared on logout
+via the existing `clearPlayerCaches`.
+
+**State-aware models (P2).** `on_off_block` rendered the same in both states despite having no
+collision when off; its off model is now an inset cube so it reads as passable. `question_block`
+with `used=true` pointed at the *brick_block* model, making spent blocks look like breakable
+bricks. A new `checkBlockModels` task then found three more of the same bug that were not in the
+issue list: `checkpoint_beacon` (`lit`), `coin_ring_block` (`used`) and `on_off_switch`
+(`powered`) all rendered identically in both states — an activated checkpoint looked exactly like
+an inactive one. All fixed with their own models and textures.
+
+`hidden_question_block` needed no change: its model is already `"elements": []`, which is the
+correct invisible-until-hit look.
+
+**New build check:** `checkBlockModels` — fails on malformed model/blockstate JSON, a blockstate
+naming a missing model, a model naming a missing texture or parent, or a multi-variant blockstate
+whose variants all render identically. Rotation is part of the identity, so facing variants that
+reuse one model at different angles (`conveyor_belt`, `shift_gate`) are correctly not flagged.
+Verified non-vacuous with a typo'd texture path and malformed JSON.
 
 ### 3.-3 Session 2026-08-31 — texture assets (P1 + P2, resolved)
 
@@ -258,19 +315,17 @@ If a future course feature legitimately needs raw cuboid iteration, add the clas
 *(None outstanding.)*
 
 ### P1 — High
-- **GUI overflow on small screens.** `ToadShopScreen` uses a fixed layout that can fall off the bottom. `CourseHud` uses a fixed panel and pips may overflow.
+*(None outstanding.)*
 
 **Resolved 2026-08-31:**
+- ~~GUI overflow~~ (P1), ~~coarse height checks~~, ~~PSwitch map leak~~, ~~C2S rate limiting~~ and ~~state-aware models~~ (P2) - see section 3.-4.
 - ~~Projectile entity textures missing~~ (P1) and ~~mob effect icons missing~~ (P2) - see section 3.-3.
 - ~~Sound events are empty~~ (P0) — 22 original OGGs now ship, see §3.-2.
 - ~~Client-side player mutation in `PlaneConstrainedInput`~~ — see §3.-1.
 - ~~Brute-force block scans in `OnOffSwitchBlock` / `PSwitchBlock`~~ — see §3.0.
 
 ### P2 — Medium
-- **State-aware models missing.** `on_off_block.json` uses the same model for `on=true` and `on=false`. `hidden_question_block.json` has no empty/hidden model distinction.
-- **Height checks are coarse.** `HiddenQuestionBlock`, `QuestionBlock`, `PrizeCacheBlock`, `BrickBlock` check the whole player Y instead of bounding-box/head contact.
-- **PSwitch CONVERTED map still leaks on non-player removal** (explosions/pistons/SETBLOCK). `playerWillDestroy` only covers player breaks.
-- **C2S payload handlers have no per-player rate-limit.** `CourseService.loadCourse` and `ToadShopService.purchase` can still be spammed.
+*(None outstanding.)*
 
 ### Warnings
 - `this-escape` warnings in constructors.

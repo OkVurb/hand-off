@@ -38,6 +38,11 @@ public final class CourseService {
         if (server == null) {
             return false;
         }
+        // Reached from a C2S payload: resolving a course and teleporting across dimensions is
+        // far too expensive to run at packet rate.
+        if (!PayloadRateLimiter.allow(player, PayloadRateLimiter.Action.LOAD_COURSE)) {
+            return false;
+        }
 
         Identifier id = Identifier.tryBuild(PlaneShift.MOD_ID, courseId);
         if (id == null) {

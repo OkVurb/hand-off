@@ -34,7 +34,7 @@ public class HiddenQuestionBlock extends Block implements HitFromBelowBlock {
         if (level.isClientSide() || !(player instanceof ServerPlayer)) {
             return;
         }
-        if (player.getY() < pos.getY()) {
+        if (HitFromBelowBlock.isHeadContact(player, pos)) {
             BlockState revealed = com.studio.planeshift.common.registry.ModBlocks.QUESTION_BLOCK.get()
                     .defaultBlockState()
                     .setValue(QuestionBlock.USED, true);

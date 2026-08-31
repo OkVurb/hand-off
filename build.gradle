@@ -408,6 +408,115 @@ tasks.register('checkTextureAssets') {
 
 tasks.named('check') { dependsOn 'checkTextureAssets' }
 
+/*
+ * Model and blockstate integrity.
+ *
+ * A blockstate pointing at a model that does not exist, or a model naming a texture that does
+ * not exist, does not fail anything at build time and only shows up as a black-and-magenta
+ * block in game. Malformed JSON is worse: the block silently falls back and the log line is
+ * easy to miss. Both are cheap to catch here.
+ *
+ * Also flags a blockstate whose variants all resolve to the same model, which is what made
+ * on_off_block (solid when on, walk-through when off) and question_block (used vs unused)
+ * indistinguishable in world.
+ */
+tasks.register('checkBlockModels') {
+    group = 'verification'
+    description = 'Fails on malformed model/blockstate JSON, dangling model or texture references, or a multi-state block that renders identically in every state.'
+
+    def assetsDir = file('src/main/resources/assets/planeshift')
+    inputs.dir(assetsDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/block-models.txt'))
+
+    doLast {
+        def problems = []
+        def slurper = new groovy.json.JsonSlurper()
+
+        // planeshift:block/foo -> assets/planeshift/<kind>/block/foo.<ext>
+        def resolve = { String ref, String kind, String ext ->
+            if (ref == null || !ref.startsWith('planeshift:')) return null   // vanilla refs are fine
+            new File(assetsDir, "${kind}/${ref.substring('planeshift:'.length())}.${ext}")
+        }
+
+        def parse = { File f ->
+            try {
+                return slurper.parse(f)
+            } catch (Exception e) {
+                problems << "${f.name} is not valid JSON: ${e.message}"
+                return null
+            }
+        }
+
+        // Models: every texture value and every parent must resolve.
+        def modelsDir = new File(assetsDir, 'models')
+        if (modelsDir.isDirectory()) {
+            modelsDir.eachFileRecurse { f ->
+                if (!f.name.endsWith('.json')) return
+                def model = parse(f)
+                if (model == null) return
+                def parent = resolve(model.parent as String, 'models', 'json')
+                if (parent != null && !parent.isFile()) {
+                    problems << "${f.name} extends missing model '${model.parent}'"
+                }
+                (model.textures ?: [:]).each { slot, ref ->
+                    // "#all" and friends refer to another slot in the same model, not a file.
+                    if (ref instanceof String && !ref.startsWith('#')) {
+                        def png = resolve(ref, 'textures', 'png')
+                        if (png != null && !png.isFile()) {
+                            problems << "${f.name} slot '${slot}' names missing texture '${ref}'"
+                        }
+                    }
+                }
+            }
+        }
+
+        // Blockstates: every variant model must resolve, and states must be distinguishable.
+        def statesDir = new File(assetsDir, 'blockstates')
+        if (statesDir.isDirectory()) {
+            statesDir.eachFile { f ->
+                if (!f.name.endsWith('.json')) return
+                def state = parse(f)
+                if (state == null) return
+                def variants = state.variants
+                if (variants == null) return
+
+                // A variant's appearance is its model plus its rotation: facing states legitimately
+                // reuse one model at different y angles, and that is not a readability problem.
+                def looks = [] as List
+                variants.each { key, value ->
+                    def entries = (value instanceof List) ? value : [value]
+                    entries.each { entry ->
+                        def ref = entry?.model as String
+                        looks << "${ref}|x=${entry?.x ?: 0}|y=${entry?.y ?: 0}".toString()
+                        def target = resolve(ref, 'models', 'json')
+                        if (target != null && !target.isFile()) {
+                            problems << "${f.name} variant '${key}' names missing model '${ref}'"
+                        }
+                    }
+                }
+                if (variants.size() > 1 && looks.toUnique().size() == 1) {
+                    problems << "${f.name} has ${variants.size()} variants that all render " +
+                            "identically as '${looks[0].split(/\|/)[0]}', so its states cannot be " +
+                            "told apart in game"
+                }
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/block-models.txt'))
+        report.parentFile.mkdirs()
+        report.text = problems.isEmpty()
+                ? "OK: models and blockstates parse, resolve, and distinguish their states\n"
+                : "MODEL PROBLEMS:\n" + problems.join('\n') + '\n'
+
+        if (!problems.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    "Model or blockstate problems:\n  " + problems.join('\n  '))
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkBlockModels' }
+
 tasks.named('jar', Jar) {
     manifest {
         attributes([

@@ -32,7 +32,7 @@ public class BrickBlock extends Block implements HitFromBelowBlock {
         if (level.isClientSide()) {
             return;
         }
-        if (player.getY() < pos.getY()) {
+        if (HitFromBelowBlock.isHeadContact(player, pos)) {
             level.destroyBlock(pos, false);
             level.playSound(null, pos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         }

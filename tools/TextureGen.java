@@ -253,6 +253,14 @@ public final class TextureGen {
             "ember_bolt", "fireball", "goomba", "hammer", "hammer_bro", "iceball", "koopa",
             "lakitu", "moving_platform", "piranha_plant", "spiny", "thwomp", "toad");
 
+    /**
+     * Textures referenced by a blockstate variant rather than by a registered block, so they
+     * have no entry in {@code ModBlocks}. They still have to exist or the model fails to load.
+     */
+    private static final List<String> BLOCK_VARIANTS = List.of(
+            "on_off_block_off", "p_switch_pressed", "prize_cache_opened", "question_block_used",
+            "checkpoint_beacon_lit", "coin_ring_block_used", "on_off_switch_powered");
+
     private static final List<String> PARTICLES = List.of(
             "coin_sparkle", "hit_burst", "pickup_glow", "respawn_warp", "theme_dust");
 
@@ -298,14 +306,16 @@ public final class TextureGen {
         int index = 0;
         List<String> log = new ArrayList<>();
 
-        Map<String, String> blockLabels = uniqueLabels(BLOCKS, labelCapacity(16));
+        List<String> allBlocks = new ArrayList<>(BLOCKS);
+        allBlocks.addAll(BLOCK_VARIANTS);
+        Map<String, String> blockLabels = uniqueLabels(allBlocks, labelCapacity(16));
         Map<String, String> itemLabels = uniqueLabels(ITEMS, labelCapacity(16));
         Map<String, String> particleLabels = uniqueLabels(PARTICLES, labelCapacity(16));
         Map<String, String> entityLabels = uniqueLabels(ENTITIES, labelCapacity(64));
         Map<String, String> effectLabels =
                 uniqueLabels(List.copyOf(EFFECTS.keySet()), labelCapacity(18));
 
-        for (String n : BLOCKS) {
+        for (String n : allBlocks) {
             write(root.resolve("block").resolve(n + ".png"),
                     tile(blockLabels.get(n), index++, 16, 16, null));
             written++;
@@ -337,7 +347,7 @@ public final class TextureGen {
         log.forEach(System.out::println);
         System.out.printf(Locale.ROOT,
                 "wrote %d placeholder textures (%d block, %d item, %d particle, %d entity, %d mob_effect)%n",
-                written, BLOCKS.size(), ITEMS.size(), PARTICLES.size(), ENTITIES.size(), EFFECTS.size());
+                written, allBlocks.size(), ITEMS.size(), PARTICLES.size(), ENTITIES.size(), EFFECTS.size());
     }
 
     private static void write(Path out, BufferedImage img) throws IOException {
