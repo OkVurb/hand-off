@@ -171,45 +171,65 @@ public final class CourseStructureService {
 
     private static void buildPlatformSet(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
                                          Palette palette) {
-        platform(level, start, 34, 2, 7, palette.platform());
-        platform(level, start, 48, 4, 6, palette.platform());
-        platform(level, start, plan.midpoint() - 8, 2, 8, palette.platform());
-        platform(level, start, plan.length() - 42, 3, 7, palette.platform());
+        int mid = plan.midpoint();
+        // Early platforms
+        platform(level, start, 20, 3, 5, palette.platform());
+        platform(level, start, 32, 5, 4, palette.platform());
+        
+        // Mid platforms
+        platform(level, start, mid - 12, 4, 6, palette.platform());
+        platform(level, start, mid + 10, 4, 5, palette.platform());
+        
+        // Late platforms
+        platform(level, start, plan.length() - 40, 5, 8, palette.platform());
+        platform(level, start, plan.length() - 25, 3, 6, palette.platform());
+        
+        // Add powerups / blocks above these platforms
+        for (int x : new int[]{22, 34, mid - 10, mid + 12, plan.length() - 38}) {
+            // Find platform height
+            int y = (x == 32 || x == 34) ? 5 : (x == plan.length() - 38 ? 5 : ((x == mid - 10 || x == mid + 12) ? 4 : 3));
+            BlockState qb = ModBlocks.QUESTION_BLOCK.get().defaultBlockState();
+            set(level, start.offset(x, y + 4, 0), qb);
+            set(level, start.offset(x + 1, y + 4, 0), ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+        }
+        
+        // A tricky hidden block over a gap
+        set(level, start.offset(47, 4, 0), ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
     }
 
     private static void buildMechanicSet(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
         int mid = plan.midpoint();
-        set(level, start.offset(mid, 0, 0), ModBlocks.CHECKPOINT_BEACON.get().defaultBlockState());
+        set(level, start.offset(mid, 1, 0), ModBlocks.CHECKPOINT_BEACON.get().defaultBlockState());
 
-        set(level, start.offset(mid + 12, 0, 0), ModBlocks.ON_OFF_SWITCH.get().defaultBlockState());
-        for (int x = mid + 16; x <= mid + 20; x++) {
-            set(level, start.offset(x, 1, 0), ModBlocks.ON_OFF_BLOCK.get().defaultBlockState());
+        set(level, start.offset(mid + 16, 1, 0), ModBlocks.ON_OFF_SWITCH.get().defaultBlockState());
+        for (int x = mid + 20; x <= mid + 24; x++) {
+            set(level, start.offset(x, 2, 0), ModBlocks.ON_OFF_BLOCK.get().defaultBlockState());
         }
 
-        set(level, start.offset(mid + 28, 0, 0), ModBlocks.P_SWITCH.get().defaultBlockState());
-        for (int x = mid + 31; x <= mid + 36; x++) {
-            set(level, start.offset(x, 1, 0), ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+        set(level, start.offset(mid + 32, 1, 0), ModBlocks.P_SWITCH.get().defaultBlockState());
+        for (int x = mid + 35; x <= mid + 40; x++) {
+            set(level, start.offset(x, 2, 0), ModBlocks.BRICK_BLOCK.get().defaultBlockState());
         }
 
         for (int x = plan.length() - 28; x <= plan.length() - 25; x++) {
-            set(level, start.offset(x, 0, 0), ModBlocks.SPIKE_BLOCK.get().defaultBlockState());
+            set(level, start.offset(x, 1, 0), ModBlocks.SPIKE_BLOCK.get().defaultBlockState());
         }
-        set(level, start.offset(plan.length() - 21, 0, 0), ModBlocks.SPRING_PAD.get().defaultBlockState());
-        set(level, start.offset(plan.length() - 17, 0, 0), ModBlocks.PRIZE_CACHE.get().defaultBlockState());
+        set(level, start.offset(plan.length() - 21, 1, 0), ModBlocks.SPRING_PAD.get().defaultBlockState());
+        set(level, start.offset(plan.length() - 17, 1, 0), ModBlocks.PRIZE_CACHE.get().defaultBlockState());
     }
 
     private static void buildFinish(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
                                     Palette palette) {
         int finish = plan.length();
-        for (int y = 0; y <= 6; y++) {
+        for (int y = 1; y <= 7; y++) {
             set(level, start.offset(finish, y, 0), ModBlocks.FLAG_POLE.get().defaultBlockState());
         }
         for (int step = 0; step < 5; step++) {
             for (int x = finish - 10 + step; x <= finish - 6 + step; x++) {
-                set(level, start.offset(x, step, 0), palette.accent());
+                set(level, start.offset(x, step + 1, 0), palette.accent());
             }
         }
-        set(level, start.offset(finish + 4, 0, 0), ModBlocks.WARP_PIPE.get().defaultBlockState());
+        set(level, start.offset(finish + 4, 1, 0), ModBlocks.WARP_PIPE.get().defaultBlockState());
     }
 
     private static void platform(ServerLevel level, BlockPos start, int offset, int height,
@@ -222,26 +242,39 @@ public final class CourseStructureService {
     }
 
     private static void spawnRewards(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
-        for (int x = 9; x < plan.length() - 12; x += 8) {
-            double arc = Math.sin(x * 0.22D) * 1.25D;
-            ItemEntity coin = new ItemEntity(level,
-                    start.getX() + x + 0.5D, start.getY() + 1.2D + Math.max(0.0D, arc),
-                    start.getZ() + 0.5D, new ItemStack(ModItems.COIN.get()));
-            coin.setPickUpDelay(0);
-            coin.setDeltaMovement(0.0D, 0.0D, 0.0D);
-            coin.addTag(GENERATED_TAG);
-            level.addFreshEntity(coin);
+        // Generate coin arches
+        for (int archStart = 10; archStart < plan.length() - 15; archStart += 25) {
+            for (int dx = 0; dx < 5; dx++) {
+                double archY = Math.sin(dx * Math.PI / 4.0) * 3.0 + 1.5;
+                spawnCoin(level, start.getX() + archStart + dx, start.getY() + archY, start.getZ());
+            }
         }
+        
+        // Generate straight coin lines on some platforms
+        for (int pStart : new int[]{32, plan.midpoint() - 12, plan.length() - 40}) {
+            int pHeight = (pStart == 32) ? 5 : (pStart == plan.midpoint() - 12 ? 4 : 5);
+            for (int dx = 0; dx < 3; dx++) {
+                spawnCoin(level, start.getX() + pStart + dx + 1, start.getY() + pHeight + 1.5, start.getZ());
+            }
+        }
+    }
+    
+    private static void spawnCoin(ServerLevel level, double x, double y, double z) {
+        ItemEntity coin = new ItemEntity(level, x + 0.5, y, z + 0.5, new ItemStack(ModItems.COIN.get()));
+        coin.setPickUpDelay(0);
+        coin.setDeltaMovement(0.0, 0.0, 0.0);
+        coin.addTag(GENERATED_TAG);
+        level.addFreshEntity(coin);
     }
 
     private static void spawnCast(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
                                   CourseTheme theme) {
         List<EntityType<? extends Mob>> cast = castFor(theme);
-        int[] offsets = {30, 54, plan.midpoint() + 20, plan.length() - 35};
+        int[] offsets = {15, 28, 42, plan.midpoint() + 5, plan.midpoint() + 28, plan.length() - 35};
         for (int i = 0; i < offsets.length; i++) {
-            spawnMob(level, cast.get(i % cast.size()), start, offsets[i], 0);
+            spawnMob(level, cast.get(i % cast.size()), start, offsets[i], 1);
         }
-        spawnMob(level, ModEntities.TOAD.get(), start, plan.length() - 13, 0);
+        spawnMob(level, ModEntities.TOAD.get(), start, plan.length() - 13, 1);
     }
 
     private static List<EntityType<? extends Mob>> castFor(CourseTheme theme) {

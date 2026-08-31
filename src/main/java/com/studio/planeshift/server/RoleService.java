@@ -22,6 +22,8 @@ public final class RoleService {
 
     private static final Identifier RUN_MODIFIER_ID = PlaneShift.id("role_run");
     private static final Identifier JUMP_MODIFIER_ID = PlaneShift.id("role_jump");
+    /** Baseline Mario jump physics boost (e.g., +150% jump height). */
+    private static final Identifier COURSE_JUMP_MODIFIER_ID = PlaneShift.id("course_jump_base");
 
     private RoleService() {
     }
@@ -59,9 +61,15 @@ public final class RoleService {
                     role.runMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
         AttributeInstance jump = player.getAttribute(Attributes.JUMP_STRENGTH);
-        if (jump != null && role.jumpMultiplier() != 1.0F) {
-            jump.addTransientModifier(new AttributeModifier(JUMP_MODIFIER_ID,
-                    role.jumpMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        if (jump != null) {
+            // Apply the global course baseline jump height (+150% base = 2.5x total height)
+            jump.addTransientModifier(new AttributeModifier(COURSE_JUMP_MODIFIER_ID,
+                    1.5D, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+            
+            if (role.jumpMultiplier() != 1.0F) {
+                jump.addTransientModifier(new AttributeModifier(JUMP_MODIFIER_ID,
+                        role.jumpMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+            }
         }
     }
 
@@ -72,6 +80,7 @@ public final class RoleService {
         }
         AttributeInstance jump = player.getAttribute(Attributes.JUMP_STRENGTH);
         if (jump != null) {
+            jump.removeModifier(COURSE_JUMP_MODIFIER_ID);
             jump.removeModifier(JUMP_MODIFIER_ID);
         }
     }

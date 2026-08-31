@@ -15,9 +15,12 @@ record CourseLayoutPlan(int length, int[][] gaps) {
         };
         int middle = length / 2;
         return new CourseLayoutPlan(length, new int[][]{
-                {26 + shift, 28 + shift},
-                {middle - 6, middle - 3},
-                {length - 48 - shift / 3, length - 45 - shift / 3}
+                {22 + shift, 27 + shift}, // 5 block gap
+                {38 + shift, 44 + shift}, // 6 block gap
+                {middle - 8, middle - 3}, // 5 block gap before checkpoint
+                {middle + 10, middle + 16}, // 6 block gap after checkpoint
+                {length - 50 - shift / 3, length - 44 - shift / 3}, // 6 block gap
+                {length - 35, length - 30} // 5 block gap near end
         });
     }
 

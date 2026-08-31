@@ -1,6 +1,6 @@
 {
   "run_multiplier": 1.0,
-  "jump_multiplier": 1.0,
+  "jump_multiplier": 1.5,
   "traction_multiplier": 1.0,
   "signature": "float_glide",
   "float_ticks": 25,

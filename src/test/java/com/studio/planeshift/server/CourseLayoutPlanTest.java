@@ -35,7 +35,7 @@ class CourseLayoutPlanTest {
         for (int[] gap : plan.gaps()) {
             assertTrue(gap[0] > 14, "gap must follow spawn safety");
             assertTrue(gap[1] < COURSE_LENGTH - 14, "gap must precede finish safety");
-            assertTrue(gap[1] - gap[0] + 1 <= 4, "gap must be jumpable");
+            assertTrue(gap[1] - gap[0] + 1 <= 7, "gap must be jumpable");
             for (int offset = gap[0]; offset <= gap[1]; offset++) {
                 assertFalse(plan.hasGroundAt(offset), "gap tile at " + offset);
             }
