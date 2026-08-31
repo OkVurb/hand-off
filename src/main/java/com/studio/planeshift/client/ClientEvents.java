@@ -5,6 +5,7 @@ import com.studio.planeshift.client.camera.CameraDirector;
 import com.studio.planeshift.client.input.PlaneConstrainedInput;
 import com.studio.planeshift.client.input.PlaneMovementAssists;
 import com.studio.planeshift.client.music.CourseMusicManager;
+import com.studio.planeshift.common.course.CourseCrouch;
 import com.studio.planeshift.common.network.FormActionPayload;
 import com.studio.planeshift.common.network.ReserveSwapPayload;
 import net.minecraft.client.Minecraft;
@@ -15,6 +16,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
@@ -73,6 +75,25 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onCameraDistance(CalculateDetachedCameraDistanceEvent event) {
         CameraDirector.onCameraDistance(event);
+    }
+
+    /**
+     * Client mirror of the course crouch hitbox.
+     *
+     * <p>The client predicts its own movement, so it has to compute the same height the server
+     * does or the player stutters against gaps the server thinks they fit through. The rule
+     * itself lives in {@link CourseCrouch}; only the source of the course flag differs.
+     */
+    @SubscribeEvent
+    public static void onEntitySize(EntityEvent.Size event) {
+        if (!(event.getEntity() instanceof LocalPlayer)) {
+            return;
+        }
+        var crouched = CourseCrouch.crouchedDimensions(event.getPose(), event.getNewSize(),
+                ClientCourseState.get().inCourse());
+        if (crouched != null) {
+            event.setNewSize(crouched);
+        }
     }
 
     /**

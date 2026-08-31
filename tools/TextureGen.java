@@ -28,6 +28,9 @@ import javax.imageio.ImageIO;
  */
 public final class TextureGen {
 
+    /** Count of production textures left untouched this run. */
+    private static int skipped = 0;
+
     // ---------------------------------------------------------------- 4x5 pixel font
 
 
@@ -223,15 +226,280 @@ public final class TextureGen {
         return label;
     }
 
-    private static BufferedImage tile(String label, int index, int w, int h, Integer forcedColour) {
+    // ---------------------------------------------------------------- motifs
+
+    /**
+     * Recognisable shapes drawn instead of bare initials.
+     *
+     * <p>A flat square with two letters on it is legible in a file browser but tells you nothing
+     * at a glance in world. A coin that looks round and a spike that looks pointed do. These are
+     * still placeholders, but they carry each block's shape language, which is the part that
+     * matters when reading a course at speed.
+     */
+    private enum Motif {
+        COIN, RING, SPIKE, BEACON, CONVEYOR, NOTE, BUTTON, CHEST, GATE,
+        DASHED, SPARKLE, BURST, GLOW, DUST, MUSHROOM, FLOWER, STAR, LEAF, EGG, AURA, NONE
+    }
+
+    /** Name to motif. Anything unmapped keeps the initials fallback. */
+    private static Motif motifFor(String name) {
+        if (name.endsWith("_spawn_egg")) {
+            return Motif.EGG;
+        }
+        if (name.endsWith("_aura") || name.equals("frozen")) {
+            return Motif.AURA;
+        }
+        return switch (name) {
+            case "coin", "coin_block", "star_coin" -> Motif.COIN;
+            case "coin_ring_block", "coin_ring_block_used" -> Motif.RING;
+            case "spike_block" -> Motif.SPIKE;
+            case "checkpoint_beacon", "checkpoint_beacon_lit" -> Motif.BEACON;
+            case "conveyor_belt" -> Motif.CONVEYOR;
+            case "note_block", "music_block" -> Motif.NOTE;
+            case "p_switch", "p_switch_pressed", "on_off_switch", "on_off_switch_powered" -> Motif.BUTTON;
+            case "prize_cache", "prize_cache_opened" -> Motif.CHEST;
+            case "shift_gate" -> Motif.GATE;
+            case "secret_passage", "hidden_question_block" -> Motif.DASHED;
+            case "coin_sparkle" -> Motif.SPARKLE;
+            case "hit_burst" -> Motif.BURST;
+            case "pickup_glow" -> Motif.GLOW;
+            case "theme_dust", "respawn_warp" -> Motif.DUST;
+            case "super_mushroom", "mega_mushroom", "mini_mushroom", "propeller_mushroom" -> Motif.MUSHROOM;
+            case "fire_flower", "ice_flower", "cloud_flower" -> Motif.FLOWER;
+            case "star_power", "extra_pip", "three_up", "five_up" -> Motif.STAR;
+            case "leaf", "acorn", "tanooki" -> Motif.LEAF;
+            default -> Motif.NONE;
+        };
+    }
+
+    private static void px(BufferedImage img, int x, int y, int rgb) {
+        if (x >= 0 && y >= 0 && x < img.getWidth() && y < img.getHeight()) {
+            img.setRGB(x, y, 0xFF000000 | rgb);
+        }
+    }
+
+    private static void disc(BufferedImage img, double cx, double cy, double r, int rgb) {
+        for (int y = 0; y < img.getHeight(); y++) {
+            for (int x = 0; x < img.getWidth(); x++) {
+                double dx = x + 0.5 - cx;
+                double dy = y + 0.5 - cy;
+                if (dx * dx + dy * dy <= r * r) {
+                    px(img, x, y, rgb);
+                }
+            }
+        }
+    }
+
+    private static void ringShape(BufferedImage img, double cx, double cy, double r, double thickness, int rgb) {
+        for (int y = 0; y < img.getHeight(); y++) {
+            for (int x = 0; x < img.getWidth(); x++) {
+                double dx = x + 0.5 - cx;
+                double dy = y + 0.5 - cy;
+                double d = Math.sqrt(dx * dx + dy * dy);
+                if (d <= r && d >= r - thickness) {
+                    px(img, x, y, rgb);
+                }
+            }
+        }
+    }
+
+    private static void rect(BufferedImage img, int x0, int y0, int x1, int y1, int rgb) {
+        for (int y = y0; y <= y1; y++) {
+            for (int x = x0; x <= x1; x++) {
+                px(img, x, y, rgb);
+            }
+        }
+    }
+
+    /** Draws {@code motif} centred in the tile. Returns false when there is nothing to draw. */
+    private static boolean drawMotif(BufferedImage img, Motif motif, int fg, int accent) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+        double cx = w / 2.0;
+        double cy = h / 2.0;
+        double r = Math.min(w, h) * 0.30;
+
+        switch (motif) {
+            case COIN -> {
+                disc(img, cx, cy, r, fg);
+                disc(img, cx - r * 0.25, cy - r * 0.25, r * 0.35, accent);
+            }
+            case RING -> ringShape(img, cx, cy, r, 2.0, fg);
+            case SPIKE -> {
+                int teeth = Math.max(3, w / 5);
+                int step = Math.max(2, w / teeth);
+                for (int t = 0; t < teeth; t++) {
+                    int bx = t * step + step / 2;
+                    for (int d = 0; d <= step / 2; d++) {
+                        int yy = h - 3 - (step / 2 - d);
+                        rect(img, bx - d, yy, bx + d, yy, fg);
+                    }
+                }
+                rect(img, 1, h - 3, w - 2, h - 2, accent);
+            }
+            case BEACON -> {
+                rect(img, (int) cx - 1, 2, (int) cx, h - 5, fg);
+                rect(img, 3, h - 5, w - 4, h - 3, accent);
+                disc(img, cx, 3, 2.0, accent);
+            }
+            case CONVEYOR -> {
+                for (int row = 0; row < 2; row++) {
+                    int y0 = 4 + row * 6;
+                    for (int t = 0; t < Math.max(1, w / 5); t++) {
+                        int bx = 2 + t * 5;
+                        for (int d = 0; d < 3; d++) {
+                            px(img, bx + d, y0 + d, fg);
+                            px(img, bx + d, y0 + 4 - d, fg);
+                        }
+                    }
+                }
+            }
+            case NOTE -> {
+                disc(img, cx - 1.5, cy + 2.5, r * 0.6, fg);
+                rect(img, (int) cx + 1, (int) (cy - r), (int) cx + 2, (int) cy + 2, fg);
+                rect(img, (int) cx + 1, (int) (cy - r), (int) cx + 4, (int) (cy - r) + 1, fg);
+            }
+            case BUTTON -> {
+                disc(img, cx, cy, r, fg);
+                ringShape(img, cx, cy, r + 1.5, 1.0, accent);
+            }
+            case CHEST -> {
+                rect(img, 3, (int) cy - 1, w - 4, h - 4, fg);
+                rect(img, 3, (int) cy - 3, w - 4, (int) cy - 2, accent);
+                rect(img, (int) cx - 1, (int) cy - 1, (int) cx, (int) cy + 2, accent);
+            }
+            case GATE -> {
+                for (int x = 3; x < w - 3; x += 4) {
+                    rect(img, x, 3, x + 1, h - 4, fg);
+                }
+                rect(img, 2, 2, w - 3, 3, accent);
+            }
+            case DASHED -> {
+                for (int x = 2; x < w - 2; x += 3) {
+                    px(img, x, 2, fg);
+                    px(img, x, h - 3, fg);
+                }
+                for (int y = 2; y < h - 2; y += 3) {
+                    px(img, 2, y, fg);
+                    px(img, w - 3, y, fg);
+                }
+            }
+            case SPARKLE -> {
+                rect(img, (int) cx - 1, 2, (int) cx, h - 3, fg);
+                rect(img, 2, (int) cy - 1, w - 3, (int) cy, fg);
+                disc(img, cx, cy, 2.0, accent);
+            }
+            case BURST -> {
+                for (int a = 0; a < 8; a++) {
+                    double ang = a * Math.PI / 4.0;
+                    for (double d = 2; d < r + 2; d++) {
+                        px(img, (int) (cx + Math.cos(ang) * d), (int) (cy + Math.sin(ang) * d), fg);
+                    }
+                }
+            }
+            case GLOW -> {
+                ringShape(img, cx, cy, r + 2, 1.0, accent);
+                disc(img, cx, cy, r * 0.7, fg);
+            }
+            case DUST -> {
+                int seed = 1;
+                for (int i = 0; i < 14; i++) {
+                    seed = seed * 1103515245 + 12345;
+                    int x = 2 + Math.floorMod(seed >> 8, Math.max(1, w - 4));
+                    seed = seed * 1103515245 + 12345;
+                    int y = 2 + Math.floorMod(seed >> 8, Math.max(1, h - 4));
+                    px(img, x, y, (i % 3 == 0) ? accent : fg);
+                }
+            }
+            case MUSHROOM -> {
+                for (int y = 0; y < h / 2; y++) {
+                    double span = Math.sqrt(Math.max(0.0, r * r * 2.2 - (y - 2) * (y - 2) * 1.4));
+                    rect(img, (int) (cx - span), 3 + y, (int) (cx + span), 3 + y, fg);
+                }
+                rect(img, (int) cx - 2, (int) cy + 2, (int) cx + 1, h - 3, accent);
+                disc(img, cx - 2.5, cy - 1.5, 1.6, accent);
+                disc(img, cx + 2.5, cy - 0.5, 1.2, accent);
+            }
+            case FLOWER -> {
+                for (int a = 0; a < 5; a++) {
+                    double ang = a * (Math.PI * 2 / 5) - Math.PI / 2;
+                    disc(img, cx + Math.cos(ang) * r * 0.8, cy + Math.sin(ang) * r * 0.8, r * 0.42, fg);
+                }
+                disc(img, cx, cy, r * 0.38, accent);
+            }
+            case STAR -> {
+                for (int a = 0; a < 5; a++) {
+                    double ang = a * (Math.PI * 2 / 5) - Math.PI / 2;
+                    for (double d = 0; d < r * 1.35; d++) {
+                        int sx = (int) (cx + Math.cos(ang) * d);
+                        int sy = (int) (cy + Math.sin(ang) * d);
+                        px(img, sx, sy, fg);
+                        px(img, sx + 1, sy, fg);
+                    }
+                }
+                disc(img, cx, cy, r * 0.45, accent);
+            }
+            case LEAF -> {
+                for (int y = 0; y < h - 5; y++) {
+                    double t = y / (double) (h - 5);
+                    double span = Math.sin(t * Math.PI) * r * 1.1;
+                    rect(img, (int) (cx - span), 2 + y, (int) (cx + span), 2 + y, fg);
+                }
+                rect(img, (int) cx, 2, (int) cx, h - 3, accent);
+            }
+            case EGG -> {
+                for (int y = 0; y < h - 4; y++) {
+                    double t = y / (double) (h - 4);
+                    double span = Math.sin(Math.min(1.0, t * 0.85 + 0.15) * Math.PI) * r * 1.15;
+                    rect(img, (int) (cx - span), 2 + y, (int) (cx + span), 2 + y, fg);
+                }
+                disc(img, cx - 1.5, cy - 1.0, 1.4, accent);
+                disc(img, cx + 2.0, cy + 2.0, 1.1, accent);
+            }
+            case AURA -> {
+                ringShape(img, cx, cy, r + 2, 1.0, accent);
+                ringShape(img, cx, cy, r, 1.0, fg);
+                disc(img, cx, cy, r * 0.4, fg);
+            }
+            case NONE -> {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Builds one tile: a shaded fill, a bevelled border, and either a motif or the initials.
+     *
+     * <p>The bevel is what stops these reading as flat swatches — a lighter top-left and darker
+     * bottom-right edge gives the block volume even before any motif is drawn.
+     */
+    private static BufferedImage tile(String name, String label, int index, int w, int h,
+                                      Integer forcedColour) {
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         int base = forcedColour != null ? forcedColour : spreadColour(index, 0.62F, 0.86F);
         fill(img, base);
-        border(img, shade(base, 0.55));
 
-        int ink = luminance(base) > 0.55 ? shade(base, 0.30) : 0xFFFFFF;
-        int textWidth = label.length() * 5 - 1;
-        drawText(img, label, (w - textWidth) / 2, (h - 5) / 2, ink);
+        // Bevel: light from the top-left, shadow to the bottom-right.
+        int lit = shade(base, 1.25);
+        int dark = shade(base, 0.62);
+        for (int x = 0; x < w; x++) {
+            px(img, x, 0, lit);
+            px(img, x, h - 1, dark);
+        }
+        for (int y = 0; y < h; y++) {
+            px(img, 0, y, lit);
+            px(img, w - 1, y, dark);
+        }
+        border(img, shade(base, 0.45));
+
+        int ink = luminance(base) > 0.55 ? shade(base, 0.28) : 0xFFFFFF;
+        int accent = luminance(base) > 0.55 ? shade(base, 0.55) : shade(base, 1.45);
+
+        if (!drawMotif(img, motifFor(name), ink, accent)) {
+            int textWidth = label.length() * 5 - 1;
+            drawText(img, label, (w - textWidth) / 2, (h - 5) / 2, ink);
+        }
         return img;
     }
 
@@ -285,7 +553,7 @@ public final class TextureGen {
         EFFECTS.put("leaf_aura", 0x55AA00);
         EFFECTS.put("star_power", 0xFFDD00);
         EFFECTS.put("mega_aura", 0xFF66AA);
-        EFFECTS.put("mini_aura", 0x88CCFF);
+        EFFECTS.put("mini_aura", 0x9AF0A8);
         EFFECTS.put("propeller_aura", 0xFFD700);
         EFFECTS.put("acorn_aura", 0xCC8833);
         EFFECTS.put("cloud_aura", 0xAADDFF);
@@ -317,40 +585,59 @@ public final class TextureGen {
 
         for (String n : allBlocks) {
             write(root.resolve("block").resolve(n + ".png"),
-                    tile(blockLabels.get(n), index++, 16, 16, null));
+                    tile(n, blockLabels.get(n), index++, 16, 16, null));
             written++;
         }
         for (String n : ITEMS) {
             write(root.resolve("item").resolve(n + ".png"),
-                    tile(itemLabels.get(n), index++, 16, 16, null));
+                    tile(n, itemLabels.get(n), index++, 16, 16, null));
             written++;
         }
         for (String n : PARTICLES) {
             write(root.resolve("particle").resolve(n + ".png"),
-                    tile(particleLabels.get(n), index++, 16, 16, null));
+                    tile(n, particleLabels.get(n), index++, 16, 16, null));
             written++;
         }
         for (String n : ENTITIES) {
             write(root.resolve("entity").resolve(n + ".png"),
-                    tile(entityLabels.get(n), index++, 64, 32, null));
+                    tile(n, entityLabels.get(n), index++, 64, 32, null));
             written++;
         }
         // Mob effect icons: vanilla is 18x18, and the colour comes from the effect itself.
         for (Map.Entry<String, Integer> e : EFFECTS.entrySet()) {
             write(root.resolve("mob_effect").resolve(e.getKey() + ".png"),
-                    tile(effectLabels.get(e.getKey()), index++, 18, 18, e.getValue()));
+                    tile(e.getKey(), effectLabels.get(e.getKey()), index++, 18, 18, e.getValue()));
             written++;
         }
 
         log.add("labels: " + blockLabels + " " + itemLabels + " " + particleLabels
                 + " " + entityLabels + " " + effectLabels);
         log.forEach(System.out::println);
+        System.out.println("left " + skipped + " production textures untouched");
         System.out.printf(Locale.ROOT,
                 "wrote %d placeholder textures (%d block, %d item, %d particle, %d entity, %d mob_effect)%n",
                 written, allBlocks.size(), ITEMS.size(), PARTICLES.size(), ENTITIES.size(), EFFECTS.size());
     }
 
+    /**
+     * Largest a generated placeholder ever gets. Anything on disk above this is hand-made or
+     * imported production art.
+     */
+    private static final long PLACEHOLDER_MAX_BYTES = 400L;
+
+    /**
+     * Writes a placeholder, but never over production art.
+     *
+     * <p>Several textures have since been replaced with real work (entity skins, the course
+     * blocks, the skybox). Regenerating placeholders used to silently destroy them, which is why
+     * ASSET_LICENSES.md carried a warning not to run this over the whole directory. The guard
+     * makes that warning unnecessary: a file larger than a placeholder is left alone.
+     */
     private static void write(Path out, BufferedImage img) throws IOException {
+        if (Files.exists(out) && Files.size(out) > PLACEHOLDER_MAX_BYTES) {
+            skipped++;
+            return;
+        }
         Files.createDirectories(out.getParent());
         ImageIO.write(img, "PNG", out.toFile());
     }

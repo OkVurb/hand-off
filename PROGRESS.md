@@ -15,6 +15,29 @@
 
 ## What Was Done This Session
 
+### Claude session — backlog tasks 2, 4, 6, 8 and texture motifs
+
+- Task 2 — course crouch: the crouched hitbox collapses to 0.5 blocks so the player can slide
+  under one-block gaps. The rule lives in `CourseCrouch` and is applied by both a server and a
+  client subscriber, because the client predicts its own movement and a disagreement about height
+  makes the player stutter against gaps the server thinks they fit through.
+- Task 4 — wall slide and wall jump in `AirMoveService`: a fall against a wall is capped so the
+  player visibly clings, and a jump inside a short grace window relaunches them.
+- Task 6 — `ModAttributes.BOUNCE_HEIGHT`, a real attribute replacing the hard-coded stomp bounce,
+  so a Form, role or effect can tune it without `CourseEnemyEntity` knowing about any of them.
+- Task 7 — decided against. Bricks break on any head contact regardless of player state; a block
+  that sometimes ignores a correct hit reads as broken rather than as a rule.
+- Task 8 — head bumps now rebound off the block instead of stopping dead.
+- **Textures.** 72 of 103 were still flat colour with initials. `TextureGen` now draws real
+  motifs — coin, ring, spikes, beacon, conveyor, note, button, chest, gate, mushroom, flower,
+  star, leaf, egg, aura — plus a bevelled edge, falling back to initials only for unmapped names.
+  It also refuses to overwrite any file bigger than a placeholder, so the production art added by
+  earlier sessions is now safe from a regeneration run; `ASSET_LICENSES.md` no longer needs to
+  warn about it. 24 production textures were left untouched.
+- `ModEffects` gave `ice_aura` and `mini_aura` the same colour, so their icons were byte-identical
+  once both used the aura motif. `mini_aura` is now distinct. This was a real in-world bug too:
+  two different effects tinted the player identically.
+
 ### Claude session — backlog tasks 9-15 (course rules, clock and scoring)
 
 - **Fixed a blocker that was already on `main`.** Commit `b3477a3` applied the jump boost twice:

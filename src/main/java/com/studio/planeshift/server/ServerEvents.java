@@ -2,6 +2,7 @@ package com.studio.planeshift.server;
 
 import java.util.UUID;
 import com.studio.planeshift.PlaneShift;
+import com.studio.planeshift.common.course.CourseCrouch;
 import com.studio.planeshift.common.course.CourseState;
 import com.studio.planeshift.common.item.CoinItem;
 import com.studio.planeshift.common.network.OpenCourseMapPayload;
@@ -51,6 +52,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -84,6 +86,24 @@ public final class ServerEvents {
                 // bounces strung together in the air.
                 CourseScoringService.endChain(player);
             }
+        }
+    }
+
+    /**
+     * Course crouch hitbox on the server, which owns collision.
+     *
+     * <p>{ ClientEvents} mirrors this so the client predicts the same height; a disagreement
+     * makes the player stutter against gaps the server thinks they fit through.
+     */
+    @SubscribeEvent
+    public static void onEntitySize(EntityEvent.Size event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        var crouched = CourseCrouch.crouchedDimensions(event.getPose(), event.getNewSize(),
+                CourseStateAccess.get(player).inCourse());
+        if (crouched != null) {
+            event.setNewSize(crouched);
         }
     }
 

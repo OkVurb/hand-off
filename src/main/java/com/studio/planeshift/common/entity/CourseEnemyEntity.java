@@ -1,5 +1,6 @@
 package com.studio.planeshift.common.entity;
 
+import com.studio.planeshift.common.registry.ModAttributes;
 import com.studio.planeshift.common.registry.ModParticles;
 import com.studio.planeshift.server.CourseScoringService;
 import com.studio.planeshift.common.registry.ModSounds;
@@ -106,9 +107,16 @@ public abstract class CourseEnemyEntity extends Monster {
         }
     }
 
+    /**
+     * Applies the stomp bounce, read from {@link ModAttributes#BOUNCE_HEIGHT} so a Form, role or
+     * effect can tune it without this class knowing about any of them. Falls back to the original
+     * constant if the attribute is somehow absent.
+     */
     private static void bounce(ServerPlayer player) {
         Vec3 velocity = player.getDeltaMovement();
-        player.setDeltaMovement(velocity.x, STOMP_BOUNCE, velocity.z);
+        var attribute = player.getAttribute(ModAttributes.BOUNCE_HEIGHT);
+        double height = attribute != null ? attribute.getValue() : STOMP_BOUNCE;
+        player.setDeltaMovement(velocity.x, height, velocity.z);
         player.hurtMarked = true;
         player.resetFallDistance();
     }

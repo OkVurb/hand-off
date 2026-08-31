@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.studio.planeshift.common.PlaneShiftConfig;
 import com.studio.planeshift.common.network.ModNetworking;
 import com.studio.planeshift.common.registry.ModAttachments;
+import com.studio.planeshift.common.registry.ModAttributes;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModCreativeTabs;
 import com.studio.planeshift.common.registry.ModEffects;
@@ -48,12 +49,14 @@ public final class PlaneShift {
         ModItems.ITEMS.register(modBus);
         ModEntities.ENTITY_TYPES.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
+        ModAttributes.ATTRIBUTES.register(modBus);
         ModEffects.EFFECTS.register(modBus);
         ModSounds.SOUNDS.register(modBus);
         ModParticles.PARTICLES.register(modBus);
 
         modBus.addListener(ModRegistries::onNewDataPackRegistries);
         modBus.addListener(ModEntities::onCreateAttributes);
+        modBus.addListener(ModAttributes::onModifyAttributes);
         modBus.addListener(ModNetworking::onRegisterPayloadHandlers);
         modBus.addListener(com.studio.planeshift.server.test.PlaneShiftGameTests::registerFunctions);
         modBus.addListener(com.studio.planeshift.server.test.PlaneShiftGameTests::onRegisterGameTests);

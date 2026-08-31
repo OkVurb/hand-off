@@ -32,6 +32,9 @@ public class BrickBlock extends Block implements HitFromBelowBlock {
         if (level.isClientSide()) {
             return;
         }
+        // Bricks break on any head contact, regardless of player state. Deliberately not gated
+        // on a "Super" size: a block that sometimes ignores a correct hit reads as broken rather
+        // than as a rule, and course routing depends on bricks always being clearable.
         if (HitFromBelowBlock.isHeadContact(player, pos)) {
             level.destroyBlock(pos, false);
             level.playSound(null, pos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);

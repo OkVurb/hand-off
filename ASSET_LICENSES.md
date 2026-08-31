@@ -11,9 +11,9 @@ franchise likenesses.
 - Mew Design produced `mew_block_atlas.png` and `mew_character_atlas.png`.
 - OpenAI's built-in image generator produced the course skybox and three 3D turnaround sheets.
 - `tools/MewRigSkinImporter.java` converts the character concepts into 64x32 cuboid UV skins.
-- `tools/TextureGen.java` still owns remaining temporary greybox textures. Running it over the
-  complete texture directory will overwrite production work; use it only for a staged placeholder
-  refresh and restore the production textures afterward.
+- `tools/TextureGen.java` owns the remaining temporary greybox textures. It refuses to overwrite
+  any file larger than a placeholder, so running it over the complete texture directory is safe:
+  production art is skipped and reported.
 
 ## Sounds
 

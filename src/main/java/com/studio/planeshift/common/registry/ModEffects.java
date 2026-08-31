@@ -56,7 +56,7 @@ public final class ModEffects {
 
     public static final DeferredHolder<MobEffect, MobEffect> MINI_AURA =
             EFFECTS.register("mini_aura", () -> {
-                MobEffect effect = new MobEffect(MobEffectCategory.BENEFICIAL, 0x88CCFF) {};
+                MobEffect effect = new MobEffect(MobEffectCategory.BENEFICIAL, 0x9AF0A8) {};
                 effect.addAttributeModifier(Attributes.SCALE,
                         PlaneShift.id("mini_scale"), -0.6D, AttributeModifier.Operation.ADD_VALUE);
                 return effect;
