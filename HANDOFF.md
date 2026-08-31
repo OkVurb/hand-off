@@ -2,7 +2,7 @@
 
 **Project root:** `C:\Dev\PlaneShift`  
 **Date:** 2026-08-31  
-**Status:** `BUILD SUCCESSFUL` — `compileJava`, `test` (31 cases), `checkClientClassLeak`, `checkNoRawCuboidScan`, `checkSoundAssets`, `checkTextureAssets`, `checkBlockModels`, and `build` all pass.
+**Status:** `BUILD SUCCESSFUL` — all checks pass. Verified at runtime: `runServer` reaches `Done` with zero errors, `runClient` reaches the title screen with zero errors.
 
 This document is a complete handoff for the PlaneShift NeoForge 1.21.11 mod. It contains the current state, what was just changed, how to build it, the full source/resource inventory, and the remaining known issues. Use it to continue work from another session or tool.
 
@@ -32,6 +32,7 @@ Run from `C:\Dev\PlaneShift`:
 - Sound asset check: `.\gradlew checkSoundAssets`
 - Texture asset check: `.\gradlew checkTextureAssets`
 - Block model check: `.\gradlew checkBlockModels`
+- Runtime smoke test: `.gradlew runServer` then `.gradlew runClient` (see section 3.-5)
 
 All `check*` tasks and `test` are wired into `check`, so `.\gradlew build` runs them.
 
@@ -53,6 +54,51 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 ---
 
 ## 3. What Was Just Done
+
+### 3.-5 Session 2026-08-31 — runtime verification (runClient / runServer)
+
+Launched the game. The build was green throughout, and the game found four bugs it could not
+see. This is the section to read before trusting a green build again.
+
+**World creation crashed (blocker).** `data/planeshift/dimension_type/course.json` used the
+pre-1.21.11 schema. `RegistryDataLoader` threw `No key monster_spawn_block_light_limit` /
+`No key monster_spawn_light_level`: those live at the *top level* now, not nested under
+`monster_settings`. Clicking into a world raised `ReportedException: Registry Loading`. Reading
+the `DimensionType` codec showed the schema had also dropped `natural`, `piglin_safe`,
+`bed_works`, `has_raids`, `ultrawarm`, `respawn_anchor_works`, `has_respawn_anchor`, `effects`
+and `fixed_time` in favour of `attributes`, `skybox`, `cardinal_light` and `timelines`, so the
+file carried nine dead keys as well. Rewritten against the codec; `fixed_time: 6000` became
+`has_fixed_time: true` plus `timelines: "#minecraft:in_overworld"`.
+
+**All 54 items rendered as missing models.** Since 1.21.4 an item needs
+`assets/<ns>/items/<id>.json` naming its model; a file under `models/item/` is not enough.
+That directory did not exist, so every item logged "No model loaded for default item model ID"
+and rendered as the missing-model block. Generated all 54.
+
+**`pack.mcmeta` was rejected — differently on each side.** The old
+`pack_format` + `supported_formats` spelling is refused above format 64. The fix is not obvious:
+`PackFormat.validateNewFormat` requires `min_format`'s major to exceed `lastPreMinorVersion`,
+which is **64 for CLIENT_RESOURCES but 81 for SERVER_DATA** — and one file is read as both. A
+first attempt at `[75, 0]` (the resource format) satisfied the client and then failed the server
+with "game versions supporting formats 17 to 81 require a supported_formats field". Now pinned
+to `[94, 1]`, matching what NeoForge's own jar declares.
+
+**`moving_platform_spawn_egg` referenced a deleted vanilla model.** It parented to
+`minecraft:item/template_spawn_egg`, which no longer exists; the other twelve spawn eggs use
+`item/generated` with their own texture. Made it match.
+
+**Verification.** `runServer` reaches `Done (0.540s)! For help, type "help"` with zero ERROR
+lines and zero registry errors — that is the path that previously threw. `runClient` reaches the
+title screen with zero errors and zero warnings beyond vanilla's own.
+
+`checkBlockModels` was extended to catch two of these classes of bug: an item model with no
+`items/` definition, and a `pack.mcmeta` that omits `min_format`/`max_format` or whose
+`min_format` major is <= 81. Both verified by reintroducing them.
+
+**What the build still cannot catch:** data-pack *schema* errors like the dimension type. The
+JSON parses fine; only the codec rejects it. `.\gradlew runServer` is the cheapest real check —
+it loads every data-pack registry headlessly in about a minute. Run it after touching anything
+under `src/main/resources/data/`.
 
 ### 3.-4 Session 2026-08-31 — remaining P1/P2 sweep
 

@@ -425,7 +425,9 @@ tasks.register('checkBlockModels') {
     description = 'Fails on malformed model/blockstate JSON, dangling model or texture references, or a multi-state block that renders identically in every state.'
 
     def assetsDir = file('src/main/resources/assets/planeshift')
+    def packMeta = file('src/main/resources/pack.mcmeta')
     inputs.dir(assetsDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(packMeta)
     outputs.file(layout.buildDirectory.file('reports/planeshift/block-models.txt'))
 
     doLast {
@@ -470,6 +472,36 @@ tasks.register('checkBlockModels') {
             }
         }
 
+        /*
+         * Item model definitions. Since 1.21.4 an item needs assets/<ns>/items/<id>.json naming
+         * its model; a model under models/item/ alone is not enough. Without it the game logs
+         * "No model loaded for default item model ID" and renders the missing-model block — which
+         * is exactly what every one of this mod's items did, with nothing failing at build time.
+         */
+        def itemModelsDir = new File(assetsDir, 'models/item')
+        def itemDefsDir = new File(assetsDir, 'items')
+        if (itemModelsDir.isDirectory()) {
+            itemModelsDir.eachFile { f ->
+                if (!f.name.endsWith('.json')) return
+                if (!new File(itemDefsDir, f.name).isFile()) {
+                    problems << "models/item/${f.name} has no items/${f.name} definition, " +
+                            "so the item renders as a missing model"
+                }
+            }
+        }
+        if (itemDefsDir.isDirectory()) {
+            itemDefsDir.eachFile { f ->
+                if (!f.name.endsWith('.json')) return
+                def def_ = parse(f)
+                if (def_ == null) return
+                def ref = def_.model?.model as String
+                def target = resolve(ref, 'models', 'json')
+                if (target != null && !target.isFile()) {
+                    problems << "items/${f.name} names missing model '${ref}'"
+                }
+            }
+        }
+
         // Blockstates: every variant model must resolve, and states must be distinguishable.
         def statesDir = new File(assetsDir, 'blockstates')
         if (statesDir.isDirectory()) {
@@ -498,6 +530,44 @@ tasks.register('checkBlockModels') {
                     problems << "${f.name} has ${variants.size()} variants that all render " +
                             "identically as '${looks[0].split(/\|/)[0]}', so its states cannot be " +
                             "told apart in game"
+                }
+            }
+        }
+
+        /*
+         * pack.mcmeta. Above resource-pack format 64 the game requires min_format/max_format and
+         * rejects the older pack_format + supported_formats spelling outright, logging
+         * "Couldn't load mod/planeshift pack metadata" and falling back. The same file is read
+         * once as a resource pack and once as a data pack, and those formats differ (75.0 vs
+         * 94.1 on 1.21.11), so the declared range has to span both.
+         */
+        def mcmeta = file('src/main/resources/pack.mcmeta')
+        if (!mcmeta.isFile()) {
+            problems << 'pack.mcmeta is missing'
+        } else {
+            def meta = parse(mcmeta)
+            def pack = meta?.pack
+            if (pack != null) {
+                if (pack.min_format == null || pack.max_format == null) {
+                    problems << 'pack.mcmeta must declare both min_format and max_format; ' +
+                            'pack_format/supported_formats is rejected above format 64'
+                } else {
+                    // PackFormat.validateNewFormat requires min_format's major to exceed
+                    // lastPreMinorVersion, or it demands the legacy supported_formats field.
+                    // That cutoff is 64 for CLIENT_RESOURCES but 81 for SERVER_DATA, and one
+                    // file is read as both — so the data cutoff is the binding one. Declaring
+                    // 75 (the resource format) satisfies the client and fails the server.
+                    def minMajor = (pack.min_format instanceof List)
+                            ? pack.min_format[0] as int : pack.min_format as int
+                    if (minMajor <= 81) {
+                        problems << "pack.mcmeta min_format major is ${minMajor}; it must exceed 81 " +
+                                '(SERVER_DATA lastPreMinorVersion) or the game demands the legacy ' +
+                                'supported_formats field when reading the jar as a data pack'
+                    }
+                }
+                if (pack.pack_format != null || pack.supported_formats != null) {
+                    problems << 'pack.mcmeta still carries the superseded pack_format/' +
+                            'supported_formats fields'
                 }
             }
         }

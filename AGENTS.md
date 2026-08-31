@@ -31,12 +31,22 @@
   in all of them (rotation counts as a difference, so facing variants are fine).
 - Blocks hit from below use `HitFromBelowBlock.isHeadContact`, not a bare `player.getY()` compare.
 - C2S payload handlers that do real work go through `PayloadRateLimiter`.
+- Build checks cannot catch data-pack **schema** errors (the JSON parses; only the codec rejects
+  it). After touching `src/main/resources/data/`, run `.\gradlew runServer` — it loads every
+  data-pack registry headlessly and is the cheapest real check. A wrong `dimension_type` schema
+  crashed world creation while the build stayed green.
+- Items need `assets/planeshift/items/<id>.json` as well as `models/item/<id>.json` (1.21.4+),
+  or they render as the missing model. `checkBlockModels` enforces this.
+- `pack.mcmeta` must use `min_format`/`max_format` with a major above 81. The file is read as
+  both a resource pack and a data pack, and the legacy-format cutoff differs (64 vs 81), so the
+  data cutoff binds. Pinned to `[94, 1]` to match NeoForge.
 - Client movement: `PlaneConstrainedInput` writes only `moveVector`/`keyPresses` and must not
   touch the player entity. Velocity assists belong in `PlaneMovementAssists`, which runs from
   `MovementInputUpdateEvent` (game bus, client only).
 - Run client: `.\gradlew runClient`.
 - Run server: `.\gradlew runServer`.
 - No CI workflow exists yet.
+- Runtime smoke test: `.gradlew runServer` (headless, loads all registries) and `.gradlew runClient`.
 
 ## Generated Artifacts & Jar Locations
 After the first build, the following jars and caches are available:
