@@ -314,6 +314,100 @@ tasks.register('checkSoundAssets') {
 
 tasks.named('check') { dependsOn 'checkSoundAssets' }
 
+/*
+ * Texture coverage and distinctness.
+ *
+ * Two failures this guards against, both of which were live:
+ *   - Missing files. Every projectile entity and all ten mob effect icons had no texture at all,
+ *     which renders as the missing-texture checkerboard rather than failing anything.
+ *   - Indistinguishable files. 24 of the 73 placeholders were byte-identical to another, including
+ *     hammer_bro/koopa and brick_block/secret_passage. A greybox that cannot be told apart is
+ *     worse than useless during playtesting, and a secret passage that looks exactly like a brick
+ *     is a gameplay bug rather than an art gap.
+ *
+ * Items are deliberately not coverage-checked: ModItems registers charms with a second Form-id
+ * argument, so the registration names cannot be extracted unambiguously by regex. The duplicate
+ * and empty-file checks below still cover every item texture.
+ */
+tasks.register('checkTextureAssets') {
+    group = 'verification'
+    description = 'Fails on a registered block/entity/effect/particle with no texture, or on two identical textures.'
+
+    def registryDir = file('src/main/java/com/studio/planeshift/common/registry')
+    def texturesDir = file('src/main/resources/assets/planeshift/textures')
+
+    inputs.dir(registryDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(texturesDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/texture-assets.txt'))
+
+    // registry source -> the textures/ subdirectory its entries must appear in
+    def coverage = [
+            'ModBlocks.java'   : 'block',
+            'ModEntities.java' : 'entity',
+            'ModEffects.java'  : 'mob_effect',
+            'ModParticles.java': 'particle'
+    ]
+
+    doLast {
+        def problems = []
+
+        coverage.each { sourceName, dirName ->
+            def source = new File(registryDir, sourceName)
+            if (!source.isFile()) {
+                problems << "registry source ${sourceName} not found"
+                return
+            }
+            // Only the first string argument of a register(...) call is the registration name;
+            // ModEffects also uses PlaneShift.id("...") for attribute modifiers, which are not
+            // registry entries and must not be matched.
+            def names = (source.text =~ /\.register(?:Block|Item)?\(\s*"([a-z0-9_]+)"/).collect { it[1] } as Set
+            if (names.isEmpty()) {
+                problems << "no register(...) names parsed out of ${sourceName}"
+                return
+            }
+            names.each { name ->
+                def png = new File(texturesDir, "${dirName}/${name}.png")
+                if (!png.isFile()) {
+                    problems << "${dirName}/${name}.png missing for entry '${name}' in ${sourceName}"
+                }
+            }
+        }
+
+        // Distinctness and non-emptiness across the whole tree.
+        def byDigest = [:].withDefault { [] }
+        texturesDir.eachFileRecurse { f ->
+            if (!f.name.endsWith('.png')) return
+            def rel = texturesDir.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+            if (f.length() == 0L) {
+                problems << "${rel} is empty"
+                return
+            }
+            def digest = java.security.MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString()
+            byDigest[digest] << rel
+        }
+        byDigest.each { digest, files ->
+            if (files.size() > 1) {
+                problems << "identical textures, cannot be told apart in game: " + files.sort().join(', ')
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/texture-assets.txt'))
+        report.parentFile.mkdirs()
+        report.text = problems.isEmpty()
+                ? "OK: ${byDigest.values().flatten().size()} textures, all present and mutually distinct\n"
+                : "TEXTURE PROBLEMS:\n" + problems.join('\n') + '\n'
+
+        if (!problems.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    "Texture assets are incomplete or ambiguous:\n  " + problems.join('\n  ') +
+                            "\nRegenerate with: java tools/TextureGen.java " +
+                            "src/main/resources/assets/planeshift/textures (see tools/README.md).")
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkTextureAssets' }
+
 tasks.named('jar', Jar) {
     manifest {
         attributes([

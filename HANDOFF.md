@@ -2,7 +2,7 @@
 
 **Project root:** `C:\Dev\PlaneShift`  
 **Date:** 2026-08-31  
-**Status:** `BUILD SUCCESSFUL` — `compileJava`, `test` (31 cases), `checkClientClassLeak`, `checkNoRawCuboidScan`, `checkSoundAssets`, and `build` all pass.
+**Status:** `BUILD SUCCESSFUL` — `compileJava`, `test` (31 cases), `checkClientClassLeak`, `checkNoRawCuboidScan`, `checkSoundAssets`, `checkTextureAssets`, and `build` all pass.
 
 This document is a complete handoff for the PlaneShift NeoForge 1.21.11 mod. It contains the current state, what was just changed, how to build it, the full source/resource inventory, and the remaining known issues. Use it to continue work from another session or tool.
 
@@ -30,6 +30,7 @@ Run from `C:\Dev\PlaneShift`:
 - Client class leak check: `.\gradlew checkClientClassLeak`
 - Raw cuboid scan check: `.\gradlew checkNoRawCuboidScan`
 - Sound asset check: `.\gradlew checkSoundAssets`
+- Texture asset check: `.\gradlew checkTextureAssets`
 
 All `check*` tasks and `test` are wired into `check`, so `.\gradlew build` runs them.
 
@@ -40,6 +41,7 @@ Current results:
 > Task :checkClientClassLeak — PASSED
 > Task :checkNoRawCuboidScan — PASSED
 > Task :checkSoundAssets — PASSED (22 events, all backed by an OGG)
+> Task :checkTextureAssets — PASSED (89 textures, present and distinct)
 > Task :test — PASSED (31 cases)
 > Task :build — BUILD SUCCESSFUL
 ```
@@ -49,6 +51,39 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 ---
 
 ## 3. What Was Just Done
+
+### 3.-3 Session 2026-08-31 — texture assets (P1 + P2, resolved)
+
+**New:** `tools/TextureGen.java`, generating all 89 placeholder textures (was 73).
+
+Two separate problems, both live:
+
+- **Missing files.** All six projectile entities (`boomerang`, `bowser_fire`, `ember_bolt`,
+  `fireball`, `hammer`, `iceball`) had no texture, and `textures/mob_effect/` did not exist at
+  all — 10 effect icons absent. Both render as the missing-texture checkerboard, which fails
+  nothing and is easy to miss.
+- **Indistinguishable files.** 24 of the 73 existing placeholders were byte-identical to another.
+  `hammer_bro`/`koopa` were the same colour, as were `brick_block`/`secret_passage` — a secret
+  passage that looks exactly like a brick is a gameplay bug, not an art gap.
+
+The generator gives each entry a hue spread by the golden angle over a shared index (cannot
+collide) plus its initials in a 4×5 pixel font. Initials alone were not enough —
+`checkpoint_beacon`, `coin_block` and `conveyor_belt` all reduce to "CB" — so colliding names
+advance through progressively more specific strategies until each category is unambiguous.
+
+Sizes match what the game expects: 16×16 blocks/items/particles, 64×32 entity skins, 18×18 mob
+effect icons (checked against vanilla in the client resources jar). Effect icons use the colour
+the effect declares in `ModEffects`, so the HUD icon matches the aura tint.
+
+**New build check:** `checkTextureAssets` — fails if a block/entity/effect/particle registered in
+`Mod*.java` has no texture, if any PNG is empty, or if two PNGs are byte-identical. Items are
+deliberately not coverage-checked (`registerCharm` takes a second Form-id argument, so
+registration names cannot be extracted unambiguously by regex); the duplicate check still covers
+them. Verified non-vacuous: deleting `mob_effect/frozen.png` and duplicating `brick_block` onto
+`secret_passage` produced exactly those two failures.
+
+Note for later: `ice_aura` and `mini_aura` share `0x88CCFF` in `ModEffects`, so their icons are
+the same colour by design of the registry, not by generator error. The labels distinguish them.
 
 ### 3.-2 Session 2026-08-31 — sound assets (P0, resolved)
 
@@ -224,15 +259,14 @@ If a future course feature legitimately needs raw cuboid iteration, add the clas
 
 ### P1 — High
 - **GUI overflow on small screens.** `ToadShopScreen` uses a fixed layout that can fall off the bottom. `CourseHud` uses a fixed panel and pips may overflow.
-- **Projectile-only entity textures missing.** Some projectiles have no dedicated textures.
 
 **Resolved 2026-08-31:**
+- ~~Projectile entity textures missing~~ (P1) and ~~mob effect icons missing~~ (P2) - see section 3.-3.
 - ~~Sound events are empty~~ (P0) — 22 original OGGs now ship, see §3.-2.
 - ~~Client-side player mutation in `PlaneConstrainedInput`~~ — see §3.-1.
 - ~~Brute-force block scans in `OnOffSwitchBlock` / `PSwitchBlock`~~ — see §3.0.
 
 ### P2 — Medium
-- **Mob effect icons missing.** `assets/planeshift/textures/mob_effect/*.png` are absent for the mod effects.
 - **State-aware models missing.** `on_off_block.json` uses the same model for `on=true` and `on=false`. `hidden_question_block.json` has no empty/hidden model distinction.
 - **Height checks are coarse.** `HiddenQuestionBlock`, `QuestionBlock`, `PrizeCacheBlock`, `BrickBlock` check the whole player Y instead of bounding-box/head contact.
 - **PSwitch CONVERTED map still leaks on non-player removal** (explosions/pistons/SETBLOCK). `playerWillDestroy` only covers player breaks.
@@ -640,8 +674,9 @@ C:\Dev\PlaneShift\src\main\resources\pack.mcmeta
 ## 8. Next Actions (Suggested)
 
 1. ~~Generate the missing sound files~~ — done 2026-08-31, see section 3.-2. Regenerate via `tools/README.md`.
-2. Add mob effect textures in `assets/planeshift/textures/mob_effect/`.
+2. ~~Add mob effect textures~~ — done 2026-08-31, see section 3.-3.
 3. ~~Improve `PlaneConstrainedInput`~~ — done 2026-08-31, see section 3.-1.
 4. ~~Optimize `OnOffSwitchBlock` and `PSwitchBlock` scans~~ — done 2026-08-31, see §3.0.
 5. Play-test the course flow: start, checkpoint, respawn, complete, leave, Toad shop.
 6. Reuse `BlockAreaScan` if any new course block needs an area search — the `checkNoRawCuboidScan` build check will reject a raw cuboid loop.
+7. Replace the greybox textures with real art when ready — drop PNGs into `assets/planeshift/textures/` at the same paths and sizes; `checkTextureAssets` keeps coverage and distinctness honest.

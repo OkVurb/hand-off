@@ -49,3 +49,28 @@ is non-positional, so the extra channel is free.
 3. Add the `sounds.json` entry plus its `subtitles.planeshift.thing` key in `en_us.json`.
 4. Regenerate, encode, and run `./gradlew checkSoundAssets` — it fails on any event that has
    no playable file behind it, and on any subtitle key missing from the language file.
+
+## TextureGen.java
+
+Generates all 89 placeholder (greybox) textures.
+
+```bash
+java tools/TextureGen.java src/main/resources/assets/planeshift/textures
+./gradlew checkTextureAssets
+```
+
+Each texture is a flat fill with a darker border and the entry's initials in a 4x5 pixel font.
+Two properties matter and are enforced:
+
+- **Distinct colours.** Hues are spread by the golden angle across a shared index, so no two
+  entries can land on the same colour. The previous hand-made set had 24 of 73 files
+  byte-identical, including `hammer_bro`/`koopa` and `brick_block`/`secret_passage`.
+- **Distinct labels.** Plain initials collide (`checkpoint_beacon`, `coin_block` and
+  `conveyor_belt` all give "CB"), so colliding names are advanced through more specific
+  strategies until the category is unambiguous.
+
+Sizes are what the game expects: 16x16 blocks/items/particles, 64x32 entity skins, 18x18 mob
+effect icons. Mob effect icons take the colour the effect declares in `ModEffects` so the HUD
+icon matches the aura tint.
+
+These are placeholders, not art — replace them freely.
