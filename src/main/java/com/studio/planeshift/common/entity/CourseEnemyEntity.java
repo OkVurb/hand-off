@@ -1,6 +1,9 @@
 package com.studio.planeshift.common.entity;
 
 import com.studio.planeshift.common.registry.ModAttributes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import com.studio.planeshift.common.registry.ModParticles;
 import com.studio.planeshift.server.CourseScoringService;
 import com.studio.planeshift.common.registry.ModSounds;
@@ -32,6 +35,61 @@ public abstract class CourseEnemyEntity extends Monster {
     private static final int STOMP_COOLDOWN_TICKS = 10;
 
     private long lastStompGameTime = -STOMP_COOLDOWN_TICKS;
+
+    /**
+     * Ticks of squish left, synced so the renderer can flatten the model.
+     *
+     * <p>Lives on the base entity rather than in each subclass so every enemy squishes the same
+     * way for free, and so the renderer needs to know about exactly one field instead of a
+     * per-enemy animation hook.
+     */
+    private static final EntityDataAccessor<Integer> SQUISH_TICKS =
+            SynchedEntityData.defineId(CourseEnemyEntity.class, EntityDataSerializers.INT);
+
+    /** How long the squish lasts. Short: it is a punctuation mark, not an animation to watch. */
+    public static final int SQUISH_DURATION = 8;
+    /** How flat the model gets at peak squish, as a fraction of normal height. */
+    public static final float SQUISH_MIN_SCALE = 0.25F;
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(SQUISH_TICKS, 0);
+    }
+
+    /** Starts the squish. Safe to call repeatedly; a fresh hit restarts it. */
+    public void startSquish() {
+        entityData.set(SQUISH_TICKS, SQUISH_DURATION);
+    }
+
+    /**
+     * Vertical scale to render at: 1 when unsquished, dipping toward {@link #SQUISH_MIN_SCALE}
+     * and springing back.
+     *
+     * <p>Width is widened by the inverse so the enemy appears to conserve volume, which is what
+     * makes a squash read as a squash rather than as the model simply shrinking.
+     */
+    public float squishScaleY(float partialTick) {
+        int ticks = entityData.get(SQUISH_TICKS);
+        if (ticks <= 0) {
+            return 1.0F;
+        }
+        float remaining = Math.max(0.0F, ticks - partialTick);
+        // Progress runs 0 -> 1 across the squish; sin gives a fast dip and an ease back out.
+        float progress = 1.0F - (remaining / SQUISH_DURATION);
+        float dip = (float) Math.sin(progress * Math.PI);
+        return 1.0F - (1.0F - SQUISH_MIN_SCALE) * dip;
+    }
+
+    /** Companion to {@link #squishScaleY}: widen as the model flattens. */
+    public float squishScaleXZ(float partialTick) {
+        float y = squishScaleY(partialTick);
+        return y >= 1.0F ? 1.0F : (float) (1.0 / Math.sqrt(y));
+    }
+
+    public boolean squishing() {
+        return entityData.get(SQUISH_TICKS) > 0;
+    }
 
     protected CourseEnemyEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -68,6 +126,17 @@ public abstract class CourseEnemyEntity extends Monster {
         return fromAbove && falling;
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        if (!level().isClientSide()) {
+            int ticks = entityData.get(SQUISH_TICKS);
+            if (ticks > 0) {
+                entityData.set(SQUISH_TICKS, ticks - 1);
+            }
+        }
+    }
+
     private void resolveStomp(ServerPlayer player) {
         long now = level().getGameTime();
         if (now - lastStompGameTime < STOMP_COOLDOWN_TICKS) {
@@ -78,6 +147,7 @@ public abstract class CourseEnemyEntity extends Monster {
         if (isStompable()) {
             hurtServer((ServerLevel) level(), damageSources().playerAttack(player), stompDamage());
             bounce(player);
+            startSquish();
             if (!isAlive()) {
                 // Only a defeat advances the combo ladder; a stagger is not worth a rung.
                 CourseScoringService.awardStomp(player);

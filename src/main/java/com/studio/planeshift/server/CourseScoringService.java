@@ -1,6 +1,7 @@
 package com.studio.planeshift.server;
 
 import com.studio.planeshift.common.course.CourseState;
+import com.studio.planeshift.common.network.ScorePopupPayload;
 import com.studio.planeshift.common.registry.ModSounds;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * Course scoring: the running score, the stomp combo ladder, and end-of-course results.
@@ -94,6 +96,10 @@ public final class CourseScoringService {
         int points = stompValue(chain.depth);
         chain.depth++;
 
+        // Presentational only: the popup tells the player which rung just paid. A dropped packet
+        // costs nothing, since the score itself rides along with the synced CourseState.
+        sendPopup(player, points == ONE_UP_INSTEAD ? 0 : points);
+
         if (points == ONE_UP_INSTEAD) {
             // Past the top of the ladder every further link is an extra life, as in the original.
             CourseStateAccess.update(player, s -> s.withLives(s.lives() + 1));
@@ -125,6 +131,12 @@ public final class CourseScoringService {
     /** The ladder length, for tests and tuning. */
     static int ladderLength() {
         return STOMP_LADDER.length;
+    }
+
+    /** Tells the client to float a number above the action. */
+    private static void sendPopup(ServerPlayer player, int amount) {
+        PacketDistributor.sendToPlayer(player,
+                new ScorePopupPayload(player.getX(), player.getY() + 1.6D, player.getZ(), amount));
     }
 
     /**

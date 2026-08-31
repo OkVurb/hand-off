@@ -19,6 +19,7 @@ import com.studio.planeshift.common.item.ExtraPipItem;
 import com.studio.planeshift.server.CourseCoopService;
 import com.studio.planeshift.common.item.FireFlowerItem;
 import com.studio.planeshift.common.item.FiveUpItem;
+import com.studio.planeshift.common.item.PoisonMushroomItem;
 import com.studio.planeshift.common.item.PropellerMushroomItem;
 import com.studio.planeshift.common.item.HammerItem;
 import com.studio.planeshift.common.item.IceFlowerItem;
@@ -53,6 +54,7 @@ import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.EntityEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -104,6 +106,19 @@ public final class ServerEvents {
                 CourseStateAccess.get(player).inCourse());
         if (crouched != null) {
             event.setNewSize(crouched);
+        }
+    }
+
+    /**
+     * Drives the power-up drift from each item entity's own tick.
+     *
+     * <p>Hooked per entity rather than by scanning the level: a whole-level sweep every tick to
+     * find a handful of mushrooms is the same mistake `checkNoRawCuboidScan` exists to prevent.
+     */
+    @SubscribeEvent
+    public static void onEntityTick(EntityTickEvent.Post event) {
+        if (event.getEntity() instanceof ItemEntity item) {
+            PowerupDriftService.tick(item);
         }
     }
 
@@ -189,6 +204,7 @@ public final class ServerEvents {
         CourseScoringService.clear(playerId);
         FlagPoleBlock.clear(playerId);
         PayloadRateLimiter.forget(playerId);
+        PlayerSizeService.forget(playerId);
     }
 
     /** Power-up items pop out of blocks and float; mobs in courses become Mario enemies. */
@@ -299,6 +315,13 @@ public final class ServerEvents {
             CourseScoringService.awardCoin(player);
             level.playSound(null, player.blockPosition(),
                     ModSounds.COIN_PICKUP.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
+        } else if (item instanceof PoisonMushroomItem) {
+            entity.discard();
+            // Routed through DamageService so the Form buffer, invulnerability window and
+            // life/game-over handling all behave exactly as they do for any other hit.
+            DamageService.interceptDamage(player, player.damageSources().magic());
+            level.playSound(null, player.blockPosition(),
+                    ModSounds.DAMAGE.get(), SoundSource.PLAYERS, 0.9F, 0.7F);
         } else if (item instanceof StarCoinItem) {
             entity.discard();
             CourseStateAccess.update(player, s -> s.withStarCoins(s.starCoins() + 1));

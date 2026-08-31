@@ -18,6 +18,7 @@ import com.studio.planeshift.client.screen.ToadShopScreen;
 import com.studio.planeshift.common.network.OpenCourseMapPayload;
 import com.studio.planeshift.common.network.OpenTitleScreenPayload;
 import com.studio.planeshift.common.network.OpenToadShopPayload;
+import com.studio.planeshift.common.network.ScorePopupPayload;
 import com.studio.planeshift.common.registry.ModEntities;
 import com.studio.planeshift.common.registry.ModParticles;
 import net.minecraft.client.Minecraft;
@@ -151,6 +152,9 @@ public final class ClientModEvents {
         event.register(OpenCourseMapPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new CourseMapScreen())));
+        event.register(ScorePopupPayload.TYPE,
+                (payload, context) -> context.enqueueWork(() ->
+                        com.studio.planeshift.client.hud.ScorePopups.add(payload.amount())));
         event.register(OpenToadShopPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new ToadShopScreen())));

@@ -138,6 +138,8 @@ public final class CourseHud {
         graphics.drawString(font, Component.translatable("hud.planeshift.score", state.score()),
                 x, y + 76, 0xFFFFFFFF);
 
+        ScorePopups.render(graphics, font);
+
         // Mode badge and transition progress.
         if (PlaneShiftConfig.CLIENT.showModeBadge.get()) {
             renderModeBadge(graphics, font, state);

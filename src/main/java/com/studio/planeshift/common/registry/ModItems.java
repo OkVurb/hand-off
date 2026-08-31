@@ -14,6 +14,7 @@ import com.studio.planeshift.common.item.CloudFlowerItem;
 import com.studio.planeshift.common.item.LeafItem;
 import com.studio.planeshift.common.item.MegaMushroomItem;
 import com.studio.planeshift.common.item.MiniMushroomItem;
+import com.studio.planeshift.common.item.PoisonMushroomItem;
 import com.studio.planeshift.common.item.PropellerMushroomItem;
 import com.studio.planeshift.common.item.StarCoinItem;
 import com.studio.planeshift.common.item.StarPowerItem;
@@ -53,6 +54,8 @@ public final class ModItems {
             ITEMS.registerItem("mega_mushroom", MegaMushroomItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<MiniMushroomItem> MINI_MUSHROOM =
             ITEMS.registerItem("mini_mushroom", MiniMushroomItem::new, p -> p.stacksTo(16));
+    public static final DeferredItem<PoisonMushroomItem> POISON_MUSHROOM =
+            ITEMS.registerItem("poison_mushroom", PoisonMushroomItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<FireFlowerItem> FIRE_FLOWER =
             ITEMS.registerItem("fire_flower", FireFlowerItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<IceFlowerItem> ICE_FLOWER =

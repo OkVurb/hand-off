@@ -54,6 +54,7 @@ public final class ModNetworking {
         registrar.playToClient(OpenTitleScreenPayload.TYPE, OpenTitleScreenPayload.STREAM_CODEC);
         registrar.playToClient(OpenCourseMapPayload.TYPE, OpenCourseMapPayload.STREAM_CODEC);
         registrar.playToClient(OpenToadShopPayload.TYPE, OpenToadShopPayload.STREAM_CODEC);
+        registrar.playToClient(ScorePopupPayload.TYPE, ScorePopupPayload.STREAM_CODEC);
 
         registrar.playToServer(ToadShopPurchasePayload.TYPE, ToadShopPurchasePayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {

@@ -15,6 +15,43 @@
 
 ## What Was Done This Session
 
+### Claude session — Phase 2/3 batch (18, 25, 27-29, 32-34, 42-45)
+
+Hard items first, at the user's request.
+
+- Task 45 — floating score popups. New `ScorePopupPayload` plus a `ScorePopups` HUD renderer;
+  a stomp chain now reads as "+100, +200, +400" climbing. **Deliberately HUD-anchored, not
+  world-anchored**: 1.21.11's `RenderLevelStageEvent` no longer exposes a camera or partial tick,
+  and `Display.TextDisplay`'s setters are private, so world anchoring would mean rebuilding the
+  projection by hand for a cosmetic label. Purely presentational — the score itself is synced
+  with `CourseState`.
+- Task 44 — squish framework. `SQUISH_TICKS` on `CourseEnemyEntity` with a sin-curve dip, read by
+  a new `CourseEnemyRenderState`. Width widens as height flattens so volume looks conserved. On
+  the base class, so every enemy including future ones squishes for free.
+- Tasks 32/33 — Koopa shell. Three states: walking, shell, sliding. A stomp retreats it instead
+  of killing it; touching a parked shell kicks it; a sliding shell destroys other enemies and
+  ricochets off walls. Stomping a slide stops it, so a lost shell is always recoverable.
+- Tasks 42/43 — Piranha Plant emerge cycle, and it will not emerge while a player is on or beside
+  the pipe. Without that rule a player who lands on a pipe is bitten with no counterplay.
+- Task 25 — the shrink is now animated. `PlayerSizeService` ramps the scale modifier over six
+  ticks instead of snapping. Driven server-side because the attribute is synced, so the client
+  interpolates for free and collision follows the same curve.
+- Task 34 — Buzzy Beetle is fire-immune, including the mod's own fireball and ember bolt, which
+  arrive as projectile hits rather than fire damage types.
+- Task 18 — fireballs bounce along the ground with decaying arcs, and stop dead on walls so they
+  cannot ricochet back at the player.
+- Tasks 27/28 — `PowerupDriftService` makes mushrooms slide, turn at walls and fall off ledges.
+  Hooked per entity via `EntityTickEvent`, not by sweeping the level, for the same reason
+  `checkNoRawCuboidScan` exists.
+- Task 29 — Poison Mushroom: drifts and pops like a real one, but costs a pip through
+  `DamageService` so the Form buffer and i-frames behave normally.
+- Task 7 revisited: bricks break regardless of player state, per the project owner.
+
+Already implemented by earlier sessions, verified not redone: 16, 17, 19, 20, 26, 30, 31, 35, 36,
+38, 39, 40, 41. Tasks 21-24 are covered by the texture motif pass.
+
+Unit tests 66 -> 72. `runServer` reaches `Done (0.401s)` with zero registry errors.
+
 ### Claude session — backlog tasks 2, 4, 6, 8 and texture motifs
 
 - Task 2 — course crouch: the crouched hitbox collapses to 0.5 blocks so the player can slide

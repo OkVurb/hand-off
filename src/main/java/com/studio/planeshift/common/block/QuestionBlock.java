@@ -75,6 +75,7 @@ public class QuestionBlock extends Block implements HitFromBelowBlock {
             case 13 -> ModItems.TANOOKI.get();
             case 14 -> ModItems.MEGA_MUSHROOM.get();
             case 15 -> ModItems.MINI_MUSHROOM.get();
+            case 18 -> ModItems.POISON_MUSHROOM.get();
             case 16 -> ModItems.THREE_UP.get();
             case 17 -> ModItems.FIVE_UP.get();
             default -> ModItems.STAR_POWER.get();

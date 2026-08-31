@@ -264,7 +264,8 @@ public final class TextureGen {
             case "hit_burst" -> Motif.BURST;
             case "pickup_glow" -> Motif.GLOW;
             case "theme_dust", "respawn_warp" -> Motif.DUST;
-            case "super_mushroom", "mega_mushroom", "mini_mushroom", "propeller_mushroom" -> Motif.MUSHROOM;
+            case "super_mushroom", "mega_mushroom", "mini_mushroom", "propeller_mushroom",
+                 "poison_mushroom" -> Motif.MUSHROOM;
             case "fire_flower", "ice_flower", "cloud_flower" -> Motif.FLOWER;
             case "star_power", "extra_pip", "three_up", "five_up" -> Motif.STAR;
             case "leaf", "acorn", "tanooki" -> Motif.LEAF;
@@ -538,7 +539,7 @@ public final class TextureGen {
             "ember_charm", "extra_pip", "fire_flower", "five_up", "gale_charm",
             "goomba_spawn_egg", "hammer", "hammer_bro_spawn_egg", "hidden_question_block",
             "ice_flower", "koopa_spawn_egg", "lakitu_spawn_egg", "leaf", "magnet_charm",
-            "mega_mushroom", "mini_mushroom", "moving_platform_spawn_egg",
+            "mega_mushroom", "mini_mushroom", "poison_mushroom", "moving_platform_spawn_egg",
             "piranha_plant_spawn_egg", "propeller_mushroom", "spiny_spawn_egg", "star_coin",
             "star_power", "super_mushroom", "tanooki", "three_up", "thwomp_spawn_egg",
             "toad_spawn_egg");
