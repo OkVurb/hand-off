@@ -1,4 +1,4 @@
-﻿# PlaneShift — Continuation Handoff
+# PlaneShift — Continuation Handoff
 
 **Project root:** `C:\Dev\PlaneShift`  
 **Date:** 2026-08-31  
@@ -873,7 +873,8 @@ C:\Dev\PlaneShift\src\main\resources\pack.mcmeta
 2. ~~Add mob effect textures~~ — done 2026-08-31, see section 3.-3.
 3. ~~Improve `PlaneConstrainedInput`~~ — done 2026-08-31, see section 3.-1.
 4. ~~Optimize `OnOffSwitchBlock` and `PSwitchBlock` scans~~ — done 2026-08-31, see §3.0.
-5. Play-test all five generated courses: facing lock, jumps, checkpoint, respawn, complete, leave and Toad shop.
-6. Reuse `BlockAreaScan` if any new course block needs an area search — the `checkNoRawCuboidScan` build check will reject a raw cuboid loop.
-7. Build bespoke enemy models/animations in Blockbench from `docs/ENEMY_ART_DIRECTION.md` and the three turnaround sheets; the current shared Java rig is articulated but intentionally provisional.
-8. Add per-theme skyboxes if desired; all five courses currently share the same bright panorama.
+5. ~~Add GameTests for block mechanics~~ — done 2026-08-31, data-driven tests added for QuestionBlock, PSwitchBlock, and OnOffSwitch.
+6. Play-test all five generated courses: facing lock, jumps, checkpoint, respawn, complete, leave and Toad shop.
+7. Reuse `BlockAreaScan` if any new course block needs an area search — the `checkNoRawCuboidScan` build check will reject a raw cuboid loop.
+8. Build bespoke enemy models/animations in Blockbench from `docs/ENEMY_ART_DIRECTION.md` and the three turnaround sheets; the current shared Java rig is articulated but intentionally provisional.
+9. Add per-theme skyboxes if desired; all five courses currently share the same bright panorama.

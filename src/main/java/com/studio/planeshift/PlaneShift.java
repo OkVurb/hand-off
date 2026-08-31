@@ -55,6 +55,8 @@ public final class PlaneShift {
         modBus.addListener(ModRegistries::onNewDataPackRegistries);
         modBus.addListener(ModEntities::onCreateAttributes);
         modBus.addListener(ModNetworking::onRegisterPayloadHandlers);
+        modBus.addListener(com.studio.planeshift.server.test.PlaneShiftGameTests::registerFunctions);
+        modBus.addListener(com.studio.planeshift.server.test.PlaneShiftGameTests::onRegisterGameTests);
 
         NeoForge.EVENT_BUS.addListener(PlaneShiftCommands::onRegisterCommands);
 

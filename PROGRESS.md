@@ -22,18 +22,18 @@
 - Installed and signature-verified portable Blockbench 5.1.6; documented the modelling/animation workflow.
 - Changed 2.5D avatar presentation so both body and head face only the last A/D direction; mouse movement no longer turns the visible head toward/away from camera, and actual player yaw remains untouched for gameplay aim.
 - Added generated-course planning tests; the suite now has 38 passing cases.
+- Implemented and successfully passed GameTests for `QuestionBlock`, `PSwitchBlock`, and `OnOffSwitchBlock` using data-driven registrations and reflection for testing internal block logic without networking issues.
 
 ## What Is In Progress
 
-Nothing — last session completed all tracked work.
+Nothing — all current tasks and prioritized fixes are complete up to the point of manual/creative art steps.
 
 ## What To Do Next (priority order)
 
 1. **Live facing check** — launch course 1, hold A/D and move the mouse; body/head must stay left/right while movement and action aim remain stable.
 2. **Full play-testing** — walk all five courses and exercise gaps, checkpoint/death, switches, rewards, shop and finish/leave flow.
 3. **Bespoke entity models** — use Blockbench plus the three turnaround sheets and `docs/ENEMY_ART_DIRECTION.md`; the current articulated Java rig is shared/procedural, not final geometry.
-4. **GameTests** — start with QuestionBlock, PSwitchBlock and OnOffSwitch.
-5. **Art continuation** — per-theme skyboxes and final item/effect textures.
+4. **Art continuation** — per-theme skyboxes and final item/effect textures.
 
 ## How To Resume
 
