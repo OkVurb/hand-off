@@ -6,6 +6,9 @@ import com.studio.planeshift.client.hud.CourseHud;
 import com.studio.planeshift.client.input.PlaneConstrainedInput;
 import com.studio.planeshift.client.music.CourseMusicManager;
 import com.studio.planeshift.client.render.CourseEnemyRenderer;
+import com.studio.planeshift.client.render.CourseSkyboxRenderer;
+import com.studio.planeshift.client.render.AnimatedCourseEnemyModel;
+import com.studio.planeshift.client.render.EnemyRigProfile;
 import com.studio.planeshift.client.render.MovingPlatformRenderer;
 import com.studio.planeshift.client.render.PlaceholderRigModel;
 import com.studio.planeshift.client.render.ToadRenderer;
@@ -30,6 +33,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RegisterCustomEnvironmentEffectRendererEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -49,6 +53,12 @@ public final class ClientModEvents {
     }
 
     @SubscribeEvent
+    public static void onRegisterEnvironmentRenderers(
+            RegisterCustomEnvironmentEffectRendererEvent event) {
+        event.registerSkyboxRenderer(PlaneShift.id("course"), new CourseSkyboxRenderer());
+    }
+
+    @SubscribeEvent
     public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
         event.registerCategory(PlaneShiftKeybinds.CATEGORY);
         event.register(PlaneShiftKeybinds.FORM_ACTION);
@@ -63,6 +73,8 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(PlaceholderRigModel.LAYER_LOCATION, PlaceholderRigModel::createBodyLayer);
+        event.registerLayerDefinition(AnimatedCourseEnemyModel.LAYER_LOCATION,
+                AnimatedCourseEnemyModel::createBodyLayer);
     }
 
     /**
@@ -94,28 +106,28 @@ public final class ClientModEvents {
         Identifier bowser = PlaneShift.id("textures/entity/bowser.png");
 
         event.registerEntityRenderer(ModEntities.GOOMBA.get(),
-                CourseEnemyRenderer.provider(goomba, 0.25F));
+                CourseEnemyRenderer.provider(goomba, 0.25F, EnemyRigProfile.SPROUTLING));
         event.registerEntityRenderer(ModEntities.KOOPA.get(),
-                CourseEnemyRenderer.provider(koopa, 0.22F));
+                CourseEnemyRenderer.provider(koopa, 0.22F, EnemyRigProfile.GECKO));
         event.registerEntityRenderer(ModEntities.THWOMP.get(),
-                CourseEnemyRenderer.provider(thwomp, 0.55F));
+                CourseEnemyRenderer.provider(thwomp, 0.55F, EnemyRigProfile.CRUSHER));
         event.registerEntityRenderer(ModEntities.BULLET_BILL.get(),
-                CourseEnemyRenderer.provider(bulletBill, 0.15F));
+                CourseEnemyRenderer.provider(bulletBill, 0.15F, EnemyRigProfile.FLYER));
         event.registerEntityRenderer(ModEntities.BOO.get(),
-                CourseEnemyRenderer.provider(boo, 0.22F));
+                CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.WISP));
         event.registerEntityRenderer(ModEntities.LAKITU.get(),
-                CourseEnemyRenderer.provider(lakitu, 0.22F));
+                CourseEnemyRenderer.provider(lakitu, 0.22F, EnemyRigProfile.RIDER));
         event.registerEntityRenderer(ModEntities.HAMMER_BRO.get(),
-                CourseEnemyRenderer.provider(hammerBro, 0.22F));
+                CourseEnemyRenderer.provider(hammerBro, 0.22F, EnemyRigProfile.WARRIOR));
         event.registerEntityRenderer(ModEntities.SPINY.get(),
-                CourseEnemyRenderer.provider(spiny, 0.22F));
+                CourseEnemyRenderer.provider(spiny, 0.22F, EnemyRigProfile.CRAWLER));
         event.registerEntityRenderer(ModEntities.BUZZY_BEETLE.get(),
-                CourseEnemyRenderer.provider(buzzyBeetle, 0.25F));
+                CourseEnemyRenderer.provider(buzzyBeetle, 0.25F, EnemyRigProfile.BEETLE));
         event.registerEntityRenderer(ModEntities.PIRANHA_PLANT.get(),
-                CourseEnemyRenderer.provider(piranhaPlant, 0.55F));
+                CourseEnemyRenderer.provider(piranhaPlant, 0.55F, EnemyRigProfile.PLANT));
         event.registerEntityRenderer(ModEntities.TOAD.get(), ToadRenderer::new);
         event.registerEntityRenderer(ModEntities.BOWSER.get(),
-                CourseEnemyRenderer.provider(bowser, 1.0F));
+                CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOSS));
         event.registerEntityRenderer(ModEntities.EMBER_BOLT.get(),
                 context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
         event.registerEntityRenderer(ModEntities.HAMMER.get(),

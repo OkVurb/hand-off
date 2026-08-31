@@ -11,12 +11,14 @@ import net.minecraft.resources.Identifier;
  * rig simple while still producing distinct enemy reads.
  */
 public class CourseEnemyRenderer<T extends com.studio.planeshift.common.entity.CourseEnemyEntity>
-        extends MobRenderer<T, LivingEntityRenderState, PlaceholderRigModel> {
+        extends MobRenderer<T, LivingEntityRenderState, AnimatedCourseEnemyModel> {
 
     private final Identifier texture;
 
-    public CourseEnemyRenderer(EntityRendererProvider.Context context, Identifier texture, float shadowRadius) {
-        super(context, new PlaceholderRigModel(context.bakeLayer(PlaceholderRigModel.LAYER_LOCATION)), shadowRadius);
+    public CourseEnemyRenderer(EntityRendererProvider.Context context, Identifier texture,
+                               float shadowRadius, EnemyRigProfile profile) {
+        super(context, new AnimatedCourseEnemyModel(
+                context.bakeLayer(AnimatedCourseEnemyModel.LAYER_LOCATION), profile), shadowRadius);
         this.texture = texture;
     }
 
@@ -31,7 +33,7 @@ public class CourseEnemyRenderer<T extends com.studio.planeshift.common.entity.C
     }
 
     public static <T extends com.studio.planeshift.common.entity.CourseEnemyEntity> EntityRendererProvider<T> provider(
-            Identifier texture, float shadowRadius) {
-        return context -> new CourseEnemyRenderer<>(context, texture, shadowRadius);
+            Identifier texture, float shadowRadius, EnemyRigProfile profile) {
+        return context -> new CourseEnemyRenderer<>(context, texture, shadowRadius, profile);
     }
 }

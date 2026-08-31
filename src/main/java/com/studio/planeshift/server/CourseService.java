@@ -27,7 +27,6 @@ import net.minecraft.world.level.portal.TeleportTransition;
  */
 public final class CourseService {
 
-    private static final int COURSE_SPACING = 256;
     private static final double RAIL_HALF_DEPTH = 0.75D;
 
     private CourseService() {
@@ -69,14 +68,18 @@ public final class CourseService {
         double startY = start.getY();
         double originZ = start.getZ() + 0.5;
 
+        // Build/reset the lane before moving the player. The original vertical slice spawned at
+        // y=64 in an otherwise empty dimension whose flat terrain is down near minY, so a player
+        // could fall through the kill plane before ever touching a course block.
+        CourseStructureService.place(courseLevel, def);
+
         player.teleportTo(courseLevel, originX, startY, originZ,
                 Collections.emptySet(), 0.0F, 0.0F, false);
 
-        CourseStructureService.place(courseLevel, def);
-
         PlaneMode mode = def.startMode();
         Optional<PlaneRail> rail = mode == PlaneMode.SIDE_ON
-                ? Optional.of(new PlaneRail(net.minecraft.core.Direction.Axis.X, start.getZ(), RAIL_HALF_DEPTH, true))
+                // BlockPos identifies a block corner; the playable lane runs through its centre.
+                ? Optional.of(new PlaneRail(net.minecraft.core.Direction.Axis.X, originZ, RAIL_HALF_DEPTH, true))
                 : Optional.empty();
         CourseThemeService.set(player, def.theme());
         CourseStateAccess.update(player, s -> new CourseState(

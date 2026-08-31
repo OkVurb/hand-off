@@ -10,12 +10,14 @@ import net.minecraft.resources.Identifier;
 /**
  * Placeholder Toad renderer using the same blocky rig as the enemies.
  */
-public class ToadRenderer extends MobRenderer<ToadEntity, LivingEntityRenderState, PlaceholderRigModel> {
+public class ToadRenderer extends MobRenderer<ToadEntity, LivingEntityRenderState, AnimatedCourseEnemyModel> {
 
     private static final Identifier TEXTURE = PlaneShift.id("textures/entity/toad.png");
 
     public ToadRenderer(EntityRendererProvider.Context context) {
-        super(context, new PlaceholderRigModel(context.bakeLayer(PlaceholderRigModel.LAYER_LOCATION)), 0.5F);
+        super(context, new AnimatedCourseEnemyModel(
+                context.bakeLayer(AnimatedCourseEnemyModel.LAYER_LOCATION),
+                EnemyRigProfile.VILLAGER), 0.5F);
     }
 
     @Override

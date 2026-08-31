@@ -1,7 +1,7 @@
 {
   "mode": "side_on",
-  "fov_degrees": 55.0,
-  "distance": 11.0,
+  "fov_degrees": 45.0,
+  "distance": 14.0,
   "pitch_degrees": 0.0,
   "look_ahead": 3.0,
   "damping": 0.35

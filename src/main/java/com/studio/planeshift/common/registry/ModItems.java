@@ -108,6 +108,19 @@ public final class ModItems {
     public static final DeferredItem<FormCharmItem> MAGNET_CHARM = registerCharm("magnet_charm", "magnet_lantern");
 
     // Block items.
+    public static final DeferredItem<?> COURSE_GRASS_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_GRASS_BLOCK);
+    public static final DeferredItem<?> COURSE_CLOUD_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_CLOUD_BLOCK);
+    public static final DeferredItem<?> COURSE_SAND_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_SAND_BLOCK);
+    public static final DeferredItem<?> COURSE_SNOW_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_SNOW_BLOCK);
+    public static final DeferredItem<?> COURSE_CASTLE_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_CASTLE_BLOCK);
+    public static final DeferredItem<?> COURSE_MAGMA_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_MAGMA_BLOCK);
+
     public static final DeferredItem<?> SHIFT_GATE_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.SHIFT_GATE);
     public static final DeferredItem<?> CHECKPOINT_BEACON_ITEM =

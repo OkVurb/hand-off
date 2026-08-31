@@ -1,80 +1,67 @@
 # Next Claude / ChatGPT / Codex Session Prompt — PlaneShift
 
-Copy and paste the block below into a fresh session, or let Codex read `CODEX.md` in the repo root.
+Copy and paste the block below into a fresh session, or let the agent read `PROGRESS.md`,
+`HANDOFF.md`, and `CODEX.md` in the repository root.
 
 ---
 
 You are continuing the PlaneShift project.
 
 Repository: https://github.com/OkVurb/hand-off
-Local root (if already cloned): C:\Dev\PlaneShift
+Local root: C:\Dev\PlaneShift
 
-High-level context:
-- PlaneShift is a NeoForge 1.21.11 Minecraft mod (MDG 2.0.144, Java 21, NeoForge 21.11.45).
-- Architecture: common/ (registries, blocks, entities, items, course/mode/rail state, Form framework, networking), server/ (authoritative services), client/ (keybinds, HUD, camera, input, music, renderers, screens).
-- Client code must stay in com.studio.planeshift.client.
+PlaneShift is a NeoForge 1.21.11 Minecraft mod using Java 21, NeoForge 21.11.45 and MDG
+2.0.144. Client-only code must remain under `com.studio.planeshift.client`; run
+`checkClientClassLeak` after client changes.
 
-Start here:
-1. Clone or pull the repo (git clone https://github.com/OkVurb/hand-off.git).
-2. Verify Java 21 JDK and the Gradle wrapper.
-3. Run .\gradlew build. It should pass with only this-escape warnings.
-4. Read HANDOFF.md sections 3.-5 through 3.0 first — they describe everything changed in the last session and, importantly, what the build checks can and cannot catch.
-5. Read AGENTS.md for conventions and the invariants each build check enforces.
+Start by pulling `main`, then read `PROGRESS.md` and HANDOFF.md section 3.-6. Run
+`.\gradlew build`; only existing this-escape warnings are expected. After changing anything in
+`src/main/resources/data/`, also run `.\gradlew runServer` because JSON codec/schema errors are
+not caught by the ordinary build.
 
-STATE: all previously-tracked P0/P1/P2 issues are closed. The build is green, CI runs it on every push, and the mod launches cleanly on both client and dedicated server. This is a working vertical slice with placeholder art and audio, not a finished game.
+Current state:
 
-The build enforces five invariants. Read AGENTS.md before working around any of them:
-- checkClientClassLeak    — common/server must never reference net.minecraft.client
-- checkNoRawCuboidScan    — area block searches go through BlockAreaScan, not BlockPos.betweenClosed
-- checkSoundAssets        — every ModSounds entry has a real OGG and a subtitle key
-- checkTextureAssets      — every registered block/entity/effect/particle has a texture, and no two textures are byte-identical
-- checkBlockModels        — model/blockstate JSON parses and resolves; multi-variant blocks must not render identically in every state; items need an assets/planeshift/items/<id>.json definition; pack.mcmeta must use min_format/max_format with a major above 81
+- Five deterministic generated courses now exist: grass, desert, snow, lava and underground.
+  They have safe start/finish zones above kill Y, jump gaps, platforms, rewards, switches,
+  checkpoints, hazards, enemies, shopkeepers and finish structures.
+- Course 1 has been loaded in `runClient`. The fixed side camera, generated terrain and custom
+  static-feeling pixel skybox rendered correctly. `runServer` reached `Done` cleanly.
+- Six real course terrain blocks use the successful Mew atlas. Entity skins use the original Mew
+  character sheet. Source/provenance is in `tools/art_sources/` and `ASSET_LICENSES.md`.
+- Enemies use `AnimatedCourseEnemyModel` plus `EnemyRigProfile`, with articulated body parts and
+  procedural walk/idle/wing/special animations. This is a working shared rig, not final bespoke
+  geometry.
+- Three detailed original enemy turnaround sheets and exact visual/animation requirements are in
+  `tools/art_sources/enemy_turnaround_01.png` through `_03.png` and
+  `docs/ENEMY_ART_DIRECTION.md`.
+- Portable Blockbench 5.1.6 is installed at
+  `C:\Users\cr0od\Apps\Blockbench\Blockbench.exe`. Read `tools/blockbench/README.md` for clip
+  names and workflow. Do not bypass Mew credit limits or create throwaway accounts.
+- In 2.5D, `PlaneConstrainedInput` changes only `Input`/`moveVector`. The post-tick presentation
+  pass locks both visible body and head to the last attempted A/D travel direction, so mouse
+  movement cannot turn the head toward/away from camera. It deliberately does not alter `yRot`,
+  preserving movement projection and gameplay action aim.
+- The full unit suite has 38 passing cases: input projection plus generated-course safety/gaps.
 
-IMPORTANT — what the build cannot catch. Data-pack *schema* errors parse as valid JSON and are only rejected by the codec at load time. A wrong dimension_type schema crashed world creation while the build stayed green for weeks. After touching anything under src/main/resources/data/, run:
+Priority work:
 
-    .\gradlew runServer
-
-It loads every data-pack registry headlessly in about a minute and is the cheapest real check. Look for "Done (Xs)! For help, type help" and zero ERROR lines.
-
-Asset generators (standalone, not compiled into the mod — see tools/README.md):
-- tools/SoundGen.java   — regenerates all 22 OGGs. Needs ffmpeg with libvorbis. SFX must be MONO; Minecraft only positions mono sources.
-- tools/TextureGen.java — regenerates all 96 placeholder PNGs.
-
-Remaining work, roughly by value:
-
-1. Play-testing. Never done; it needs a human at the keyboard. Launch with .\gradlew runClient, then: /planeshift role planeshift:balanced, /planeshift course course_1, and walk the flow — A/D rail movement, coyote time, glider float, shift gates, checkpoint, death below kill_y, Toad shop, /planeshift leave. HANDOFF.md section 3.-1 explains what to watch for in the movement refactor specifically.
-
-2. GameTests. build.gradle already configures a gameTestServer run and sets neoforge.enabledGameTestNamespaces, but ZERO tests exist. 1.21.11 uses the data-driven test_instance registry; NeoForge bridges to Java via RegisterGameTestsEvent (mod bus) with registerTest/registerEnvironment. Block behaviour is the obvious first target: QuestionBlock popping a pickup on a head bump, PSwitch converting and reverting, OnOffSwitch toggling. This is the highest-value automated-testing work available.
-
-3. Test coverage. JUnit 5 is wired up via MDG's neoForge.unitTest with 31 cases, but they only cover the 2.5D input projection geometry (src/test/java/.../PlaneConstrainedInputTest.java).
-
-4. Real art and audio. Everything ships as generated placeholders — flat colours with 2-4 letter labels, and synthesised chiptune. Both are original and license-clean (see ASSET_LICENSES.md) and can be replaced in place at the same paths and sizes.
-
-5. Known smaller issues:
-   - src/generated/resources/ is EMPTY, but build.gradle's comment claims datagen output is checked in so a clean clone builds without running the game. Either run runClientData and commit the output, or correct the comment.
-   - The built jar ships src/generated/resources/.cache/ because that whole directory is a resource root. Harmless but dead weight.
-   - ModEffects gives ice_aura and mini_aura the same colour (0x88CCFF), so their HUD icons match. Registry-level, not a generator bug.
-   - this-escape warnings in block constructors. Cosmetic.
+1. Live-check the newest facing change: in course 1 hold A/D while moving the mouse. The body and
+   head must face only left/right; movement and action aim must remain stable.
+2. Play all five courses end-to-end and fix practical layout/gameplay problems. Test coyote time,
+   glider, switches, checkpoint/death at kill Y=40, rewards, shop, flag finish and leave flow.
+3. Create bespoke Blockbench models and keyframed clips for each enemy from the turnaround sheets.
+   Preserve the original sky-island designs; do not copy protected franchise characters. Keep
+   the current Java rig as a fallback until replacements work in-game.
+4. Add GameTests for QuestionBlock, PSwitchBlock and OnOffSwitch. Existing `build.gradle` already
+   configures `gameTestServer` but no GameTests exist.
+5. Continue final art: per-theme skyboxes and remaining item/effect textures. The current skybox
+   is intentionally shared by all courses.
 
 Rules:
-- Do not commit build/, .gradle/, run/, .mcsources/, or secrets.
-- Prefer existing patterns; the codebase favours small focused Gradle verification tasks in the style of checkClientClassLeak over broad frameworks.
-- Before changing client/server event wiring, verify which event bus (mod vs game) an event belongs to.
-- When unsure of a Minecraft API, read the decompiled source in .mcsources/ rather than guessing. The 1.21.11 schemas for dimension types, pack metadata and item models all changed recently and guessing costs more than looking.
-- Verify a new build check by deliberately breaking the thing it guards and confirming it fails. Every check in this repo was validated that way.
 
-Goal for this session: pick one item above, implement it, run .\gradlew build AND .\gradlew runServer, and update HANDOFF.md with what you did and what you verified.
+- Do not commit `build/`, `.gradle/`, `run/`, `.mcsources/`, generated caches or secrets.
+- Prefer existing project patterns and inspect `.mcsources/` before guessing 1.21.11 APIs.
+- Verify event bus ownership before changing event wiring.
+- Run `.\gradlew build`, update `HANDOFF.md` and `PROGRESS.md`, commit, and push `main` when done.
 
 ---
-
-## Where the jars/caches live on disk
-
-These are generated by the build and are intentionally **not** in Git. They reappear after `gradlew build`:
-
-- `build/moddev/artifacts/` — NeoForge merged jar, sources jar, coremod jars
-- `build/libs/` — built mod jar (`planeshift-0.1.0.jar`)
-- `.mcsources/` — decompiled source cache (listed in `.gitignore`)
-- `C:\Users\<user>\.gradle\caches\` — downloaded dependency jars
-- `run/` — MDG test client/server directory
-
-To use them, just build once. To look up a class, inspect `build/moddev/artifacts/neoforge-21.11.45-merged.jar` or extract `neoforge-21.11.45-sources.jar`.

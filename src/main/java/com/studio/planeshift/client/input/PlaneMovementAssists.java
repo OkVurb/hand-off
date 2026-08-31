@@ -43,7 +43,7 @@ public final class PlaneMovementAssists {
     private static boolean jumpWasDown;
     private static int floatTicksUsed;
 
-    /** Last direction the player actually travelled, so the avatar keeps facing it at rest. */
+    /** Last direction the player tried to travel, so the avatar keeps facing it at rest. */
     private static float lastTravelYaw;
     private static boolean hasTravelYaw;
 
@@ -136,17 +136,18 @@ public final class PlaneMovementAssists {
     }
 
     /**
-     * Points the avatar's body along the direction of travel, so it still reads as a
-     * side-scroller even though the projection no longer rotates the player.
+     * Points the visible avatar's body and head along the direction of travel, so it reads as a
+     * side-scroller even though the projection never rotates the player itself.
      *
-     * <p>Presentation only: this writes {@code yBodyRot}, not {@code yRot}. The look direction
-     * stays the player's own, which is what {@code FormActionPayload} aims with. Called from
-     * the client tick *after* entities have ticked, because {@code LivingEntity#tickHeadTurn}
-     * would otherwise drag the body back toward the head within the same tick. The previous
-     * value is written alongside it so rendering has nothing to interpolate across and the
-     * avatar does not visibly snap.
+     * <p>Presentation only: this writes {@code yBodyRot} and {@code yHeadRot}, but deliberately
+     * leaves {@code yRot} alone. Mouse look therefore still supplies the private gameplay aim
+     * used by {@code FormActionPayload}, while the rendered head cannot turn toward or away from
+     * the camera. Called from the client tick *after* entities have ticked, because
+     * {@code LivingEntity#tickHeadTurn} would otherwise drag the body back toward the mouse in
+     * the same tick. Previous values are written alongside the current ones so rendering has no
+     * interpolation path through a camera-facing angle.
      */
-    public static void tickBodyFacing(LocalPlayer player) {
+    public static void tickAvatarFacing(LocalPlayer player) {
         CourseState state = ClientCourseState.get();
         if (!state.in2_5D() || state.rail().isEmpty()) {
             hasTravelYaw = false;
@@ -158,5 +159,7 @@ public final class PlaneMovementAssists {
         float facing = Mth.wrapDegrees(lastTravelYaw);
         player.yBodyRot = facing;
         player.yBodyRotO = facing;
+        player.setYHeadRot(facing);
+        player.yHeadRotO = facing;
     }
 }

@@ -74,3 +74,19 @@ effect icons. Mob effect icons take the colour the effect declares in `ModEffect
 icon matches the aura tint.
 
 These are placeholders, not art — replace them freely.
+
+## MewRigSkinImporter.java
+
+Converts the retained Mew 4x4 character concept atlas into the 64x32 UV layout used by
+`AnimatedCourseEnemyModel`:
+
+```bash
+java tools/MewRigSkinImporter.java \
+  tools/art_sources/mew_character_atlas.png \
+  src/main/resources/assets/planeshift/textures/entity
+./gradlew checkTextureAssets
+```
+
+It crops each original subject, derives its palette, paints every cuboid face, and places the
+concept on the front faces with nearest-neighbour sampling. See `docs/ENEMY_ART_DIRECTION.md` for
+the exact model and animation contract.

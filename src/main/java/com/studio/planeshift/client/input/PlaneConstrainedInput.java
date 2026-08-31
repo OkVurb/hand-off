@@ -79,8 +79,9 @@ public final class PlaneConstrainedInput extends KeyboardInput {
      * {@code getYRot()} before adding it to the velocity — so the previous approach of forcing
      * {@code setYRot} to the travel direction and pushing a constant {@code (0, 1)} was really
      * just a way of making that rotation the identity. Cancelling the yaw here instead gives the
-     * same world-space motion without writing to the player, and leaves the look direction free
-     * for aiming (see {@code FormActionPayload}, which sends {@code getLookAngle}).
+     * same world-space motion without writing to the player, and leaves its actual look direction
+     * free for aiming (see {@code FormActionPayload}, which sends {@code getLookAngle}). The
+     * separate presentation pass pins only the rendered body/head to this travel direction.
      *
      * <p>Derivation: for player yaw {@code t} and travel yaw {@code v}, the engine maps
      * {@code (x, z)} to world {@code (x·cos t − z·sin t, z·cos t + x·sin t)}. Substituting

@@ -52,8 +52,8 @@ public final class ClientEvents {
                 ClientPacketDistributor.sendToServer(ReserveSwapPayload.INSTANCE);
             }
 
-            // After the entities have ticked, so tickHeadTurn does not undo it this frame.
-            PlaneMovementAssists.tickBodyFacing(player);
+            // After entities tick, so mouse-driven head turning cannot undo the 2.5D silhouette.
+            PlaneMovementAssists.tickAvatarFacing(player);
         }
 
         CameraDirector.tickCameraType();

@@ -20,6 +20,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 public class CourseMapScreen extends Screen {
 
     private static final Component TITLE = Component.translatable("gui.planeshift.course_map");
+    private static final int COURSE_COUNT = 5;
 
     public CourseMapScreen() {
         super(TITLE);
@@ -27,21 +28,18 @@ public class CourseMapScreen extends Screen {
 
     @Override
     protected void init() {
-        int y = this.height / 4;
-        addRenderableWidget(Button.builder(Component.translatable("gui.planeshift.course_map.course_1"), b -> selectCourse("course_1"))
-                .pos(this.width / 2 - 100, y)
-                .size(200, 20)
-                .build());
-        addRenderableWidget(Button.builder(Component.translatable("gui.planeshift.course_map.course_2"), b -> selectCourse("course_2"))
-                .pos(this.width / 2 - 100, y + 30)
-                .size(200, 20)
-                .build());
-        addRenderableWidget(Button.builder(Component.translatable("gui.planeshift.course_map.course_3"), b -> selectCourse("course_3"))
-                .pos(this.width / 2 - 100, y + 60)
-                .size(200, 20)
-                .build());
+        int y = Math.max(52, this.height / 4);
+        for (int course = 1; course <= COURSE_COUNT; course++) {
+            int courseNumber = course;
+            addRenderableWidget(Button.builder(
+                            Component.translatable("gui.planeshift.course_map.course_" + courseNumber),
+                            b -> selectCourse("course_" + courseNumber))
+                    .pos(this.width / 2 - 100, y + (courseNumber - 1) * 26)
+                    .size(200, 20)
+                    .build());
+        }
         addRenderableWidget(Button.builder(Component.translatable("gui.planeshift.course_map.close"), b -> this.onClose())
-                .pos(this.width / 2 - 100, y + 100)
+                .pos(this.width / 2 - 100, y + COURSE_COUNT * 26 + 8)
                 .size(200, 20)
                 .build());
     }
@@ -54,8 +52,11 @@ public class CourseMapScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        PlaneShiftGui.renderPanel(graphics, this.width / 2 - 110, this.height / 6 - 30, 220, 40);
-        PlaneShiftGui.drawTitle(graphics, this.font, this.title, this.width / 2 - this.font.width(this.title) / 2, this.height / 6 - 20, PlaneShiftGui.COIN_YELLOW);
+        int titleY = Math.max(30, this.height / 6 - 20);
+        PlaneShiftGui.renderPanel(graphics, this.width / 2 - 110, titleY - 10, 220, 30);
+        PlaneShiftGui.drawTitle(graphics, this.font, this.title,
+                this.width / 2 - this.font.width(this.title) / 2, titleY,
+                PlaneShiftGui.COIN_YELLOW);
     }
 
     @Override

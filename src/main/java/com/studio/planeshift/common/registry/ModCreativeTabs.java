@@ -41,6 +41,12 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.GALE_CHARM.get());
                         output.accept(ModItems.BARRIER_CHARM.get());
                         output.accept(ModItems.MAGNET_CHARM.get());
+                        output.accept(ModItems.COURSE_GRASS_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_CLOUD_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_SAND_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_SNOW_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_CASTLE_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_MAGMA_BLOCK_ITEM.get());
                         output.accept(ModItems.SHIFT_GATE_ITEM.get());
                         output.accept(ModItems.CHECKPOINT_BEACON_ITEM.get());
                         output.accept(ModItems.SPRING_PAD_ITEM.get());

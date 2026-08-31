@@ -20,6 +20,7 @@ import com.studio.planeshift.common.block.ShiftGateBlock;
 import com.studio.planeshift.common.block.SpikeBlock;
 import com.studio.planeshift.common.block.SpringPadBlock;
 import com.studio.planeshift.common.block.WarpPipeBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -33,6 +34,20 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class ModBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(PlaneShift.MOD_ID);
+
+    /** Bright, durable terrain tiles used by the generated 2.5D courses. */
+    public static final DeferredBlock<Block> COURSE_GRASS_BLOCK = courseBlock(
+            "course_grass_block", MapColor.GRASS, SoundType.GRASS);
+    public static final DeferredBlock<Block> COURSE_CLOUD_BLOCK = courseBlock(
+            "course_cloud_block", MapColor.SNOW, SoundType.WOOL);
+    public static final DeferredBlock<Block> COURSE_SAND_BLOCK = courseBlock(
+            "course_sand_block", MapColor.SAND, SoundType.SAND);
+    public static final DeferredBlock<Block> COURSE_SNOW_BLOCK = courseBlock(
+            "course_snow_block", MapColor.ICE, SoundType.SNOW);
+    public static final DeferredBlock<Block> COURSE_CASTLE_BLOCK = courseBlock(
+            "course_castle_block", MapColor.DEEPSLATE, SoundType.DEEPSLATE_BRICKS);
+    public static final DeferredBlock<Block> COURSE_MAGMA_BLOCK = courseBlock(
+            "course_magma_block", MapColor.FIRE, SoundType.NETHER_BRICKS);
 
     public static final DeferredBlock<ShiftGateBlock> SHIFT_GATE =
             BLOCKS.registerBlock("shift_gate", ShiftGateBlock::new, p -> p
@@ -164,6 +179,14 @@ public final class ModBlocks {
                     .noOcclusion()
                     .noLootTable()
                     .sound(SoundType.STONE));
+
+    private static DeferredBlock<Block> courseBlock(String name, MapColor mapColor,
+                                                     SoundType sound) {
+        return BLOCKS.registerSimpleBlock(name, properties -> properties
+                .mapColor(mapColor)
+                .strength(1.5F, 6.0F)
+                .sound(sound));
+    }
 
     private ModBlocks() {
     }

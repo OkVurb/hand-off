@@ -3,5 +3,6 @@
   "start_pos": [512, 64, 0],
   "start_mode": "side_on",
   "theme": "snow",
-  "kill_y": -50.0
+  "kill_y": 40.0,
+  "length": 160
 }

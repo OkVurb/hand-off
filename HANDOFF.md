@@ -2,7 +2,7 @@
 
 **Project root:** `C:\Dev\PlaneShift`  
 **Date:** 2026-08-31  
-**Status:** `BUILD SUCCESSFUL` — all checks pass. Verified at runtime: `runServer` reaches `Done` with zero errors, `runClient` reaches the title screen with zero errors.
+**Status:** `BUILD SUCCESSFUL` — all checks pass. Verified at runtime: `runServer` reaches `Done` with zero errors and `runClient` loaded an integrated world, generated course 1, rendered the fixed side camera/skybox/course art, and exited cleanly.
 
 This document is a complete handoff for the PlaneShift NeoForge 1.21.11 mod. It contains the current state, what was just changed, how to build it, the full source/resource inventory, and the remaining known issues. Use it to continue work from another session or tool.
 
@@ -43,9 +43,9 @@ Current results:
 > Task :checkClientClassLeak — PASSED
 > Task :checkNoRawCuboidScan — PASSED
 > Task :checkSoundAssets — PASSED (22 events, all backed by an OGG)
-> Task :checkTextureAssets — PASSED (96 textures, present and distinct)
+> Task :checkTextureAssets — PASSED (all required textures present and distinct)
 > Task :checkBlockModels — PASSED
-> Task :test — PASSED (31 cases)
+> Task :test — PASSED (38 cases)
 > Task :build — BUILD SUCCESSFUL
 ```
 
@@ -54,6 +54,55 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 ---
 
 ## 3. What Was Just Done
+
+### 3.-6 Session 2026-08-31 — playable generated courses, art pass, skybox and animated rigs
+
+This session turned the empty course dimension into a playable side-scrolling scene and replaced
+the most visible greybox art. The latest user-facing adjustment also locks the rendered player
+head to left/right travel, independent of mouse movement.
+
+**Five generated courses.** `CourseDefinition` now has a bounded `length`, and
+`CourseStructureService` generates grass, desert, snow, lava and underground courses at separate
+origins. Each course has a three-wide/four-thick floor, guaranteed safe start and finish zones,
+theme-specific jump gaps, platforms, rewards, checkpoints, ON/OFF and P-switch setups, hazards,
+stairs, a flagpole, a warp pipe, coin arcs, enemies and a shopkeeper. Floors are at Y=63, spawn
+is Y=64 and every course uses kill Y=40, leaving real fall space before instant death. Optional
+authored structure templates still take precedence. `CourseLayoutPlanTest` adds ten cases covering
+safe zones and bounded gaps across all themes.
+
+**2.5D presentation.** The side profile uses a 45-degree FOV and 14-block camera distance. The
+camera remains fixed side-on while A/D maps to screen-left/screen-right. `PlaneConstrainedInput`
+still changes only `Input`/`moveVector`; it does not rotate the player or write velocity. The
+post-tick presentation pass now pins both `yBodyRot` and `yHeadRot` to the last attempted A/D
+heading. Mouse look therefore cannot turn the visible head toward/away from the camera, while
+the untouched `yRot` still supplies gameplay aim to `FormActionPayload`.
+
+**Course art and sky.** Six registered course blocks were added: grass, cloud, sand, snow,
+castle and magma. A successful Mew Design block atlas was cropped into these and several existing
+block textures. A Mew original-character sheet was converted into valid 64x32 cuboid UV skins.
+The course dimension now registers `CourseSkyboxRenderer`, rendering a camera-centred bright
+pixel-art panorama that stays visually static as the player runs. Source sheets and provenance
+are retained under `tools/art_sources/` and `ASSET_LICENSES.md`.
+
+**Enemies and animation direction.** `AnimatedCourseEnemyModel` supplies independent head,
+body, arms, legs and wings, selected through `EnemyRigProfile`. Renderers now animate walking,
+counter-swing, idle bobbing, wing flaps, sprout bounce, crusher slam, plant sway and boss weight.
+Three original enemy turnaround sheets and exact per-registry visual/animation notes live in
+`tools/art_sources/` and `docs/ENEMY_ART_DIRECTION.md`. These are a production direction pass,
+not final bespoke meshes: the next art task is hand-authored per-enemy Blockbench geometry and
+keyframed clips.
+
+**Free modelling workflow.** Official Blockbench 5.1.6 portable is installed at
+`C:\Users\cr0od\Apps\Blockbench\Blockbench.exe`; its signature was verified. The intended clip
+names and export workflow are in `tools/blockbench/README.md`. Mew ran out of credits before the
+detailed 3D turnaround request, so no account-limit workaround was used; original fallback sheets
+were generated and checked in for legitimate continuation.
+
+**Runtime verification.** `runServer` reached `Done` with no registry errors. `runClient` loaded
+course 1 and logged a generated 144-block grass course at `(0,64,0)`. Visual inspection confirmed
+the fixed flat camera, pixel skybox and course terrain; there were no model, renderer, texture or
+skybox errors, and the client exited with `BUILD SUCCESSFUL`. The final head-facing adjustment was
+compiled and covered by the full unit/check suite but still needs a quick live A/D + mouse check.
 
 ### 3.-5 Session 2026-08-31 — runtime verification (runClient / runServer)
 
@@ -375,14 +424,15 @@ If a future course feature legitimately needs raw cuboid iteration, add the clas
 
 ### Warnings / smaller known issues
 - `this-escape` warnings in block constructors. Cosmetic.
-- Test coverage is thin: JUnit 5 is wired up (`src/test/java`, 31 cases) but only the 2.5D input
-  projection geometry is covered. Everything else is guarded by the `check*` build tasks.
+- Test coverage is still thin: JUnit 5 is wired up (`src/test/java`, 38 cases), covering 2.5D
+  input projection geometry and generated-course safety/gap planning. Runtime block behaviour is
+  still guarded mainly by the `check*` tasks and smoke tests.
 - **Zero GameTests exist** despite `build.gradle` configuring a `gameTestServer` run and setting
   `neoforge.enabledGameTestNamespaces`. 1.21.11 uses the data-driven `test_instance` registry;
   NeoForge bridges to Java through `RegisterGameTestsEvent` on the mod bus. This is the largest
   automated-testing gap.
-- **Play-testing has never been done.** The mod launches clean on client and server, but nobody
-  has walked the course flow. See §5.
+- **Full gameplay play-testing is incomplete.** Course 1 has loaded and rendered successfully,
+  but nobody has walked all five courses and exercised every mechanic end-to-end. See §5.
 - `src/generated/resources/` is **empty**, yet `build.gradle`'s comment claims datagen output is
   checked in so a clean clone builds without running the game. Either run `runClientData` and
   commit the result, or correct the comment.
@@ -390,8 +440,9 @@ If a future course feature legitimately needs raw cuboid iteration, add the clas
   resource root. Harmless, but dead weight in the artifact.
 - `ModEffects` gives `ice_aura` and `mini_aura` the same colour (`0x88CCFF`), so their HUD icons
   are identical. Registry-level, not a texture-generator bug.
-- All art and audio are generated placeholders. Original and license-clean (see
-  `ASSET_LICENSES.md`), replaceable in place at the same paths and sizes.
+- Block terrain, the skybox and entity skins have received an original art pass, but many items,
+  effects and the shared procedural enemy geometry remain placeholders. Audio is original
+  synthesized chiptune. See `ASSET_LICENSES.md` and `docs/ENEMY_ART_DIRECTION.md`.
 
 ### Repository
 - Remote: `https://github.com/OkVurb/hand-off`, branch `main`.
@@ -411,17 +462,17 @@ If a future course feature legitimately needs raw cuboid iteration, add the clas
    to OGG (needs ffmpeg with libvorbis), and
    `java tools/TextureGen.java src/main/resources/assets/planeshift/textures`.
 
-### The play-test that has not been done
+### The full play-test that is still needed
 
-Everything below loads without error, but none of it has been played. Launch `runClient`, make a
-Creative world, then:
+Course 1 has been loaded and visually inspected, but the complete flow below has not been played.
+Launch `runClient`, make a Creative world, then repeat relevant checks on courses 2 through 5:
 
 | Step | Command / action | What to watch |
 |---|---|---|
 | 1 | `/planeshift role planeshift:balanced` | Role accepted |
 | 2 | `/planeshift course course_1` | Teleport to `planeshift:course` at 0,64,0 in side-on. This is the path that threw before the §3.-5 dimension fix |
 | 3 | — | HUD cluster top-left: pips, timer, lives, coins, star coins all inside the panel |
-| 4 | A / D, then turn the mouse while holding D | Rail movement. W/S must do nothing. **Direction must not change as you look around** — that is the §3.-1 refactor |
+| 4 | A / D, then turn the mouse while holding D | Rail movement. W/S must do nothing; the visible body/head must stay left/right with travel and ignore the mouse; gameplay movement/aim must remain stable |
 | 5 | Walk off a ledge, jump ~2 ticks late | Coyote time |
 | 6 | `/planeshift role planeshift:float_glide`, hold jump falling | Glider float, ~1.25 s |
 | 7 | `/planeshift mode free_3d` / `side_on` | Camera blend, mode badge |
@@ -430,12 +481,11 @@ Creative world, then:
 | 10 | Brick + P-switch, then blow one up with TNT | Bricks→coins, revert after 10 s, and the revert must survive an explosion (§3.-4) |
 | 11 | ON/OFF switch + ON/OFF block | Off state renders inset and is walk-through |
 | 12 | `/planeshift coins 100`, Toad shop **at GUI Scale 4 in a small window** | All ten offers and Close must stay on screen (§3.-4) |
-| 13 | Fall below `kill_y` (-50) | Death and checkpoint respawn |
+| 13 | Fall below `kill_y` (40 in generated courses) | Death and checkpoint respawn |
 | 14 | `/planeshift map`, `/planeshift leave` | Map screen, return to hub |
 
-Also worth judging by ear and eye: the audio is synthesised chiptune, and the textures are flat
-colours with 2-4 letter labels. Both are placeholders — the question is whether cues are audible
-and whether blocks are tellable apart, not whether they are pretty.
+Also judge the new terrain/entity art against the source sheets. The remaining generated item and
+effect textures are still placeholders, while audio is synthesized chiptune.
 
 ---
 
@@ -811,9 +861,9 @@ C:\Dev\PlaneShift\src\main\resources\pack.mcmeta
 
 ## 7. Environment Notes
 
-- **No Git repository** exists in `C:\Dev\PlaneShift`. Git for Windows is installed at `C:\Program Files\Git\cmd\git.exe`, but the project has not been initialized.
-- The MCP server list includes `github-mcp-server`; if configured, the project can be pushed to a GitHub repository.
-- The workspace also contains `.mcsources` (MCP decompiled sources), `.gradle`, `build/`, and `run/` directories.
+- `C:\Dev\PlaneShift` is a Git repository on `main`, with `origin` set to `https://github.com/OkVurb/hand-off.git`.
+- Blockbench portable is at `C:\Users\cr0od\Apps\Blockbench\Blockbench.exe`.
+- The workspace contains `.mcsources` (decompiled API cache), `.gradle`, `build/`, and `run/`; all are ignored and must not be committed.
 
 ---
 
@@ -823,6 +873,7 @@ C:\Dev\PlaneShift\src\main\resources\pack.mcmeta
 2. ~~Add mob effect textures~~ — done 2026-08-31, see section 3.-3.
 3. ~~Improve `PlaneConstrainedInput`~~ — done 2026-08-31, see section 3.-1.
 4. ~~Optimize `OnOffSwitchBlock` and `PSwitchBlock` scans~~ — done 2026-08-31, see §3.0.
-5. Play-test the course flow: start, checkpoint, respawn, complete, leave, Toad shop.
+5. Play-test all five generated courses: facing lock, jumps, checkpoint, respawn, complete, leave and Toad shop.
 6. Reuse `BlockAreaScan` if any new course block needs an area search — the `checkNoRawCuboidScan` build check will reject a raw cuboid loop.
-7. Replace the greybox textures with real art when ready — drop PNGs into `assets/planeshift/textures/` at the same paths and sizes; `checkTextureAssets` keeps coverage and distinctness honest.
+7. Build bespoke enemy models/animations in Blockbench from `docs/ENEMY_ART_DIRECTION.md` and the three turnaround sheets; the current shared Java rig is articulated but intentionally provisional.
+8. Add per-theme skyboxes if desired; all five courses currently share the same bright panorama.
