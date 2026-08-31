@@ -82,18 +82,28 @@ the range out of the source, so it follows automatically. Do not disable a check
 - Verify which event bus (mod vs game) an event belongs to before wiring it.
 - Asset generators live in `tools/` and are not compiled into the mod. `SoundGen.java` needs
   ffmpeg with libvorbis; SFX must be **mono** because Minecraft only positions mono sources.
-  Running `TextureGen.java` over the whole texture directory overwrites production art — see
-  `ASSET_LICENSES.md`.
+  `TextureGen.java` refuses to overwrite any file larger than a placeholder, so running it over
+  the whole texture directory is safe; production art is skipped and reported.
 
 ## Current state
 
-- All originally-tracked P0/P1/P2 issues are closed.
-- Five generated courses exist (grass, desert, snow, lava, underground).
-- Course clock, arcade score, stomp combo ladder and auto-scroll are implemented.
-- 66 unit tests pass. GameTests exist for `QuestionBlock`, `PSwitchBlock`, `OnOffSwitchBlock`.
-- Enemies use a shared procedural rig (`AnimatedCourseEnemyModel`), not bespoke geometry.
+- All originally-tracked P0/P1/P2 issues are closed. Roughly 46 of the previous 100-task backlog
+  is done; `docs/GEMINI_BACKLOG.md` lists what is left plus new work.
+- Five generated courses exist (grass, desert, snow, lava, underground), now including donut
+  bridges, firebars, an axe bridge collapse, secret vines, coin heaven, a note-block run and
+  moving platforms on both axes.
+- Movement: 2.5D rail projection, coyote time, jump buffering, Glider float, wall jump, ground
+  pound and a 0.5-block course crouch.
+- Rules: course clock with countdown and death at zero, arcade score, stomp combo ladder with
+  1-Ups, auto-scroll flag, game over exits to the hub.
+- Enemies: Koopa shell and kick, Piranha Plant emerge cycle, Buzzy Beetle fire immunity, Spiny
+  anti-stomp, a shared squish framework and floating score popups.
+- 72 unit tests pass. GameTests exist for `QuestionBlock`, `PSwitchBlock`, `OnOffSwitchBlock`.
+- Six build checks guard client leaks, area scans, sounds, textures, models and datapack ranges.
+- Enemies still use a shared procedural rig (`AnimatedCourseEnemyModel`), not bespoke geometry.
 - **The mod has never been play-tested end to end.** It loads clean on client and server; nobody
-  has actually walked a course.
+  has actually walked a course. That is Phase A of the backlog and it matters more than any new
+  feature.
 
 ## How to work
 

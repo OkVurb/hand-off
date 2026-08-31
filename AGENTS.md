@@ -7,6 +7,7 @@ Act as an ultra-concise assistant. Provide only direct, high-value answers with 
 When continuing this project in a fresh session, read **PROGRESS.md** first (where the last session stopped), then read the prompt file for your tool:
 - **Claude** (Claude.ai, Claude Code, Claude in Antigravity): `CLAUDE.md`
 - **ChatGPT/Codex**: `CODEX.md`
+- **Gemini** (Gemini app, Gemini CLI, Gemini in Antigravity): `GEMINI.md`, backlog in `docs/GEMINI_BACKLOG.md`
 - **Google Antigravity** (Gemini, Claude, GPT-OSS): `AGENTS.md` (this file) — Antigravity auto-reads it
 - **Any other agent**: `NEXT_SESSION_PROMPT.md`
 
@@ -100,6 +101,8 @@ Loaded from `data/planeshift/planeshift/<registry>/`:
 - `PROGRESS.md` — **READ THIS FIRST** every session. Where the last session stopped. Update before ending.
 - `CLAUDE.md` — copy-paste prompt for Claude sessions (Claude.ai, Claude Code, Claude in Antigravity).
 - `CODEX.md` — copy-paste prompt for ChatGPT/Codex sessions.
+- `GEMINI.md` — copy-paste prompt for Gemini sessions.
+- `docs/GEMINI_BACKLOG.md` — the 100-task backlog Gemini works through.
 - `NEXT_SESSION_PROMPT.md` — generic copy-paste prompt for any agent.
 - `MCP_TOOLS.md` — auto-generated registry of all available MCP tools.
 

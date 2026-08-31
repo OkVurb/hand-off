@@ -142,6 +142,12 @@ Unit tests 66 -> 72. `runServer` reaches `Done (0.401s)` with zero registry erro
 
 Nothing — all current tasks and prioritized fixes are complete up to the point of manual/creative art steps.
 
+## Handoff
+
+The next agent is Gemini. Its prompt is `GEMINI.md` and its 100-task backlog is
+`docs/GEMINI_BACKLOG.md`. Phase A of that backlog is play-testing, which has still never been
+done and is worth more than any new feature.
+
 ## What To Do Next (priority order)
 
 0. **Play-test the new course rules** — start a course, watch the clock count down and flash under
@@ -165,6 +171,8 @@ Nothing — all current tasks and prioritized fixes are complete up to the point
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-08-31 | Claude | Phase 5: donut blocks, firebars, axe bridge collapse, secret vines, coin heaven, note-block run, moving platforms; wrote the Gemini handoff (GEMINI.md + docs/GEMINI_BACKLOG.md) |
+| 2026-08-31 | Claude | Phase 2/3: Koopa shell, Piranha cycle, squish framework, score popups, drifting powerups, Poison Mushroom |
 | 2026-08-31 | Claude | Backlog tasks 9-15: auto-scroll, course clock, score, stomp combos, game-over exit; fixed a datapack blocker from b3477a3 that stopped any world loading; added checkDataRanges |
 | 2026-08-31 | ChatGPT | Added five generated courses, original art/skybox, articulated enemies, Blockbench workflow and travel-locked body/head presentation |
 | 2026-08-31 | Devin | Fixed all P0/P1/P2 issues, added 5 build checks, generated assets, pushed to GitHub, created handoff docs |
