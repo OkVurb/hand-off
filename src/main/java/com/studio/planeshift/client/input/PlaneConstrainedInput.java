@@ -47,6 +47,11 @@ public final class PlaneConstrainedInput extends KeyboardInput {
         PlaneRail rail = state.rail().get();
 
         float impulse = (keyPresses.right() ? 1.0F : 0.0F) - (keyPresses.left() ? 1.0F : 0.0F);
+        // Classic auto-scroll: the course only advances one way, so backward input is dropped
+        // rather than fought. Screen-right is forward, matching the travel-yaw remap below.
+        if (state.autoScroll() && impulse < 0.0F) {
+            impulse = 0.0F;
+        }
         if (impulse == 0.0F) {
             this.moveVector = Vec2.ZERO;
             this.keyPresses = new Input(false, false, false, false,

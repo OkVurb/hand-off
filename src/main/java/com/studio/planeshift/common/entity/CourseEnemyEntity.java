@@ -1,6 +1,7 @@
 package com.studio.planeshift.common.entity;
 
 import com.studio.planeshift.common.registry.ModParticles;
+import com.studio.planeshift.server.CourseScoringService;
 import com.studio.planeshift.common.registry.ModSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -77,6 +78,8 @@ public abstract class CourseEnemyEntity extends Monster {
             hurtServer((ServerLevel) level(), damageSources().playerAttack(player), stompDamage());
             bounce(player);
             if (!isAlive()) {
+                // Only a defeat advances the combo ladder; a stagger is not worth a rung.
+                CourseScoringService.awardStomp(player);
                 level().playSound(null, blockPosition(), ModSounds.ENEMY_DEFEAT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
                 spawnHitParticles(10);
             } else {

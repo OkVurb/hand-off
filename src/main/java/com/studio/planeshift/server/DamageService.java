@@ -1,8 +1,12 @@
 package com.studio.planeshift.server;
 
 import com.studio.planeshift.common.course.CourseState;
+import com.studio.planeshift.common.mode.PlaneMode;
+import com.studio.planeshift.common.mode.PlayState;
 import com.studio.planeshift.common.registry.ModEffects;
 import com.studio.planeshift.common.registry.ModSounds;
+import java.util.Optional;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -77,14 +81,21 @@ public final class DamageService {
         int newLives = Math.max(0, state.lives() - 1);
 
         if (newLives == 0) {
-            // No lives left: kill the player for real.
+            // Game over: the run is finished, so the player leaves the course entirely rather
+            // than respawning inside it with a fresh life bar. Returning to the hub also clears
+            // the course clock and auto-scroll rule.
             player.level().playSound(null, player.blockPosition(), ModSounds.GAME_OVER.get(),
                     SoundSource.PLAYERS, 1.0F, 1.0F);
-            player.kill(player.level());
             CourseStateAccess.update(player, s -> s
+                    .withState(PlayState.HUB)
+                    .withMode(PlaneMode.FREE_3D, Optional.empty())
                     .withFormSlot(s.formSlot().loseActive())
                     .withPips(CourseState.MAX_PIPS, now + INVULN_TICKS * 2L)
-                    .withLives(CourseState.STARTING_LIVES));
+                    .withLives(CourseState.STARTING_LIVES)
+                    .withCheckpoint(Optional.empty()));
+            CourseScoringService.clear(player.getUUID());
+            CourseService.returnToHub(player);
+            player.sendSystemMessage(Component.translatable("chat.planeshift.game_over"));
             return;
         }
 

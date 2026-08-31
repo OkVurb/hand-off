@@ -95,13 +95,21 @@ public final class CourseService {
                 s.coins(),
                 s.starCoins(),
                 s.lives(),
-                def.killY()
+                def.killY(),
+                // Score is zeroed by startCourse below; the clock and auto-scroll come from the
+                // course definition so each course can set its own rules.
+                0,
+                def.timeLimitTicks(),
+                def.autoScroll()
         ));
         CourseScoringService.startCourse(player);
         return true;
     }
 
     public static void returnToHub(ServerPlayer player) {
+        // Drop the course rules first: the hub has no clock and never auto-scrolls, and a stale
+        // countdown would keep ticking the player toward a death they cannot see coming.
+        CourseTimerService.clear(player);
         TeleportTransition transition = player.findRespawnPositionAndUseSpawnBlock(false, TeleportTransition.DO_NOTHING);
         player.teleport(transition);
     }

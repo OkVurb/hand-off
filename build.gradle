@@ -587,6 +587,103 @@ tasks.register('checkBlockModels') {
 
 tasks.named('check') { dependsOn 'checkBlockModels' }
 
+/*
+ * Data-pack values against their codec ranges.
+ *
+ * A datapack JSON that parses as valid JSON but violates its codec's numeric range is invisible
+ * to the build and only fails at world load, where it takes the whole server down with
+ * "Failed to load datapacks, can't proceed with server load". That is exactly what happened when
+ * a script multiplied every role's jump_multiplier by 1.5 and pushed it outside the 0.85-1.15
+ * contract PlayerRole declares: the build stayed green and no world could be created.
+ *
+ * The ranges are PARSED OUT of the codec source rather than duplicated here, so widening a
+ * contract in Java automatically widens this check instead of leaving it stale.
+ */
+tasks.register('checkDataRanges') {
+    group = 'verification'
+    description = 'Fails if a datapack JSON value falls outside the numeric range its codec declares.'
+
+    // codec source -> the datapack directory whose entries it decodes
+    def sources = [
+            'src/main/java/com/studio/planeshift/common/role/PlayerRole.java':
+                    'src/main/resources/data/planeshift/planeshift/role',
+            'src/main/java/com/studio/planeshift/common/course/CourseDefinition.java':
+                    'src/main/resources/data/planeshift/planeshift/course'
+    ]
+    sources.each { src, dir ->
+        inputs.file(file(src))
+        if (file(dir).isDirectory()) {
+            inputs.dir(file(dir)).withPathSensitivity(PathSensitivity.RELATIVE)
+        }
+    }
+    outputs.file(layout.buildDirectory.file('reports/planeshift/data-ranges.txt'))
+
+    doLast {
+        def problems = []
+        def checked = 0
+        def slurper = new groovy.json.JsonSlurper()
+
+        sources.each { srcPath, dirPath ->
+            def src = file(srcPath)
+            def dir = file(dirPath)
+            if (!src.isFile() || !dir.isDirectory()) {
+                return
+            }
+            // Codec.floatRange(0.85F, 1.15F).optionalFieldOf("run_multiplier", ...)
+            // Codec.intRange(0, 60).optionalFieldOf("float_ticks", ...)  /  .fieldOf("x")
+            def pattern = ~/(?:float|int|double)Range\(\s*([-\d.]+)F?\s*,\s*([-\d.]+)F?\s*\)\s*\.\s*(?:optionalF|f)ieldOf\(\s*"([a-z0-9_]+)"/
+            def ranges = [:]
+            src.text.findAll(pattern) { full, min, max, name ->
+                ranges[name] = [min as double, max as double]
+            }
+            if (ranges.isEmpty()) {
+                problems << "no numeric codec ranges parsed out of ${src.name}; the check would " +
+                        "pass vacuously"
+                return
+            }
+
+            dir.eachFile { f ->
+                if (!f.name.endsWith('.json')) return
+                def json
+                try {
+                    json = slurper.parse(f)
+                } catch (Exception e) {
+                    problems << "${dirPath}/${f.name} is not valid JSON: ${e.message}"
+                    return
+                }
+                if (!(json instanceof Map)) return
+                ranges.each { field, bounds ->
+                    def value = json[field]
+                    if (value instanceof Number) {
+                        checked++
+                        double v = value.doubleValue()
+                        if (v < bounds[0] || v > bounds[1]) {
+                            problems << "${dirPath}/${f.name}: ${field} is ${v}, outside the " +
+                                    "[${bounds[0]}, ${bounds[1]}] range ${src.name} declares"
+                        }
+                    }
+                }
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/data-ranges.txt'))
+        report.parentFile.mkdirs()
+        report.text = problems.isEmpty()
+                ? "OK: ${checked} datapack values within their declared codec ranges\n"
+                : "DATA RANGE PROBLEMS:\n" + problems.join('\n') + '\n'
+
+        if (!problems.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    "Datapack values violate their codec ranges:\n  " + problems.join('\n  ') +
+                            "\nThese parse as valid JSON and only fail at world load, taking the " +
+                            "server down. Fix the value, or widen the range in the codec if the " +
+                            "contract genuinely changed.")
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkDataRanges' }
+
 tasks.named('jar', Jar) {
     manifest {
         attributes([

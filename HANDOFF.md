@@ -30,6 +30,7 @@ Run from `C:\Dev\PlaneShift`:
 - Client class leak check: `.\gradlew checkClientClassLeak`
 - Raw cuboid scan check: `.\gradlew checkNoRawCuboidScan`
 - Sound asset check: `.\gradlew checkSoundAssets`
+- Data range check: `.\gradlew checkDataRanges`
 - Texture asset check: `.\gradlew checkTextureAssets`
 - Block model check: `.\gradlew checkBlockModels`
 - Runtime smoke test: `.gradlew runServer` then `.gradlew runClient` (see section 3.-5)

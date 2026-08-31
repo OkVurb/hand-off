@@ -29,9 +29,15 @@ public final class CourseHud {
     private static final int BADGE_FREE = 0xFFE7B54A;   // gold
     private static final int BAR_BACK = 0xB0101418;
 
-    /** Top-left cluster panel. Height covers the star-coin line at y+64 plus its descender. */
+    /** Clock colours: normal, warning band (flashing pair), and expired. */
+    private static final int TIME_NORMAL = 0xFF4CEFFF;
+    private static final int TIME_CRITICAL = 0xFFFF5555;
+    private static final int TIME_CRITICAL_DIM = 0xFFFFAA55;
+    private static final int TIME_EXPIRED = 0xFF8B2C2C;
+
+    /** Top-left cluster panel. Height covers the score line at y+76 plus its descender. */
     private static final int PANEL_WIDTH = 200;
-    private static final int PANEL_HEIGHT = 86;
+    private static final int PANEL_HEIGHT = 98;
     private static final int PANEL_INSET = 2;
 
     private static long courseStartTicks = -1L;
@@ -98,8 +104,20 @@ public final class CourseHud {
                     x, y + 16, 0xFF9DA8B5);
         }
 
-        // Timer.
-        if (minecraft.level != null && courseStartTicks >= 0L) {
+        // Clock. A timed course shows the countdown that can actually kill the player; an
+        // untimed one falls back to elapsed time, which is only informational.
+        if (state.timed()) {
+            int secondsLeft = Math.max(0, (state.timeLeft() + 19) / 20);
+            // Flash once a second inside the warning band so the danger is visible, not just read.
+            boolean flash = state.timeCritical()
+                    && minecraft.level != null
+                    && (minecraft.level.getGameTime() / 10L) % 2L == 0L;
+            int colour = state.timeExpired() ? TIME_EXPIRED
+                    : state.timeCritical() ? (flash ? TIME_CRITICAL : TIME_CRITICAL_DIM)
+                    : TIME_NORMAL;
+            graphics.drawString(font,
+                    Component.translatable("hud.planeshift.time_left", secondsLeft), x, y + 28, colour);
+        } else if (minecraft.level != null && courseStartTicks >= 0L) {
             long elapsed = minecraft.level.getGameTime() - courseStartTicks;
             int totalSeconds = (int) (elapsed / 20L);
             int minutes = totalSeconds / 60;
@@ -107,16 +125,18 @@ public final class CourseHud {
             int centi = (int) ((elapsed % 20L) * 5L);
             String time = String.format("%d:%02d.%02d", minutes, seconds, centi);
             graphics.drawString(font, Component.translatable("hud.planeshift.time", time),
-                    x, y + 28, 0xFF4CEFFF);
+                    x, y + 28, TIME_NORMAL);
         }
 
-        // Lives, coins and star coins.
+        // Lives, coins, star coins and score.
         graphics.drawString(font, Component.translatable("hud.planeshift.lives", state.lives()),
                 x, y + 40, 0xFF4CFF4C);
         graphics.drawString(font, Component.translatable("hud.planeshift.coins", state.coins()),
                 x, y + 52, 0xFFE7D07A);
         graphics.drawString(font, Component.translatable("hud.planeshift.star_coins", state.starCoins()),
                 x, y + 64, 0xFFFFA500);
+        graphics.drawString(font, Component.translatable("hud.planeshift.score", state.score()),
+                x, y + 76, 0xFFFFFFFF);
 
         // Mode badge and transition progress.
         if (PlaneShiftConfig.CLIENT.showModeBadge.get()) {

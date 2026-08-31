@@ -78,6 +78,12 @@ public final class ServerEvents {
             PlayerSizeService.apply(player, CourseStateAccess.get(player));
             AirMoveService.tick(player);
             LeafFlightService.tick(player);
+            CourseTimerService.tick(player);
+            if (player.onGround()) {
+                // Landing closes any airborne stomp chain, so the combo ladder only rewards
+                // bounces strung together in the air.
+                CourseScoringService.endChain(player);
+            }
         }
     }
 
@@ -270,11 +276,13 @@ public final class ServerEvents {
                 }
                 return s.withCoins(coins).withLives(lives);
             });
+            CourseScoringService.awardCoin(player);
             level.playSound(null, player.blockPosition(),
                     ModSounds.COIN_PICKUP.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
         } else if (item instanceof StarCoinItem) {
             entity.discard();
             CourseStateAccess.update(player, s -> s.withStarCoins(s.starCoins() + 1));
+            CourseScoringService.awardStarCoin(player);
             level.playSound(null, player.blockPosition(),
                     ModSounds.COIN_PICKUP.get(), SoundSource.PLAYERS, 0.9F, 1.5F);
         } else if (item instanceof StarPowerItem) {
