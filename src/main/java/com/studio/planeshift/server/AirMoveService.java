@@ -68,8 +68,9 @@ public final class AirMoveService {
                 BlockPos pos = player.blockPosition();
                 BlockPos below = pos.below();
                 BlockState state = player.level().getBlockState(below);
-                if (state.getBlock() instanceof com.studio.planeshift.common.block.BrickBlock) {
-                    player.level().destroyBlock(below, false);
+                if (state.getBlock() instanceof com.studio.planeshift.common.block.BrickBlock || 
+                    state.getBlock() instanceof com.studio.planeshift.common.block.QuestionBlock) {
+                    player.level().destroyBlock(below, true);
                     player.level().playSound(null, below, com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
             }
