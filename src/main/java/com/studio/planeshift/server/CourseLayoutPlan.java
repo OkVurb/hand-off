@@ -12,6 +12,8 @@ record CourseLayoutPlan(int length, int[][] gaps) {
             case SNOW -> 6;
             case LAVA -> 9;
             case UNDERGROUND -> 12;
+            case GHOST_HOUSE -> 15;
+            default -> 0;
         };
         int middle = length / 2;
         return new CourseLayoutPlan(length, new int[][]{

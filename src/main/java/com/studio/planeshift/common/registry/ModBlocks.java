@@ -12,6 +12,7 @@ import com.studio.planeshift.common.block.CourseVineBlock;
 import com.studio.planeshift.common.block.DonutBlock;
 import com.studio.planeshift.common.block.SecretVineBlock;
 import com.studio.planeshift.common.block.HiddenQuestionBlock;
+import com.studio.planeshift.common.block.LoopTriggerBlock;
 import com.studio.planeshift.common.block.MusicBlock;
 import com.studio.planeshift.common.block.OnOffBlock;
 import com.studio.planeshift.common.block.OnOffSwitchBlock;
@@ -215,6 +216,15 @@ public final class ModBlocks {
             BLOCKS.registerBlock("secret_passage", SecretPassageBlock::new, p -> p
                     .mapColor(MapColor.COLOR_RED)
                     .strength(0.2F)
+                    .noCollision()
+                    .noOcclusion()
+                    .noLootTable()
+                    .sound(SoundType.STONE));
+
+    public static final DeferredBlock<LoopTriggerBlock> LOOP_TRIGGER =
+            BLOCKS.registerBlock("loop_trigger", LoopTriggerBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(-1.0F, 3_600_000.0F)
                     .noCollision()
                     .noOcclusion()
                     .noLootTable()

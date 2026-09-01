@@ -38,4 +38,21 @@ public class BowserEntity extends CourseEnemyEntity {
     public boolean isStompable() {
         return false;
     }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (this.isAlive() && !this.level().isClientSide()) {
+            if (this.isInLava() || this.getY() < -64.0D) {
+                this.hurtServer((net.minecraft.server.level.ServerLevel) this.level(), this.damageSources().fellOutOfWorld(), Float.MAX_VALUE);
+            }
+        }
+
+        if (this.fallDistance > 1.5F) {
+            this.setYRot(this.getYRot() + 25.0F);
+            this.yBodyRot = this.getYRot();
+            this.yHeadRot = this.getYRot();
+        }
+    }
 }

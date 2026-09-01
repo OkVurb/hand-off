@@ -11,7 +11,8 @@ public enum CourseTheme implements StringRepresentable {
     DESERT("desert", 0xFFEECC66, 0xFF88CCFF),
     SNOW("snow", 0xFFFFFFFF, 0xFF88AAFF),
     LAVA("lava", 0xFF331111, 0xFFAA3300),
-    UNDERGROUND("underground", 0xFF332222, 0xFF000000);
+    UNDERGROUND("underground", 0xFF332222, 0xFF000000),
+    GHOST_HOUSE("ghost_house", 0xFF221133, 0xFF000000);
 
     public static final Codec<CourseTheme> CODEC = StringRepresentable.fromEnum(CourseTheme::values);
 

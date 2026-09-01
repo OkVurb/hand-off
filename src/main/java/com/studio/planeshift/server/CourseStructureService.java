@@ -110,6 +110,9 @@ public final class CourseStructureService {
             // Only the lava theme gets a castle finale; a castle in a meadow reads as a mistake.
             buildCastleFinale(level, start, plan, palette);
         }
+        if (course.theme() == CourseTheme.GHOST_HOUSE) {
+            buildGhostHouseLoop(level, start, plan);
+        }
 
         PlaneShift.LOGGER.info("Generated {} course at {} ({} blocks long, floor y={}, kill y={})",
                 course.theme().getSerializedName(), start, plan.length(), floorY, course.killY());
@@ -375,6 +378,23 @@ public final class CourseStructureService {
         spawnFirebar(level, start, bridgeEnd - 2, 6, 3, -1.0F);
     }
 
+    private static void buildGhostHouseLoop(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
+        int loopX = plan.midpoint() + 15;
+        // Invisible wall of trigger blocks
+        for (int y = 1; y <= 5; y++) {
+            for (int z = -LANE_HALF_WIDTH; z <= LANE_HALF_WIDTH; z++) {
+                set(level, start.offset(loopX, y, z), ModBlocks.LOOP_TRIGGER.get().defaultBlockState());
+            }
+        }
+        
+        // A hidden path to climb over the loop trigger
+        set(level, start.offset(loopX - 5, 2, 0), ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
+        set(level, start.offset(loopX - 3, 4, 0), ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
+        for (int x = loopX - 1; x <= loopX + 1; x++) {
+            set(level, start.offset(x, 6, 0), ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
+        }
+    }
+
     /** Anchors a rotating firebar at a fixed point in the lane. */
     private static void spawnFirebar(ServerLevel level, BlockPos start, int offset, int height,
                                      int length, float spin) {
@@ -474,6 +494,7 @@ public final class CourseStructureService {
             case SNOW -> List.of(ModEntities.GOOMBA.get(), ModEntities.BUZZY_BEETLE.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.THWOMP.get());
             case UNDERGROUND -> List.of(ModEntities.BOO.get(), ModEntities.BUZZY_BEETLE.get());
+            case GHOST_HOUSE -> List.of(ModEntities.BOO.get());
         };
     }
 
@@ -513,9 +534,13 @@ public final class CourseStructureService {
                 case UNDERGROUND -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         Blocks.DEEPSLATE.defaultBlockState(), Blocks.PURPLE_TERRACOTTA.defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
+                case GHOST_HOUSE -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        Blocks.DARK_OAK_PLANKS.defaultBlockState(), Blocks.DARK_OAK_LOG.defaultBlockState(),
+                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
             };
         }
     }
 }
+
 
 

@@ -28,12 +28,12 @@ public class BowserGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return !bowser.isDeadOrDying();
+        return !bowser.isDeadOrDying() && bowser.fallDistance < 1.5F;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return !bowser.isDeadOrDying();
+        return !bowser.isDeadOrDying() && bowser.fallDistance < 1.5F;
     }
 
     @Override
