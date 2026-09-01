@@ -22,7 +22,8 @@ shift gates, checkpoints, a course clock and an arcade scoring system.
 
 1. `git pull`
 2. Read **PROGRESS.md** — where the last session stopped. This is the single source of truth.
-3. Read **AGENTS.md** — build invariants and conventions.
+3. Read **AGENTS.md** — build invariants and conventions. Its **Token budget** section is
+   mandatory: The user pays per token and every tool result is re-sent with the whole conversation. Filter command output, batch edits before verifying, escalate compileJava -> test -> build rather than running a full build after every change, and read line ranges instead of whole files. Check whether a task is already done before implementing it.
 4. Read **docs/GEMINI_BACKLOG.md** — your 100 tasks.
 5. `.\gradlew build` — must be green; only `this-escape` warnings are expected.
 

@@ -23,7 +23,8 @@ Start here:
 3. Verify Java 21 JDK and the Gradle wrapper.
 4. Run .\gradlew build. It should pass with only this-escape warnings.
 5. Read HANDOFF.md sections 3.-5 through 3.0 first — they describe everything changed in the last session and, importantly, what the build checks can and cannot catch.
-6. Read AGENTS.md for conventions and the invariants each build check enforces.
+6. Read AGENTS.md for conventions and the invariants each build check enforces. Its **Token
+   budget** section is mandatory: The user pays per token and every tool result is re-sent with the whole conversation. Filter command output, batch edits before verifying, escalate compileJava -> test -> build rather than running a full build after every change, and read line ranges instead of whole files. Check whether a task is already done before implementing it.
 
 **CRITICAL — before ending your session, you MUST update PROGRESS.md** with:
 - What you did this session

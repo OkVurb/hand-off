@@ -3,6 +3,34 @@
 ## Communication style (MANDATORY — applies to every session, every model)
 Act as an ultra-concise assistant. Provide only direct, high-value answers with no filler, pleasantries, or repeating of my prompt back to me. Keep responses short and punchy. If you need more context to complete the task, ask a single clarifying question rather than guessing. This saves token usage and credits.
 
+## Token budget (MANDATORY — applies to every session, every model)
+The user pays per token, and every tool result is re-sent with the whole conversation on each
+request. **What costs money is output coming back into context, not work happening on disk.** Act
+accordingly:
+
+- **Filter every command's output.** Never let a raw `gradlew` run dump into context. Use
+  `... 2>&1 | Select-String -Pattern "error:|FAILED|BUILD"` (PowerShell) or `| grep -E`. A full
+  unfiltered build log is thousands of tokens for one line of information.
+- **Batch edits, then verify once.** A verify run after every single edit is the biggest avoidable
+  cost in a session. Make a coherent group of related changes, then check.
+- **Escalate verification, do not start at the top.** `compileJava` for a syntax check
+  (seconds, tiny output) → `test` for logic → full `build` only before committing. `runServer`
+  only after touching `src/main/resources/data/`, where it is genuinely the only thing that
+  catches codec errors.
+- **Read line ranges, not whole files.** `CourseStructureService` and `ServerEvents` are 500+
+  lines each; `sed -n '120,180p'` after a `grep -n` costs a fraction of a full read. Never re-read
+  a file you already have in context, and never re-read one you just edited to confirm the edit —
+  the edit tools error if they fail.
+- **Search, do not enumerate.** `grep -rn` for a symbol beats reading candidate files. Never run a
+  filesystem-wide `find /` — vanilla and NeoForge sources are already cached in `.mcsources`.
+- **Do not leave background processes running.** If a command is backgrounded, either read its
+  result or stop it. An abandoned process is waste even when it is not costing tokens.
+- **Check whether a task is already done before implementing it.** Sessions on this project have
+  repeatedly rebuilt things that already existed — the single largest source of wasted spend here.
+  `grep` for the feature first and say so in `PROGRESS.md` if it turns out to be complete.
+- **Do not add unrequested work.** No extra docs, changelogs, formatting passes or coverage the
+  task did not ask for.
+
 ## Continuation prompt
 When continuing this project in a fresh session, read **PROGRESS.md** first (where the last session stopped), then read the prompt file for your tool:
 - **Claude** (Claude.ai, Claude Code, Claude in Antigravity): `CLAUDE.md`

@@ -15,7 +15,8 @@ NeoForge 1.21.11 Minecraft mod (Java 21, NeoForge 21.11.45, MDG 2.0.144). Mario-
 ## Start here (in order)
 1. `git pull` — get latest from main
 2. Read **PROGRESS.md** — tells you exactly where the last session stopped
-3. Read **AGENTS.md** — build invariants, conventions, jar locations
+3. Read **AGENTS.md** — build invariants, conventions, jar locations. Its **Token budget**
+   section is mandatory: The user pays per token and every tool result is re-sent with the whole conversation. Filter command output, batch edits before verifying, escalate compileJava -> test -> build rather than running a full build after every change, and read line ranges instead of whole files. Check whether a task is already done before implementing it.
 4. Read **HANDOFF.md** sections 3.-6 through 3.0 — what was recently changed
 5. `.\gradlew build` — verify green (only this-escape warnings expected)
 6. If you touched data-pack files: `.\gradlew runServer` — verify zero ERROR lines
