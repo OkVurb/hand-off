@@ -56,6 +56,26 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 
 ## 3. What Was Just Done
 
+### 3.-8 Session 2026-09-01 — bespoke shopkeeper, projectiles and conveyor
+
+Finished the next visual-production batch after the hostile cast. `ToadModel` replaces the old
+shared villager rig with a thirteen-group lantern-cap merchant: separate coat, cap, backpack,
+articulated limbs and hanging lantern. The retained shopkeeper material now generates Toad's
+128x128 side-camera UV sheet.
+
+All six projectile entities now use independently baked voxel geometry through
+`BespokeProjectileModel` and `BespokeProjectileRenderer`, replacing `ThrownItemRenderer`
+billboards. Ember bolt, hammer, fireball, iceball, boomerang and boss fire have different meshes,
+flight alignment, profile-specific spin and full-bright treatment for hot projectiles. The
+original `projectile_material_atlas.png` feeds deterministic 64x64 UV generation; its exact prompt
+and provenance are retained under `tools/art_sources/`.
+
+The conveyor now visually matches its half-block collision shape. Its block model is eight pixels
+tall with a directional cyan-chevron top and mechanical roller sides. Added model-bake tests for
+the shopkeeper and all six projectiles. Full `gradlew build` passes. `runClient` loaded the
+integrated course, rendered a summoned Toad and rotating 3D hammer, and logged no renderer, layer,
+model or resource errors.
+
 ### 3.-7 Session 2026-09-01 — bespoke enemy meshes and side-camera UVs
 
 Replaced the scale/visibility variants of `AnimatedCourseEnemyModel` with eleven independently

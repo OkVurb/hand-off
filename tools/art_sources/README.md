@@ -25,6 +25,10 @@ These are source/reference sheets, not files loaded directly by Minecraft.
   original transparent 4x4 atlas for the remaining visible greybox course props. Imported by
   `tools/CoursePropTextureImporter.java`; no commercial-game art was used.
 - `course_prop_atlas.prompt.txt` — exact generation prompt for the transparent prop atlas.
+- `projectile_material_atlas.png` — generated with the built-in image generator on 2026-09-01
+  as an original 3x2 material atlas for six voxel projectile meshes. It is converted into exact
+  64x64 UV sheets by `tools/ProjectileTextureGen.java`.
+- `projectile_material_atlas.prompt.txt` — exact generation prompt for the projectile atlas.
 
 The course panorama was generated with the built-in image generator from the Mew block atlas's
 pixel treatment and is shipped as `assets/planeshift/textures/environment/course_skybox.png`.

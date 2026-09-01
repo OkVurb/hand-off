@@ -1,6 +1,21 @@
 {
-  "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "planeshift:block/conveyor_belt"
-  }
+    "particle": "planeshift:block/conveyor_belt",
+    "top": "planeshift:block/conveyor_belt_top",
+    "side": "planeshift:block/conveyor_belt_side"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 8, 16],
+      "faces": {
+        "down": { "uv": [0, 0, 16, 16], "texture": "#side", "cullface": "down" },
+        "up": { "uv": [0, 0, 16, 16], "texture": "#top" },
+        "north": { "uv": [0, 0, 16, 8], "texture": "#side", "cullface": "north" },
+        "south": { "uv": [0, 0, 16, 8], "texture": "#side", "cullface": "south" },
+        "west": { "uv": [0, 0, 16, 8], "texture": "#side", "cullface": "west" },
+        "east": { "uv": [0, 0, 16, 8], "texture": "#side", "cullface": "east" }
+      }
+    }
+  ]
 }

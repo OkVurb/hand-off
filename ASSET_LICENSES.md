@@ -14,12 +14,17 @@ franchise likenesses.
   material swatches with no characters, logos or commercial-game imagery.
 - OpenAI's built-in image generator produced `course_prop_atlas.png`, an original transparent
   4x4 prop sheet used for axes, checkpoints, coin rings, vines, switches, spikes and loop trigger.
+- OpenAI's built-in image generator produced `projectile_material_atlas.png`, an original 3x2
+  material sheet containing no characters, objects, logos or commercial-game imagery.
 - `tools/MewRigSkinImporter.java` converts the character concepts into 64x32 cuboid UV skins.
 - `tools/EnemyTextureGen.java` converts the material atlas into the final 128x128 UV sheets used
   by the eleven bespoke enemy meshes. It owns exact UV placement, side-camera faces and value
   grading; generated imagery is never trusted to supply UV coordinates directly.
 - `tools/CoursePropTextureImporter.java` crops and scales the prop atlas into exact 16x16 runtime
   textures while preserving alpha for cutout block models.
+- `tools/ProjectileTextureGen.java` converts its material atlas into exact 64x64 UV sheets for six
+  independently baked voxel projectile props. `tools/ConveyorTextureGen.java` deterministically
+  draws the conveyor surface, rollers and particle texture without external source art.
 - `tools/TextureGen.java` owns the remaining temporary greybox textures. It refuses to overwrite
   any file larger than a placeholder, so running it over the complete texture directory is safe:
   production art is skipped and reported.

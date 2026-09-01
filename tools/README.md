@@ -107,6 +107,27 @@ nearest-neighbour pixel density, gameplay-safe brightness, and lateral eyes/mout
 side camera. This avoids the common failure where an attractive AI texture has no usable model UV
 layout or only looks correct when the mob faces the camera.
 
+## ProjectileTextureGen.java
+
+Builds six production 64x64 projectile UV sheets from the retained original material atlas:
+
+```powershell
+java tools/ProjectileTextureGen.java `
+  tools/art_sources/projectile_material_atlas.png `
+  src/main/resources/assets/planeshift/textures/entity
+```
+
+The atlas supplies material language; Java owns the exact UV quadrants used by the six voxel
+projectile meshes.
+
+## ConveyorTextureGen.java
+
+Generates the directional conveyor top, roller side and distinct particle texture:
+
+```powershell
+java tools/ConveyorTextureGen.java src/main/resources/assets/planeshift/textures/block
+```
+
 ## CoursePropTextureImporter.java
 
 Crops the retained transparent 4x4 prop atlas into the remaining visible course-block sprites:

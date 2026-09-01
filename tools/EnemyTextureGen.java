@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
 public final class EnemyTextureGen {
 
     private record Design(int cell, Color base, Color dark, Color light, Color glow, Face face) { }
-    private enum Face { SPROUT, GECKO, CRUSHER, TORPEDO, WISP, RIDER, PANGOLIN, CRAB, BEETLE, PLANT, BOSS }
+    private enum Face { SPROUT, GECKO, CRUSHER, TORPEDO, WISP, RIDER, PANGOLIN, CRAB, BEETLE, PLANT, BOSS, SHOPKEEPER }
 
     private static final Map<String, Design> DESIGNS = new LinkedHashMap<>();
 
@@ -37,6 +37,7 @@ public final class EnemyTextureGen {
         DESIGNS.put("buzzy_beetle", new Design(8, c(0x263B67), c(0x111B36), c(0x97712B), c(0x4CE3EC), Face.BEETLE));
         DESIGNS.put("piranha_plant", new Design(9, c(0x4F852E), c(0x24451F), c(0xD44E50), c(0xF1E4B8), Face.PLANT));
         DESIGNS.put("bowser", new Design(10, c(0x29282A), c(0x111214), c(0xA54528), c(0xFF7B22), Face.BOSS));
+        DESIGNS.put("toad", new Design(11, c(0x246F6D), c(0x17353B), c(0xD9A846), c(0x63E7EC), Face.SHOPKEEPER));
     }
 
     public static void main(String[] args) throws Exception {
@@ -174,6 +175,13 @@ public final class EnemyTextureGen {
                 face(g, 74, 10, 12, 8, d.dark(), d.glow(), false);
                 muzzle(g, 6, 86, 10, 5, c(0xA84A24), c(0x1A1717));
                 sideFace(g, 64, 0, 12, 8, 10, d.dark(), d.glow(), false);
+            }
+            case SHOPKEEPER -> {
+                face(g, 71, 7, 7, 6, d.dark(), d.light(), false);
+                sideFace(g, 64, 0, 7, 6, 7, d.dark(), d.light(), false);
+                g.setColor(d.glow());
+                g.fillRect(65, 81, 4, 3);
+                g.fillRect(72, 87, 2, 3);
             }
         }
     }

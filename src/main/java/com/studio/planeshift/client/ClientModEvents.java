@@ -9,10 +9,14 @@ import com.studio.planeshift.client.render.CourseEnemyRenderer;
 import com.studio.planeshift.client.render.CourseSkyboxRenderer;
 import com.studio.planeshift.client.render.AnimatedCourseEnemyModel;
 import com.studio.planeshift.client.render.BespokeEnemyModel;
+import com.studio.planeshift.client.render.BespokeProjectileModel;
+import com.studio.planeshift.client.render.BespokeProjectileRenderer;
 import com.studio.planeshift.client.render.EnemyRigProfile;
 import com.studio.planeshift.client.render.FirebarRenderer;
 import com.studio.planeshift.client.render.MovingPlatformRenderer;
 import com.studio.planeshift.client.render.PlaceholderRigModel;
+import com.studio.planeshift.client.render.ProjectileVisualProfile;
+import com.studio.planeshift.client.render.ToadModel;
 import com.studio.planeshift.client.render.ToadRenderer;
 import com.studio.planeshift.client.gui.PlaneShiftTitleScreen;
 import com.studio.planeshift.client.screen.CourseMapScreen;
@@ -80,11 +84,16 @@ public final class ClientModEvents {
         event.registerLayerDefinition(PlaceholderRigModel.LAYER_LOCATION, PlaceholderRigModel::createBodyLayer);
         event.registerLayerDefinition(AnimatedCourseEnemyModel.LAYER_LOCATION,
                 AnimatedCourseEnemyModel::createBodyLayer);
+        event.registerLayerDefinition(ToadModel.LAYER_LOCATION, ToadModel::createBodyLayer);
         for (EnemyRigProfile profile : EnemyRigProfile.values()) {
             if (profile != EnemyRigProfile.VILLAGER) {
                 event.registerLayerDefinition(BespokeEnemyModel.layer(profile),
                         () -> BespokeEnemyModel.createLayer(profile));
             }
+        }
+        for (ProjectileVisualProfile profile : ProjectileVisualProfile.values()) {
+            event.registerLayerDefinition(BespokeProjectileModel.layer(profile),
+                    () -> BespokeProjectileModel.createLayer(profile));
         }
     }
 
@@ -140,17 +149,23 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.BOWSER.get(),
                 CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOSS));
         event.registerEntityRenderer(ModEntities.EMBER_BOLT.get(),
-                context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/ember_bolt.png"),
+                        ProjectileVisualProfile.EMBER_BOLT));
         event.registerEntityRenderer(ModEntities.HAMMER.get(),
-                context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/hammer.png"),
+                        ProjectileVisualProfile.HAMMER));
         event.registerEntityRenderer(ModEntities.FIREBALL.get(),
-                context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/fireball.png"),
+                        ProjectileVisualProfile.FIREBALL));
         event.registerEntityRenderer(ModEntities.ICEBALL.get(),
-                context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/iceball.png"),
+                        ProjectileVisualProfile.ICEBALL));
         event.registerEntityRenderer(ModEntities.BOOMERANG.get(),
-                context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, true));
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/boomerang.png"),
+                        ProjectileVisualProfile.BOOMERANG));
         event.registerEntityRenderer(ModEntities.BOWSER_FIRE.get(),
-                context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 2.0F, true));
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/bowser_fire.png"),
+                        ProjectileVisualProfile.BOWSER_FIRE));
         event.registerEntityRenderer(ModEntities.MOVING_PLATFORM.get(), MovingPlatformRenderer::new);
         event.registerEntityRenderer(ModEntities.FIREBAR.get(), FirebarRenderer::new);
     }

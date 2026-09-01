@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: original material-reference atlas for a Minecraft-style voxel projectile texture pipeline
+Primary request: Create an exact 3 columns by 2 rows grid of six square, edge-to-edge pixel-art material swatches. Each cell is only a close-up tileable fantasy material surface, never an object or character.
+Row 1: glowing ember-orange crystal wrapped by charcoal iron bands with tiny cyan heat vents; warm hammered brass and dark teal leather grip material; brilliant orange-gold magical plasma with a cream-hot core and sparse dark ember flecks.
+Row 2: faceted pale-cyan ice crystal with navy shadows and bright white glints; sea-green lacquered hardwood with brass edge inlay and cyan glyph flecks; volcanic crimson flame material with black basalt crust, molten orange cracks, and a white-hot center.
+Style/medium: crisp hand-authored 16-bit pixel art material study, blocky pixels, subtle bevel highlights, high gameplay readability, original fantasy sky-island aesthetic
+Composition/framing: exact equal 3x2 grid, thin dark navy separators, every material fills its cell, flat orthographic surface, no perspective
+Lighting/mood: bright neutral game-asset lighting, top-left highlight and bottom-right shade
+Color palette: saturated and luminous enough to remain readable at small in-world scale
+Constraints: no text, no labels, no logos, no characters, no objects, no silhouettes, no recognizable commercial-game imagery, no watermark, no transparency, all designs original
+Avoid: muddy near-black values, photographic surfaces, smooth vector gradients, UI frames

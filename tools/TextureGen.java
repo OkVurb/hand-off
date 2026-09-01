@@ -635,7 +635,8 @@ public final class TextureGen {
             "checkpoint_beacon_lit.png", "coin_ring_block.png", "coin_ring_block_used.png",
             "course_vine.png", "donut_block_shaking.png", "loop_trigger.png", "note_block.png",
             "on_off_switch.png", "on_off_switch_powered.png", "p_switch.png",
-            "p_switch_pressed.png", "secret_vine.png", "spike_block.png");
+            "p_switch_pressed.png", "secret_vine.png", "spike_block.png",
+            "conveyor_belt.png", "conveyor_belt_top.png", "conveyor_belt_side.png");
 
     /**
      * Writes a placeholder, but never over production art.

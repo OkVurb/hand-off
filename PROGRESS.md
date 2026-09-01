@@ -6,7 +6,7 @@
 
 ## Current State
 
-**Last updated:** 2026-08-31 (Claude session — backlog tasks 9-15)
+**Last updated:** 2026-09-01 (ChatGPT visual-production batch)
 **Build status:** GREEN — `.\gradlew build` passes with only this-escape warnings
 **Server launch:** GREEN — `.\gradlew runServer` loads all data-pack registries cleanly
 **Client launch:** GREEN — course 1 generated and rendered with the fixed side camera and skybox
@@ -14,6 +14,18 @@
 **Open branches:** None
 
 ## What Was Done This Session
+
+### ChatGPT session — shopkeeper, projectile and conveyor art
+
+- Replaced Toad's shared placeholder biped with a dedicated thirteen-group lantern-cap merchant
+  model and generated 128x128 side-camera UV sheet.
+- Replaced all six projectile billboards with independently baked ember-bolt, hammer, fireball,
+  iceball, boomerang and boss-fire voxel meshes, including flight alignment, spin and full-bright
+  hot projectiles.
+- Retained an original 3x2 projectile material atlas, exact prompt and deterministic UV converter.
+- Rebuilt the conveyor as a visual half-block with directional top chevrons and roller sides.
+- Added bake/count tests for Toad and all six projectiles. Full build passed. `runClient` rendered
+  a summoned Toad and rotating 3D hammer with no renderer, layer, model or resource errors.
 
 ### Claude session — Phase 5 batch (63-69, 73, 74)
 
@@ -140,9 +152,9 @@ Unit tests 66 -> 72. `runServer` reaches `Done (0.401s)` with zero registry erro
 
 ## What Is In Progress
 
-Visual production pass: eleven hostile enemies now have bespoke source-authored meshes and 128x128
-UV sheets derived from the original material atlas. The shopkeeper, projectile props, remaining
-greybox items/effects and per-theme skyboxes are the next visual-only work.
+Visual production pass: eleven hostile enemies, the Toad shopkeeper and all six projectile props
+now have bespoke meshes and generated production UVs. Remaining visual work is moving-platform
+geometry, greybox items/effects/particles and per-theme skyboxes.
 
 ## Handoff
 
@@ -157,16 +169,16 @@ done and is worth more than any new feature.
    been played at vanilla jump height. Everything anyone concluded about gap fairness or platform
    reachability before 51bd8ce was measured against the wrong physics and should be re-checked.
    Tune `courseJumpBoost` / `courseRunBoost` in `run/config/planeshift-server.toml` live.
-1. **Conveyor texture.** The belt physics are fixed; the texture is still a placeholder and reads
-   badly at slab height. Assigned to ChatGPT.
+1. **Moving-platform art.** Replace `PlaceholderRigModel` and its greybox texture with a bespoke
+   platform mesh that reads clearly against every course theme.
 2. **Play-test the world map and progression** — clear a course, confirm the results screen totals,
    confirm the next node unlocks and the one after it does not, and that a boss clear opens the
    next world.
 3. **Live facing check** — launch course 1, hold A/D and move the mouse; body/head must stay
    left/right while movement and action aim remain stable.
-4. **Bespoke entity models** — hostile cast complete in `BespokeEnemyModel`; next make the Toad
-   shopkeeper and projectile props equally bespoke, then do a close-range live silhouette review.
-5. **Art continuation** — per-theme skyboxes and final block/item/effect textures.
+4. **Bespoke entity review** — hostile cast, Toad and projectiles are complete; perform a
+   close-range silhouette/animation review of the complete cast.
+5. **Art continuation** — per-theme skyboxes and final block/item/effect/particle textures.
 
 ## How To Resume
 
