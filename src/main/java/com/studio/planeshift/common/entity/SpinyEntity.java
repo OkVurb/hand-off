@@ -22,7 +22,7 @@ public class SpinyEntity extends CourseEnemyEntity {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 8.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.2D)
+                .add(Attributes.MOVEMENT_SPEED, 0.15D)
                 .add(Attributes.ATTACK_DAMAGE, 3.0D);
     }
 
@@ -39,3 +39,4 @@ public class SpinyEntity extends CourseEnemyEntity {
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 }
+

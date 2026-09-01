@@ -19,7 +19,7 @@ public class HammerBroEntity extends CourseEnemyEntity {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 10.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.22D)
+                .add(Attributes.MOVEMENT_SPEED, 0.17D)
                 .add(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
@@ -29,3 +29,4 @@ public class HammerBroEntity extends CourseEnemyEntity {
         goalSelector.addGoal(1, new HammerBroGoal(this));
     }
 }
+

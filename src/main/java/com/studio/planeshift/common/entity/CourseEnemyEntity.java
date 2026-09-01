@@ -130,9 +130,29 @@ public abstract class CourseEnemyEntity extends Monster {
     public void tick() {
         super.tick();
         if (!level().isClientSide()) {
-            int ticks = entityData.get(SQUISH_TICKS);
+                        int ticks = entityData.get(SQUISH_TICKS);
             if (ticks > 0) {
                 entityData.set(SQUISH_TICKS, ticks - 1);
+            }
+            
+            if (getTarget() instanceof ServerPlayer player) {
+                com.studio.planeshift.common.course.CourseState state = com.studio.planeshift.server.CourseStateAccess.get(player);
+                if (state.inCourse() && state.rail().isPresent()) {
+                    var rail = state.rail().get();
+                    double depthCoord = rail.planeCoord();
+                    
+                    if (rail.travelAxis() == net.minecraft.core.Direction.Axis.X) {
+                        if (Math.abs(getZ() - depthCoord) > 0.05) {
+                            setPos(getX(), getY(), depthCoord);
+                            setDeltaMovement(getDeltaMovement().x, getDeltaMovement().y, 0);
+                        }
+                    } else if (rail.travelAxis() == net.minecraft.core.Direction.Axis.Z) {
+                        if (Math.abs(getX() - depthCoord) > 0.05) {
+                            setPos(depthCoord, getY(), getZ());
+                            setDeltaMovement(0, getDeltaMovement().y, getDeltaMovement().z);
+                        }
+                    }
+                }
             }
         }
     }
@@ -191,3 +211,4 @@ public abstract class CourseEnemyEntity extends Monster {
         player.resetFallDistance();
     }
 }
+

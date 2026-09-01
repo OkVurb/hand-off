@@ -60,7 +60,7 @@ public class KoopaEntity extends CourseEnemyEntity {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 8.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.26D)
+                .add(Attributes.MOVEMENT_SPEED, 0.18D)
                 .add(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
@@ -231,3 +231,4 @@ public class KoopaEntity extends CourseEnemyEntity {
         return getBoundingBox();
     }
 }
+
