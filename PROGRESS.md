@@ -23,6 +23,8 @@
 - Verified the check by deliberately commenting out `ModEntities.GOOMBA`'s renderer and confirming the build fails with the exact missing constant.
 - Added `testAirDrop` (CourseEnemy air-drop immunity flag), `testCoinBrick` (SPENT state and break behaviour), and `testHammerBroPerch` (perch clamp at 2.5 blocks) to `PlaneShiftGameTests`.
 - `runGameTestServer` now reports **all 7 required tests passed**.
+- Fixed `testAirDrop` flakiness: give the spawned Goomba a stone floor so it lands and `CourseEnemyEntity.tick()` clears `airDropped`.
+- Extended `.github/workflows/build.yml` to run `runGameTestServer` and a headless `runServer` smoke test that waits for `Done (Xs)!` before terminating.
 - Full `build` and `runServer` both pass.
 
 ### ChatGPT session — shopkeeper, projectile and conveyor art
