@@ -4,6 +4,7 @@ import com.studio.planeshift.client.ClientCourseState;
 import com.studio.planeshift.common.course.CourseState;
 import com.studio.planeshift.common.role.PlayerRole;
 import com.studio.planeshift.common.role.RoleSignature;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -80,6 +81,18 @@ public final class PlaneMovementAssists {
             floatTicksUsed = 0;
         } else {
             ticksSinceGrounded++;
+        }
+
+        // Task 44: Climbable vines. Without horizontal collision, vanilla climbing won't trigger.
+        // We inject the vertical velocity directly if the player is inside a climbable block and presses W/S.
+        if (player.onClimbable()) {
+            boolean up = Minecraft.getInstance().options.keyUp.isDown();
+            boolean down = Minecraft.getInstance().options.keyDown.isDown();
+            if (up) {
+                player.setDeltaMovement(player.getDeltaMovement().x, 0.2D, player.getDeltaMovement().z);
+            } else if (down) {
+                player.setDeltaMovement(player.getDeltaMovement().x, -0.2D, player.getDeltaMovement().z);
+            }
         }
 
         // Jump buffering: a press just before landing is honored on the landing tick. This one

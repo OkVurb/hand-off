@@ -104,7 +104,7 @@
   "gui.planeshift.course_map.close": "Close",
   "gui.planeshift.course_map.play": "Enter Course",
   "gui.planeshift.course_map.locked": "Locked — clear the previous course first",
-  "gui.planeshift.course_map.detail": "Course %s   ·   Best score %s",
+  "gui.planeshift.course_map.detail": "Course %s   ·   Best score %s   ·   Best time %ss",
   "gui.planeshift.course_map.course_1": "1-1 Sunlit Meadows",
   "gui.planeshift.course_map.course_2": "2-1 Dune Dash",
   "gui.planeshift.course_map.course_3": "3-1 Frostline Run",

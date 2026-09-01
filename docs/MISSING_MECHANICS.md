@@ -84,8 +84,8 @@ Bullet Bill, Piranha Plant, Bowser. All ground walkers now patrol rather than ch
 37. **Enemy shell interactions.** [extend] A kicked Koopa shell should defeat other enemies it
     passes through and build a combo. `KoopaEntity` has the shell; it does not hit other enemies.
 38. **Enemies knocked off by a shell falling into pits.** [extend]
-39. **Stomp chains across different enemy types.** [fix] Verify `CourseScoringService` counts a
-    mixed chain; it currently counts defeats, which may not match a shell-kill chain.
+~~39. **Stomp chains across different enemy types.** [fix] Verify `CourseScoringService` counts a
+    mixed chain; it currently counts defeats, which may not match a shell-kill chain.~~
 40. **Enemy spawn density curve.** [fix] `spawnCast` places one enemy per set piece uniformly;
     later worlds should be denser and mix types.
 
@@ -100,8 +100,8 @@ grass/sand/snow/magma terrain blocks.
     turning spent. `BrickBlock` now has the SPENT state to build on.
 42. **Rotating block.** [new] Spins when hit and is passable while spinning.
 43. **Trampoline** distinct from the spring pad — carryable and placeable. [new]
-44. **Climbable vines.** [fix] `SecretVineBlock` grows a vine but the player cannot climb it, which
-    makes the coin heaven above it unreachable by its intended route.
+~~44. **Climbable vines.** [fix] `SecretVineBlock` grows a vine but the player cannot climb it, which
+    makes the coin heaven above it unreachable by its intended route.~~
 45. **Ice block** that melts to water under fire. [new]
 46. **Moving platform on a rail path** with authored waypoints. [extend] `MovingPlatformEntity`
     only does a straight axis sweep.
@@ -169,10 +169,10 @@ Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 
 ## Course rules, scoring and meta (83–90)
 
-83. **100 coins = 1-Up.** [fix] Mentioned in a comment in `ServerEvents` as handled "by the pickup
-    itself" — verify it actually fires, because nothing obviously implements it.
-84. **Speedrun timer and best-time display.** [extend] `CourseProgress` stores `bestTimeLeft`;
-    nothing shows it outside the results screen.
+~~83. **100 coins = 1-Up.** [fix] Mentioned in a comment in `ServerEvents` as handled "by the pickup
+    itself" — verify it actually fires, because nothing obviously implements it.~~
+~~84. **Speedrun timer and best-time display.** [extend] `CourseProgress` stores `bestTimeLeft`;
+    nothing shows it outside the results screen.~~
 85. **Continue system after game over.** [extend] Game over now returns to the map with a retry;
     classic design offers a limited number of continues.
 86. **World map branching paths.** [fix] `WorldRegistry` is a linear list of ten per world.

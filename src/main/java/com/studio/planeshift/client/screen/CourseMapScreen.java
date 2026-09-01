@@ -273,7 +273,8 @@ public class CourseMapScreen extends Screen {
         boolean unlocked = WorldRegistry.isUnlocked(progress, courseId);
         Component line = unlocked
                 ? Component.translatable("gui.planeshift.course_map.detail",
-                        selected + 1, progress.record(courseId).bestScore())
+                        selected + 1, progress.record(courseId).bestScore(),
+                        progress.record(courseId).bestTimeLeft() / 20)
                 : Component.translatable("gui.planeshift.course_map.locked");
         graphics.drawString(this.font, line,
                 this.width / 2 - this.font.width(line) / 2, y, 0xFF_FFFFFF, true);

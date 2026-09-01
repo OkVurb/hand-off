@@ -58,11 +58,22 @@ public final class CourseCompletionService {
         CourseService.returnToHub(player);
 
         // Reward: coins scaled by pips remaining (placeholder formula).
-        CourseStateAccess.update(player, s -> s
-                .withState(PlayState.RESULTS)
-                .withMode(PlaneMode.FREE_3D, Optional.empty())
-                .withPips(Math.max(1, s.pips()), 0L)
-                .withCoins(s.coins() + Math.max(1, s.pips() * 2)));
+        CourseStateAccess.update(player, s -> {
+            int newCoins = s.coins() + Math.max(1, s.pips() * 2);
+            int newLives = s.lives();
+            while (newCoins >= 100) {
+                newLives++;
+                newCoins -= 100;
+                // Note: We don't play the 1-UP sound here because the course clear sound plays immediately after, 
+                // but the player still gets the life!
+            }
+            return s
+                    .withState(PlayState.RESULTS)
+                    .withMode(PlaneMode.FREE_3D, Optional.empty())
+                    .withPips(Math.max(1, s.pips()), 0L)
+                    .withCoins(newCoins)
+                    .withLives(newLives);
+        });
 
         player.level().playSound(null, player.blockPosition(), ModSounds.COURSE_CLEAR.get(),
                 SoundSource.PLAYERS, 1.0F, 1.0F);
