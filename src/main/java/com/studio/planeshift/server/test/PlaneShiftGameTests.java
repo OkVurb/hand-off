@@ -1,6 +1,7 @@
 package com.studio.planeshift.server.test;
 
 import com.studio.planeshift.PlaneShift;
+import com.studio.planeshift.common.block.BrickBlock;
 import com.studio.planeshift.common.block.HitFromBelowBlock;
 import com.studio.planeshift.common.block.QuestionBlock;
 import com.studio.planeshift.common.block.PSwitchBlock;
@@ -9,6 +10,7 @@ import com.studio.planeshift.common.block.OnOffSwitchBlock;
 import com.studio.planeshift.common.entity.CourseEnemyEntity;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModEntities;
+import net.minecraft.world.level.GameType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -32,6 +34,7 @@ public class PlaneShiftGameTests {
     public static final Identifier P_SWITCH_TEST = PlaneShift.id("p_switch_test");
     public static final Identifier ON_OFF_SWITCH_TEST = PlaneShift.id("on_off_switch_test");
     public static final Identifier AIR_DROP_TEST = PlaneShift.id("air_drop_test");
+    public static final Identifier COIN_BRICK_TEST = PlaneShift.id("coin_brick_test");
 
     public static void registerFunctions(RegisterEvent event) {
         event.register(Registries.TEST_FUNCTION, helper -> {
@@ -39,6 +42,7 @@ public class PlaneShiftGameTests {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, P_SWITCH_TEST), PlaneShiftGameTests::testPSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), PlaneShiftGameTests::testOnOffSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), PlaneShiftGameTests::testAirDrop);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), PlaneShiftGameTests::testCoinBrick);
         });
     }
 
@@ -50,6 +54,7 @@ public class PlaneShiftGameTests {
         event.registerTest(P_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, P_SWITCH_TEST), data));
         event.registerTest(ON_OFF_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), data));
         event.registerTest(AIR_DROP_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), data));
+        event.registerTest(COIN_BRICK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), data));
     }
 
     private static void testQuestionBlock(GameTestHelper helper) {
@@ -128,5 +133,46 @@ public class PlaneShiftGameTests {
         helper.succeedWhen(() -> {
             helper.assertFalse(enemy.fallingFromDrop(), "Enemy should clear airDropped flag when on ground");
         });
+    }
+
+    private static void testCoinBrick(GameTestHelper helper) {
+        BlockPos coinPos = findBrickPosition(helper, true);
+        BlockPos breakPos = findBrickPosition(helper, false);
+
+        // Coin brick: hit from below, expect SPENT=true and a coin item spawned.
+        helper.setBlock(coinPos, ModBlocks.BRICK_BLOCK.get());
+        hitBrickFromBelow(helper, coinPos);
+
+        // Regular brick: hit from below, expect it breaks.
+        helper.setBlock(breakPos, ModBlocks.BRICK_BLOCK.get());
+        hitBrickFromBelow(helper, breakPos);
+
+        helper.succeedIf(() -> {
+            helper.assertBlockProperty(coinPos, BrickBlock.SPENT, true);
+            helper.assertBlockNotPresent(ModBlocks.BRICK_BLOCK.get(), breakPos);
+        });
+    }
+
+    private static BlockPos findBrickPosition(GameTestHelper helper, boolean coin) {
+        for (int y = 1; y <= 3; y++) {
+            for (int x = 1; x <= 3; x++) {
+                for (int z = 1; z <= 3; z++) {
+                    BlockPos p = new BlockPos(x, y, z);
+                    if (BrickBlock.isCoinBrick(helper.absolutePos(p)) == coin) {
+                        return p;
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("Could not find " + (coin ? "coin" : "break") + " brick position");
+    }
+
+    private static void hitBrickFromBelow(GameTestHelper helper, BlockPos pos) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos abs = helper.absolutePos(pos);
+        player.setPos(abs.getX() + 0.5D, abs.getY() - 1.8D, abs.getZ() + 0.5D);
+
+        BlockState state = helper.getBlockState(pos);
+        ((HitFromBelowBlock) state.getBlock()).attemptHitFromBelow(state, helper.getLevel(), abs, player);
     }
 }

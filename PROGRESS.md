@@ -8,7 +8,7 @@
 
 **Last updated:** 2026-09-01 (Devin session)
 **Build status:** GREEN — `.\gradlew build` passes; new `checkEntityRenderers` verified by deliberate failure
-**GameTest status:** GREEN — `runGameTestServer` reports all 5 required tests passed
+**GameTest status:** GREEN — `runGameTestServer` reports all 6 required tests passed
 **Server launch:** GREEN — `.\gradlew runServer` reaches `Done (6.296s)!`
 **Client launch:** GREEN — course 1 generated and rendered with the fixed side camera and skybox
 **Open PRs:** None
@@ -21,8 +21,8 @@
 - Added `checkEntityRenderers` Gradle task in `build.gradle`. It parses `ModEntities.java` for all entity constants and `ClientModEvents.java` for all `registerEntityRenderer` calls, then fails the build if any registered entity lacks a client renderer.
 - The regex is anchored at the start of the line so commented-out renderer calls do not count.
 - Verified the check by deliberately commenting out `ModEntities.GOOMBA`'s renderer and confirming the build fails with the exact missing constant.
-- Added `testAirDrop` to `PlaneShiftGameTests`: spawns a Goomba, calls `CourseEnemyEntity.markAirDropped()`, asserts `fallingFromDrop()` is true, then sets `onGround` true and ticks, asserting the flag clears.
-- `runGameTestServer` now reports **all 5 required tests passed**.
+- Added `testCoinBrick` to `PlaneShiftGameTests`: searches for a coin-brick and a regular-brick position, places each, hits it from below with a mock player, and asserts the coin brick becomes `SPENT` while the regular brick breaks.
+- `runGameTestServer` now reports **all 6 required tests passed**.
 - Full `build` and `runServer` both pass.
 
 ### ChatGPT session — shopkeeper, projectile and conveyor art
