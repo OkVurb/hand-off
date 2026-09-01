@@ -256,3 +256,7 @@ table before starting anything in the movement, audio or particle groups.
 - **A green build does not mean it works.** Run `.\gradlew runServer` after touching
   `src/main/resources/data/`, and actually launch the game after touching rendering.
 - **Check before building.** Items marked [fix] and [extend] have real code behind them already.
+
+## Completed this session
+
+- **Entity-renderer build check** — every ModEntities entry now has a checkEntityRenderers Gradle check that fails the build if a registered entity lacks a client renderer. Done in uild.gradle and verified by deliberate failure/repair.

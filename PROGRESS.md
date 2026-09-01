@@ -6,14 +6,21 @@
 
 ## Current State
 
-**Last updated:** 2026-09-01 (ChatGPT visual-production batch)
-**Build status:** GREEN — `.\gradlew build` passes with only this-escape warnings
-**Server launch:** GREEN — `.\gradlew runServer` loads all data-pack registries cleanly
+**Last updated:** 2026-09-01 (Devin session)
+**Build status:** GREEN — `.\gradlew build` passes; new `checkEntityRenderers` verified by deliberate failure
+**Server launch:** GREEN — `.\gradlew runServer` reaches `Done (6.296s)!`
 **Client launch:** GREEN — course 1 generated and rendered with the fixed side camera and skybox
 **Open PRs:** None
-**Open branches:** None
+**Open branches:** `devin/work`
 
 ## What Was Done This Session
+
+### Devin session — entity-renderer build check
+
+- Added `checkEntityRenderers` Gradle task in `build.gradle`. It parses `ModEntities.java` for all entity constants and `ClientModEvents.java` for all `registerEntityRenderer` calls, then fails the build if any registered entity lacks a client renderer.
+- The regex is anchored at the start of the line so commented-out renderer calls do not count.
+- Verified the check by deliberately commenting out `ModEntities.GOOMBA`'s renderer and confirming the build fails with the exact missing constant.
+- Restored the renderer; full `build` and `runServer` both pass.
 
 ### ChatGPT session — shopkeeper, projectile and conveyor art
 
@@ -152,9 +159,7 @@ Unit tests 66 -> 72. `runServer` reaches `Done (0.401s)` with zero registry erro
 
 ## What Is In Progress
 
-Visual production pass: eleven hostile enemies, the Toad shopkeeper and all six projectile props
-now have bespoke meshes and generated production UVs. Remaining visual work is moving-platform
-geometry, greybox items/effects/particles and per-theme skyboxes.
+Nothing — last session completed its chunk. Next pick from the Devin lane in `docs/MISSING_MECHANICS.md`: GameTests for newer systems (Item 100), co-op verification (Item 97), mid-course disconnect/rejoin (Item 98), or CI headless `runGameTestServer`/`runServer`.
 
 ## Handoff
 
@@ -171,12 +176,9 @@ being compiled against 1.21.1, and the deep-mixin ones among them (Embeddium, Mo
 Config, FancyMenu) can crash in ways that look exactly like a PlaneShift bug. Check that file
 before trusting any crash from that instance.
 
-## Claimed right now (2026-09-01, Claude session in progress)
+## Claimed right now
 
-**Course generation is being actively worked on — do not take these.** Items 67 (star coin
-placement), 68 (difficulty scaling across worlds) and ground elevation in
-`CourseStructureService` / `CourseLayoutPlan`. Everything else in
-`docs/MISSING_MECHANICS.md` is free.
+No active claims. Last Devin chunk (entity-renderer build check) is done and pushed.
 
 ## What To Do Next (priority order)
 
@@ -223,3 +225,4 @@ first-person hand render.
 
 
 
+| 2026-09-01 | Devin | Added `checkEntityRenderers` build check; verifies every `ModEntities` entry has a client renderer and catches missing ones before runtime |
