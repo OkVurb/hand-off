@@ -34,10 +34,13 @@ import org.joml.Vector4f;
  */
 public final class CourseSkyboxRenderer implements CustomSkyboxRenderer {
 
-    private static final Identifier TEXTURE =
-            PlaneShift.id("textures/environment/course_skybox.png");
     private static final int VERTEX_COUNT = 24;
     private static final int INDEX_COUNT = 36;
+
+    private static Identifier getTexture() {
+        com.studio.planeshift.common.course.CourseTheme theme = com.studio.planeshift.client.ClientCourseState.get().theme();
+        return PlaneShift.id("textures/environment/course_skybox_" + theme.getSerializedName() + ".png");
+    }
 
     private GpuBuffer cubeBuffer;
 
@@ -50,7 +53,7 @@ public final class CourseSkyboxRenderer implements CustomSkyboxRenderer {
         }
 
         Minecraft minecraft = Minecraft.getInstance();
-        AbstractTexture texture = minecraft.getTextureManager().getTexture(TEXTURE);
+        AbstractTexture texture = minecraft.getTextureManager().getTexture(getTexture());
         RenderSystem.AutoStorageIndexBuffer indices =
                 RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         GpuBuffer indexBuffer = indices.getBuffer(INDEX_COUNT);
