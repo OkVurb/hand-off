@@ -108,7 +108,8 @@ public final class CourseService {
                 // course definition so each course can set its own rules.
                 0,
                 def.timeLimitTicks(),
-                def.autoScroll()
+                def.autoScroll(),
+                def.theme()
         ));
         // The course movement baseline has to follow the state change, not precede it: it reads
         // inCourse() to decide whether to apply.
@@ -165,3 +166,4 @@ public final class CourseService {
         return null;
     }
 }
+

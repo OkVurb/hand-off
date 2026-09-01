@@ -64,7 +64,8 @@ public record CourseState(
         double killY,
         int score,
         int timeLeft,
-        boolean autoScroll
+        boolean autoScroll,
+        CourseTheme theme
 ) {
     public static final int MAX_PIPS = 2;
     public static final int STARTING_LIVES = 3;
@@ -79,7 +80,7 @@ public record CourseState(
     public static final CourseState DEFAULT = new CourseState(
             PlayState.HUB, PlaneMode.FREE_3D, Optional.empty(), Optional.empty(),
             FormSlot.EMPTY, Optional.empty(), MAX_PIPS, 0L, Optional.empty(), 0, 0, STARTING_LIVES,
-            DEFAULT_KILL_Y, 0, NO_TIME_LIMIT, false);
+            DEFAULT_KILL_Y, 0, NO_TIME_LIMIT, false, CourseTheme.GRASS);
 
     /**
      * Persistence codec. Deliberately excludes {@link #transition}: an uncommitted
@@ -109,12 +110,13 @@ public record CourseState(
             com.mojang.serialization.Codec.intRange(NO_TIME_LIMIT, 1_000_000)
                     .optionalFieldOf("time_left", NO_TIME_LIMIT).forGetter(CourseState::timeLeft),
             com.mojang.serialization.Codec.BOOL.optionalFieldOf("auto_scroll", false)
-                    .forGetter(CourseState::autoScroll)
+                    .forGetter(CourseState::autoScroll),
+            CourseTheme.CODEC.optionalFieldOf("theme", CourseTheme.GRASS).forGetter(CourseState::theme)
     ).apply(instance, (state, mode, rail, role, formSlot, pips, invuln, checkpoint, coins, starCoins,
-                       lives, killY, score, timeLeft, autoScroll) ->
+                       lives, killY, score, timeLeft, autoScroll, theme) ->
             sanitize(new CourseState(state, mode, rail, role, formSlot,
                     Optional.empty(), pips, invuln, checkpoint, coins, starCoins, lives, killY,
-                    score, timeLeft, autoScroll))));
+                    score, timeLeft, autoScroll, theme))));
 
     /** Network codec: the full snapshot, including transition presentation data. */
     public static final StreamCodec<ByteBuf, CourseState> STREAM_CODEC = new StreamCodec<>() {
@@ -137,9 +139,10 @@ public record CourseState(
             // Signed: NO_TIME_LIMIT is -1, which VAR_INT would encode wastefully but correctly.
             int timeLeft = ByteBufCodecs.INT.decode(buf);
             boolean autoScroll = ByteBufCodecs.BOOL.decode(buf);
+            CourseTheme theme = ByteBufCodecs.fromCodec(CourseTheme.CODEC).decode(buf);
             return new CourseState(state, mode, rail, roleId, formSlot, transition,
                     pips, invulnUntil, checkpoint, coins, starCoins, lives, killY,
-                    score, timeLeft, autoScroll);
+                    score, timeLeft, autoScroll, theme);
         }
 
         @Override
@@ -160,6 +163,7 @@ public record CourseState(
             ByteBufCodecs.VAR_INT.encode(buf, state.score());
             ByteBufCodecs.INT.encode(buf, state.timeLeft());
             ByteBufCodecs.BOOL.encode(buf, state.autoScroll());
+            ByteBufCodecs.fromCodec(CourseTheme.CODEC).encode(buf, state.theme());
         }
     };
 
@@ -177,7 +181,7 @@ public record CourseState(
                     loaded.roleId(), loaded.formSlot(), Optional.empty(),
                     loaded.pips(), loaded.invulnUntil(), loaded.checkpoint(),
                     loaded.coins(), loaded.starCoins(), loaded.lives(), loaded.killY(),
-                    loaded.score(), NO_TIME_LIMIT, false);
+                    loaded.score(), NO_TIME_LIMIT, false, loaded.theme());
         }
         PlaneMode mode = loaded.mode();
         Optional<PlaneRail> rail = loaded.rail();
@@ -194,7 +198,7 @@ public record CourseState(
         return new CourseState(state, mode, rail, loaded.roleId(), loaded.formSlot(), Optional.empty(),
                 loaded.pips(), loaded.invulnUntil(), loaded.checkpoint(),
                 loaded.coins(), loaded.starCoins(), loaded.lives(), loaded.killY(),
-                loaded.score(), loaded.timeLeft(), loaded.autoScroll());
+                loaded.score(), loaded.timeLeft(), loaded.autoScroll(), loaded.theme());
     }
 
     /** The perspective the client should present right now. */
@@ -237,78 +241,78 @@ public record CourseState(
 
     public CourseState withState(PlayState newState) {
         return new CourseState(newState, mode, rail, roleId, formSlot, transition,
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withMode(PlaneMode newMode, Optional<PlaneRail> newRail) {
         PlayState newState = state == PlayState.HUB ? PlayState.HUB : PlayState.playingFor(newMode);
         return new CourseState(newState, newMode, newRail, roleId, formSlot, Optional.empty(),
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withTransition(Optional<TransitionSync> newTransition) {
         PlayState newState = newTransition.isPresent() ? PlayState.TRANSITION : state;
         return new CourseState(newState, mode, rail, roleId, formSlot, newTransition,
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withRole(Optional<Identifier> newRole) {
         return new CourseState(state, mode, rail, newRole, formSlot, transition,
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withFormSlot(FormSlot newSlot) {
         return new CourseState(state, mode, rail, roleId, newSlot, transition,
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withPips(int newPips, long newInvulnUntil) {
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
                 Math.max(0, Math.min(MAX_PIPS, newPips)), newInvulnUntil, checkpoint,
-                coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withCheckpoint(Optional<GlobalPos> newCheckpoint) {
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
-                pips, invulnUntil, newCheckpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll);
+                pips, invulnUntil, newCheckpoint, coins, starCoins, lives, killY, score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withCoins(int newCoins) {
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
                 pips, invulnUntil, checkpoint, clampValue(newCoins), starCoins, lives, killY,
-                score, timeLeft, autoScroll);
+                score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withStarCoins(int newStarCoins) {
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
                 pips, invulnUntil, checkpoint, coins, clampValue(newStarCoins), lives, killY,
-                score, timeLeft, autoScroll);
+                score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withLives(int newLives) {
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
                 pips, invulnUntil, checkpoint, coins, starCoins, clampValue(newLives), killY,
-                score, timeLeft, autoScroll);
+                score, timeLeft, autoScroll, theme);
     }
 
     public CourseState withScore(int newScore) {
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
                 pips, invulnUntil, checkpoint, coins, starCoins, lives, killY,
-                clampValue(newScore), timeLeft, autoScroll);
+                clampValue(newScore), timeLeft, autoScroll, theme);
     }
 
     /** Sets the remaining clock. Pass {@link #NO_TIME_LIMIT} to clear it. */
     public CourseState withTimeLeft(int newTimeLeft) {
         int clamped = newTimeLeft <= NO_TIME_LIMIT ? NO_TIME_LIMIT : clampValue(newTimeLeft);
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, clamped, autoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, clamped, autoScroll, theme);
     }
 
     /** Applies the per-course rules chosen at load time. */
     public CourseState withCourseRules(int newTimeLeft, boolean newAutoScroll) {
         int clamped = newTimeLeft <= NO_TIME_LIMIT ? NO_TIME_LIMIT : clampValue(newTimeLeft);
         return new CourseState(state, mode, rail, roleId, formSlot, transition,
-                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, clamped, newAutoScroll);
+                pips, invulnUntil, checkpoint, coins, starCoins, lives, killY, score, clamped, newAutoScroll, theme);
     }
 
     private static int clampValue(int value) {
@@ -317,3 +321,6 @@ public record CourseState(
         return value;
     }
 }
+
+
+
