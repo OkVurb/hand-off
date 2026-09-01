@@ -84,6 +84,18 @@ public final class ServerEvents {
             LeafFlightService.tick(player);
             CourseTimerService.tick(player);
             CourseProgressService.tick(player);
+            // Task 59: Ambient ash and spark particles for lava theme
+            if (CourseStateAccess.get(player).inCourse()
+                    && CourseThemeService.get(player) == com.studio.planeshift.common.course.CourseTheme.LAVA
+                    && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel
+                    && player.getRandom().nextInt(5) == 0) {
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA,
+                        player.getX(), player.getY() + 3.0D, player.getZ(),
+                        2, 4.0D, 2.0D, 4.0D, 0.0D);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,
+                        player.getX(), player.getY() + 1.0D, player.getZ(),
+                        1, 3.0D, 1.0D, 3.0D, 0.01D);
+            }
             if (player.onGround()) {
                 // Landing closes any airborne stomp chain, so the combo ladder only rewards
                 // bounces strung together in the air.

@@ -52,6 +52,12 @@ public class CoinBlock extends Block implements HitFromBelowBlock {
             drop.setDeltaMovement(0.0D, 0.28D, 0.0D);
             level.addFreshEntity(drop);
             level.playSound(null, pos, ModSounds.COIN_PICKUP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            // Task 55: Coin particles flying upward
+            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
+                        pos.getX() + 0.5D, pos.getY() + 1.2D, pos.getZ() + 0.5D,
+                        8, 0.2D, 0.3D, 0.2D, 0.05D);
+            }
             level.setBlock(pos, state.setValue(COINS, remaining - 1), Block.UPDATE_ALL);
         }
     }

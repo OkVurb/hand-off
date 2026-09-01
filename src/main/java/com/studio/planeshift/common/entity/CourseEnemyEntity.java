@@ -173,6 +173,11 @@ public abstract class CourseEnemyEntity extends Monster {
                 CourseScoringService.awardStomp(player);
                 level().playSound(null, blockPosition(), ModSounds.ENEMY_DEFEAT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
                 spawnHitParticles(10);
+                // Task 57: Smoke puff on enemy defeat
+                if (level() instanceof ServerLevel serverLevel) {
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD,
+                            getX(), getY(0.5D), getZ(), 12, 0.3D, 0.2D, 0.3D, 0.02D);
+                }
             } else {
                 level().playSound(null, blockPosition(), ModSounds.STOMP.get(), SoundSource.HOSTILE, 1.0F, 1.2F);
                 spawnHitParticles(4);

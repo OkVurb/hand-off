@@ -298,10 +298,17 @@ public final class CourseStructureService {
                 set(level, start.offset(x, 1, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
             }
         }
-        if (gaps.length > 3) {
-            int[] gap2 = gaps[3];
-            for (int x = gap2[0]; x <= gap2[1]; x++) {
-                set(level, start.offset(x, (x % 2 == 0) ? 2 : 1, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+        
+        int mid = plan.midpoint();
+        for (int i = 0; i < gaps.length; i++) {
+            if (gaps[i][0] > mid) {
+                int[] gap = gaps[i];
+                for (int x = gap[0]; x <= gap[1]; x++) {
+                    int y = (x % 2 == 0) ? 2 : 1;
+                    if (x % 3 == 0) y = 3;
+                    set(level, start.offset(x, y, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+                }
+                break;
             }
         }
     }

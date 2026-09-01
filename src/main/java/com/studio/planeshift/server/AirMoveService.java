@@ -70,6 +70,13 @@ public final class AirMoveService {
                 BlockState state = player.level().getBlockState(below);
                 if (state.getBlock() instanceof com.studio.planeshift.common.block.BrickBlock || 
                     state.getBlock() instanceof com.studio.planeshift.common.block.QuestionBlock) {
+                    // Task 56: Brick debris particles
+                    if (player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                        serverLevel.sendParticles(
+                                net.minecraft.core.particles.ParticleTypes.CRIT,
+                                below.getX() + 0.5D, below.getY() + 0.5D, below.getZ() + 0.5D,
+                                20, 0.3D, 0.3D, 0.3D, 0.1D);
+                    }
                     player.level().destroyBlock(below, true);
                     player.level().playSound(null, below, com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
