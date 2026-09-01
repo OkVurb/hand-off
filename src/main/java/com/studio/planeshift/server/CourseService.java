@@ -97,7 +97,7 @@ public final class CourseService {
                 s.roleId(),
                 s.formSlot(),
                 Optional.empty(),
-                CourseState.MAX_PIPS,
+                Math.max(1, s.pips()),
                 0L,
                 Optional.of(net.minecraft.core.GlobalPos.of(courseLevel.dimension(), start)),
                 s.coins(),

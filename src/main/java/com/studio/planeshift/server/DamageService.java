@@ -115,7 +115,7 @@ public final class DamageService {
                     .withState(PlayState.HUB)
                     .withMode(PlaneMode.FREE_3D, Optional.empty())
                     .withFormSlot(s.formSlot().loseActive())
-                    .withPips(CourseState.MAX_PIPS, now + INVULN_TICKS * 2L)
+                    .withPips(1, now + INVULN_TICKS * 2L)
                     .withLives(CourseState.STARTING_LIVES)
                     .withCheckpoint(Optional.empty()));
             // Read before the reset below wipes them; the screen has nothing else to show.

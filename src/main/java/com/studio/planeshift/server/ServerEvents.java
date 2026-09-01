@@ -222,7 +222,7 @@ public final class ServerEvents {
             CourseMovementService.refresh(player);
             CourseState state = CourseStateAccess.get(player);
             CourseStateAccess.update(player, s -> s
-                    .withPips(CourseState.MAX_PIPS, 0L)
+                    .withPips(1, 0L)
                     .withLives(state.lives() <= 0 ? CourseState.STARTING_LIVES : state.lives()));
             if (CourseStateAccess.get(player).inCourse()) {
                 CheckpointService.returnToCheckpoint(player);

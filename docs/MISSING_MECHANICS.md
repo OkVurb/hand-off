@@ -161,8 +161,8 @@ Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 78. **Frog / Penguin suit** for water courses. [new]
 79. **Gold flower** — turns blocks to coins. [new]
 80. **P-balloon.** [new]
-81. **Power-up carry between courses.** [fix] Forms reset on course load; classic behaviour keeps
-    them.
+~~81. **Power-up carry between courses.** [fix] Forms reset on course load; classic behaviour keeps
+    them.~~
 82. **Form-specific interactions with blocks.** [new] Fire melting ice, Mega smashing anything,
     Mini fitting through one-block gaps — Mini and Mega exist but change nothing about what the
     player can traverse.

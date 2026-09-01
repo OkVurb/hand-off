@@ -61,7 +61,7 @@ public final class CourseCompletionService {
         CourseStateAccess.update(player, s -> s
                 .withState(PlayState.RESULTS)
                 .withMode(PlaneMode.FREE_3D, Optional.empty())
-                .withPips(CourseState.MAX_PIPS, 0L)
+                .withPips(Math.max(1, s.pips()), 0L)
                 .withCoins(s.coins() + Math.max(1, s.pips() * 2)));
 
         player.level().playSound(null, player.blockPosition(), ModSounds.COURSE_CLEAR.get(),
