@@ -48,11 +48,11 @@ public final class CourseStructureService {
     private CourseStructureService() {
     }
 
-    public static void place(ServerLevel level, CourseDefinition course) {
+    public static void place(ServerLevel level, CourseDefinition course, String courseId) {
         if (course.structure().isPresent() && placeTemplate(level, course, course.structure().get())) {
             return;
         }
-        placeGenerated(level, course);
+        placeGenerated(level, course, courseId);
     }
 
     private static boolean placeTemplate(ServerLevel level, CourseDefinition course,
@@ -75,9 +75,10 @@ public final class CourseStructureService {
         return true;
     }
 
-    private static void placeGenerated(ServerLevel level, CourseDefinition course) {
+    private static void placeGenerated(ServerLevel level, CourseDefinition course, String courseId) {
         BlockPos start = course.startPos();
-        CourseLayoutPlan plan = CourseLayoutPlan.forCourse(course);
+        // Seeded from the save as well as the course, so a new world is a new set of courses.
+        CourseLayoutPlan plan = CourseLayoutPlan.forCourse(course, courseId, level.getSeed());
         int floorY = start.getY() - 1;
 
         clearCorridor(level, start, plan.length());

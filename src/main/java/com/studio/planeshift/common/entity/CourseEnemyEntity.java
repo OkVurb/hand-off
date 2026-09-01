@@ -37,6 +37,26 @@ public abstract class CourseEnemyEntity extends Monster {
     private long lastStompGameTime = -STOMP_COOLDOWN_TICKS;
 
     /**
+     * Set when this enemy was dropped from the air by another one, e.g. a Lakitu's Spiny.
+     *
+     * <p>A dropped enemy is harmless until it lands. Without that, an enemy spawned directly above
+     * the player lands *on* them and deals contact damage before it is visible as a threat, which
+     * is a hit the player had no way to avoid — the one kind of damage a platformer must not
+     * deal. It clears the moment it touches ground, so it costs nothing after the drop.
+     */
+    private boolean airDropped;
+
+    /** Marks this enemy as dropped from above; it cannot touch the player until it lands. */
+    public void markAirDropped() {
+        this.airDropped = true;
+    }
+
+    /** True while a dropped enemy is still falling and must not interact with the player. */
+    public boolean fallingFromDrop() {
+        return airDropped;
+    }
+
+    /**
      * Ticks of squish left, synced so the renderer can flatten the model.
      *
      * <p>Lives on the base entity rather than in each subclass so every enemy squishes the same
@@ -110,6 +130,11 @@ public abstract class CourseEnemyEntity extends Monster {
         if (level().isClientSide() || !(player instanceof ServerPlayer serverPlayer)) {
             return;
         }
+        if (airDropped) {
+            // Still in the air after being dropped: no contact damage and no stomp either, so the
+            // exchange is simply postponed until the enemy has landed and can be seen coming.
+            return;
+        }
         if (isStompContact(serverPlayer)) {
             resolveStomp(serverPlayer);
         } else {
@@ -130,6 +155,9 @@ public abstract class CourseEnemyEntity extends Monster {
     public void tick() {
         super.tick();
         if (!level().isClientSide()) {
+            if (airDropped && onGround()) {
+                airDropped = false;
+            }
                         int ticks = entityData.get(SQUISH_TICKS);
             if (ticks > 0) {
                 entityData.set(SQUISH_TICKS, ticks - 1);

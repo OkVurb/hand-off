@@ -1,8 +1,23 @@
 {
   "dimension": "planeshift:course",
-  "start_pos": [4864, 64, 0],
+  "start_pos": [
+    4864,
+    64,
+    0
+  ],
   "start_mode": "side_on",
-  "theme": "lava",
+  "theme": "snow",
   "kill_y": 40,
-  "length": 224
+  "length": 224,
+  "layout": {
+    "features": [
+      "donut_bridge",
+      "donut_gauntlet",
+      "note_block_run",
+      "vertical_climb",
+      "staircase",
+      "moving_platforms",
+      "castle_finale"
+    ]
+  }
 }

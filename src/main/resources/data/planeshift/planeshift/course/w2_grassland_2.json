@@ -1,8 +1,12 @@
 {
   "dimension": "planeshift:course",
-  "start_pos": [256, 64, 0],
+  "start_pos": [
+    256,
+    64,
+    0
+  ],
   "start_mode": "side_on",
-  "theme": "desert",
+  "theme": "grass",
   "kill_y": 40,
   "length": 152
 }

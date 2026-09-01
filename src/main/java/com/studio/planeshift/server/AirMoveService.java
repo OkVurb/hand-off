@@ -1,5 +1,6 @@
 package com.studio.planeshift.server;
 
+import com.studio.planeshift.common.PlaneShiftConfig;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
@@ -21,6 +22,14 @@ public final class AirMoveService {
     private static final double GROUND_POUND_SPEED = -1.2D;
     /** Ticks a given block ignores repeat head-bumps from the same player. */
     private static final int HIT_DEBOUNCE_TICKS = 10;
+
+    /**
+     * How far past the top of the head to look for the block being hit.
+     *
+     * <p>Large enough to cross into the block that stopped the player's rise, small enough that
+     * it cannot reach the block above that one.
+     */
+    private static final double HEAD_PROBE = 0.1D;
 
     /** Downward kick after a head bump, so the hit reads as a collision not a swallowed jump. */
     private static final double HEAD_BUMP_REBOUND = -0.12D;
@@ -85,7 +94,21 @@ public final class AirMoveService {
 
         // Head-hit question blocks from below.
         if (player.getDeltaMovement().y > 0.0D) {
-            BlockPos headPos = BlockPos.containing(player.getX(), player.getEyeY() + 0.1D, player.getZ()).above();
+            // The block the top of the head is entering.
+            //
+            // This used to be eye height plus a tenth, then .above(). Eye height sits about 1.62
+            // above the feet, so that expression lands on the correct block only while the eyes
+            // are in the lower part of their block — the moment a rising player's eyes cross a
+            // block boundary, .above() points one block too high and the bump silently misses.
+            // Since the player is always rising when this runs, it missed constantly, which is
+            // why question blocks and bricks so often did nothing.
+            //
+            // Measuring from the top of the bounding box instead targets the block the head is
+            // actually about to touch, at any sub-block position and at any pose: collision stops
+            // a rising player with maxY exactly at the block's underside, so maxY plus a small
+            // epsilon lands inside the block that stopped them.
+            BlockPos headPos = BlockPos.containing(
+                    player.getX(), player.getBoundingBox().maxY + HEAD_PROBE, player.getZ());
             BlockState state = player.level().getBlockState(headPos);
             Block block = state.getBlock();
             if (block instanceof com.studio.planeshift.common.block.HitFromBelowBlock hit
@@ -147,6 +170,13 @@ public final class AirMoveService {
         }
         // A jump pressed inside the grace window converts the slide into a fresh launch. The
         // player has already left the wall by this tick, which is why the window exists at all.
+        //
+        // Off by default. In a course packed with blocks almost any airborne moment is within six
+        // ticks of touching something, so this fired constantly and read as a free double jump
+        // rather than as a wall jump. Anyone who wants the mechanic can switch it back on.
+        if (!PlaneShiftConfig.SERVER.wallJump.get()) {
+            return;
+        }
         if (player.getLastClientInput().jump() && velocity.y <= 0.0D) {
             player.setDeltaMovement(velocity.x, WALL_JUMP_STRENGTH, velocity.z);
             player.hurtMarked = true;

@@ -183,6 +183,11 @@ public final class ClientModEvents {
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new CourseGameOverScreen(payload))));
 
+        event.register(com.studio.planeshift.common.network.OpenTesterPayload.TYPE,
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().setScreen(
+                                new com.studio.planeshift.client.screen.TesterScreen())));
+
         event.register(OpenTitleScreenPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new PlaneShiftTitleScreen())));

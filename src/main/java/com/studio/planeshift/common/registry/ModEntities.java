@@ -41,70 +41,70 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<GoombaEntity>> GOOMBA =
             ENTITY_TYPES.register("goomba", () -> EntityType.Builder
                     .of(GoombaEntity::new, MobCategory.MONSTER)
-                    .sized(0.7F, 0.65F)
+                    .sized(0.58F, 0.58F)
                     .clientTrackingRange(8)
                     .build(key("goomba")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<KoopaEntity>> KOOPA =
             ENTITY_TYPES.register("koopa", () -> EntityType.Builder
                     .of(KoopaEntity::new, MobCategory.MONSTER)
-                    .sized(0.55F, 0.9F)
+                    .sized(0.5F, 0.8F)
                     .clientTrackingRange(8)
                     .build(key("koopa")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ThwompEntity>> THWOMP =
             ENTITY_TYPES.register("thwomp", () -> EntityType.Builder
                     .of(ThwompEntity::new, MobCategory.MONSTER)
-                    .sized(1.0F, 1.4F)
+                    .sized(0.95F, 0.95F)
                     .clientTrackingRange(8)
                     .build(key("thwomp")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BulletBillEntity>> BULLET_BILL =
             ENTITY_TYPES.register("bullet_bill", () -> EntityType.Builder
                     .of(BulletBillEntity::new, MobCategory.MONSTER)
-                    .sized(0.6F, 0.6F)
+                    .sized(0.45F, 0.45F)
                     .clientTrackingRange(8)
                     .build(key("bullet_bill")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BooEntity>> BOO =
             ENTITY_TYPES.register("boo", () -> EntityType.Builder
                     .of(BooEntity::new, MobCategory.MONSTER)
-                    .sized(0.75F, 0.75F)
+                    .sized(0.6F, 0.6F)
                     .clientTrackingRange(8)
                     .build(key("boo")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<LakituEntity>> LAKITU =
             ENTITY_TYPES.register("lakitu", () -> EntityType.Builder
                     .of(LakituEntity::new, MobCategory.MONSTER)
-                    .sized(0.9F, 1.2F)
+                    .sized(0.7F, 0.95F)
                     .clientTrackingRange(8)
                     .build(key("lakitu")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<HammerBroEntity>> HAMMER_BRO =
             ENTITY_TYPES.register("hammer_bro", () -> EntityType.Builder
                     .of(HammerBroEntity::new, MobCategory.MONSTER)
-                    .sized(0.75F, 1.2F)
+                    .sized(0.6F, 1.0F)
                     .clientTrackingRange(8)
                     .build(key("hammer_bro")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<SpinyEntity>> SPINY =
             ENTITY_TYPES.register("spiny", () -> EntityType.Builder
                     .of(SpinyEntity::new, MobCategory.MONSTER)
-                    .sized(0.65F, 0.7F)
+                    .sized(0.52F, 0.5F)
                     .clientTrackingRange(8)
                     .build(key("spiny")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BuzzyBeetleEntity>> BUZZY_BEETLE =
             ENTITY_TYPES.register("buzzy_beetle", () -> EntityType.Builder
                     .of(BuzzyBeetleEntity::new, MobCategory.MONSTER)
-                    .sized(0.75F, 0.55F)
+                    .sized(0.6F, 0.45F)
                     .clientTrackingRange(8)
                     .build(key("buzzy_beetle")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<PiranhaPlantEntity>> PIRANHA_PLANT =
             ENTITY_TYPES.register("piranha_plant", () -> EntityType.Builder
                     .of(PiranhaPlantEntity::new, MobCategory.MONSTER)
-                    .sized(0.75F, 1.4F)
+                    .sized(0.55F, 1.15F)
                     .clientTrackingRange(8)
                     .build(key("piranha_plant")));
 
@@ -151,7 +151,7 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<ToadEntity>> TOAD =
             ENTITY_TYPES.register("toad", () -> EntityType.Builder
                     .<ToadEntity>of(ToadEntity::new, MobCategory.CREATURE)
-                    .sized(0.6F, 0.9F)
+                    .sized(0.5F, 0.8F)
                     .clientTrackingRange(10)
                     .updateInterval(3)
                     .build(key("toad")));
@@ -159,7 +159,7 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<BowserEntity>> BOWSER =
             ENTITY_TYPES.register("bowser", () -> EntityType.Builder
                     .<BowserEntity>of(BowserEntity::new, MobCategory.MONSTER)
-                    .sized(1.5F, 1.8F)
+                    .sized(1.3F, 1.7F)
                     .clientTrackingRange(12)
                     .updateInterval(3)
                     .build(key("bowser")));

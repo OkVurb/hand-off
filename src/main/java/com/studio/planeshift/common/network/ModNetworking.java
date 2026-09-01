@@ -58,6 +58,7 @@ public final class ModNetworking {
         registrar.playToClient(ScorePopupPayload.TYPE, ScorePopupPayload.STREAM_CODEC);
         registrar.playToClient(CourseResultsPayload.TYPE, CourseResultsPayload.STREAM_CODEC);
         registrar.playToClient(GameOverPayload.TYPE, GameOverPayload.STREAM_CODEC);
+        registrar.playToClient(OpenTesterPayload.TYPE, OpenTesterPayload.STREAM_CODEC);
 
         registrar.playToServer(LeaveCoursePayload.TYPE, LeaveCoursePayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {

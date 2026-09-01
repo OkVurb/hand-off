@@ -19,7 +19,7 @@ import java.util.Set;
  * checkpoint.
  */
 record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> features,
-                        int setPieceCount) {
+                        int setPieceCount, int seed) {
 
     /** Blocks of ground guaranteed between two pits, so they can never merge into one. */
     static final int MIN_GROUND_RUN = 4;
@@ -30,22 +30,60 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
     /** Roughly one set piece per this many blocks when the course does not say otherwise. */
     private static final int BLOCKS_PER_SET_PIECE = 24;
 
-    static CourseLayoutPlan forCourse(CourseDefinition course) {
-        return build(course.theme(), course.length(), course.layout().orElse(CourseLayout.DEFAULT));
+    static CourseLayoutPlan forCourse(CourseDefinition course, String courseId, long worldSeed) {
+        return build(course.theme(), course.length(), course.layout().orElse(CourseLayout.DEFAULT),
+                seedOf(courseId, worldSeed));
     }
 
     /** Convenience for the theme defaults; the generator always goes through {@link #forCourse}. */
     static CourseLayoutPlan forTheme(CourseTheme theme, int length) {
-        return build(theme, length, CourseLayout.DEFAULT);
+        return build(theme, length, CourseLayout.DEFAULT, 0);
+    }
+
+    /**
+     * A stable per-course seed.
+     *
+     * <p>Every course of a theme used to produce a byte-identical layout, because the derivation
+     * read only the theme and the length. Fifty courses generated as five, repeated ten times
+     * each.
+     *
+     * <p>Mixing the world seed in makes a new save a new set of courses, the way a new Minecraft
+     * world is new terrain. Mixing the course id in keeps the fifty courses of one save distinct
+     * from each other. And because it is a hash rather than a random draw, a given course in a
+     * given save regenerates identically every time it loads — which retrying a course after a
+     * death depends on completely.
+     */
+    static int seedOf(String courseId, long worldSeed) {
+        long hash = worldSeed;
+        if (courseId != null) {
+            for (int i = 0; i < courseId.length(); i++) {
+                hash = hash * 31L + courseId.charAt(i);
+            }
+        }
+        // Fold the 64-bit value down and mix, so two ids one character apart do not produce two
+        // seeds one apart — which would give neighbouring courses near-identical layouts.
+        hash ^= hash >>> 32;
+        hash *= 0x9E3779B97F4A7C15L;
+        hash ^= hash >>> 29;
+        return (int) (hash & 0x7FFFFFFF);
+    }
+
+    /** Overload for tests and for callers with no world, e.g. the theme-default plans. */
+    static int seedOf(String courseId) {
+        return seedOf(courseId, 0L);
     }
 
     static CourseLayoutPlan build(CourseTheme theme, int length, CourseLayout layout) {
+        return build(theme, length, layout, 0);
+    }
+
+    static CourseLayoutPlan build(CourseTheme theme, int length, CourseLayout layout, int seed) {
         int[][] gaps = layout.gaps()
                 .map(list -> explicitGaps(list, length, layout))
-                .orElseGet(() -> derivedGaps(theme, length, layout));
+                .orElseGet(() -> derivedGaps(theme, length, layout, seed));
         int setPieces = layout.setPieceCount()
                 .orElseGet(() -> Math.clamp(length / BLOCKS_PER_SET_PIECE, 3, 12));
-        return new CourseLayoutPlan(length, gaps, layout.resolvedFeatures(theme), setPieces);
+        return new CourseLayoutPlan(length, gaps, layout.resolvedFeatures(theme), setPieces, seed);
     }
 
     /**
@@ -87,7 +125,7 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
      * at the same length do not produce an identical silhouette, but it no longer moves the pits
      * bodily — that displacement was what let them collide.
      */
-    private static int[][] derivedGaps(CourseTheme theme, int length, CourseLayout layout) {
+    private static int[][] derivedGaps(CourseTheme theme, int length, CourseLayout layout, int seed) {
         int spanStart = layout.safeStart() + 1;
         int spanEnd = length - layout.safeFinish() - 1;
         int span = spanEnd - spanStart + 1;
@@ -107,14 +145,21 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
         }
 
         int widthSpread = Math.max(1, layout.maxGapWidth() - 3);
-        int shift = theme.ordinal();
+        // Theme still perturbs the widths; the seed makes two courses of the same theme and
+        // length differ, which is the whole point of it existing.
+        int shift = theme.ordinal() + seed;
         int mid = length / 2;
 
         List<int[]> accepted = new ArrayList<>();
         int previousEnd = spanStart - MIN_GROUND_RUN - 1;
         for (int i = 0; i < count; i++) {
             int width = Math.min(layout.maxGapWidth(), 4 + ((i + shift) % widthSpread));
-            int centre = spanStart + slot * i + slot / 2;
+            // Nudge each pit within its own slot rather than moving it into a neighbour's, so the
+            // spacing guarantees below still hold no matter what the seed is.
+            int jitter = slot <= width + MIN_GROUND_RUN * 2
+                    ? 0
+                    : ((seed / (i + 1)) % (slot - width - MIN_GROUND_RUN)) - (slot - width - MIN_GROUND_RUN) / 2;
+            int centre = spanStart + slot * i + slot / 2 + jitter;
             int from = centre - width / 2;
             int to = from + width - 1;
 

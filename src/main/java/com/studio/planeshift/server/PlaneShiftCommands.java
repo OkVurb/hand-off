@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.network.OpenCourseMapPayload;
+import com.studio.planeshift.common.network.OpenTesterPayload;
 import com.studio.planeshift.common.network.OpenTitleScreenPayload;
 import com.studio.planeshift.common.course.CourseState;
 import com.studio.planeshift.common.mode.PlaneMode;
@@ -80,6 +81,8 @@ public final class PlaneShiftCommands {
                                         StringArgumentType.getString(context, "id")))))
                 .then(Commands.literal("map")
                         .executes(context -> openCourseMap(context.getSource())))
+                .then(Commands.literal("test")
+                        .executes(context -> openTester(context.getSource())))
                 .then(Commands.literal("title")
                         .executes(context -> openTitleScreen(context.getSource())))
                 .then(Commands.literal("theme")
@@ -186,6 +189,15 @@ public final class PlaneShiftCommands {
         }
         net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, OpenCourseMapPayload.INSTANCE);
         source.sendSuccess(() -> Component.translatable("commands.planeshift.map.opened"), false);
+        return 1;
+    }
+
+    /** Opens the tester menu without needing the F6 binding to be free. */
+    private static int openTester(CommandSourceStack source) {
+        if (!(source.getEntity() instanceof ServerPlayer player)) {
+            return 0;
+        }
+        PacketDistributor.sendToPlayer(player, OpenTesterPayload.INSTANCE);
         return 1;
     }
 

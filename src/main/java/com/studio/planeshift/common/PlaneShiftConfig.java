@@ -87,6 +87,7 @@ public final class PlaneShiftConfig {
         public final ModConfigSpec.BooleanValue allowManualShift;
         public final ModConfigSpec.DoubleValue courseJumpBoost;
         public final ModConfigSpec.DoubleValue courseRunBoost;
+        public final ModConfigSpec.BooleanValue wallJump;
         public final ModConfigSpec.DoubleValue conveyorSpeed;
         public final ModConfigSpec.BooleanValue testerMenu;
 
@@ -116,6 +117,12 @@ public final class PlaneShiftConfig {
                             "what makes a gap feel jumpable; at vanilla speed the same gap reads",
                             "as unfair.")
                     .defineInRange("courseRunBoost", 0.9D, 0.0D, 4.0D);
+            wallJump = builder
+                    .comment("Allow jumping off a wall while airborne.",
+                            "Off by default. A course is dense enough that almost any airborne",
+                            "moment is within the grace window of touching something, so this",
+                            "reads as a free double jump rather than as a wall jump.")
+                    .define("wallJump", false);
             builder.pop();
 
             builder.push("blocks");

@@ -79,7 +79,7 @@ public final class CourseService {
         // Build/reset the lane before moving the player. The original vertical slice spawned at
         // y=64 in an otherwise empty dimension whose flat terrain is down near minY, so a player
         // could fall through the kill plane before ever touching a course block.
-        CourseStructureService.place(courseLevel, def);
+        CourseStructureService.place(courseLevel, def, courseId);
 
         player.teleportTo(courseLevel, originX, startY, originZ,
                 Collections.emptySet(), 0.0F, 0.0F, false);

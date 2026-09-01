@@ -76,6 +76,9 @@ public class LakituGoal extends Goal {
         SpinyEntity spiny = new SpinyEntity(ModEntities.SPINY.get(), lakitu.level());
         spiny.setPos(lakitu.getX(), lakitu.getY() - 1.0D, lakitu.getZ());
         spiny.setDeltaMovement(new Vec3(0.0D, -0.3D, 0.0D));
+        // Harmless until it lands. A Spiny dropped straight onto the player would otherwise deal
+        // contact damage on the way down, which is a hit with no counterplay.
+        spiny.markAirDropped();
         lakitu.level().addFreshEntity(spiny);
     }
 }
