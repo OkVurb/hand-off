@@ -684,6 +684,59 @@ tasks.register('checkDataRanges') {
 
 tasks.named('check') { dependsOn 'checkDataRanges' }
 
+/*
+ * Entity renderer registration.
+ *
+ * A registered entity type without a client renderer will crash the client with an NPE the
+ * moment the entity comes into view, and the crash report points at Minecraft's entity
+ * rendering, not at the missing registration. The existing renderer check in
+ * ClientModEvents.onRegisterRenderers must cover every ModEntities entry. This task compares
+ * the set of declared entity constants in ModEntities against the set referenced in
+ * registerEntityRenderer calls.
+ */
+tasks.register('checkEntityRenderers') {
+    group = 'verification'
+    description = 'Fails if any ModEntities entry has no client renderer registered.'
+
+    def entitiesFile = file('src/main/java/com/studio/planeshift/common/registry/ModEntities.java')
+    def clientEventsFile = file('src/main/java/com/studio/planeshift/client/ClientModEvents.java')
+    inputs.file(entitiesFile).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(clientEventsFile).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/entity-renderers.txt'))
+
+    doLast {
+        def entityPattern = ~/public static final DeferredHolder<EntityType<\?>, EntityType<[^>]+>>\s+(\w+)\s*=/
+        def rendererPattern = ~/^\s*event\.registerEntityRenderer\s*\(\s*ModEntities\.(\w+)\.get\(\)/
+
+        def entities = []
+        entitiesFile.eachLine { line ->
+            def m = entityPattern.matcher(line)
+            if (m.find()) entities << m.group(1)
+        }
+
+        def renderers = []
+        clientEventsFile.eachLine { line ->
+            def m = rendererPattern.matcher(line)
+            if (m.find()) renderers << m.group(1)
+        }
+
+        def missing = entities - renderers
+        def report = file(layout.buildDirectory.file('reports/planeshift/entity-renderers.txt'))
+        report.parentFile.mkdirs()
+
+        if (missing.isEmpty()) {
+            report.text = "OK: all ${entities.size()} ModEntities entries have client renderers\n"
+        } else {
+            report.text = "MISSING RENDERERS:\n" + missing.join('\n') + '\n'
+            throw new org.gradle.api.GradleException(
+                    "Entity renderer registration incomplete. " +
+                    "Add registerEntityRenderer calls in ClientModEvents for: ${missing.join(', ')}")
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkEntityRenderers' }
+
 tasks.named('jar', Jar) {
     manifest {
         attributes([

@@ -202,7 +202,8 @@ Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 99. **Item textures.** [fix] All 37 item textures are still generated placeholders under 400 bytes.
     This is the most visible unfinished thing in the mod.
 100. **GameTests for the new systems** — coin bricks, air-drop immunity, the perch clamp, layout
-     seeding. Only three block types have GameTests today.
+     seeding. Air-drop, coin bricks and Hammer Bro perch are now covered (`testAirDrop`,
+     `testCoinBrick`, `testHammerBroPerch`).
 
 ---
 
@@ -256,4 +257,8 @@ table before starting anything in the movement, audio or particle groups.
 - **A green build does not mean it works.** Run `.\gradlew runServer` after touching
   `src/main/resources/data/`, and actually launch the game after touching rendering.
 - **Check before building.** Items marked [fix] and [extend] have real code behind them already.
+
+## Completed this session
+
+- **Entity-renderer build check** � every ModEntities entry now has a checkEntityRenderers Gradle check that fails the build if a registered entity lacks a client renderer. Done in uild.gradle and verified by deliberate failure/repair.
 
