@@ -21,6 +21,33 @@ Check any jar's real declared range rather than trusting its filename:
 unzip -p <mod>.jar META-INF/neoforge.mods.toml | grep -A3 'modId *= *"minecraft"'
 ```
 
+### Verified by launching
+
+The instance now launches. Getting there took removing every 1.21.1 build; with them present the
+process died silently between mixin configuration and Minecraft's own `main`, producing no
+exception, no crash report and no log line — the worst possible failure to read. With them gone,
+the game reaches `Setting user`, initialises OpenAL, loads a world and runs.
+
+A clean-room launch (PlaneShift alone, same launcher, same arguments) worked throughout, which is
+what proved the launcher was fine and the mod set was not.
+
+**Remove 1.21.1 builds. Do not try to make them work.** They are not "probably fine" — they are
+the entire reason this instance would not start.
+
+### Entity Model Features crashes on the first-person hand
+
+A correct 1.21.11 build that still crashes:
+
+```
+NullPointerException: EMFState.state() returned null
+  at entity_model_features $emf$endRender (ModelPartFeatureRenderer)
+  at ItemInHandRenderer.renderHandsWithItems
+```
+
+It survives 80 seconds and a thousand ticks and then dies the moment a hand is drawn, because a
+held item has no entity render state for EMF to read. Disabled. Nothing in PlaneShift needs it —
+the enemy models are bespoke geometry, not resource-pack overrides.
+
 ### Crashers — load fine, then die during mixin setup
 
 Confirmed by launching, not predicted. Both are 1.21.1 builds calling FML static methods whose
