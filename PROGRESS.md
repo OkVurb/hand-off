@@ -162,6 +162,15 @@ The next agent is Gemini. Its prompt is `GEMINI.md` and its 100-task backlog is
 `docs/GEMINI_BACKLOG.md`. Phase A of that backlog is play-testing, which has still never been
 done and is worth more than any new feature.
 
+## Playtest instance
+
+The CurseForge instance is documented in `docs/PLAYTEST_INSTANCE.md`. Short version: it targets
+1.21.11 correctly, but roughly half its mods are 1.21.1 builds. Five were hard-blocking the launch
+and are renamed to `.jar.disabled`; about ten more load on an open-ended version range despite
+being compiled against 1.21.1, and the deep-mixin ones among them (Embeddium, ModernFix, Cloth
+Config, FancyMenu) can crash in ways that look exactly like a PlaneShift bug. Check that file
+before trusting any crash from that instance.
+
 ## What To Do Next (priority order)
 
 0. **Re-play-test movement.** The jump and run boost were fixed this session — they had never
@@ -192,6 +201,7 @@ done and is worth more than any new feature.
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-09-01 | Claude | Game-over screen with retry, course pause menu, localisation pass, per-power-up pickup particles; documented the playtest instance's mod version problem |
 | 2026-09-01 | Claude | Play-test fixes: course jump/run boost had never applied (gated on a role nothing selects), conveyor rewritten from an accelerator to a real belt; config now covers jump, run, conveyor, HUD scale, hurry-up |
 | 2026-09-01 | Claude | Audio: boss, Star Power and Toad fanfare tracks; hurry-up pitch shift; Toad castle speech |
 | 2026-09-01 | Claude | Progression: CourseProgress save data, star coins per course, unlock gating, real world map screen, course-results screen |
