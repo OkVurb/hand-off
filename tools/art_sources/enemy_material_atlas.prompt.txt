@@ -1,0 +1,12 @@
+Use case: stylized-concept
+Asset type: original material-reference atlas for a Minecraft-style voxel enemy model texture pipeline
+Primary request: Create a clean 4 columns by 3 rows grid of twelve square, edge-to-edge pixel-art material swatches. Each cell is a close-up tileable surface, not a character and not an object.
+Row 1: warm amber clay with turquoise mineral flecks; moss-jade reptile scales with aged brass mechanisms; charcoal basalt blocks with luminous cyan runes; dark charcoal chitin with brass wing trim and cyan glass.
+Row 2: translucent moon-purple jelly with cyan bioluminescence; pale-cyan cloud-manta skin with cream and gold trim; deep teal pangolin scales with hammered gold; coral-red crab shell with cyan crystal quills.
+Row 3: navy layered beetle armor with brass joints and cyan lenses; segmented jade vine with coral-red mouth tissue and cream tooth material; volcanic black basalt scales with ember-orange magma cracks and dark red shell plates; teal shopkeeper cloth with warm brass, amber leather, and cyan lantern glass.
+Style/medium: crisp hand-authored 16-bit pixel art material study, blocky pixels, subtle bevel highlights, high readability, original fantasy sky-island aesthetic
+Composition/framing: exact equal 4x3 grid, thin dark navy separators, every material fills its cell, no perspective
+Lighting/mood: neutral game-asset lighting, top-left highlight and bottom-right shade
+Color palette: rich but controlled, no muddy gradients
+Constraints: no text, no labels, no logos, no characters, no recognizable commercial-game imagery, no watermark, no checkerboard transparency; all designs original
+Avoid: photographic surfaces, smooth vector gradients, item icons, faces, silhouettes, UI frames

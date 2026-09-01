@@ -56,6 +56,33 @@ The remaining warnings are `this-escape` in constructors and are considered cosm
 
 ## 3. What Was Just Done
 
+### 3.-7 Session 2026-09-01 — bespoke enemy meshes and side-camera UVs
+
+Replaced the scale/visibility variants of `AnimatedCourseEnemyModel` with eleven independently
+baked `BespokeEnemyModel` layers: sproutling, clockwork gecko, rune crusher, torpedo moth,
+moon-jelly wisp, manta rider, crescent pangolin, pincushion crab, burrowing beetle, trumpet vine
+and salamander monarch. The cast now has authored leaves, tails, shells, wings, six-leg rigs,
+separate jaws, horns and boss mantle geometry. `CourseEnemyRenderer` retains the shared stomp
+squish and adds modest profile-specific readability scaling for the fixed 14-block side camera.
+
+Generated an original 4x3 material atlas with the built-in image generator and retained it as
+`tools/art_sources/enemy_material_atlas.png`. `tools/EnemyTextureGen.java` converts it into exact
+128x128 UV sheets, nearest-neighbour pixelates the material, lifts values that previously collapsed
+to black under world lighting, and paints eyes/mouths on both lateral faces for side-on gameplay.
+The prompt/provenance is recorded in `tools/art_sources/README.md` and `ASSET_LICENSES.md`.
+
+`BespokeEnemyModelTest` bakes, constructs and animates every hostile profile and asserts its exact
+visible cuboid-group count. The runtime client reached the integrated course with no layer,
+renderer, texture or UV exceptions. After visual feedback showed the previous distant enemies as
+dark anonymous cubes, the texture/value and side-face pass above was added. `clean build` passes.
+
+The same screenshot exposed the remaining coloured-square/initial greybox course props. A second
+original transparent source, `course_prop_atlas.png`, now feeds
+`tools/CoursePropTextureImporter.java`, replacing 16 axe, checkpoint, coin-ring, vine, switch,
+spike, note, donut-state and loop-trigger textures. Added the missing `loop_trigger` blockstate and
+cutout model that had produced a runtime model warning. `TextureGen` now explicitly protects these
+small transparent production sprites instead of relying only on compressed byte size.
+
 ### 3.-6 Session 2026-08-31 — playable generated courses, art pass, skybox and animated rigs
 
 This session turned the empty course dimension into a playable side-scrolling scene and replaced
@@ -89,9 +116,8 @@ are retained under `tools/art_sources/` and `ASSET_LICENSES.md`.
 body, arms, legs and wings, selected through `EnemyRigProfile`. Renderers now animate walking,
 counter-swing, idle bobbing, wing flaps, sprout bounce, crusher slam, plant sway and boss weight.
 Three original enemy turnaround sheets and exact per-registry visual/animation notes live in
-`tools/art_sources/` and `docs/ENEMY_ART_DIRECTION.md`. These are a production direction pass,
-not final bespoke meshes: the next art task is hand-authored per-enemy Blockbench geometry and
-keyframed clips.
+`tools/art_sources/` and `docs/ENEMY_ART_DIRECTION.md`. The provisional shared geometry described
+in this historical section was replaced by bespoke source-authored layers in section 3.-7.
 
 **Free modelling workflow.** Official Blockbench 5.1.6 portable is installed at
 `C:\Users\cr0od\Apps\Blockbench\Blockbench.exe`; its signature was verified. The intended clip

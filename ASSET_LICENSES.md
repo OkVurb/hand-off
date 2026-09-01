@@ -10,7 +10,16 @@ franchise likenesses.
 
 - Mew Design produced `mew_block_atlas.png` and `mew_character_atlas.png`.
 - OpenAI's built-in image generator produced the course skybox and three 3D turnaround sheets.
+- OpenAI's built-in image generator produced `enemy_material_atlas.png`, an original 4x3 set of
+  material swatches with no characters, logos or commercial-game imagery.
+- OpenAI's built-in image generator produced `course_prop_atlas.png`, an original transparent
+  4x4 prop sheet used for axes, checkpoints, coin rings, vines, switches, spikes and loop trigger.
 - `tools/MewRigSkinImporter.java` converts the character concepts into 64x32 cuboid UV skins.
+- `tools/EnemyTextureGen.java` converts the material atlas into the final 128x128 UV sheets used
+  by the eleven bespoke enemy meshes. It owns exact UV placement, side-camera faces and value
+  grading; generated imagery is never trusted to supply UV coordinates directly.
+- `tools/CoursePropTextureImporter.java` crops and scales the prop atlas into exact 16x16 runtime
+  textures while preserving alpha for cutout block models.
 - `tools/TextureGen.java` owns the remaining temporary greybox textures. It refuses to overwrite
   any file larger than a placeholder, so running it over the complete texture directory is safe:
   production art is skipped and reported.

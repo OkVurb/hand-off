@@ -8,6 +8,7 @@ import com.studio.planeshift.client.music.CourseMusicManager;
 import com.studio.planeshift.client.render.CourseEnemyRenderer;
 import com.studio.planeshift.client.render.CourseSkyboxRenderer;
 import com.studio.planeshift.client.render.AnimatedCourseEnemyModel;
+import com.studio.planeshift.client.render.BespokeEnemyModel;
 import com.studio.planeshift.client.render.EnemyRigProfile;
 import com.studio.planeshift.client.render.FirebarRenderer;
 import com.studio.planeshift.client.render.MovingPlatformRenderer;
@@ -17,6 +18,8 @@ import com.studio.planeshift.client.gui.PlaneShiftTitleScreen;
 import com.studio.planeshift.client.screen.CourseMapScreen;
 import com.studio.planeshift.client.screen.ToadShopScreen;
 import com.studio.planeshift.common.network.OpenCourseMapPayload;
+import com.studio.planeshift.common.network.CourseResultsPayload;
+import com.studio.planeshift.client.screen.CourseResultsScreen;
 import com.studio.planeshift.common.network.OpenTitleScreenPayload;
 import com.studio.planeshift.common.network.OpenToadShopPayload;
 import com.studio.planeshift.common.network.ScorePopupPayload;
@@ -77,6 +80,12 @@ public final class ClientModEvents {
         event.registerLayerDefinition(PlaceholderRigModel.LAYER_LOCATION, PlaceholderRigModel::createBodyLayer);
         event.registerLayerDefinition(AnimatedCourseEnemyModel.LAYER_LOCATION,
                 AnimatedCourseEnemyModel::createBodyLayer);
+        for (EnemyRigProfile profile : EnemyRigProfile.values()) {
+            if (profile != EnemyRigProfile.VILLAGER) {
+                event.registerLayerDefinition(BespokeEnemyModel.layer(profile),
+                        () -> BespokeEnemyModel.createLayer(profile));
+            }
+        }
     }
 
     /**
@@ -148,6 +157,10 @@ public final class ClientModEvents {
 
     @SubscribeEvent
     public static void onRegisterClientPayloadHandlers(RegisterClientPayloadHandlersEvent event) {
+        event.register(CourseResultsPayload.TYPE,
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().setScreen(new CourseResultsScreen(payload))));
+
         event.register(OpenTitleScreenPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new PlaneShiftTitleScreen())));

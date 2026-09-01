@@ -140,7 +140,9 @@ Unit tests 66 -> 72. `runServer` reaches `Done (0.401s)` with zero registry erro
 
 ## What Is In Progress
 
-Nothing — all current tasks and prioritized fixes are complete up to the point of manual/creative art steps.
+Visual production pass: eleven hostile enemies now have bespoke source-authored meshes and 128x128
+UV sheets derived from the original material atlas. The shopkeeper, projectile props, remaining
+greybox items/effects and per-theme skyboxes are the next visual-only work.
 
 ## Handoff
 
@@ -156,8 +158,9 @@ done and is worth more than any new feature.
    Auto-scroll is off for every shipped course; set `"auto_scroll": true` on one to try it.
 1. **Live facing check** — launch course 1, hold A/D and move the mouse; body/head must stay left/right while movement and action aim remain stable.
 2. **Full play-testing** — walk all five courses and exercise gaps, checkpoint/death, switches, rewards, shop and finish/leave flow.
-3. **Bespoke entity models** — use Blockbench plus the three turnaround sheets and `docs/ENEMY_ART_DIRECTION.md`; the current articulated Java rig is shared/procedural, not final geometry.
-4. **Art continuation** — per-theme skyboxes and final item/effect textures.
+3. **Bespoke entity models** — hostile cast complete in `BespokeEnemyModel`; next make the Toad
+   shopkeeper and projectile props equally bespoke, then do a close-range live silhouette review.
+4. **Art continuation** — per-theme skyboxes and final block/item/effect textures.
 
 ## How To Resume
 

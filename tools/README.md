@@ -90,3 +90,33 @@ java tools/MewRigSkinImporter.java \
 It crops each original subject, derives its palette, paints every cuboid face, and places the
 concept on the front faces with nearest-neighbour sampling. See `docs/ENEMY_ART_DIRECTION.md` for
 the exact model and animation contract.
+
+## EnemyTextureGen.java
+
+Builds the production 128x128 skins for all eleven hostile enemy meshes from the retained,
+original material atlas:
+
+```powershell
+java tools/EnemyTextureGen.java `
+  tools/art_sources/enemy_material_atlas.png `
+  src/main/resources/assets/planeshift/textures/entity
+```
+
+The source atlas supplies material language only. The Java generator enforces exact UV regions,
+nearest-neighbour pixel density, gameplay-safe brightness, and lateral eyes/mouths for the fixed
+side camera. This avoids the common failure where an attractive AI texture has no usable model UV
+layout or only looks correct when the mob faces the camera.
+
+## CoursePropTextureImporter.java
+
+Crops the retained transparent 4x4 prop atlas into the remaining visible course-block sprites:
+
+```powershell
+java tools/CoursePropTextureImporter.java `
+  tools/art_sources/course_prop_atlas.png `
+  src/main/resources/assets/planeshift/textures/block
+```
+
+The result replaces the old coloured squares/initials for axes, beacons, rings, vines, switches,
+spikes and the loop trigger. `TextureGen` explicitly protects these production files; transparent
+sprites may compress below its historical 400-byte placeholder threshold.

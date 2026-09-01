@@ -15,6 +15,16 @@ These are source/reference sheets, not files loaded directly by Minecraft.
   pangolin and pincushion crab.
 - `enemy_turnaround_03.png` — production views for the burrowing beetle, trumpet vine,
   lantern-headed shopkeeper and volcanic salamander monarch.
+- `enemy_material_atlas.png` — generated with OpenAI's built-in image generator on 2026-09-01
+  as twelve original pixel-material swatches matching the turnaround cast. It is sampled by
+  `tools/EnemyTextureGen.java`; the generator then pixelates, colour-grades and places those
+  materials into deterministic 128x128 cuboid UV sheets. It contains no copied game art.
+- `enemy_material_atlas.prompt.txt` — the exact built-in image-generator prompt used for that
+  atlas, retained so the source can be audited or intentionally regenerated.
+- `course_prop_atlas.png` — generated with the built-in image generator on 2026-09-01 as an
+  original transparent 4x4 atlas for the remaining visible greybox course props. Imported by
+  `tools/CoursePropTextureImporter.java`; no commercial-game art was used.
+- `course_prop_atlas.prompt.txt` — exact generation prompt for the transparent prop atlas.
 
 The course panorama was generated with the built-in image generator from the Mew block atlas's
 pixel treatment and is shipped as `assets/planeshift/textures/environment/course_skybox.png`.

@@ -1,0 +1,9 @@
+Use case: stylized-concept
+Asset type: transparent pixel-art prop atlas for a Minecraft NeoForge sky-island platformer mod
+Primary request: Create an exact 4 columns by 4 rows grid of sixteen isolated voxel/pixel-art props, one centered prop per equal cell, each with generous transparent padding and no cell background.
+Cell order left-to-right, top-to-bottom: brass bridge axe standing upright with teal grip; same axe socket after the axe is removed, clearly empty; unlit checkpoint beacon, brass tripod with cyan glass lamp; lit checkpoint beacon, same tripod with bright cyan glow; floating thick gold coin ring; dim used coin ring, desaturated and slightly broken; curling jade course vine with two leaves; orange donut platform wobbling with motion cracks; compact teal-and-brass music note block face with embossed note, no text; chunky red ON/OFF lever switch, unpowered; same switch glowing cyan and powered; large blue floor pressure switch with brass abstract plate and no readable letter; same floor switch pressed flat; cluster of pale cyan crystal spikes with dark base; translucent cyan loop-course trigger arch with brass anchors; secret sprouting vine bud with golden seed and jade leaves.
+Style/medium: crisp original 16-bit pixel art, voxel-like faceting, 1-pixel dark navy outlines, top-left highlights, readable at 16x16, matching the PlaneShift sky-island material atlas
+Composition/framing: exact equal 4x4 grid, every object centered and fully inside its cell, identical camera angle, no overlap
+Lighting/mood: bright neutral game asset lighting
+Constraints: genuinely transparent background and transparent gaps around every prop; no checkerboard; no text labels; no logos; no recognizable commercial-game designs; no watermark; all props original
+Avoid: solid cell backgrounds, UI cards, captions, photorealism, blur, anti-aliased vector style, franchise symbols

@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import javax.imageio.ImageIO;
 
 /**
@@ -628,6 +629,14 @@ public final class TextureGen {
      */
     private static final long PLACEHOLDER_MAX_BYTES = 400L;
 
+    /** Small transparent production sprites can compress below the old byte-size heuristic. */
+    private static final Set<String> PRODUCTION_BLOCK_TEXTURES = Set.of(
+            "axe_block.png", "axe_block_taken.png", "checkpoint_beacon.png",
+            "checkpoint_beacon_lit.png", "coin_ring_block.png", "coin_ring_block_used.png",
+            "course_vine.png", "donut_block_shaking.png", "loop_trigger.png", "note_block.png",
+            "on_off_switch.png", "on_off_switch_powered.png", "p_switch.png",
+            "p_switch_pressed.png", "secret_vine.png", "spike_block.png");
+
     /**
      * Writes a placeholder, but never over production art.
      *
@@ -637,7 +646,10 @@ public final class TextureGen {
      * makes that warning unnecessary: a file larger than a placeholder is left alone.
      */
     private static void write(Path out, BufferedImage img) throws IOException {
-        if (Files.exists(out) && Files.size(out) > PLACEHOLDER_MAX_BYTES) {
+        boolean protectedProductionBlock = out.getParent() != null
+                && out.getParent().getFileName().toString().equals("block")
+                && PRODUCTION_BLOCK_TEXTURES.contains(out.getFileName().toString());
+        if (Files.exists(out) && (protectedProductionBlock || Files.size(out) > PLACEHOLDER_MAX_BYTES)) {
             skipped++;
             return;
         }
