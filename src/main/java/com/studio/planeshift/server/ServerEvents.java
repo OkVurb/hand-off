@@ -77,10 +77,35 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onPlayerTickPost(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            var state = CourseStateAccess.get(player);
+            if (state.state() == com.studio.planeshift.common.mode.PlayState.DOWNED) {
+                long now = player.level().getGameTime();
+                long downTime = DamageService.DOWN_TIMES.getOrDefault(player.getUUID(), now);
+                if (now - downTime > 40) {
+                    DamageService.resolveDown(player);
+                } else {
+                    player.setDeltaMovement(0, player.getDeltaMovement().y, 0);
+                    player.hurtMarked = true;
+                }
+            }
+
             MovementRuleService.tick(player);
             HungerService.tick(player);
-            PlayerSizeService.apply(player, CourseStateAccess.get(player));
+            PlayerSizeService.apply(player, state);
             AirMoveService.tick(player);
+
+            if (!CourseCompletionService.SLIDING_PLAYERS.isEmpty()) {
+                var uuid = player.getUUID();
+                if (CourseCompletionService.SLIDING_PLAYERS.containsKey(uuid)) {
+                    if (player.onGround() || player.getDeltaMovement().y >= 0 || player.getY() < 0) {
+                        CourseCompletionService.SLIDING_PLAYERS.remove(uuid);
+                        CourseCompletionService.onComplete(player);
+                    } else {
+                        player.setDeltaMovement(0, -0.2, 0);
+                        player.hurtMarked = true;
+                    }
+                }
+            }
             LeafFlightService.tick(player);
             CourseTimerService.tick(player);
             CourseProgressService.tick(player);

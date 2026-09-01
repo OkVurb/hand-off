@@ -22,12 +22,28 @@ import net.neoforged.neoforge.network.PacketDistributor;
  */
 public final class CourseCompletionService {
 
+    public static final java.util.Map<java.util.UUID, net.minecraft.core.BlockPos> SLIDING_PLAYERS = new java.util.HashMap<>();
+
     private CourseCompletionService() {
+    }
+
+    public static void beginSlide(ServerPlayer player, net.minecraft.core.BlockPos polePos) {
+        CourseState state = CourseStateAccess.get(player);
+        if (!state.inCourse()) {
+            return;
+        }
+
+        CourseStateAccess.update(player, s -> s.withState(PlayState.RESULTS));
+        
+        player.teleportTo(polePos.getX() + 0.5, player.getY(), polePos.getZ() + 0.5);
+        player.setDeltaMovement(0, -0.2, 0);
+        player.hurtMarked = true;
+        SLIDING_PLAYERS.put(player.getUUID(), polePos);
     }
 
     public static void onComplete(ServerPlayer player) {
         CourseState state = CourseStateAccess.get(player);
-        if (!state.inCourse()) {
+        if (!state.inCourse() && state.state() != PlayState.RESULTS) {
             return;
         }
 

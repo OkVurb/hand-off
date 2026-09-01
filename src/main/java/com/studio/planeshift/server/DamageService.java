@@ -42,6 +42,9 @@ public final class DamageService {
         }
 
         CourseState state = CourseStateAccess.get(player);
+        if (state.state() == PlayState.RESULTS) {
+            return true;
+        }
         if (!state.inCourse()) {
             return false;
         }
@@ -74,8 +77,30 @@ public final class DamageService {
         return true;
     }
 
-    /** DOWNED -> checkpoint recovery, consuming a life. Real death at 0 lives. */
+    public static final java.util.Map<java.util.UUID, Long> DOWN_TIMES = new java.util.HashMap<>();
+
+    /** DOWNED -> sets state to DOWNED and triggers pop-up animation. */
     public static void down(ServerPlayer player, DamageSource source) {
+        if (source.is(DamageTypes.FELL_OUT_OF_WORLD)) {
+            resolveDown(player);
+            return;
+        }
+
+        long now = player.level().getGameTime();
+        CourseStateAccess.update(player, s -> s
+                .withState(PlayState.DOWNED)
+                .withPips(s.pips(), now + 100L));
+        DOWN_TIMES.put(player.getUUID(), now);
+
+        player.setDeltaMovement(0.0, 0.7, 0.0);
+        player.hurtMarked = true;
+        
+        player.level().playSound(null, player.blockPosition(), ModSounds.DAMAGE.get(),
+                SoundSource.PLAYERS, 0.8F, 0.9F);
+    }
+
+    /** Called after the DOWNED animation finishes, or immediately if falling out of the world. */
+    public static void resolveDown(ServerPlayer player) {
         long now = player.level().getGameTime();
         CourseState state = CourseStateAccess.get(player);
         int newLives = Math.max(0, state.lives() - 1);
@@ -109,11 +134,10 @@ public final class DamageService {
         }
 
         CourseStateAccess.update(player, s -> s
+                .withState(PlayState.playingFor(s.mode())) // Return to playing state
                 .withFormSlot(s.formSlot().loseActive())
                 .withPips(CourseState.MAX_PIPS, now + INVULN_TICKS * 2L)
                 .withLives(newLives));
         CheckpointService.returnToCheckpoint(player);
-        player.level().playSound(null, player.blockPosition(), ModSounds.DAMAGE.get(),
-                SoundSource.PLAYERS, 0.8F, 0.9F);
     }
 }

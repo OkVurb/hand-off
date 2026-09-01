@@ -178,9 +178,8 @@ or [fix]. Prefer [fix] items: the feature exists and is broken, which is worse t
 
 1. **All 37 item textures are placeholders** under 400 bytes. The most visible unfinished thing.
 2. **Play the mod start to finish.** Still never done by anyone.
-3. **Ghost-house loop.** (Task 31)
-4. **Reserve item HUD.** (Display the reserved item).
-5. **Death animation.** (Task 94)
+3. **Parallax backgrounds per theme.** (Task 91)
+4. **Power-up carry between courses.** (Task 81 - needs verification if actually broken)
 
 Playtest instance: see `docs/PLAYTEST_INSTANCE.md`. Several 1.21.1 mods are disabled because they
 stopped the game launching; Entity Model Features is disabled because it crashes on the
@@ -198,6 +197,7 @@ first-person hand render.
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-09-01 | Gemini | Fixes: Death animation (94), Flagpole slide (96), Conveyor jump momentum (14), Short course variations (72), Graphical reserve item HUD. Cleared Ghost House Loop (already done). |
 | 2026-09-01 | Gemini | Fixes from MISSING_MECHANICS: 100 coins awards 1-Up sound/popup, reserve box correctly stashes a duplicate power-up, climbable tag added for vines, course difficulty scales by world ID, star coins spawned. |
 | 2026-09-01 | Claude | Play-test round 2: head bumps fixed, hitboxes shrunk, ground enemies patrol instead of chase, coin bricks, 3D coin, per-world biome, world-seeded layouts, Hammer Bro perch, F6 tester menu, air-drop immunity; wrote docs/MISSING_MECHANICS.md |
 | 2026-09-01 | Claude | Launched the modded instance: found and disabled 1.21.1 crashers, confirmed PlaneShift runs clean in-game |

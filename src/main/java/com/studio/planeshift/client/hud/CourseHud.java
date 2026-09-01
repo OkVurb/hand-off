@@ -10,8 +10,11 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /**
  * Course HUD (Design Bible, "HUD, menus, and feedback").
@@ -118,17 +121,6 @@ public final class CourseHud {
                             panelRight - labelX),
                     labelX, y + 2, 0xFFFFFFFF);
         }
-        if (slot.reserve().isPresent()) {
-            Identifier reserve = slot.reserve().get();
-            graphics.drawString(font, clip(font,
-                            Component.translatable("hud.planeshift.reserve",
-                                    Component.translatableWithFallback(
-                                            "form." + reserve.getNamespace() + "." + reserve.getPath(),
-                                            reserve.getPath())),
-                            panelRight - x),
-                    x, y + 16, 0xFF9DA8B5);
-        }
-
         // Clock. A timed course shows the countdown that can actually kill the player; an
         // untimed one falls back to elapsed time, which is only informational.
         if (state.timed()) {
@@ -167,7 +159,7 @@ public final class CourseHud {
 
         // Mode badge and transition progress.
         if (PlaneShiftConfig.CLIENT.showModeBadge.get()) {
-            renderModeBadge(graphics, font, state);
+            renderModeBadge(graphics, font, state, usableWidth);
         }
 
         if (PlaneShiftConfig.CLIENT.showDebugHud.get()) {
@@ -181,27 +173,40 @@ public final class CourseHud {
         return font.width(plain) <= maxWidth ? plain : font.plainSubstrByWidth(plain, maxWidth);
     }
 
-    private static void renderModeBadge(GuiGraphics graphics, Font font, CourseState state) {
-        int screenWidth = graphics.guiWidth();
+    private static void renderModeBadge(GuiGraphics graphics, Font font, CourseState state, int usableWidth) {
         int y = 8;
+        
+        if (state.formSlot().reserve().isPresent()) {
+            Identifier reserve = state.formSlot().reserve().get();
+            var item = BuiltInRegistries.ITEM.getValue(reserve);
+            if (item != Items.AIR) {
+                int boxSize = 24;
+                int boxX = usableWidth / 2 - boxSize / 2;
+                int boxY = y + 16;
+                graphics.fill(boxX, boxY, boxX + boxSize, boxY + boxSize, BAR_BACK);
+                graphics.fill(boxX + 1, boxY + 1, boxX + boxSize - 1, boxY + boxSize - 1, 0x50FFFFFF);
+                graphics.renderItem(new ItemStack(item), boxX + 4, boxY + 4);
+            }
+        }
+
         if (state.transition().isPresent()) {
             TransitionSync sync = state.transition().get();
             long gameTime = Minecraft.getInstance().level != null
                     ? Minecraft.getInstance().level.getGameTime() : 0L;
             float progress = sync.progress(gameTime, 0.0F);
             int barWidth = 60;
-            int barX = screenWidth / 2 - barWidth / 2;
+            int barX = usableWidth / 2 - barWidth / 2;
             graphics.fill(barX - 1, y - 1, barX + barWidth + 1, y + 5, BAR_BACK);
             graphics.fill(barX, y, barX + (int) (barWidth * progress), y + 4, BADGE_SIDE);
             graphics.drawCenteredString(font, Component.translatable("hud.planeshift.shifting"),
-                    screenWidth / 2, y + 8, 0xFFFFFFFF);
+                    usableWidth / 2, y + 8, 0xFFFFFFFF);
             return;
         }
         Component label = state.in2_5D()
                 ? Component.translatable("hud.planeshift.mode.side_on")
                 : Component.translatable("hud.planeshift.mode.free_3d");
         int color = state.in2_5D() ? BADGE_SIDE : BADGE_FREE;
-        graphics.drawCenteredString(font, label, screenWidth / 2, y, color);
+        graphics.drawCenteredString(font, label, usableWidth / 2, y, color);
     }
 
     /**

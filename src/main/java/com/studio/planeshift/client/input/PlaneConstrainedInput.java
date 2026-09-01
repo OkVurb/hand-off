@@ -41,6 +41,14 @@ public final class PlaneConstrainedInput extends KeyboardInput {
             return;
         }
         CourseState state = ClientCourseState.get();
+
+        if (state.state() == com.studio.planeshift.common.mode.PlayState.DOWNED ||
+            state.state() == com.studio.planeshift.common.mode.PlayState.RESULTS) {
+            this.keyPresses = Input.EMPTY;
+            this.moveVector = Vec2.ZERO;
+            return;
+        }
+
         if (!state.in2_5D() || state.rail().isEmpty()) {
             return;
         }

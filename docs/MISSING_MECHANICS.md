@@ -44,7 +44,7 @@ exist in `PlaneMovementAssists` and `AirMoveService`. These do not.
     re-enabled.
 12. **Quicksand** for the DESERT theme. [new] Sinking unless the player keeps jumping.
 13. **Wind zones** that push horizontally. [new]
-14. **Conveyor influence while airborne.** [fix] `ConveyorBlock.stepOn` only fires on contact, so
+~~14. **Conveyor influence~~ while airborne.** [fix] `ConveyorBlock.stepOn` only fires on contact, so
     jumping straight up over a belt loses all belt momentum instantly.
 15. **Variable gravity per course.** [new] A "low gravity" sky course is one JSON field away given
     the config work already done in `PlaneShiftConfig`.
@@ -145,14 +145,14 @@ generates a different set. These are the shapes it still cannot produce.
     path exists in `CourseStructureService.placeTemplate` and nothing uses it.
 71. **Guaranteed completability proof.** [new] Backlog item 38, never done: assert every generated
     course is clearable, ideally as a unit test over many seeds now that seeding exists.
-72. **Course length variety.** [fix] Almost every course JSON is 144–224; nothing short and intense.
+~~72. **Course length~~ variety.** [fix] Almost every course JSON is 144–224; nothing short and intense.
 
 ## Power-ups and Forms (73–82)
 
 Existing: Super, Mega, Mini, Fire, Ice, Leaf, Propeller, Cloud, Tanooki, Hammer, Boomerang, Acorn,
 Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 
-73. **Reserve item box.** [fix] `FormSlot` has an active and a reserve and a swap key, but nothing
+~~73. **Reserve item~~ box.** [fix] `FormSlot` has an active and a reserve and a swap key, but nothing
     ever fills the reserve automatically the way picking up a power-up while already powered should.
 74. **Cape feather** — glide plus dive-and-climb. [new]
 75. **Yoshi.** [new] Large, but the highest-impact single addition on this list.
@@ -188,9 +188,9 @@ Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 92. **Camera zones** — authored camera distance and height per course segment. [extend]
     `CameraProfile` exists as data and only two profiles are defined.
 93. **Screen shake** on heavy landings and Thwomp impacts, respecting `reducedMotion`. [new]
-94. **Death animation.** [fix] Death is instant; the classic pop-up-then-fall is most of its charm.
+~~94. **Death animation~~.** [fix] Death is instant; the classic pop-up-then-fall is most of its charm.
 95. **Course intro card** — "World 1-1" before play. [new]
-96. **Flagpole slide and fanfare sequence.** [fix] `FlagPoleBlock` completes the course instantly;
+~~96. **Flagpole slide~~ and fanfare sequence.** [fix] `FlagPoleBlock` completes the course instantly;
     the slide down the pole is the reward moment.
 
 ## Technical and multiplayer (97–100)

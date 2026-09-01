@@ -46,7 +46,7 @@ public class FlagPoleBlock extends Block {
             return;
         }
         LAST_TRIGGER.put(player.getUUID(), now);
-        CourseCompletionService.onComplete(player);
+        CourseCompletionService.beginSlide(player, pos);
     }
 
     public static void clear(UUID playerId) {

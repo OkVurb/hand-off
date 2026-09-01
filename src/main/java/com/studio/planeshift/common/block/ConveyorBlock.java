@@ -69,9 +69,6 @@ public class ConveyorBlock extends HorizontalDirectionalBlock {
      */
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
-        if (level.isClientSide()) {
-            return;
-        }
         double speed = PlaneShiftConfig.SERVER.conveyorSpeed.get();
         if (speed <= 0.0D) {
             return;
