@@ -83,6 +83,7 @@ public final class ServerEvents {
             AirMoveService.tick(player);
             LeafFlightService.tick(player);
             CourseTimerService.tick(player);
+            CourseProgressService.tick(player);
             if (player.onGround()) {
                 // Landing closes any airborne stomp chain, so the combo ladder only rewards
                 // bounces strung together in the air.
@@ -100,6 +101,9 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onEntitySize(EntityEvent.Size event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        if (player.connection == null) {
             return;
         }
         var crouched = CourseCrouch.crouchedDimensions(event.getPose(), event.getNewSize(),
@@ -205,6 +209,7 @@ public final class ServerEvents {
         FlagPoleBlock.clear(playerId);
         PayloadRateLimiter.forget(playerId);
         PlayerSizeService.forget(playerId);
+        CourseProgressService.removeBar(player);
     }
 
     /** Power-up items pop out of blocks and float; mobs in courses become Mario enemies. */

@@ -24,6 +24,7 @@ public final class RoleService {
     private static final Identifier JUMP_MODIFIER_ID = PlaneShift.id("role_jump");
     /** Baseline Mario jump physics boost (e.g., +150% jump height). */
     private static final Identifier COURSE_JUMP_MODIFIER_ID = PlaneShift.id("course_jump_base");
+    private static final Identifier COURSE_RUN_MODIFIER_ID = PlaneShift.id("course_run_base");
 
     private RoleService() {
     }
@@ -53,12 +54,17 @@ public final class RoleService {
                         () -> clearAttributes(player));
     }
 
-    private static void applyAttributes(ServerPlayer player, PlayerRole role) {
+        private static void applyAttributes(ServerPlayer player, PlayerRole role) {
         clearAttributes(player);
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speed != null && role.runMultiplier() != 1.0F) {
-            speed.addTransientModifier(new AttributeModifier(RUN_MODIFIER_ID,
-                    role.runMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        if (speed != null) {
+            speed.addTransientModifier(new AttributeModifier(COURSE_RUN_MODIFIER_ID,
+                    0.6D, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+            
+            if (role.runMultiplier() != 1.0F) {
+                speed.addTransientModifier(new AttributeModifier(RUN_MODIFIER_ID,
+                        role.runMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+            }
         }
         AttributeInstance jump = player.getAttribute(Attributes.JUMP_STRENGTH);
         if (jump != null) {
@@ -73,9 +79,10 @@ public final class RoleService {
         }
     }
 
-    private static void clearAttributes(ServerPlayer player) {
+        private static void clearAttributes(ServerPlayer player) {
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed != null) {
+            speed.removeModifier(COURSE_RUN_MODIFIER_ID);
             speed.removeModifier(RUN_MODIFIER_ID);
         }
         AttributeInstance jump = player.getAttribute(Attributes.JUMP_STRENGTH);
@@ -85,3 +92,4 @@ public final class RoleService {
         }
     }
 }
+

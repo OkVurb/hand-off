@@ -101,6 +101,7 @@ public final class CourseStructureService {
         buildCoinHeaven(level, start, plan, palette);
         buildVerticalClimb(level, start, plan);
         buildConveyorGauntlet(level, start, plan);
+        buildStaircaseObstacle(level, start, plan, palette);
         buildFinish(level, start, plan, palette);
         spawnRewards(level, start, plan);
         spawnCast(level, start, plan, course.theme());
@@ -229,6 +230,18 @@ public final class CourseStructureService {
         }
         set(level, start.offset(plan.length() - 21, 1, 0), ModBlocks.SPRING_PAD.get().defaultBlockState());
         set(level, start.offset(plan.length() - 17, 1, 0), ModBlocks.PRIZE_CACHE.get().defaultBlockState());
+    }
+
+        private static void buildStaircaseObstacle(ServerLevel level, BlockPos start, CourseLayoutPlan plan, Palette palette) {
+        // Place a classic pyramid/staircase obstacle near the start
+        int base = 25;
+        if (plan.hasGroundAt(base) && plan.hasGroundAt(base + 8)) {
+            for (int h = 0; h < 4; h++) {
+                for (int x = base + h; x <= base + 8 - h; x++) {
+                    set(level, start.offset(x, 1 + h, 0), palette.surface());
+                }
+            }
+        }
     }
 
     private static void buildFinish(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
@@ -504,4 +517,5 @@ public final class CourseStructureService {
         }
     }
 }
+
 

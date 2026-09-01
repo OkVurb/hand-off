@@ -40,6 +40,7 @@ public final class CourseScoringService {
 
     private static final Map<UUID, Long> COURSE_START = new HashMap<>();
     private static final Map<UUID, Chain> CHAINS = new HashMap<>();
+    private static final Map<UUID, Integer> DEFEATED = new HashMap<>();
 
     /** Live combo bookkeeping. Deliberately not persisted. */
     private static final class Chain {
@@ -53,6 +54,7 @@ public final class CourseScoringService {
     public static void startCourse(ServerPlayer player) {
         COURSE_START.put(player.getUUID(), player.level().getGameTime());
         CHAINS.remove(player.getUUID());
+        DEFEATED.remove(player.getUUID());
         // A fresh run starts from zero; score is not carried between courses.
         CourseStateAccess.update(player, s -> s.withScore(0));
     }
@@ -87,6 +89,7 @@ public final class CourseScoringService {
     public static int awardStomp(ServerPlayer player) {
         long now = player.level().getGameTime();
         Chain chain = CHAINS.computeIfAbsent(player.getUUID(), id -> new Chain());
+        DEFEATED.put(player.getUUID(), DEFEATED.getOrDefault(player.getUUID(), 0) + 1);
 
         if (now - chain.lastStompTick > CHAIN_TIMEOUT_TICKS) {
             chain.depth = 0;
@@ -164,14 +167,17 @@ public final class CourseScoringService {
 
         // Coins and stomps have already been scored as they happened; the finish adds the
         // survival and speed bonuses on top of that running total.
-        int bonus = state.pips() * PIP_BONUS;
+        int healthBonus = state.pips() * PIP_BONUS;
+        int timeBonus = 0;
         if (state.timed()) {
-            bonus += (state.timeLeft() / 20) * TIME_BONUS_PER_SECOND;
+            timeBonus = (state.timeLeft() / 20) * TIME_BONUS_PER_SECOND;
         }
+        int bonus = healthBonus + timeBonus;
         int finalScore = addScore(player, bonus);
+        int enemiesDefeated = DEFEATED.getOrDefault(player.getUUID(), 0);
 
         player.sendSystemMessage(Component.translatable("chat.planeshift.course_complete",
-                state.coins(), state.starCoins(), formatTime(ticks), finalScore));
+                timeBonus, healthBonus, enemiesDefeated, state.coins(), finalScore));
     }
 
     public static String formatTime(long ticks) {
@@ -185,5 +191,6 @@ public final class CourseScoringService {
     public static void clear(UUID playerId) {
         COURSE_START.remove(playerId);
         CHAINS.remove(playerId);
+        DEFEATED.remove(playerId);
     }
 }

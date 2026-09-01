@@ -33,7 +33,7 @@ public final class CourseCompletionService {
 
         // Reward: coins scaled by pips remaining (placeholder formula).
         CourseStateAccess.update(player, s -> s
-                .withState(PlayState.HUB)
+                .withState(PlayState.RESULTS)
                 .withMode(PlaneMode.FREE_3D, Optional.empty())
                 .withPips(CourseState.MAX_PIPS, 0L)
                 .withCoins(s.coins() + Math.max(1, s.pips() * 2)));

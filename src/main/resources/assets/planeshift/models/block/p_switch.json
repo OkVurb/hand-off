@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cross",
   "textures": {
-    "all": "planeshift:block/p_switch"
+    "cross": "planeshift:block/p_switch"
   }
 }

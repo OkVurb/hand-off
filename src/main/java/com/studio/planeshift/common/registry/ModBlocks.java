@@ -67,6 +67,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.GOLD)
                     .strength(1.5F)
                     .lightLevel(state -> state.getValue(CheckpointBeaconBlock.LIT) ? 13 : 4)
+                    .noCollision()
                     .sound(SoundType.COPPER));
 
     public static final DeferredBlock<SpringPadBlock> SPRING_PAD =
@@ -165,6 +166,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(2.0F)
                     .noOcclusion()
+                    .noCollision()
                     .sound(SoundType.METAL));
 
     /** Hidden until hit from below, then grows a climbable vine upward. */
@@ -173,6 +175,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.PLANT)
                     .strength(0.8F)
                     .noOcclusion()
+                    .noCollision()
                     .sound(SoundType.GRASS));
 
     /** The climbable stalk grown by SECRET_VINE. */
@@ -181,6 +184,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.PLANT)
                     .strength(0.2F)
                     .noOcclusion()
+                    .noCollision()
                     .sound(SoundType.VINE));
 
     public static final DeferredBlock<HiddenQuestionBlock> HIDDEN_QUESTION_BLOCK =
@@ -226,3 +230,4 @@ public final class ModBlocks {
     private ModBlocks() {
     }
 }
+

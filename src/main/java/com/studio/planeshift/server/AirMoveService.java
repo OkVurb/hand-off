@@ -37,6 +37,9 @@ public final class AirMoveService {
     /** Weak keys so a disconnected player cannot keep an entry alive. */
     private static final Map<ServerPlayer, LastHit> LAST_HIT = new WeakHashMap<>();
 
+    /** Tracks if the player is currently executing a ground pound. */
+    private static final Map<ServerPlayer, Boolean> GROUND_POUNDING = new WeakHashMap<>();
+
     private AirMoveService() {
     }
 
@@ -45,18 +48,31 @@ public final class AirMoveService {
             return;
         }
 
-        // Variable jump: if the player is still moving upward, keep giving a tiny boost.
+                // Variable jump: if the player is still moving upward, keep giving a tiny boost.
         // Holding space = longer air time = higher jump in practice.
-        if (!player.onGround() && player.getDeltaMovement().y > 0.0D && player.getDeltaMovement().y < 0.35D) {
-            player.move(MoverType.SELF, new Vec3(0.0D, HOLD_JUMP_BOOST, 0.0D));
+        if (!player.onGround() && player.getLastClientInput().jump() && player.getDeltaMovement().y > 0.0D && player.getDeltaMovement().y < 0.45D) {
+            Vec3 vel = player.getDeltaMovement();
+            player.setDeltaMovement(vel.x, vel.y + HOLD_JUMP_BOOST, vel.z);
             player.hurtMarked = true;
         }
 
-        // Ground pound: crouch in mid-air to slam downward.
-        if (!player.onGround() && player.isShiftKeyDown() && player.getDeltaMovement().y > GROUND_POUND_SPEED) {
+        // Ground pound mechanics
+        if (!player.onGround() && player.isShiftKeyDown() && player.getDeltaMovement().y <= 0.0D) {
             player.setDeltaMovement(new Vec3(0.0D, GROUND_POUND_SPEED, 0.0D));
             player.hurtMarked = true;
             player.resetFallDistance();
+            GROUND_POUNDING.put(player, true);
+        } else if (player.onGround()) {
+            if (GROUND_POUNDING.remove(player) != null) {
+                // Just landed from a ground pound. Break bricks below!
+                BlockPos pos = player.blockPosition();
+                BlockPos below = pos.below();
+                BlockState state = player.level().getBlockState(below);
+                if (state.getBlock() instanceof com.studio.planeshift.common.block.BrickBlock) {
+                    player.level().destroyBlock(below, false);
+                    player.level().playSound(null, below, com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
         }
 
         // Head-hit question blocks from below.
@@ -93,6 +109,7 @@ public final class AirMoveService {
     private static void tickWallSlide(ServerPlayer player) {
         if (player.onGround()) {
             WALL_CONTACT.remove(player);
+        GROUND_POUNDING.remove(player);
             return;
         }
 
@@ -117,6 +134,7 @@ public final class AirMoveService {
         long since = player.level().getGameTime() - contact;
         if (since > WALL_JUMP_GRACE_TICKS) {
             WALL_CONTACT.remove(player);
+        GROUND_POUNDING.remove(player);
             return;
         }
         // A jump pressed inside the grace window converts the slide into a fresh launch. The
@@ -126,6 +144,7 @@ public final class AirMoveService {
             player.hurtMarked = true;
             player.resetFallDistance();
             WALL_CONTACT.remove(player);
+        GROUND_POUNDING.remove(player);
         }
     }
 
@@ -149,8 +168,11 @@ public final class AirMoveService {
     public static void forget(ServerPlayer player) {
         LAST_HIT.remove(player);
         WALL_CONTACT.remove(player);
+        GROUND_POUNDING.remove(player);
     }
 
     private record LastHit(long pos, long tick) {
     }
 }
+
+
