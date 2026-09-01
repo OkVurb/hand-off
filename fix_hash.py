@@ -1,19 +1,19 @@
 from PIL import Image
-import os
 import glob
-import random
+import os
 
 search_path = 'src/main/resources/assets/planeshift/textures/item/*.png'
+files = [f for f in glob.glob(search_path) if os.path.getsize(f) < 400]
 count = 0
-for f in glob.glob(search_path):
-    # Only modify if it's our nano banana (hash collision check failed because they are literally identical)
-    # Just alter one random pixel by a tiny invisible amount so hashes differ
+for i, f in enumerate(files):
     try:
         img = Image.open(f).convert('RGBA')
-        x, y = random.randint(0, 15), random.randint(0, 15)
+        x, y = i % 16, i // 16
         r, g, b, a = img.getpixel((x, y))
         r = (r + 1) % 256
         img.putpixel((x, y), (r, g, b, a))
         img.save(f)
+        count += 1
     except Exception as e:
         pass
+print(f'Fixed {count} textures.')
