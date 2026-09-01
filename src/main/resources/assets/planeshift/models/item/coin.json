@@ -1,6 +1,38 @@
 {
-  "parent": "minecraft:item/generated",
+  "__comment": "A real coin, not a flat sprite. Coins spawn as world items in a side-on course, so a billboard vanishes edge-on every time the camera is square to the lane - which is most of the time. A thin box always reads as a disc.",
   "textures": {
-    "layer0": "planeshift:item/coin"
+    "face": "planeshift:item/coin",
+    "particle": "planeshift:item/coin"
+  },
+  "elements": [
+    {
+      "from": [5.5, 1, 7.5],
+      "to": [10.5, 14, 8.5],
+      "faces": {
+        "north": { "uv": [3, 0, 13, 16], "texture": "#face" },
+        "south": { "uv": [13, 0, 3, 16], "texture": "#face" },
+        "east":  { "uv": [7, 0, 9, 16], "texture": "#face" },
+        "west":  { "uv": [7, 0, 9, 16], "texture": "#face" },
+        "up":    { "uv": [3, 7, 13, 9], "texture": "#face" },
+        "down":  { "uv": [3, 7, 13, 9], "texture": "#face" }
+      }
+    },
+    {
+      "from": [4.5, 3, 7.5],
+      "to": [11.5, 12, 8.5],
+      "faces": {
+        "north": { "uv": [2, 3, 14, 13], "texture": "#face" },
+        "south": { "uv": [14, 3, 2, 13], "texture": "#face" },
+        "east":  { "uv": [7, 3, 9, 13], "texture": "#face" },
+        "west":  { "uv": [7, 3, 9, 13], "texture": "#face" }
+      }
+    }
+  ],
+  "display": {
+    "gui":            { "rotation": [0, 0, 0],   "translation": [0, 0, 0],   "scale": [1, 1, 1] },
+    "ground":         { "rotation": [0, 0, 0],   "translation": [0, 2, 0],   "scale": [0.6, 0.6, 0.6] },
+    "fixed":          { "rotation": [0, 0, 0],   "translation": [0, 0, 0],   "scale": [1, 1, 1] },
+    "thirdperson_righthand": { "rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.55, 0.55, 0.55] },
+    "firstperson_righthand": { "rotation": [0, 90, 0], "translation": [0, 2, 0], "scale": [0.6, 0.6, 0.6] }
   }
 }

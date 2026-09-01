@@ -1,5 +1,6 @@
 {
   "variants": {
-    "": { "model": "planeshift:block/brick_block" }
+    "spent=false": { "model": "planeshift:block/brick_block" },
+    "spent=true": { "model": "planeshift:block/brick_block_spent" }
   }
 }

@@ -11,8 +11,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -81,10 +79,10 @@ public class KoopaEntity extends CourseEnemyEntity {
 
     @Override
     protected void registerGoals() {
+        // Walks its lane like the rest of the ground cast; the shell states are what make a
+        // Koopa a Koopa, not pursuit.
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, false));
-        goalSelector.addGoal(2, new LanePatrolGoal(this, 1.0D));
-        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        goalSelector.addGoal(1, new LanePatrolGoal(this, 1.0D));
     }
 
     /**

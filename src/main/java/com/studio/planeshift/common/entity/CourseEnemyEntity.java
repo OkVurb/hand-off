@@ -46,6 +46,38 @@ public abstract class CourseEnemyEntity extends Monster {
      */
     private boolean airDropped;
 
+    /**
+     * The depth coordinate this enemy belongs on, captured the first time it ticks.
+     *
+     * <p>Course enemies used to be pulled back to the rail only while they had a player targeted.
+     * Now that the ground cast patrols instead of chasing, none of them hold a target at all, and
+     * without this they drift off the playable plane and end up behind the camera — visible as a
+     * silhouette that cannot be reached or hit.
+     */
+    private double laneDepth = Double.NaN;
+
+    /**
+     * Keeps the enemy on its lane.
+     *
+     * <p>Clamps to where it spawned rather than to the player's rail, so it works for an enemy
+     * nobody is near, and so a Lakitu dropping a Spiny puts it on the Lakitu's lane rather than
+     * on whatever plane the nearest player happens to occupy.
+     */
+    private void holdLane() {
+        if (Double.isNaN(laneDepth)) {
+            laneDepth = getZ();
+            return;
+        }
+        if (Math.abs(getZ() - laneDepth) <= LANE_TOLERANCE) {
+            return;
+        }
+        setPos(getX(), getY(), laneDepth);
+        setDeltaMovement(getDeltaMovement().x, getDeltaMovement().y, 0.0D);
+    }
+
+    /** How far off its lane an enemy may drift before being pulled back. */
+    private static final double LANE_TOLERANCE = 0.05D;
+
     /** Marks this enemy as dropped from above; it cannot touch the player until it lands. */
     public void markAirDropped() {
         this.airDropped = true;
@@ -163,25 +195,7 @@ public abstract class CourseEnemyEntity extends Monster {
                 entityData.set(SQUISH_TICKS, ticks - 1);
             }
             
-            if (getTarget() instanceof ServerPlayer player) {
-                com.studio.planeshift.common.course.CourseState state = com.studio.planeshift.server.CourseStateAccess.get(player);
-                if (state.inCourse() && state.rail().isPresent()) {
-                    var rail = state.rail().get();
-                    double depthCoord = rail.planeCoord();
-                    
-                    if (rail.travelAxis() == net.minecraft.core.Direction.Axis.X) {
-                        if (Math.abs(getZ() - depthCoord) > 0.05) {
-                            setPos(getX(), getY(), depthCoord);
-                            setDeltaMovement(getDeltaMovement().x, getDeltaMovement().y, 0);
-                        }
-                    } else if (rail.travelAxis() == net.minecraft.core.Direction.Axis.Z) {
-                        if (Math.abs(getX() - depthCoord) > 0.05) {
-                            setPos(depthCoord, getY(), getZ());
-                            setDeltaMovement(0, getDeltaMovement().y, getDeltaMovement().z);
-                        }
-                    }
-                }
-            }
+            holdLane();
         }
     }
 

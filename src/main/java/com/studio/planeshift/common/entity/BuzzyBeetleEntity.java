@@ -4,13 +4,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
@@ -55,10 +52,12 @@ public class BuzzyBeetleEntity extends CourseEnemyEntity {
 
     @Override
     protected void registerGoals() {
+        // No targeting and no melee goal on purpose. A Buzzy Beetle does not hunt: it walks its lane,
+        // turns at a wall or a ledge, and hurts whatever it happens to walk into. Chasing made it
+        // read as a zombie in a costume, and in a side-on course a pursuer that leaves its lane is
+        // also the thing most likely to end up somewhere the player cannot see it.
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, false));
-        goalSelector.addGoal(2, new LanePatrolGoal(this, 1.0D));
-        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        goalSelector.addGoal(1, new LanePatrolGoal(this, 1.0D));
     }
 }
 

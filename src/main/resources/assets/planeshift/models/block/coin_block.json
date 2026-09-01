@@ -1,6 +1,9 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "__comment": "Framed like a question block rather than a plain cube_all: the coin block is a reward container and should read as one from the side, which is the only angle a 2.5D player sees.",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "all": "planeshift:block/coin_block"
+    "top": "planeshift:block/coin_block_top",
+    "bottom": "planeshift:block/coin_block_top",
+    "side": "planeshift:block/coin_block"
   }
 }
