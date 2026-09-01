@@ -6,7 +6,9 @@ import com.studio.planeshift.common.block.QuestionBlock;
 import com.studio.planeshift.common.block.PSwitchBlock;
 import com.studio.planeshift.common.block.OnOffBlock;
 import com.studio.planeshift.common.block.OnOffSwitchBlock;
+import com.studio.planeshift.common.entity.CourseEnemyEntity;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -29,12 +31,14 @@ public class PlaneShiftGameTests {
     public static final Identifier QUESTION_BLOCK_TEST = PlaneShift.id("question_block_test");
     public static final Identifier P_SWITCH_TEST = PlaneShift.id("p_switch_test");
     public static final Identifier ON_OFF_SWITCH_TEST = PlaneShift.id("on_off_switch_test");
+    public static final Identifier AIR_DROP_TEST = PlaneShift.id("air_drop_test");
 
     public static void registerFunctions(RegisterEvent event) {
         event.register(Registries.TEST_FUNCTION, helper -> {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, QUESTION_BLOCK_TEST), PlaneShiftGameTests::testQuestionBlock);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, P_SWITCH_TEST), PlaneShiftGameTests::testPSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), PlaneShiftGameTests::testOnOffSwitch);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), PlaneShiftGameTests::testAirDrop);
         });
     }
 
@@ -45,6 +49,7 @@ public class PlaneShiftGameTests {
         event.registerTest(QUESTION_BLOCK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, QUESTION_BLOCK_TEST), data));
         event.registerTest(P_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, P_SWITCH_TEST), data));
         event.registerTest(ON_OFF_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), data));
+        event.registerTest(AIR_DROP_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), data));
     }
 
     private static void testQuestionBlock(GameTestHelper helper) {
@@ -107,6 +112,21 @@ public class PlaneShiftGameTests {
         helper.succeedWhen(() -> {
             helper.assertBlockProperty(switchPos, OnOffSwitchBlock.POWERED, true);
             helper.assertBlockProperty(targetPos, OnOffBlock.ON, true);
+        });
+    }
+
+    private static void testAirDrop(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        CourseEnemyEntity enemy = helper.spawn(ModEntities.GOOMBA.get(), pos);
+
+        enemy.markAirDropped();
+        helper.assertTrue(enemy.fallingFromDrop(), "Enemy should be falling from drop after markAirDropped");
+
+        enemy.setOnGround(true);
+        enemy.tick();
+
+        helper.succeedWhen(() -> {
+            helper.assertFalse(enemy.fallingFromDrop(), "Enemy should clear airDropped flag when on ground");
         });
     }
 }

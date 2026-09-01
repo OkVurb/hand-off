@@ -8,6 +8,7 @@
 
 **Last updated:** 2026-09-01 (Devin session)
 **Build status:** GREEN — `.\gradlew build` passes; new `checkEntityRenderers` verified by deliberate failure
+**GameTest status:** GREEN — `runGameTestServer` reports all 5 required tests passed
 **Server launch:** GREEN — `.\gradlew runServer` reaches `Done (6.296s)!`
 **Client launch:** GREEN — course 1 generated and rendered with the fixed side camera and skybox
 **Open PRs:** None
@@ -15,12 +16,14 @@
 
 ## What Was Done This Session
 
-### Devin session — entity-renderer build check
+### Devin session — entity-renderer build check + air-drop GameTest
 
 - Added `checkEntityRenderers` Gradle task in `build.gradle`. It parses `ModEntities.java` for all entity constants and `ClientModEvents.java` for all `registerEntityRenderer` calls, then fails the build if any registered entity lacks a client renderer.
 - The regex is anchored at the start of the line so commented-out renderer calls do not count.
 - Verified the check by deliberately commenting out `ModEntities.GOOMBA`'s renderer and confirming the build fails with the exact missing constant.
-- Restored the renderer; full `build` and `runServer` both pass.
+- Added `testAirDrop` to `PlaneShiftGameTests`: spawns a Goomba, calls `CourseEnemyEntity.markAirDropped()`, asserts `fallingFromDrop()` is true, then sets `onGround` true and ticks, asserting the flag clears.
+- `runGameTestServer` now reports **all 5 required tests passed**.
+- Full `build` and `runServer` both pass.
 
 ### ChatGPT session — shopkeeper, projectile and conveyor art
 
@@ -159,7 +162,7 @@ Unit tests 66 -> 72. `runServer` reaches `Done (0.401s)` with zero registry erro
 
 ## What Is In Progress
 
-Nothing — last session completed its chunk. Next pick from the Devin lane in `docs/MISSING_MECHANICS.md`: GameTests for newer systems (Item 100), co-op verification (Item 97), mid-course disconnect/rejoin (Item 98), or CI headless `runGameTestServer`/`runServer`.
+Devin is continuing in the **Testing / CI / multiplayer** lane. Air-drop immunity GameTest is done. Next chunk will likely be coin-brick GameTest, Hammer-Bro perch clamp GameTest, or CI headless `runGameTestServer`/`runServer`.
 
 ## Handoff
 

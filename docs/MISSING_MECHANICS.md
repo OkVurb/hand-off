@@ -202,7 +202,7 @@ Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 99. **Item textures.** [fix] All 37 item textures are still generated placeholders under 400 bytes.
     This is the most visible unfinished thing in the mod.
 100. **GameTests for the new systems** â€” coin bricks, air-drop immunity, the perch clamp, layout
-     seeding. Only three block types have GameTests today.
+     seeding. Only three block types had GameTests; air-drop immunity is now covered (`testAirDrop`).
 
 ---
 
@@ -259,4 +259,4 @@ table before starting anything in the movement, audio or particle groups.
 
 ## Completed this session
 
-- **Entity-renderer build check** — every ModEntities entry now has a checkEntityRenderers Gradle check that fails the build if a registered entity lacks a client renderer. Done in uild.gradle and verified by deliberate failure/repair.
+- **Entity-renderer build check** ï¿½ every ModEntities entry now has a checkEntityRenderers Gradle check that fails the build if a registered entity lacks a client renderer. Done in uild.gradle and verified by deliberate failure/repair.
