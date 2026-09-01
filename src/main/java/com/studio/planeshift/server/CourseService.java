@@ -110,6 +110,9 @@ public final class CourseService {
                 def.timeLimitTicks(),
                 def.autoScroll()
         ));
+        // The course movement baseline has to follow the state change, not precede it: it reads
+        // inCourse() to decide whether to apply.
+        CourseMovementService.refresh(player);
         CourseScoringService.startCourse(player);
         ProgressionService.enterCourse(player, courseId);
         // A player who has moved on should not still be being thanked for the last course.
@@ -118,6 +121,10 @@ public final class CourseService {
     }
 
     public static void returnToHub(ServerPlayer player) {
+        // Drop the course movement baseline; the hub is ordinary Minecraft, and leaving a player
+        // in the hub with course jump height makes the hub feel broken instead of the course
+        // feeling special.
+        CourseMovementService.clear(player);
         // Drop the course rules first: the hub has no clock and never auto-scrolls, and a stale
         // countdown would keep ticking the player toward a death they cannot see coming.
         CourseTimerService.clear(player);

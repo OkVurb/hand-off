@@ -62,11 +62,36 @@ public final class CourseHud {
         int x = 8;
         int y = 8;
 
+        // hudScale is applied as a pose transform around the whole HUD rather than by scaling
+        // every coordinate: the layout arithmetic below already handles clipping against the
+        // window, and duplicating that at two scales is how panels start disagreeing with their
+        // contents. guiWidth/guiHeight are read back through the scale so the clipping still
+        // refers to real screen space.
+        float hudScale = PlaneShiftConfig.CLIENT.hudScale.get().floatValue();
+        boolean scaled = Math.abs(hudScale - 1.0F) > 0.001F;
+        if (scaled) {
+            graphics.pose().pushMatrix();
+            graphics.pose().scale(hudScale, hudScale);
+        }
+        try {
+            renderCluster(graphics, font, minecraft, state, x, y, hudScale);
+        } finally {
+            if (scaled) {
+                graphics.pose().popMatrix();
+            }
+        }
+    }
+
+    private static void renderCluster(GuiGraphics graphics, Font font, Minecraft minecraft,
+                                      CourseState state, int x, int y, float hudScale) {
+
         // Panel sized to the window, not fixed: at a large GUI scale the usable width can be
         // narrower than the 200px this used to assume, and the old 76px height cut off the
         // star-coin line that sits at y+64.
-        int panelWidth = Math.min(PANEL_WIDTH, graphics.guiWidth() - 2 * PANEL_INSET);
-        int panelHeight = Math.min(PANEL_HEIGHT, graphics.guiHeight() - 2 * PANEL_INSET);
+        int usableWidth = (int) (graphics.guiWidth() / hudScale);
+        int usableHeight = (int) (graphics.guiHeight() / hudScale);
+        int panelWidth = Math.min(PANEL_WIDTH, usableWidth - 2 * PANEL_INSET);
+        int panelHeight = Math.min(PANEL_HEIGHT, usableHeight - 2 * PANEL_INSET);
         PlaneShiftGui.renderPanel(graphics, PANEL_INSET, PANEL_INSET, panelWidth, panelHeight);
         int panelRight = PANEL_INSET + panelWidth;
         int panelBottom = PANEL_INSET + panelHeight;

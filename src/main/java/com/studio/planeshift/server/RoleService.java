@@ -22,9 +22,6 @@ public final class RoleService {
 
     private static final Identifier RUN_MODIFIER_ID = PlaneShift.id("role_run");
     private static final Identifier JUMP_MODIFIER_ID = PlaneShift.id("role_jump");
-    /** Baseline Mario jump physics boost (e.g., +150% jump height). */
-    private static final Identifier COURSE_JUMP_MODIFIER_ID = PlaneShift.id("course_jump_base");
-    private static final Identifier COURSE_RUN_MODIFIER_ID = PlaneShift.id("course_run_base");
 
     private RoleService() {
     }
@@ -54,40 +51,36 @@ public final class RoleService {
                         () -> clearAttributes(player));
     }
 
-        private static void applyAttributes(ServerPlayer player, PlayerRole role) {
+    /**
+     * Applies only the role's own tuning. The course movement baseline is not here: it belongs to
+     * being in a course rather than to having a role, and lived here long enough to mean that a
+     * player who never picked a role platformed at vanilla jump height. See
+     * {@link CourseMovementService}.
+     *
+     * <p>ADD_MULTIPLIED_TOTAL rather than ADD_MULTIPLIED_BASE, so a role's twelve percent is
+     * twelve percent of the boosted course value rather than of the vanilla one.
+     */
+    private static void applyAttributes(ServerPlayer player, PlayerRole role) {
         clearAttributes(player);
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speed != null) {
-            speed.addTransientModifier(new AttributeModifier(COURSE_RUN_MODIFIER_ID,
-                    0.6D, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-            
-            if (role.runMultiplier() != 1.0F) {
-                speed.addTransientModifier(new AttributeModifier(RUN_MODIFIER_ID,
-                        role.runMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-            }
+        if (speed != null && role.runMultiplier() != 1.0F) {
+            speed.addTransientModifier(new AttributeModifier(RUN_MODIFIER_ID,
+                    role.runMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
         AttributeInstance jump = player.getAttribute(Attributes.JUMP_STRENGTH);
-        if (jump != null) {
-            // Apply the global course baseline jump height (+150% base = 2.5x total height)
-            jump.addTransientModifier(new AttributeModifier(COURSE_JUMP_MODIFIER_ID,
-                    1.5D, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-            
-            if (role.jumpMultiplier() != 1.0F) {
-                jump.addTransientModifier(new AttributeModifier(JUMP_MODIFIER_ID,
-                        role.jumpMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-            }
+        if (jump != null && role.jumpMultiplier() != 1.0F) {
+            jump.addTransientModifier(new AttributeModifier(JUMP_MODIFIER_ID,
+                    role.jumpMultiplier() - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
     }
 
-        private static void clearAttributes(ServerPlayer player) {
+    private static void clearAttributes(ServerPlayer player) {
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed != null) {
-            speed.removeModifier(COURSE_RUN_MODIFIER_ID);
             speed.removeModifier(RUN_MODIFIER_ID);
         }
         AttributeInstance jump = player.getAttribute(Attributes.JUMP_STRENGTH);
         if (jump != null) {
-            jump.removeModifier(COURSE_JUMP_MODIFIER_ID);
             jump.removeModifier(JUMP_MODIFIER_ID);
         }
     }

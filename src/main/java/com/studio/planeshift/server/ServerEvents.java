@@ -163,6 +163,7 @@ public final class ServerEvents {
             // Loaded state was sanitized by the codec (never mid-transition). Re-apply
             // role stats and resolve a mid-course disconnect to the checkpoint.
             RoleService.reapply(player);
+            CourseMovementService.refresh(player);
             CourseState state = CourseStateAccess.get(player);
             if (state.pips() < CourseState.MAX_PIPS || state.lives() <= 0) {
                 CourseStateAccess.update(player, s -> s
@@ -193,6 +194,7 @@ public final class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             clearPlayerCaches(player);
             RoleService.reapply(player);
+            CourseMovementService.refresh(player);
             CourseState state = CourseStateAccess.get(player);
             CourseStateAccess.update(player, s -> s
                     .withPips(CourseState.MAX_PIPS, 0L)
@@ -209,6 +211,7 @@ public final class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             clearPlayerCaches(player);
             RoleService.reapply(player);
+            CourseMovementService.refresh(player);
         }
     }
 

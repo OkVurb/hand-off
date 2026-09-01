@@ -1,6 +1,7 @@
 package com.studio.planeshift.client.music;
 
 import com.studio.planeshift.client.ClientCourseState;
+import com.studio.planeshift.common.PlaneShiftConfig;
 import com.studio.planeshift.common.course.CourseState;
 import com.studio.planeshift.common.entity.BowserEntity;
 import com.studio.planeshift.common.registry.ModEffects;
@@ -68,6 +69,7 @@ public final class CourseMusicManager {
         // Only the ordinary course tracks speed up. Speeding up the boss or Star Power loops
         // would double up two different "hurry" signals and read as a glitch.
         boolean hurry = state.timeCritical()
+                && PlaneShiftConfig.CLIENT.hurryUpMusic.get()
                 && (mood == Mood.COURSE_2_5D || mood == Mood.COURSE_3D || mood == Mood.COMBAT);
         ticksSinceLastStart++;
 
