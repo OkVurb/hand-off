@@ -113,6 +113,7 @@ public final class ModBlocks {
             BLOCKS.registerBlock("conveyor_belt", ConveyorBlock::new, p -> p
                     .mapColor(MapColor.TERRACOTTA_GRAY)
                     .strength(1.0F)
+                    .noOcclusion()
                     .sound(SoundType.STONE));
 
     public static final DeferredBlock<PlaneshiftNoteBlock> NOTE_BLOCK =

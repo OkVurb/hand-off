@@ -18,9 +18,15 @@ public class ConveyorBlock extends HorizontalDirectionalBlock {
 
     public static final MapCodec<ConveyorBlock> CODEC = simpleCodec(ConveyorBlock::new);
     public static final double SPEED = 0.06D;
+    protected static final net.minecraft.world.phys.shapes.VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
 
     public ConveyorBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+        return SHAPE;
     }
 
     @Override
