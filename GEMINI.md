@@ -1,7 +1,6 @@
-# Gemini Session Prompt — PlaneShift
+# Gemini session prompt
 
-Copy-paste the block below into a new Gemini session (Gemini app, Gemini CLI, or Gemini in
-Antigravity). The 100-task backlog for Gemini is in `docs/GEMINI_BACKLOG.md`.
+Copy the block below into Gemini. Everything it needs is in the repo.
 
 ---
 
@@ -14,18 +13,19 @@ Branch: main
 
 ## What this is
 
-A NeoForge 1.21.11 Minecraft mod (Java 21, NeoForge 21.11.45, MDG 2.0.144). A Mario-inspired
-2.5D platformer inside Minecraft: perspective-rail camera, Forms, enemies, generated courses,
-shift gates, checkpoints, a course clock and an arcade scoring system.
+A NeoForge 1.21.11 Minecraft mod (Java 21, NeoForge 21.11.45, MDG 2.0.144). A Mario-style 2.5D
+platformer inside Minecraft: perspective-rail camera, Forms, patrolling enemies, procedurally
+generated courses, five worlds of ten courses, a world map, scoring and a course clock.
 
 ## Start here, in order
 
 1. `git pull`
-2. Read **PROGRESS.md** — where the last session stopped. This is the single source of truth.
-3. Read **AGENTS.md** — build invariants and conventions. Its **Token budget** section is
-   mandatory: The user pays per token and every tool result is re-sent with the whole conversation. Filter command output, batch edits before verifying, escalate compileJava -> test -> build rather than running a full build after every change, and read line ranges instead of whole files. Check whether a task is already done before implementing it.
-4. Read **docs/GEMINI_BACKLOG.md** — your 100 tasks.
-5. `.\gradlew build` — must be green; only `this-escape` warnings are expected.
+2. **PROGRESS.md** — where the last session stopped. Single source of truth.
+3. **AGENTS.md** — build invariants, conventions, and the mandatory **Token budget** section.
+4. **docs/MISSING_MECHANICS.md** — your backlog. 103 items, each tagged [new], [extend] or [fix].
+5. **docs/PLAYTEST_INSTANCE.md** — the CurseForge instance and its mod rules. Read before touching
+   anything about launching or mod compatibility.
+6. `.\gradlew build` — must be green; only `this-escape` warnings are expected.
 
 ## Hard constraints
 
@@ -33,84 +33,84 @@ shift gates, checkpoints, a course clock and an arcade scoring system.
    after any client change.
 2. GameTests register through `Registries.TEST_FUNCTION` via `RegisterEvent`, then wrap in
    `FunctionGameTestInstance` through `RegisterGameTestsEvent`. The `@GameTest` annotation does not
-   exist in 1.21.11. Follow `server/test/PlaneShiftGameTests.java` exactly.
-3. Commit as `OkVurb <85900298+OkVurb@users.noreply.github.com>`. Put `Generated with Gemini` in
-   the commit body. Never use a fabricated AI email.
-4. Do not commit `build/`, `.gradle/`, `run/`, `.mcsources/`, generated caches or secrets.
-5. Never commit a one-shot mutation script (like the old `update_roles.py`) into the repo root. If
-   you write one, run it and delete it. One such script silently broke the mod for a whole session.
+   exist in 1.21.11. Follow `server/test/PlaneShiftGameTests.java`.
+3. Commit as `OkVurb <85900298+OkVurb@users.noreply.github.com>`. Put `Generated with Gemini` in the
+   commit body. Never use a fabricated AI email.
+4. Do not commit `build/`, `.gradle/`, `run/`, `.mcsources/`, or one-shot mutation scripts. Four
+   dead texture scripts were deleted from the repo root for this reason; one of them corrupted the
+   datapack for a whole session.
+5. The user pays per token. Filter every command's output, batch edits before verifying, and
+   escalate `compileJava` → `test` → `build` rather than running a full build after each change.
 
-## The rule that matters most
+## The two rules that matter most
 
-**A green build does not mean the mod works.** Datapack JSON that parses fine can still be
-rejected by its codec at world load, taking the entire server down. This has already happened
-twice: a wrong `dimension_type` schema, and role multipliers pushed outside their declared range.
+**A green build does not mean it works.** Datapack JSON that parses fine can still be rejected by
+its codec at world load and take the server down. After touching `src/main/resources/data/`, run
+`.\gradlew runServer` and look for `Done (Xs)!` with no ERROR lines.
 
-After touching anything under `src/main/resources/data/`, run:
+**Check whether a task is already done before building it.** This is the single largest source of
+wasted effort on this project — multiple sessions have rebuilt existing features. The backlog marks
+[extend] and [fix] items precisely because real code already sits behind them. `grep` first.
 
-```
-.\gradlew runServer
-```
+## Build checks
 
-Look for `Done (Xs)! For help, type "help"` and zero `ERROR` lines. It takes about a minute and is
-the cheapest real check that exists.
-
-## Build checks you must work within
-
-All are wired into `.\gradlew build` and run in CI on every push.
-
-| Task | Enforces |
-|---|---|
-| `checkClientClassLeak` | `common`/`server` never reference `net.minecraft.client` |
-| `checkNoRawCuboidScan` | Area block searches go through `BlockAreaScan`, not `BlockPos.betweenClosed` |
-| `checkSoundAssets` | Every `ModSounds` entry has a real OGG and a subtitle key |
-| `checkTextureAssets` | Every registered block/entity/effect/particle has a texture; no two are byte-identical |
-| `checkBlockModels` | Model/blockstate JSON parses and resolves; multi-variant blocks must not render identically in every state; items need an `assets/planeshift/items/<id>.json`; `pack.mcmeta` uses `min_format`/`max_format` with a major above 81 |
-| `checkDataRanges` | Datapack values stay inside the numeric ranges their codecs declare |
-
-If you genuinely need to change a contract, widen it in the Java codec — `checkDataRanges` reads
-the range out of the source, so it follows automatically. Do not disable a check to get green.
-
-## Working rules
-
-- Read `.mcsources/` (decompiled vanilla + NeoForge source) before guessing at a 1.21.11 API. The
-  schemas for dimension types, pack metadata and item models all changed recently; guessing costs
-  more than looking.
-- Verify every new build check by deliberately breaking the thing it guards and confirming it
-  fails. Every check in this repo was validated that way.
-- Prefer the existing pattern: small focused Gradle verification tasks in the style of
-  `checkClientClassLeak`, not broad frameworks.
-- Verify which event bus (mod vs game) an event belongs to before wiring it.
-- Asset generators live in `tools/` and are not compiled into the mod. `SoundGen.java` needs
-  ffmpeg with libvorbis; SFX must be **mono** because Minecraft only positions mono sources.
-  `TextureGen.java` refuses to overwrite any file larger than a placeholder, so running it over
-  the whole texture directory is safe; production art is skipped and reported.
+Six, all wired into `build` and CI: `checkClientClassLeak`, `checkNoRawCuboidScan`,
+`checkSoundAssets`, `checkTextureAssets`, `checkBlockModels`, `checkDataRanges`. Widen a contract in
+the Java codec if you genuinely need to; never disable a check to get green. Verify any new check by
+deliberately breaking the thing it guards.
 
 ## Current state
 
-- All originally-tracked P0/P1/P2 issues are closed. Roughly 46 of the previous 100-task backlog
-  is done; `docs/GEMINI_BACKLOG.md` lists what is left plus new work.
-- Five generated courses exist (grass, desert, snow, lava, underground), now including donut
-  bridges, firebars, an axe bridge collapse, secret vines, coin heaven, a note-block run and
-  moving platforms on both axes.
-- Movement: 2.5D rail projection, coyote time, jump buffering, Glider float, wall jump, ground
-  pound and a 0.5-block course crouch.
-- Rules: course clock with countdown and death at zero, arcade score, stomp combo ladder with
-  1-Ups, auto-scroll flag, game over exits to the hub.
-- Enemies: Koopa shell and kick, Piranha Plant emerge cycle, Buzzy Beetle fire immunity, Spiny
-  anti-stomp, a shared squish framework and floating score popups.
-- 72 unit tests pass. GameTests exist for `QuestionBlock`, `PSwitchBlock`, `OnOffSwitchBlock`.
-- Six build checks guard client leaks, area scans, sounds, textures, models and datapack ranges.
-- Enemies still use a shared procedural rig (`AnimatedCourseEnemyModel`), not bespoke geometry.
-- **The mod has never been play-tested end to end.** It loads clean on client and server; nobody
-  has actually walked a course. That is Phase A of the backlog and it matters more than any new
-  feature.
+Working and verified in-game this session:
+
+- Courses generate from a layout seeded on the **world seed mixed with the course id**, so a new
+  save is a new set of courses while a given course still regenerates identically for retries.
+- Each world is one biome. The tenth course of each keeps its castle finale via the feature list.
+- Ground enemies patrol and turn at walls and ledges. None of them chase — that was removed.
+- Head bumps work. Question blocks darken rather than break; roughly one brick in four is a coin
+  brick that pays a coin, darkens and stays solid, chosen by position hash so routes are learnable.
+- Progression persists: cleared courses, star coin counts, best scores, server-enforced unlocking,
+  a world map, a results screen and a game-over screen with retry.
+- Movement: 2.5D rail, coyote time, jump buffering, ground pound, crouch, Glider float. Cross-rail
+  momentum is folded onto the travel axis so third-party dash mods work. PlaneShift's own wall jump
+  is off by default because it read as a free double jump.
+- Config covers jump, run, conveyor speed, HUD scale, hurry-up music, boss music and the tester
+  menu. Cloth Config gives it an in-game UI.
+- Press **F6** or run **`/planeshift test`** for the tester menu: power-ups, enemy spawns, course
+  jumps, clock and lives, progress reset.
+- 153 unit tests. GameTests exist for three block types only.
+
+Known unfinished, highest value first:
+
+1. **Star coins are never placed by generation**, so the per-course counter can only read zero.
+2. **All 37 item textures are generated placeholders** under 400 bytes. Most visible gap in the mod.
+3. **Secret vines cannot be climbed**, so the coin heaven above them is unreachable by its route.
+4. **Difficulty does not scale across worlds** — world 5 generates with world 1's parameters.
+5. The mod has never been played start-to-finish by anyone.
+
+## Working with the installed mods
+
+The playtest instance runs a real 1.21.11 mod set. Several backlog items are already provided by
+one of them, and building a second copy is worse than not building it — two systems on one input
+reads as a bug in both. `docs/MISSING_MECHANICS.md` has the full table. The short version:
+
+- **Omni** and **Enhanced Movement** already give sprint, ledge grabs and wall jumps. Do not
+  reimplement them; PlaneShift yields.
+- **Boss Music Mod** owns boss music. PlaneShift's is off by default; leave it off.
+- **AttributeFix** is what stops large jump boosts being silently clamped. Do not remove it.
+- **SereneSeasons** drifts biome tint over time, which fights the one-biome-per-world rule. Settle
+  this before doing anything about per-theme identity.
+- **Never install a 1.21.1 mod.** Half a day went into a launch failure caused by them. Five were
+  blocking startup outright; FerriteCore and ModernFix crashed during mixin setup; and the rest
+  killed the process between mixin config and Minecraft's `main` with no exception, no crash report
+  and no log line. Check a jar's declared range rather than its filename:
+  `unzip -p <mod>.jar META-INF/neoforge.mods.toml | grep -A3 'modId *= *"minecraft"'`
 
 ## How to work
 
-Pick a contiguous chunk of 5–10 tasks from `docs/GEMINI_BACKLOG.md`. Implement them thoroughly.
-Run `.\gradlew build`, plus `.\gradlew runServer` if you touched `data/`. Add tests. Update
-`PROGRESS.md` and `HANDOFF.md`. Commit and push `main`. Then take the next chunk.
+Take a contiguous chunk of 5–10 backlog items. Prefer [fix] items first — they are cheap and the
+feature is currently broken rather than absent, which is worse. Implement thoroughly, add tests,
+run `.\gradlew build` plus `runServer` if you touched `data/`. Update PROGRESS.md. Commit and push
+main. Then take the next chunk.
 
-If a task turns out to be already done, say so and move on rather than redoing it. Several tasks
-in the previous backlog were already implemented and got reworked wastefully.
+If an item turns out to be already done, say so in PROGRESS.md and move on rather than redoing it.
