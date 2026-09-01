@@ -1,7 +1,4 @@
-package com.studio.planeshift.server;
-
-import com.studio.planeshift.common.course.CourseTheme;
-import com.studio.planeshift.common.course.WorldDefinition;
+package com.studio.planeshift.common.course;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +15,11 @@ import java.util.Map;
  * <p>World 3: Volcano – lava/underground mix, hard
  * <p>World 4: Haunted Manor – ghost_house/underground mix, hard
  * <p>World 5: Sky Kingdom – mixed themes, expert
+ *
+ * <p>Lives in {@code common} rather than {@code server} because the world map screen needs the
+ * same table and the same unlock rule the server enforces. The rule is a pure function of a
+ * {@link CourseProgress}, so the client can grey out a locked course honestly instead of guessing,
+ * while the server still refuses the load — see {@code ProgressionService}.
  */
 public final class WorldRegistry {
 
@@ -78,6 +80,46 @@ public final class WorldRegistry {
     /** Total number of worlds. */
     public static int worldCount() {
         return ORDERED.size();
+    }
+
+    /**
+     * Whether a saved progress record opens a course.
+     *
+     * <p>The rules, in order:
+     * <ul>
+     *   <li>A course this table has never heard of — the five vertical-slice courses, or anything
+     *       a datapack adds outside the world list — is always open. Gating unknown content locks
+     *       it out with no way in.</li>
+     *   <li>A course already cleared stays open, so it can be replayed for star coins.</li>
+     *   <li>Any course after the first in a world opens when the previous one is cleared.</li>
+     *   <li>The first course of a world opens when the previous world's boss course is cleared.</li>
+     * </ul>
+     */
+    public static boolean isUnlocked(CourseProgress progress, String courseId) {
+        WorldDefinition world = worldForCourse(courseId);
+        if (world == null) {
+            return true;
+        }
+        if (progress.cleared(courseId)) {
+            return true;
+        }
+
+        List<String> courses = world.courseIds();
+        int index = courses.indexOf(courseId);
+        if (index > 0) {
+            return progress.cleared(courses.get(index - 1));
+        }
+
+        int worldIndex = worldIndex(world.worldId());
+        if (worldIndex <= 0) {
+            return true;
+        }
+        return progress.cleared(ORDERED.get(worldIndex - 1).bossCourseId());
+    }
+
+    /** A world is open when its first course is. Used by the map screen to grey out a page. */
+    public static boolean isWorldUnlocked(CourseProgress progress, WorldDefinition world) {
+        return isUnlocked(progress, world.courseIds().get(0));
     }
 
     /** Total number of courses across all worlds. */

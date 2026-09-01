@@ -55,6 +55,14 @@ public final class CourseService {
             return false;
         }
 
+        // Gating is enforced here rather than only in the map screen. The screen greys locked
+        // courses out because that is honest UI; this is what makes it true.
+        if (!ProgressionService.isUnlocked(player, courseId)) {
+            player.sendSystemMessage(net.minecraft.network.chat.Component
+                    .translatable("message.planeshift.course_locked"));
+            return false;
+        }
+
         ServerLevel courseLevel = server.getLevel(def.dimensionKey());
         if (courseLevel == null) {
             PlaneShift.LOGGER.error("Course dimension not found: {}", def.dimensionKey());
@@ -103,6 +111,7 @@ public final class CourseService {
                 def.autoScroll()
         ));
         CourseScoringService.startCourse(player);
+        ProgressionService.enterCourse(player, courseId);
         return true;
     }
 

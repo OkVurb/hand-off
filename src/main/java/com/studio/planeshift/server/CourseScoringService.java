@@ -159,7 +159,22 @@ public final class CourseScoringService {
         return chain == null ? 0 : chain.depth;
     }
 
-    public static void finishCourse(ServerPlayer player) {
+    /**
+     * What a finished run was worth. Returned rather than only announced in chat so the results
+     * screen can show the same breakdown — chat scrolls away, and on a course clear the player is
+     * looking at a screen, not at the log.
+     *
+     * @param finalScore      score after the finish bonuses
+     * @param timeBonus       points from the clock left over
+     * @param healthBonus     points from surviving pips
+     * @param enemiesDefeated defeats this run
+     * @param runTicks        wall-clock length of the run
+     */
+    public record Results(int finalScore, int timeBonus, int healthBonus, int enemiesDefeated,
+                          long runTicks) {
+    }
+
+    public static Results finishCourse(ServerPlayer player) {
         Long start = COURSE_START.remove(player.getUUID());
         CHAINS.remove(player.getUUID());
         long ticks = start != null ? player.level().getGameTime() - start : 0L;
@@ -178,6 +193,7 @@ public final class CourseScoringService {
 
         player.sendSystemMessage(Component.translatable("chat.planeshift.course_complete",
                 timeBonus, healthBonus, enemiesDefeated, state.coins(), finalScore));
+        return new Results(finalScore, timeBonus, healthBonus, enemiesDefeated, ticks);
     }
 
     public static String formatTime(long ticks) {

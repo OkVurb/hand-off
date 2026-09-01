@@ -342,6 +342,9 @@ public final class ServerEvents {
         } else if (item instanceof StarCoinItem) {
             entity.discard();
             CourseStateAccess.update(player, s -> s.withStarCoins(s.starCoins() + 1));
+            // The run counter above resets with the course; this is the permanent record, capped
+            // per course so replaying cannot inflate the collection total.
+            ProgressionService.recordStarCoin(player);
             CourseScoringService.awardStarCoin(player);
             level.playSound(null, player.blockPosition(),
                     ModSounds.COIN_PICKUP.get(), SoundSource.PLAYERS, 0.9F, 1.5F);
