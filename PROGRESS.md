@@ -152,15 +152,21 @@ done and is worth more than any new feature.
 
 ## What To Do Next (priority order)
 
-0. **Play-test the new course rules** — start a course, watch the clock count down and flash under
-   100 s, let it hit zero (should cost a life), chain stomps in one jump (100/200/400... then a
-   1-Up past the 8th), and lose all lives to confirm the game-over now returns you to the hub.
-   Auto-scroll is off for every shipped course; set `"auto_scroll": true` on one to try it.
-1. **Live facing check** — launch course 1, hold A/D and move the mouse; body/head must stay left/right while movement and action aim remain stable.
-2. **Full play-testing** — walk all five courses and exercise gaps, checkpoint/death, switches, rewards, shop and finish/leave flow.
-3. **Bespoke entity models** — hostile cast complete in `BespokeEnemyModel`; next make the Toad
+0. **Re-play-test movement.** The jump and run boost were fixed this session — they had never
+   actually applied, because they were gated on a role nothing ever selected, so every course had
+   been played at vanilla jump height. Everything anyone concluded about gap fairness or platform
+   reachability before 51bd8ce was measured against the wrong physics and should be re-checked.
+   Tune `courseJumpBoost` / `courseRunBoost` in `run/config/planeshift-server.toml` live.
+1. **Conveyor texture.** The belt physics are fixed; the texture is still a placeholder and reads
+   badly at slab height. Assigned to ChatGPT.
+2. **Play-test the world map and progression** — clear a course, confirm the results screen totals,
+   confirm the next node unlocks and the one after it does not, and that a boss clear opens the
+   next world.
+3. **Live facing check** — launch course 1, hold A/D and move the mouse; body/head must stay
+   left/right while movement and action aim remain stable.
+4. **Bespoke entity models** — hostile cast complete in `BespokeEnemyModel`; next make the Toad
    shopkeeper and projectile props equally bespoke, then do a close-range live silhouette review.
-4. **Art continuation** — per-theme skyboxes and final block/item/effect textures.
+5. **Art continuation** — per-theme skyboxes and final block/item/effect textures.
 
 ## How To Resume
 
@@ -174,6 +180,10 @@ done and is worth more than any new feature.
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-09-01 | Claude | Play-test fixes: course jump/run boost had never applied (gated on a role nothing selects), conveyor rewritten from an accelerator to a real belt; config now covers jump, run, conveyor, HUD scale, hurry-up |
+| 2026-09-01 | Claude | Audio: boss, Star Power and Toad fanfare tracks; hurry-up pitch shift; Toad castle speech |
+| 2026-09-01 | Claude | Progression: CourseProgress save data, star coins per course, unlock gating, real world map screen, course-results screen |
+| 2026-09-01 | Claude | Course layout made data-driven from course JSON; fixed a 14-block unjumpable pit in every ghost-house course |
 | 2026-08-31 | Claude | Phase 5: donut blocks, firebars, axe bridge collapse, secret vines, coin heaven, note-block run, moving platforms; wrote the Gemini handoff (GEMINI.md + docs/GEMINI_BACKLOG.md) |
 | 2026-08-31 | Claude | Phase 2/3: Koopa shell, Piranha cycle, squish framework, score popups, drifting powerups, Poison Mushroom |
 | 2026-08-31 | Claude | Backlog tasks 9-15: auto-scroll, course clock, score, stomp combos, game-over exit; fixed a datapack blocker from b3477a3 that stopped any world loading; added checkDataRanges |
