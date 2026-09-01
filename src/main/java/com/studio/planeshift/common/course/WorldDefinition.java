@@ -12,6 +12,16 @@ public record WorldDefinition(
         CourseTheme primaryTheme,
         List<String> courseIds
 ) {
+    /**
+     * Translation key for this world's name.
+     *
+     * <p>{@link #displayName} is the English fallback used in logs and commands; anything a player
+     * reads goes through this instead, so the map screen is not hard-coded to one language.
+     */
+    public String nameKey() {
+        return "world.planeshift." + worldId;
+    }
+
     /** Number of courses per world. */
     public static final int COURSES_PER_WORLD = 10;
 

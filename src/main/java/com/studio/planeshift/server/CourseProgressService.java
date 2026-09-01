@@ -26,7 +26,7 @@ public final class CourseProgressService {
         int startX = START_X.get(player);
 
         ServerBossEvent bar = BARS.computeIfAbsent(player, p -> {
-            ServerBossEvent b = new ServerBossEvent(Component.literal("Course Progress"), 
+            ServerBossEvent b = new ServerBossEvent(Component.translatable("hud.planeshift.course_progress"), 
                 BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS);
             b.addPlayer(p);
             return b;
@@ -36,7 +36,8 @@ public final class CourseProgressService {
         float progress = Math.min(1.0F, distance / 120.0F); // Assuming ~120 block course length
         
         bar.setProgress(progress);
-        bar.setName(Component.literal("\u2691 " + player.getScoreboardName() + " \u2691"));
+        bar.setName(Component.translatable("hud.planeshift.course_progress.player",
+                player.getScoreboardName()));
     }
 
     public static void removeBar(ServerPlayer player) {

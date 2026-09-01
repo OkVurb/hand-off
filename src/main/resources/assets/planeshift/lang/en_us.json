@@ -260,5 +260,22 @@
   "message.planeshift.toad.final_1": "§dToad:§r You did it! Every castle, every world.",
   "message.planeshift.toad.final_2": "§dToad:§r Nobody has ever run them all the way through.",
   "message.planeshift.toad.final_3": "§dToad:§r The Kingdom is safe, and it is safe because of you.",
-  "message.planeshift.toad.final_4": "§6Thank you for playing PlaneShift!"
+  "message.planeshift.toad.final_4": "§6Thank you for playing PlaneShift!",
+  "gui.planeshift.game_over": "Game Over",
+  "gui.planeshift.game_over.retry": "Retry Course",
+  "gui.planeshift.game_over.map": "World Map",
+  "gui.planeshift.game_over.score": "Final score: %s",
+  "gui.planeshift.pause": "Paused",
+  "gui.planeshift.pause.resume": "Resume Course",
+  "gui.planeshift.pause.options": "Options...",
+  "gui.planeshift.pause.map": "World Map",
+  "gui.planeshift.pause.leave": "Leave Course",
+  "gui.planeshift.course_map.world": "World %s · %s",
+  "hud.planeshift.course_progress": "Course Progress",
+  "hud.planeshift.course_progress.player": "⚑ %s ⚑",
+  "world.planeshift.grassland": "Grassland",
+  "world.planeshift.frozen": "Frozen Peaks",
+  "world.planeshift.volcano": "Volcano",
+  "world.planeshift.haunted": "Haunted Manor",
+  "world.planeshift.sky": "Sky Kingdom"
 }

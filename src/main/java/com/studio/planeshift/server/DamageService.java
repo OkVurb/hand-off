@@ -93,9 +93,18 @@ public final class DamageService {
                     .withPips(CourseState.MAX_PIPS, now + INVULN_TICKS * 2L)
                     .withLives(CourseState.STARTING_LIVES)
                     .withCheckpoint(Optional.empty()));
+            // Read before the reset below wipes them; the screen has nothing else to show.
+            String courseId = ProgressionService.get(player).currentCourse().orElse("");
+            int finalScore = state.score();
+
             CourseScoringService.clear(player.getUUID());
             CourseService.returnToHub(player);
+            // The run is over, so the player is no longer in any course. Without this a star coin
+            // picked up later would still be credited to the course they just lost.
+            ProgressionService.leaveCourse(player);
             player.sendSystemMessage(Component.translatable("chat.planeshift.game_over"));
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,
+                    new com.studio.planeshift.common.network.GameOverPayload(courseId, finalScore));
             return;
         }
 

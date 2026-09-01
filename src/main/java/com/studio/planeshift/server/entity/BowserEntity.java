@@ -19,7 +19,7 @@ import java.util.EnumSet;
 
 public class BowserEntity extends Monster {
     
-    private final ServerBossEvent bossEvent = new ServerBossEvent(Component.literal("Bowser"), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
+    private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translatable("entity.planeshift.bowser"), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
     private boolean isPhaseTwo = false;
 
     public BowserEntity(EntityType<? extends Monster> entityType, Level level) {

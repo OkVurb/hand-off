@@ -23,6 +23,8 @@ import com.studio.planeshift.client.screen.CourseMapScreen;
 import com.studio.planeshift.client.screen.ToadShopScreen;
 import com.studio.planeshift.common.network.OpenCourseMapPayload;
 import com.studio.planeshift.common.network.CourseResultsPayload;
+import com.studio.planeshift.common.network.GameOverPayload;
+import com.studio.planeshift.client.screen.CourseGameOverScreen;
 import com.studio.planeshift.client.screen.CourseResultsScreen;
 import com.studio.planeshift.common.network.OpenTitleScreenPayload;
 import com.studio.planeshift.common.network.OpenToadShopPayload;
@@ -175,6 +177,10 @@ public final class ClientModEvents {
         event.register(CourseResultsPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new CourseResultsScreen(payload))));
+
+        event.register(GameOverPayload.TYPE,
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().setScreen(new CourseGameOverScreen(payload))));
 
         event.register(OpenTitleScreenPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->

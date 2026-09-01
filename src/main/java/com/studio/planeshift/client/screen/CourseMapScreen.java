@@ -199,8 +199,8 @@ public class CourseMapScreen extends Screen {
 
         int titleY = Math.max(24, rowY() - 46);
         PlaneShiftGui.renderPanel(graphics, this.width / 2 - 130, titleY - 8, 260, 30);
-        Component heading = Component.literal(
-                (worldIndex + 1) + " · " + world.displayName());
+        Component heading = Component.translatable("gui.planeshift.course_map.world",
+                worldIndex + 1, Component.translatableWithFallback(world.nameKey(), world.displayName()));
         PlaneShiftGui.drawTitle(graphics, this.font, heading,
                 this.width / 2 - this.font.width(heading) / 2, titleY, PlaneShiftGui.COIN_YELLOW);
 

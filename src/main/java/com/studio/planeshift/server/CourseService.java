@@ -120,6 +120,27 @@ public final class CourseService {
         return true;
     }
 
+    /**
+     * Abandons the course from the pause menu.
+     *
+     * <p>Distinct from {@link #returnToHub} because leaving is a decision with consequences: the
+     * run is over, so the score is dropped and the progress record is closed out. Nothing is
+     * recorded as cleared — walking out of a course is not finishing it.
+     */
+    public static void leaveCourse(ServerPlayer player) {
+        if (!CourseStateAccess.get(player).inCourse()) {
+            return;
+        }
+        CourseScoringService.clear(player.getUUID());
+        ProgressionService.leaveCourse(player);
+        ToadDialogueService.clear(player);
+        returnToHub(player);
+        CourseStateAccess.update(player, s -> s
+                .withState(PlayState.HUB)
+                .withMode(PlaneMode.FREE_3D, Optional.empty())
+                .withScore(0));
+    }
+
     public static void returnToHub(ServerPlayer player) {
         // Drop the course movement baseline; the hub is ordinary Minecraft, and leaving a player
         // in the hub with course jump height makes the hub feel broken instead of the course

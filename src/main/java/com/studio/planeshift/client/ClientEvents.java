@@ -6,9 +6,11 @@ import com.studio.planeshift.client.input.PlaneConstrainedInput;
 import com.studio.planeshift.client.input.PlaneMovementAssists;
 import com.studio.planeshift.client.music.CourseMusicManager;
 import com.studio.planeshift.common.course.CourseCrouch;
+import com.studio.planeshift.client.screen.CoursePauseScreen;
 import com.studio.planeshift.common.network.FormActionPayload;
 import com.studio.planeshift.common.network.ReserveSwapPayload;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -19,6 +21,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -33,6 +36,28 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 public final class ClientEvents {
 
     private ClientEvents() {
+    }
+
+    /**
+     * Swaps the vanilla pause screen for the course one while a course is running.
+     *
+     * <p>Done by replacing the screen as it opens rather than by binding a key, so it covers every
+     * route to pausing — Escape, losing window focus, a controller Start button — without having
+     * to know about any of them.
+     *
+     * <p>Only the plain pause screen is intercepted. {@code PauseScreen} is also constructed for
+     * the "Saving world" pause during a level save, which has no menu and must not be replaced;
+     * {@code isPauseScreen()} being false on that variant is how the two are told apart.
+     */
+    @SubscribeEvent
+    public static void onScreenOpening(ScreenEvent.Opening event) {
+        if (!(event.getNewScreen() instanceof PauseScreen pause) || !pause.isPauseScreen()) {
+            return;
+        }
+        if (!ClientCourseState.get().inCourse()) {
+            return;
+        }
+        event.setNewScreen(new CoursePauseScreen());
     }
 
     @SubscribeEvent
