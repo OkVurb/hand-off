@@ -88,7 +88,7 @@ public final class CourseMusicManager {
         if (minecraft.player.hasEffect(ModEffects.STAR_POWER)) {
             return Mood.STAR_POWER;
         }
-        if (state.inCourse() && bossNearby(minecraft)) {
+        if (PlaneShiftConfig.CLIENT.bossMusic.get() && state.inCourse() && bossNearby(minecraft)) {
             return Mood.BOSS;
         }
         if (state.in2_5D()) {

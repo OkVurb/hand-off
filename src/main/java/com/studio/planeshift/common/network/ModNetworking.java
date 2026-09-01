@@ -1,6 +1,7 @@
 package com.studio.planeshift.common.network;
 
 import com.studio.planeshift.server.CourseService;
+import com.studio.planeshift.server.TesterService;
 import com.studio.planeshift.server.FormService;
 import com.studio.planeshift.server.ToadShopService;
 import net.minecraft.server.level.ServerPlayer;
@@ -62,6 +63,13 @@ public final class ModNetworking {
                 (payload, context) -> context.enqueueWork(() -> {
                     if (context.player() instanceof ServerPlayer player) {
                         CourseService.leaveCourse(player);
+                    }
+                }));
+
+        registrar.playToServer(TesterActionPayload.TYPE, TesterActionPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof ServerPlayer player) {
+                        TesterService.handle(player, payload.action(), payload.arg());
                     }
                 }));
 

@@ -36,6 +36,7 @@ public final class PlaneShiftConfig {
         public final ModConfigSpec.BooleanValue showDebugHud;
         public final ModConfigSpec.DoubleValue hudScale;
         public final ModConfigSpec.BooleanValue hurryUpMusic;
+        public final ModConfigSpec.BooleanValue bossMusic;
 
         Client(ModConfigSpec.Builder builder) {
             builder.push("camera");
@@ -69,6 +70,13 @@ public final class PlaneShiftConfig {
                     .comment("Speed the course track up when the clock drops under 100 seconds.",
                             "Turn off if the pitch shift is uncomfortable; the HUD still warns.")
                     .define("hurryUpMusic", true);
+            bossMusic = builder
+                    .comment("Play PlaneShift's own boss theme near Bowser.",
+                            "Off by default: a dedicated boss-music mod in the pack will also try",
+                            "to own the music channel during the fight, and two mods fighting over",
+                            "it sounds like a bug rather than like either one working. Turn this on",
+                            "only if nothing else in the pack is handling boss music.")
+                    .define("bossMusic", false);
             builder.pop();
         }
     }
@@ -80,6 +88,7 @@ public final class PlaneShiftConfig {
         public final ModConfigSpec.DoubleValue courseJumpBoost;
         public final ModConfigSpec.DoubleValue courseRunBoost;
         public final ModConfigSpec.DoubleValue conveyorSpeed;
+        public final ModConfigSpec.BooleanValue testerMenu;
 
         Server(ModConfigSpec.Builder builder) {
             builder.push("transitions");
@@ -116,6 +125,14 @@ public final class PlaneShiftConfig {
                             "adds every tick, so a player who walks against it wins. Raise it to",
                             "make belts a hazard; lower it to make them scenery.")
                     .defineInRange("conveyorSpeed", 0.035D, 0.0D, 0.4D);
+            builder.pop();
+
+            builder.push("debug");
+            testerMenu = builder
+                    .comment("Allow the tester menu (F6) without operator permissions.",
+                            "Intended for playtest instances. Turn off on any server where players",
+                            "should not be able to hand themselves power-ups and unlock courses.")
+                    .define("testerMenu", true);
             builder.pop();
         }
     }

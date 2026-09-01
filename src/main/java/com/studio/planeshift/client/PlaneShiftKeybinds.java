@@ -32,6 +32,17 @@ public final class PlaneShiftKeybinds {
             GLFW.GLFW_KEY_V,
             CATEGORY);
 
+    /**
+     * Opens the playtest tester menu. F6 because it is outside the F1-F5 block vanilla already
+     * uses and outside the number row the player is holding during a course.
+     */
+    public static final KeyMapping TESTER_MENU = new KeyMapping(
+            "key.planeshift.tester_menu",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_F6,
+            CATEGORY);
+
     private PlaneShiftKeybinds() {
     }
 }

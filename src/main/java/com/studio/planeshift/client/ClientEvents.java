@@ -7,6 +7,7 @@ import com.studio.planeshift.client.input.PlaneMovementAssists;
 import com.studio.planeshift.client.music.CourseMusicManager;
 import com.studio.planeshift.common.course.CourseCrouch;
 import com.studio.planeshift.client.screen.CoursePauseScreen;
+import com.studio.planeshift.client.screen.TesterScreen;
 import com.studio.planeshift.common.network.FormActionPayload;
 import com.studio.planeshift.common.network.ReserveSwapPayload;
 import net.minecraft.client.Minecraft;
@@ -77,6 +78,10 @@ public final class ClientEvents {
 
             while (PlaneShiftKeybinds.SWAP_RESERVE.consumeClick()) {
                 ClientPacketDistributor.sendToServer(ReserveSwapPayload.INSTANCE);
+            }
+
+            while (PlaneShiftKeybinds.TESTER_MENU.consumeClick()) {
+                minecraft.setScreen(new TesterScreen());
             }
 
             // After entities tick, so mouse-driven head turning cannot undo the 2.5D silhouette.

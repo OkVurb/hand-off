@@ -74,6 +74,7 @@ public final class ClientModEvents {
         event.registerCategory(PlaneShiftKeybinds.CATEGORY);
         event.register(PlaneShiftKeybinds.FORM_ACTION);
         event.register(PlaneShiftKeybinds.SWAP_RESERVE);
+        event.register(PlaneShiftKeybinds.TESTER_MENU);
     }
 
     @SubscribeEvent
