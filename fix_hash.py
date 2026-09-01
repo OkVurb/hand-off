@@ -3,9 +3,11 @@ import glob
 import os
 
 search_path = 'src/main/resources/assets/planeshift/textures/item/*.png'
-files = [f for f in glob.glob(search_path) if os.path.getsize(f) < 400]
+files = glob.glob(search_path)
 count = 0
 for i, f in enumerate(files):
+    if os.path.getsize(f) > 1000:
+        continue
     try:
         img = Image.open(f).convert('RGBA')
         x, y = i % 16, i // 16
