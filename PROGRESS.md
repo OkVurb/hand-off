@@ -25,7 +25,7 @@
 - `runGameTestServer` now reports **all 7 required tests passed**.
 - Fixed `testAirDrop` flakiness: give the spawned Goomba a stone floor so it lands and `CourseEnemyEntity.tick()` clears `airDropped`.
 - Extended `.github/workflows/build.yml` to run `runGameTestServer` and a headless `runServer` smoke test that waits for `Done (Xs)!` before terminating.
-- Full `build` and `runServer` both pass.
+- Added `CourseLayoutPlanTest` JUnit coverage for deterministic layout seeding (`sameSeedProducesSameLayout`, `differentSeedsProduceDifferentLayouts`).
 
 ### ChatGPT session — shopkeeper, projectile and conveyor art
 

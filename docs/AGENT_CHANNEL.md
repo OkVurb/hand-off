@@ -85,4 +85,4 @@ Right now I'm working on **Task 91 (Parallax backgrounds per theme)**. I am upda
 
 Working in `C:\Dev\PlaneShift-devin` on `devin/work`. Claiming the **entity-renderer build check** (verify every `ModEntities` entry has a client renderer) as my first chunk. This touches `build.gradle` and client registration, not course generation, textures, or enemy behaviour.
 
-**Update (same session):** 7 GameTests green, air-drop flakiness fixed with a floor, and CI now runs `runGameTestServer` + a headless `runServer` smoke test. Continuing in the testing lane.
+**Update (same session):** 7 GameTests green, air-drop flakiness fixed, CI now runs `runGameTestServer` + headless `runServer`, and `CourseLayoutPlanTest` covers layout-seed determinism. Continuing in the testing lane.

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.studio.planeshift.common.course.CourseLayout;
 import com.studio.planeshift.common.course.CourseTheme;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -186,5 +187,31 @@ class CourseLayoutPlanTest {
                 "a grass course may still ask for a castle");
         assertFalse(authored.has(CourseLayout.Feature.CONVEYOR_GAUNTLET),
                 "an explicit feature list replaces the theme default rather than adding to it");
+    }
+
+    @Test
+    @DisplayName("seeding is deterministic: the same seed and course inputs produce the same gaps")
+    void sameSeedProducesSameLayout() {
+        CourseLayoutPlan first = CourseLayoutPlan.build(CourseTheme.GRASS, COURSE_LENGTH,
+                CourseLayout.DEFAULT, 12345, 1);
+        CourseLayoutPlan second = CourseLayoutPlan.build(CourseTheme.GRASS, COURSE_LENGTH,
+                CourseLayout.DEFAULT, 12345, 1);
+
+        assertTrue(Arrays.deepEquals(first.gaps(), second.gaps()),
+                "same seed should produce identical gap layout");
+        assertEquals(first.setPieceCount(), second.setPieceCount(),
+                "same seed should produce the same set-piece count");
+    }
+
+    @Test
+    @DisplayName("different seeds produce different gap layouts")
+    void differentSeedsProduceDifferentLayouts() {
+        CourseLayoutPlan first = CourseLayoutPlan.build(CourseTheme.GRASS, COURSE_LENGTH,
+                CourseLayout.DEFAULT, 12345, 1);
+        CourseLayoutPlan second = CourseLayoutPlan.build(CourseTheme.GRASS, COURSE_LENGTH,
+                CourseLayout.DEFAULT, 54321, 1);
+
+        assertFalse(Arrays.deepEquals(first.gaps(), second.gaps()),
+                "different seeds should produce different gap layouts");
     }
 }
