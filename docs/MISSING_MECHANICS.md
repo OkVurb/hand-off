@@ -202,7 +202,8 @@ Star, Poison, 1-Up/3-Up/5-Up, Extra Pip.
 99. **Item textures.** [fix] All 37 item textures are still generated placeholders under 400 bytes.
     This is the most visible unfinished thing in the mod.
 100. **GameTests for the new systems** — coin bricks, air-drop immunity, the perch clamp, layout
-     seeding. Air-drop and coin bricks are now covered (`testAirDrop`, `testCoinBrick`).
+     seeding. Air-drop, coin bricks and Hammer Bro perch are now covered (`testAirDrop`,
+     `testCoinBrick`, `testHammerBroPerch`).
 
 ---
 

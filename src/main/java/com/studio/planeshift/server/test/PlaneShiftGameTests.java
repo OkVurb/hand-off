@@ -8,9 +8,12 @@ import com.studio.planeshift.common.block.PSwitchBlock;
 import com.studio.planeshift.common.block.OnOffBlock;
 import com.studio.planeshift.common.block.OnOffSwitchBlock;
 import com.studio.planeshift.common.entity.CourseEnemyEntity;
+import com.studio.planeshift.common.entity.HammerBroEntity;
+import com.studio.planeshift.common.entity.HammerBroGoal;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModEntities;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -35,6 +38,7 @@ public class PlaneShiftGameTests {
     public static final Identifier ON_OFF_SWITCH_TEST = PlaneShift.id("on_off_switch_test");
     public static final Identifier AIR_DROP_TEST = PlaneShift.id("air_drop_test");
     public static final Identifier COIN_BRICK_TEST = PlaneShift.id("coin_brick_test");
+    public static final Identifier HAMMER_BRO_PERCH_TEST = PlaneShift.id("hammer_bro_perch_test");
 
     public static void registerFunctions(RegisterEvent event) {
         event.register(Registries.TEST_FUNCTION, helper -> {
@@ -43,6 +47,7 @@ public class PlaneShiftGameTests {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), PlaneShiftGameTests::testOnOffSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), PlaneShiftGameTests::testAirDrop);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), PlaneShiftGameTests::testCoinBrick);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), PlaneShiftGameTests::testHammerBroPerch);
         });
     }
 
@@ -55,6 +60,7 @@ public class PlaneShiftGameTests {
         event.registerTest(ON_OFF_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), data));
         event.registerTest(AIR_DROP_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), data));
         event.registerTest(COIN_BRICK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), data));
+        event.registerTest(HAMMER_BRO_PERCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), data));
     }
 
     private static void testQuestionBlock(GameTestHelper helper) {
@@ -174,5 +180,32 @@ public class PlaneShiftGameTests {
 
         BlockState state = helper.getBlockState(pos);
         ((HitFromBelowBlock) state.getBlock()).attemptHitFromBelow(state, helper.getLevel(), abs, player);
+    }
+
+    private static void testHammerBroPerch(GameTestHelper helper) {
+        BlockPos spawnPos = new BlockPos(1, 2, 1);
+        BlockPos floorPos = new BlockPos(1, 1, 1);
+        helper.setBlock(floorPos, Blocks.STONE);
+
+        HammerBroEntity bro = helper.spawn(ModEntities.HAMMER_BRO.get(), spawnPos);
+        HammerBroGoal goal = new HammerBroGoal(bro);
+
+        // First tick captures the spawn position as the perch anchor.
+        goal.tick();
+
+        // Move the Bro beyond its 2.5-block perch and tick again; holdPerch should clamp.
+        // The entity's spawn anchor is at the block center (absolute pos + 0.5).
+        BlockPos abs = helper.absolutePos(spawnPos);
+        double anchorX = abs.getX() + 0.5D;
+        double anchorZ = abs.getZ() + 0.5D;
+        bro.setPos(anchorX + 5.0D, spawnPos.getY(), anchorZ + 5.0D);
+        goal.tick();
+
+        helper.succeedIf(() -> {
+            double expectedX = anchorX + 2.5D;
+            double expectedZ = anchorZ + 2.5D;
+            helper.assertTrue(Math.abs(bro.getX() - expectedX) < 0.01D, "Hammer Bro X not clamped to perch");
+            helper.assertTrue(Math.abs(bro.getZ() - expectedZ) < 0.01D, "Hammer Bro Z not clamped to perch");
+        });
     }
 }
