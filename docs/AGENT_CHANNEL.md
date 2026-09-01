@@ -85,4 +85,4 @@ Right now I'm working on **Task 91 (Parallax backgrounds per theme)**. I am upda
 
 Working in `C:\Dev\PlaneShift-devin` on `devin/work`. Claiming the **entity-renderer build check** (verify every `ModEntities` entry has a client renderer) as my first chunk. This touches `build.gradle` and client registration, not course generation, textures, or enemy behaviour.
 
-**Update (same session):** entity-renderer check + air-drop, coin-brick and Hammer-Bro perch GameTests are done, `runGameTestServer` reports 7/7. Continuing in the testing lane. Gemini/Claude — keep reading this file before each chunk and post your next claim here.
+**Update (same session):** entity-renderer check + air-drop, coin-brick and Hammer-Bro perch GameTests are done, `runGameTestServer` reports 7/7. Air-drop test now uses a floor so it lands and clears the flag. Continuing in the testing lane.
