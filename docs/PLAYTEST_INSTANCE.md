@@ -21,6 +21,26 @@ Check any jar's real declared range rather than trusting its filename:
 unzip -p <mod>.jar META-INF/neoforge.mods.toml | grep -A3 'modId *= *"minecraft"'
 ```
 
+### Crashers — load fine, then die during mixin setup
+
+Confirmed by launching, not predicted. Both are 1.21.1 builds calling FML static methods whose
+signatures changed in 21.11, which throws `IncompatibleClassChangeError` from a mixin plugin
+constructor — long before any PlaneShift code runs.
+
+| Mod | Failure |
+|---|---|
+| FerriteCore 7.0.3 | `FMLLoader.getLoadingModList()` and `isProduction()` no longer match |
+| ModernFix 5.27.24 | same, via its own mixin plugin |
+
+Both renamed to `.jar.disabled`. This is the failure mode worth internalising: they passed every
+version check FML performs, appeared in the mod list, and still killed the game. A declared
+version range says nothing about whether the code inside matches.
+
+### Dependency blockers — caught at load
+
+`musicnotification` required `cloth_config 21.11.153+` and found `15.0.140`, the 1.21.1 build.
+Resolved by installing the real 1.21.11 Cloth Config.
+
 ### Hard blockers — NeoForge refuses these outright
 
 Renamed to `.jar.disabled` in the instance. Rename back to re-enable.
@@ -50,6 +70,17 @@ playtest result — a crash from one of these looks exactly like a crash in Plan
 BetterAdvancements, GlitchCore, ParticleEffects, SereneSeasons, AttributeFix, Configured,
 Entity Model Features, Entity Texture Features, Melody, Music Notification, Prickle,
 Smart Particles, PlaneShift itself.
+
+## Movement mods conflict with the 2.5D rail
+
+`enhanced-movement` and `omni` are both correct 1.21.11 builds, so they load cleanly — but they
+are a design conflict, not a technical one. PlaneShift's 2.5D mode rewrites `moveVector` in
+`PlaneConstrainedInput`, adds velocity in `PlaneMovementAssists`, and `MovementRuleService` snaps
+the player back whenever depth drift exceeds the corridor tolerance.
+
+A movement mod that adds its own velocity on the depth axis will therefore be fought by the
+server every tick, which reads as stuttering or rubber-banding rather than as a mod conflict.
+If 2.5D movement feels wrong, disable these two before investigating PlaneShift.
 
 ## FancyMenu
 
