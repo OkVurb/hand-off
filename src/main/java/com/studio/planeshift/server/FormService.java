@@ -93,6 +93,12 @@ public final class FormService {
                 next = slot.withActive(formId, form.maxCharges());
             } else if (slot.active().get().equals(formId)) {
                 next = slot.withActive(formId, form.maxCharges());
+                if (form.reserveEligible()) {
+                    if (slot.reserve().isPresent() && !slot.reserve().get().equals(formId)) {
+                        refundedCoins += RESERVE_REFUND_COINS;
+                    }
+                    next = next.withReserve(Optional.of(formId));
+                }
             } else {
                 Identifier displaced = slot.active().get();
                 boolean displacedEligible = lookup(player, displaced)

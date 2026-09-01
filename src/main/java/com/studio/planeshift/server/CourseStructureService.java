@@ -526,6 +526,11 @@ public final class CourseStructureService {
             for (int dx = 0; dx < 3; dx++) {
                 spawnCoin(level, start.getX() + offset + dx, start.getY() + height + 1.5, start.getZ());
             }
+            
+            // Spawn 3 Star Coins at specific platforms
+            if (i == 0 || i == count / 2 || i == count - 1) {
+                spawnStarCoin(level, start.getX() + offset + 1, start.getY() + height + 3.0, start.getZ());
+            }
         }
     }
 
@@ -535,6 +540,14 @@ public final class CourseStructureService {
         coin.setDeltaMovement(0.0, 0.0, 0.0);
         coin.addTag(GENERATED_TAG);
         level.addFreshEntity(coin);
+    }
+
+    private static void spawnStarCoin(ServerLevel level, double x, double y, double z) {
+        ItemEntity starCoin = new ItemEntity(level, x + 0.5, y, z + 0.5, new ItemStack(ModItems.STAR_COIN.get()));
+        starCoin.setPickUpDelay(0);
+        starCoin.setDeltaMovement(0.0, 0.0, 0.0);
+        starCoin.addTag(GENERATED_TAG);
+        level.addFreshEntity(starCoin);
     }
 
     private static void spawnCast(ServerLevel level, BlockPos start, CourseLayoutPlan plan,

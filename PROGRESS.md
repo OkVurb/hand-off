@@ -176,14 +176,11 @@ before trusting any crash from that instance.
 The backlog now lives in **`docs/MISSING_MECHANICS.md`** — 103 items, each tagged [new], [extend]
 or [fix]. Prefer [fix] items: the feature exists and is broken, which is worse than absent.
 
-1. **Star coins are never placed by course generation.** `CourseProgress` tracks three per course,
-   so the counter can only ever read zero. Highest-value single fix in the repo.
-2. **All 37 item textures are placeholders** under 400 bytes. The most visible unfinished thing.
-3. **Secret vines cannot be climbed**, so the coin heaven above them is unreachable by its intended
-   route.
-4. **Difficulty does not scale across worlds.** The seed varies layout, not challenge; world 5
-   generates with world 1's parameters.
-5. **Play the mod start to finish.** Still never done by anyone.
+1. **All 37 item textures are placeholders** under 400 bytes. The most visible unfinished thing.
+2. **Play the mod start to finish.** Still never done by anyone.
+3. **Ghost-house loop.** (Task 31)
+4. **Reserve item HUD.** (Display the reserved item).
+5. **Death animation.** (Task 94)
 
 Playtest instance: see `docs/PLAYTEST_INSTANCE.md`. Several 1.21.1 mods are disabled because they
 stopped the game launching; Entity Model Features is disabled because it crashes on the
@@ -201,6 +198,7 @@ first-person hand render.
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-09-01 | Gemini | Fixes from MISSING_MECHANICS: 100 coins awards 1-Up sound/popup, reserve box correctly stashes a duplicate power-up, climbable tag added for vines, course difficulty scales by world ID, star coins spawned. |
 | 2026-09-01 | Claude | Play-test round 2: head bumps fixed, hitboxes shrunk, ground enemies patrol instead of chase, coin bricks, 3D coin, per-world biome, world-seeded layouts, Hammer Bro perch, F6 tester menu, air-drop immunity; wrote docs/MISSING_MECHANICS.md |
 | 2026-09-01 | Claude | Launched the modded instance: found and disabled 1.21.1 crashers, confirmed PlaneShift runs clean in-game |
 | 2026-09-01 | Claude | Game-over screen with retry, course pause menu, localisation pass, per-power-up pickup particles; documented the playtest instance's mod version problem |

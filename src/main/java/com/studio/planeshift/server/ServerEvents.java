@@ -324,18 +324,27 @@ public final class ServerEvents {
         Level level = player.level();
         if (item instanceof CoinItem) {
             entity.discard();
+            boolean[] gainedLife = new boolean[1];
             CourseStateAccess.update(player, s -> {
                 int coins = s.coins() + 1;
                 int lives = s.lives();
                 while (coins >= 100) {
                     lives++;
                     coins -= 100;
+                    gainedLife[0] = true;
                 }
                 return s.withCoins(coins).withLives(lives);
             });
             CourseScoringService.awardCoin(player);
-            level.playSound(null, player.blockPosition(),
-                    ModSounds.COIN_PICKUP.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
+            if (gainedLife[0]) {
+                level.playSound(null, player.blockPosition(), ModSounds.ONE_UP.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,
+                        new com.studio.planeshift.common.network.ScorePopupPayload(
+                                player.getX(), player.getY() + 1.6D, player.getZ(), 0));
+            } else {
+                level.playSound(null, player.blockPosition(),
+                        ModSounds.COIN_PICKUP.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
+            }
         } else if (item instanceof PoisonMushroomItem) {
             entity.discard();
             // Routed through DamageService so the Form buffer, invulnerability window and

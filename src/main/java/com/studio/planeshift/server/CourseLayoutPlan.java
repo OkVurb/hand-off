@@ -30,14 +30,26 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
     /** Roughly one set piece per this many blocks when the course does not say otherwise. */
     private static final int BLOCKS_PER_SET_PIECE = 24;
 
+    private static int worldOf(String courseId) {
+        if (courseId == null || !courseId.startsWith("w")) return 1;
+        try {
+            int underscore = courseId.indexOf('_');
+            if (underscore > 1) {
+                int courseNum = Integer.parseInt(courseId.substring(1, underscore));
+                return Math.clamp((courseNum - 1) / 10 + 1, 1, 5);
+            }
+        } catch (NumberFormatException ignored) {}
+        return 1;
+    }
+
     static CourseLayoutPlan forCourse(CourseDefinition course, String courseId, long worldSeed) {
         return build(course.theme(), course.length(), course.layout().orElse(CourseLayout.DEFAULT),
-                seedOf(courseId, worldSeed));
+                seedOf(courseId, worldSeed), worldOf(courseId));
     }
 
     /** Convenience for the theme defaults; the generator always goes through {@link #forCourse}. */
     static CourseLayoutPlan forTheme(CourseTheme theme, int length) {
-        return build(theme, length, CourseLayout.DEFAULT, 0);
+        return build(theme, length, CourseLayout.DEFAULT, 0, 1);
     }
 
     /**
@@ -74,15 +86,23 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
     }
 
     static CourseLayoutPlan build(CourseTheme theme, int length, CourseLayout layout) {
-        return build(theme, length, layout, 0);
+        return build(theme, length, layout, 0, 1);
     }
 
-    static CourseLayoutPlan build(CourseTheme theme, int length, CourseLayout layout, int seed) {
+    static CourseLayoutPlan build(CourseTheme theme, int length, CourseLayout layout, int seed, int worldNum) {
+        final int blocksPerGap = Math.max(12, BLOCKS_PER_GAP - (worldNum - 1) * 2);
+        final int blocksPerSetPiece = Math.max(12, BLOCKS_PER_SET_PIECE - (worldNum - 1) * 3);
+        int gapWidth = layout.maxGapWidth();
+        if (layout.gapCount().isEmpty() && worldNum > 1) {
+            gapWidth = Math.min(8, gapWidth + worldNum - 1);
+        }
+        final int finalGapWidth = gapWidth;
+
         int[][] gaps = layout.gaps()
-                .map(list -> explicitGaps(list, length, layout))
-                .orElseGet(() -> derivedGaps(theme, length, layout, seed));
+                .map(list -> explicitGaps(list, length, layout, finalGapWidth))
+                .orElseGet(() -> derivedGaps(theme, length, layout, seed, finalGapWidth, blocksPerGap));
         int setPieces = layout.setPieceCount()
-                .orElseGet(() -> Math.clamp(length / BLOCKS_PER_SET_PIECE, 3, 12));
+                .orElseGet(() -> Math.clamp(length / blocksPerSetPiece, 3, 16));
         return new CourseLayoutPlan(length, gaps, layout.resolvedFeatures(theme), setPieces, seed);
     }
 
@@ -92,7 +112,7 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
      * course that cannot be finished is not a course.
      */
     private static int[][] explicitGaps(List<CourseLayout.Gap> declared, int length,
-                                        CourseLayout layout) {
+                                        CourseLayout layout, int maxGapWidth) {
         List<int[]> accepted = new ArrayList<>();
         int spanStart = layout.safeStart() + 1;
         int spanEnd = length - layout.safeFinish() - 1;
@@ -100,7 +120,7 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
         for (CourseLayout.Gap gap : declared) {
             int from = Math.min(gap.from(), gap.to());
             int to = Math.max(gap.from(), gap.to());
-            if (to - from + 1 > layout.maxGapWidth() || from < spanStart || to > spanEnd) {
+            if (to - from + 1 > maxGapWidth || from < spanStart || to > spanEnd) {
                 continue;
             }
             if (from <= mid + CHECKPOINT_CLEARANCE && to >= mid - CHECKPOINT_CLEARANCE) {
@@ -125,7 +145,7 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
      * at the same length do not produce an identical silhouette, but it no longer moves the pits
      * bodily — that displacement was what let them collide.
      */
-    private static int[][] derivedGaps(CourseTheme theme, int length, CourseLayout layout, int seed) {
+    private static int[][] derivedGaps(CourseTheme theme, int length, CourseLayout layout, int seed, int maxGapWidth, int blocksPerGap) {
         int spanStart = layout.safeStart() + 1;
         int spanEnd = length - layout.safeFinish() - 1;
         int span = spanEnd - spanStart + 1;
@@ -133,18 +153,18 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
             return new int[0][];
         }
 
-        int count = layout.gapCount().orElseGet(() -> Math.clamp(span / BLOCKS_PER_GAP, 2, 10));
+        int count = layout.gapCount().orElseGet(() -> Math.clamp(span / blocksPerGap, 2, 10));
         if (count <= 0) {
             return new int[0][];
         }
         int slot = span / count;
-        if (slot <= layout.maxGapWidth() + MIN_GROUND_RUN) {
+        if (slot <= maxGapWidth + MIN_GROUND_RUN) {
             // Too many pits to fit while keeping ground between them; drop back to what fits.
-            count = Math.max(1, span / (layout.maxGapWidth() + MIN_GROUND_RUN + 1));
+            count = Math.max(1, span / (maxGapWidth + MIN_GROUND_RUN + 1));
             slot = span / count;
         }
 
-        int widthSpread = Math.max(1, layout.maxGapWidth() - 3);
+        int widthSpread = Math.max(1, maxGapWidth - 3);
         // Theme still perturbs the widths; the seed makes two courses of the same theme and
         // length differ, which is the whole point of it existing.
         int shift = theme.ordinal() + seed;
@@ -153,7 +173,7 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
         List<int[]> accepted = new ArrayList<>();
         int previousEnd = spanStart - MIN_GROUND_RUN - 1;
         for (int i = 0; i < count; i++) {
-            int width = Math.min(layout.maxGapWidth(), 4 + ((i + shift) % widthSpread));
+            int width = Math.min(maxGapWidth, 4 + ((i + shift) % widthSpread));
             // Nudge each pit within its own slot rather than moving it into a neighbour's, so the
             // spacing guarantees below still hold no matter what the seed is.
             int jitter = slot <= width + MIN_GROUND_RUN * 2
