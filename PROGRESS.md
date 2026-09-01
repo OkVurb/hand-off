@@ -171,6 +171,13 @@ being compiled against 1.21.1, and the deep-mixin ones among them (Embeddium, Mo
 Config, FancyMenu) can crash in ways that look exactly like a PlaneShift bug. Check that file
 before trusting any crash from that instance.
 
+## Claimed right now (2026-09-01, Claude session in progress)
+
+**Course generation is being actively worked on — do not take these.** Items 67 (star coin
+placement), 68 (difficulty scaling across worlds) and ground elevation in
+`CourseStructureService` / `CourseLayoutPlan`. Everything else in
+`docs/MISSING_MECHANICS.md` is free.
+
 ## What To Do Next (priority order)
 
 The backlog now lives in **`docs/MISSING_MECHANICS.md`** — 103 items, each tagged [new], [extend]
