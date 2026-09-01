@@ -481,21 +481,10 @@ public final class ServerEvents {
                     ModSounds.POWER_UP.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
         }
 
-        if (entity.isRemoved()) {
-            spawnPickupParticles(player, level, item instanceof CoinItem || item instanceof StarCoinItem
-                    ? ModParticles.COIN_SPARKLE.get() : ModParticles.PICKUP_GLOW.get());
-        }
-    }
-
-    private static void spawnPickupParticles(ServerPlayer player, Level level, net.minecraft.core.particles.SimpleParticleType type) {
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            for (int i = 0; i < 6; i++) {
-                double ox = player.getRandom().nextGaussian() * 0.2D;
-                double oy = player.getRandom().nextGaussian() * 0.2D;
-                double oz = player.getRandom().nextGaussian() * 0.2D;
-                serverLevel.sendParticles(type, player.getX(), player.getY(0.5D), player.getZ(),
-                        1, ox, oy, oz, 0.05D);
-            }
+        if (entity.isRemoved() && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            // Per-power-up bursts rather than one generic glow: see PickupParticles for why the
+            // shape of the burst is the only confirmation the player reliably gets.
+            PickupParticles.spawn(player, serverLevel, item);
         }
     }
 }
