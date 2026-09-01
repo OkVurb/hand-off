@@ -4,5 +4,17 @@
   "start_mode": "side_on",
   "theme": "grass",
   "kill_y": 40.0,
-  "length": 144
+  "length": 144,
+  "layout": {
+    "gap_count": 3,
+    "max_gap_width": 4,
+    "features": [
+      "donut_bridge",
+      "note_block_run",
+      "secret_vine",
+      "coin_heaven",
+      "staircase",
+      "moving_platforms"
+    ]
+  }
 }

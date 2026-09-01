@@ -2,6 +2,7 @@ package com.studio.planeshift.server;
 
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.course.CourseDefinition;
+import com.studio.planeshift.common.course.CourseLayout;
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.entity.FirebarEntity;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
@@ -76,7 +77,7 @@ public final class CourseStructureService {
 
     private static void placeGenerated(ServerLevel level, CourseDefinition course) {
         BlockPos start = course.startPos();
-        CourseLayoutPlan plan = CourseLayoutPlan.forTheme(course.theme(), course.length());
+        CourseLayoutPlan plan = CourseLayoutPlan.forCourse(course);
         int floorY = start.getY() - 1;
 
         clearCorridor(level, start, plan.length());
@@ -95,27 +96,47 @@ public final class CourseStructureService {
         buildRewardRun(level, start);
         buildPlatformSet(level, start, plan, palette);
         buildMechanicSet(level, start, plan);
-        buildDonutBridge(level, start, plan);
-        buildNoteBlockRun(level, start, plan);
-        buildSecretVine(level, start, plan);
-        buildCoinHeaven(level, start, plan, palette);
-        buildVerticalClimb(level, start, plan);
-        buildConveyorGauntlet(level, start, plan);
-        buildStaircaseObstacle(level, start, plan, palette);
         buildFinish(level, start, plan, palette);
         spawnRewards(level, start, plan);
         spawnCast(level, start, plan, course.theme());
-        spawnMovingPlatforms(level, start, plan);
-        if (course.theme() == CourseTheme.LAVA) {
-            // Only the lava theme gets a castle finale; a castle in a meadow reads as a mistake.
+
+        // Set pieces are opt-in per course now rather than switched on the theme, so two courses
+        // sharing a theme can differ in what they actually ask the player to do.
+        if (plan.has(CourseLayout.Feature.DONUT_BRIDGE) || plan.has(CourseLayout.Feature.DONUT_GAUNTLET)) {
+            buildDonutBridge(level, start, plan);
+        }
+        if (plan.has(CourseLayout.Feature.NOTE_BLOCK_RUN)) {
+            buildNoteBlockRun(level, start, plan);
+        }
+        if (plan.has(CourseLayout.Feature.SECRET_VINE)) {
+            buildSecretVine(level, start, plan);
+        }
+        if (plan.has(CourseLayout.Feature.COIN_HEAVEN)) {
+            buildCoinHeaven(level, start, plan, palette);
+        }
+        if (plan.has(CourseLayout.Feature.VERTICAL_CLIMB)) {
+            buildVerticalClimb(level, start, plan);
+        }
+        if (plan.has(CourseLayout.Feature.CONVEYOR_GAUNTLET)) {
+            buildConveyorGauntlet(level, start, plan);
+        }
+        if (plan.has(CourseLayout.Feature.STAIRCASE)) {
+            buildStaircaseObstacle(level, start, plan, palette);
+        }
+        if (plan.has(CourseLayout.Feature.MOVING_PLATFORMS)) {
+            spawnMovingPlatforms(level, start, plan);
+        }
+        if (plan.has(CourseLayout.Feature.CASTLE_FINALE)) {
             buildCastleFinale(level, start, plan, palette);
         }
-        if (course.theme() == CourseTheme.GHOST_HOUSE) {
+        if (plan.has(CourseLayout.Feature.GHOST_LOOP)) {
             buildGhostHouseLoop(level, start, plan);
         }
 
-        PlaneShift.LOGGER.info("Generated {} course at {} ({} blocks long, floor y={}, kill y={})",
-                course.theme().getSerializedName(), start, plan.length(), floorY, course.killY());
+        PlaneShift.LOGGER.info(
+                "Generated {} course at {} ({} blocks long, {} pits, {} set pieces, floor y={}, kill y={})",
+                course.theme().getSerializedName(), start, plan.length(), plan.gaps().length,
+                plan.setPieceCount(), floorY, course.killY());
     }
 
     private static void clearCorridor(ServerLevel level, BlockPos start, int length) {
@@ -186,32 +207,45 @@ public final class CourseStructureService {
         set(level, start.offset(31, 3, 0), ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
     }
 
+    /**
+     * Ledges spread along the course, one per set piece.
+     *
+     * <p>The count comes from {@code setPieceCount}, which is derived from the course length, so a
+     * 224-block course is genuinely denser rather than the same six platforms stretched out. The
+     * heights cycle rather than being random: the player should be able to read a rhythm.
+     */
     private static void buildPlatformSet(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
                                          Palette palette) {
-        int mid = plan.midpoint();
-        // Early platforms
-        platform(level, start, 20, 3, 5, palette.platform());
-        platform(level, start, 32, 5, 4, palette.platform());
-        
-        // Mid platforms
-        platform(level, start, mid - 12, 4, 6, palette.platform());
-        platform(level, start, mid + 10, 4, 5, palette.platform());
-        
-        // Late platforms
-        platform(level, start, plan.length() - 40, 5, 8, palette.platform());
-        platform(level, start, plan.length() - 25, 3, 6, palette.platform());
-        
-        // Add powerups / blocks above these platforms
-        for (int x : new int[]{22, 34, mid - 10, mid + 12, plan.length() - 38}) {
-            // Find platform height
-            int y = (x == 32 || x == 34) ? 5 : (x == plan.length() - 38 ? 5 : ((x == mid - 10 || x == mid + 12) ? 4 : 3));
-            BlockState qb = ModBlocks.QUESTION_BLOCK.get().defaultBlockState();
-            set(level, start.offset(x, y + 4, 0), qb);
-            set(level, start.offset(x + 1, y + 4, 0), ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+        int count = plan.setPieceCount();
+        int usable = plan.length() - 30;
+        int stride = Math.max(8, usable / count);
+
+        for (int i = 0; i < count; i++) {
+            int offset = 18 + stride * i;
+            if (offset + 8 >= plan.length() - 8) {
+                break;
+            }
+            int height = 3 + (i % 3);
+            int width = 4 + (i % 3);
+            platform(level, start, offset, height, width, palette.platform());
+
+            // Every other ledge carries a prize row, so the platforms are worth climbing rather
+            // than only worth clearing.
+            if (i % 2 == 0) {
+                set(level, start.offset(offset + 1, height + 4, 0),
+                        ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+                set(level, start.offset(offset + 2, height + 4, 0),
+                        ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            }
         }
-        
-        // A tricky hidden block over a gap
-        set(level, start.offset(47, 4, 0), ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
+
+        // One hidden block deliberately placed over a pit: reachable only by jumping out over
+        // nothing, which is the whole joke.
+        int[] pit = plan.gapAfter(plan.length() / 3);
+        if (pit != null) {
+            set(level, start.offset(pit[0] + 1, 4, 0),
+                    ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
+        }
     }
 
     private static void buildMechanicSet(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
@@ -291,24 +325,28 @@ public final class CourseStructureService {
     }
 
     private static void buildDonutBridge(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
-        int[][] gaps = plan.gaps();
-        if (gaps.length > 1) {
-            int[] gap = gaps[1];
-            for (int x = gap[0]; x <= gap[1]; x++) {
-                set(level, start.offset(x, 1, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+        BlockState donut = ModBlocks.DONUT_BLOCK.get().defaultBlockState();
+
+        // The teaching version: a flat run across an early pit, so the block's behaviour is
+        // learned somewhere a mistake costs one jump.
+        if (plan.has(CourseLayout.Feature.DONUT_BRIDGE)) {
+            int[] gap = plan.gapAfter(plan.midpoint() / 2);
+            if (gap != null && gap[0] < plan.midpoint()) {
+                for (int x = gap[0]; x <= gap[1]; x++) {
+                    set(level, start.offset(x, 1, 0), donut);
+                }
             }
         }
-        
-        int mid = plan.midpoint();
-        for (int i = 0; i < gaps.length; i++) {
-            if (gaps[i][0] > mid) {
-                int[] gap = gaps[i];
+
+        // The exam: staggered heights over a later pit, gated behind the checkpoint so a failure
+        // costs the run from the beacon rather than the whole course.
+        if (plan.has(CourseLayout.Feature.DONUT_GAUNTLET)) {
+            int[] gap = plan.gapAfter(plan.midpoint() + 1);
+            if (gap != null) {
                 for (int x = gap[0]; x <= gap[1]; x++) {
-                    int y = (x % 2 == 0) ? 2 : 1;
-                    if (x % 3 == 0) y = 3;
-                    set(level, start.offset(x, y, 0), ModBlocks.DONUT_BLOCK.get().defaultBlockState());
+                    int y = x % 3 == 0 ? 3 : (x % 2 == 0 ? 2 : 1);
+                    set(level, start.offset(x, y, 0), donut);
                 }
-                break;
             }
         }
     }
@@ -425,12 +463,15 @@ public final class CourseStructureService {
      */
     private static void spawnMovingPlatforms(ServerLevel level, BlockPos start,
                                              CourseLayoutPlan plan) {
-        int[][] gaps = plan.gaps();
-        if (gaps.length >= 5) {
-            spawnPlatform(level, start, gaps[4][0], 3, MovingPlatformEntity.AXIS_X, 5.0F);
+        // Indexed off the checkpoint rather than off fixed gap numbers: the pit count now varies
+        // with course length, so gaps[4] is not guaranteed to exist.
+        int[] late = plan.gapAfter(plan.length() - plan.length() / 3);
+        if (late != null) {
+            spawnPlatform(level, start, late[0], 3, MovingPlatformEntity.AXIS_X, 5.0F);
         }
-        if (gaps.length >= 3) {
-            spawnPlatform(level, start, gaps[2][0] + 2, 3, MovingPlatformEntity.AXIS_Y, 4.0F);
+        int[] middle = plan.gapAfter(plan.midpoint() - plan.length() / 6);
+        if (middle != null && middle != late) {
+            spawnPlatform(level, start, middle[0] + 2, 3, MovingPlatformEntity.AXIS_Y, 4.0F);
         }
     }
 
@@ -459,23 +500,34 @@ public final class CourseStructureService {
     }
 
     private static void spawnRewards(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
-        // Generate coin arches
+        // Coin arches along the ground, skipped over pits so the coins are not floating in a hole
+        // the player is trying to jump.
         for (int archStart = 10; archStart < plan.length() - 15; archStart += 25) {
             for (int dx = 0; dx < 5; dx++) {
+                if (!plan.hasGroundAt(archStart + dx)) {
+                    continue;
+                }
                 double archY = Math.sin(dx * Math.PI / 4.0) * 3.0 + 1.5;
                 spawnCoin(level, start.getX() + archStart + dx, start.getY() + archY, start.getZ());
             }
         }
-        
-        // Generate straight coin lines on some platforms
-        for (int pStart : new int[]{32, plan.midpoint() - 12, plan.length() - 40}) {
-            int pHeight = (pStart == 32) ? 5 : (pStart == plan.midpoint() - 12 ? 4 : 5);
+
+        // A coin line over each platform. Uses the same stride as buildPlatformSet so the coins
+        // land on the ledges rather than beside them.
+        int count = plan.setPieceCount();
+        int stride = Math.max(8, (plan.length() - 30) / count);
+        for (int i = 0; i < count; i++) {
+            int offset = 18 + stride * i;
+            if (offset + 8 >= plan.length() - 8) {
+                break;
+            }
+            int height = 3 + (i % 3);
             for (int dx = 0; dx < 3; dx++) {
-                spawnCoin(level, start.getX() + pStart + dx + 1, start.getY() + pHeight + 1.5, start.getZ());
+                spawnCoin(level, start.getX() + offset + dx, start.getY() + height + 1.5, start.getZ());
             }
         }
     }
-    
+
     private static void spawnCoin(ServerLevel level, double x, double y, double z) {
         ItemEntity coin = new ItemEntity(level, x + 0.5, y, z + 0.5, new ItemStack(ModItems.COIN.get()));
         coin.setPickUpDelay(0);
@@ -487,9 +539,22 @@ public final class CourseStructureService {
     private static void spawnCast(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
                                   CourseTheme theme) {
         List<EntityType<? extends Mob>> cast = castFor(theme);
-        int[] offsets = {15, 28, 42, plan.midpoint() + 5, plan.midpoint() + 28, plan.length() - 35};
-        for (int i = 0; i < offsets.length; i++) {
-            spawnMob(level, cast.get(i % cast.size()), start, offsets[i], 1);
+        // Enemy count tracks the set-piece count for the same reason the platforms do: a longer
+        // course should be a longer fight, not a longer walk.
+        int count = plan.setPieceCount();
+        int usable = plan.length() - 40;
+        int stride = Math.max(10, usable / count);
+
+        for (int i = 0; i < count; i++) {
+            int offset = 15 + stride * i;
+            if (offset >= plan.length() - 20) {
+                break;
+            }
+            if (!plan.hasGroundAt(offset)) {
+                // Spawning into a pit hands the player a free kill and costs the course an enemy.
+                continue;
+            }
+            spawnMob(level, cast.get(i % cast.size()), start, offset, 1);
         }
         spawnMob(level, ModEntities.TOAD.get(), start, plan.length() - 13, 1);
     }

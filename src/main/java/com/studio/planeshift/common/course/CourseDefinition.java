@@ -23,7 +23,8 @@ public record CourseDefinition(
         Optional<Identifier> structure,
         int length,
         int timeLimitSeconds,
-        boolean autoScroll
+        boolean autoScroll,
+        Optional<CourseLayout> layout
 ) {
     public static final int DEFAULT_LENGTH = 144;
 
@@ -33,7 +34,7 @@ public record CourseDefinition(
     public CourseDefinition(Identifier dimension, BlockPos startPos, PlaneMode startMode,
                             CourseTheme theme, double killY) {
         this(dimension, startPos, startMode, theme, killY, Optional.empty(), DEFAULT_LENGTH,
-                DEFAULT_TIME_LIMIT_SECONDS, false);
+                DEFAULT_TIME_LIMIT_SECONDS, false, Optional.empty());
     }
 
     public static final Codec<CourseDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -46,7 +47,8 @@ public record CourseDefinition(
             Codec.intRange(64, 224).optionalFieldOf("length", DEFAULT_LENGTH).forGetter(CourseDefinition::length),
             Codec.intRange(0, 9999).optionalFieldOf("time_limit_seconds", DEFAULT_TIME_LIMIT_SECONDS)
                     .forGetter(CourseDefinition::timeLimitSeconds),
-            Codec.BOOL.optionalFieldOf("auto_scroll", false).forGetter(CourseDefinition::autoScroll)
+            Codec.BOOL.optionalFieldOf("auto_scroll", false).forGetter(CourseDefinition::autoScroll),
+            CourseLayout.CODEC.optionalFieldOf("layout").forGetter(CourseDefinition::layout)
     ).apply(instance, CourseDefinition::new));
 
     /** Starting clock in ticks, or { CourseState#NO_TIME_LIMIT} when untimed. */

@@ -4,5 +4,20 @@
   "start_mode": "side_on",
   "theme": "underground",
   "kill_y": 40.0,
-  "length": 176
+  "length": 176,
+  "layout": {
+    "gap_count": 8,
+    "max_gap_width": 7,
+    "set_piece_count": 10,
+    "features": [
+      "donut_bridge",
+      "donut_gauntlet",
+      "note_block_run",
+      "vertical_climb",
+      "conveyor_gauntlet",
+      "staircase",
+      "moving_platforms",
+      "castle_finale"
+    ]
+  }
 }
