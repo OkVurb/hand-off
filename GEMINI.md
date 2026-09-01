@@ -114,3 +114,10 @@ run `.\gradlew build` plus `runServer` if you touched `data/`. Update PROGRESS.m
 main. Then take the next chunk.
 
 If an item turns out to be already done, say so in PROGRESS.md and move on rather than redoing it.
+
+## Before you finish
+
+Follow the **Handoff sync** section of `AGENTS.md`. Three other agents work on this repo and cannot
+see your session; `PROGRESS.md` and `docs/MISSING_MECHANICS.md` are the only things telling them
+what changed. Update both, and call out anything you changed that another agent may be mid-way
+through — a shared file, a renamed class, a disabled mod. Assume nobody reads your diff.

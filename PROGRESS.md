@@ -173,21 +173,21 @@ before trusting any crash from that instance.
 
 ## What To Do Next (priority order)
 
-0. **Re-play-test movement.** The jump and run boost were fixed this session — they had never
-   actually applied, because they were gated on a role nothing ever selected, so every course had
-   been played at vanilla jump height. Everything anyone concluded about gap fairness or platform
-   reachability before 51bd8ce was measured against the wrong physics and should be re-checked.
-   Tune `courseJumpBoost` / `courseRunBoost` in `run/config/planeshift-server.toml` live.
-1. **Moving-platform art.** Replace `PlaceholderRigModel` and its greybox texture with a bespoke
-   platform mesh that reads clearly against every course theme.
-2. **Play-test the world map and progression** — clear a course, confirm the results screen totals,
-   confirm the next node unlocks and the one after it does not, and that a boss clear opens the
-   next world.
-3. **Live facing check** — launch course 1, hold A/D and move the mouse; body/head must stay
-   left/right while movement and action aim remain stable.
-4. **Bespoke entity review** — hostile cast, Toad and projectiles are complete; perform a
-   close-range silhouette/animation review of the complete cast.
-5. **Art continuation** — per-theme skyboxes and final block/item/effect/particle textures.
+The backlog now lives in **`docs/MISSING_MECHANICS.md`** — 103 items, each tagged [new], [extend]
+or [fix]. Prefer [fix] items: the feature exists and is broken, which is worse than absent.
+
+1. **Star coins are never placed by course generation.** `CourseProgress` tracks three per course,
+   so the counter can only ever read zero. Highest-value single fix in the repo.
+2. **All 37 item textures are placeholders** under 400 bytes. The most visible unfinished thing.
+3. **Secret vines cannot be climbed**, so the coin heaven above them is unreachable by its intended
+   route.
+4. **Difficulty does not scale across worlds.** The seed varies layout, not challenge; world 5
+   generates with world 1's parameters.
+5. **Play the mod start to finish.** Still never done by anyone.
+
+Playtest instance: see `docs/PLAYTEST_INSTANCE.md`. Several 1.21.1 mods are disabled because they
+stopped the game launching; Entity Model Features is disabled because it crashes on the
+first-person hand render.
 
 ## How To Resume
 
@@ -201,6 +201,8 @@ before trusting any crash from that instance.
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-09-01 | Claude | Play-test round 2: head bumps fixed, hitboxes shrunk, ground enemies patrol instead of chase, coin bricks, 3D coin, per-world biome, world-seeded layouts, Hammer Bro perch, F6 tester menu, air-drop immunity; wrote docs/MISSING_MECHANICS.md |
+| 2026-09-01 | Claude | Launched the modded instance: found and disabled 1.21.1 crashers, confirmed PlaneShift runs clean in-game |
 | 2026-09-01 | Claude | Game-over screen with retry, course pause menu, localisation pass, per-power-up pickup particles; documented the playtest instance's mod version problem |
 | 2026-09-01 | Claude | Play-test fixes: course jump/run boost had never applied (gated on a role nothing selects), conveyor rewritten from an accelerator to a real belt; config now covers jump, run, conveyor, HUD scale, hurry-up |
 | 2026-09-01 | Claude | Audio: boss, Star Power and Toad fanfare tracks; hurry-up pitch shift; Toad castle speech |

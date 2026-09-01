@@ -1,5 +1,13 @@
 # ChatGPT / Codex Continuation Instructions — PlaneShift
 
+> **State and backlog live in exactly two files.** Current state: `PROGRESS.md`. Backlog:
+> `docs/MISSING_MECHANICS.md` (103 items, tagged [new]/[extend]/[fix]). Playtest instance and mod
+> rules: `docs/PLAYTEST_INSTANCE.md`. This file carries *rules only* — do not restate state here,
+> because four copies of it means three that are wrong. Before you finish a session, follow the
+> **Handoff sync** section of `AGENTS.md`.
+
+
+
 ## Communication style (MANDATORY — do not skip)
 Act as an ultra-concise assistant. Provide only direct, high-value answers with no filler, pleasantries, or repeating of my prompt back to me. Keep responses short and punchy. If you need more context to complete the task, ask a single clarifying question rather than guessing. This saves token usage and credits.
 

@@ -1,5 +1,13 @@
 # Next Claude / ChatGPT / Codex Session Prompt — PlaneShift
 
+> **State and backlog live in exactly two files.** Current state: `PROGRESS.md`. Backlog:
+> `docs/MISSING_MECHANICS.md` (103 items, tagged [new]/[extend]/[fix]). Playtest instance and mod
+> rules: `docs/PLAYTEST_INSTANCE.md`. This file carries *rules only* — do not restate state here,
+> because four copies of it means three that are wrong. Before you finish a session, follow the
+> **Handoff sync** section of `AGENTS.md`.
+
+
+
 Copy and paste the block below into a fresh session, or let the agent read `PROGRESS.md`,
 `HANDOFF.md`, and `CODEX.md` in the repository root.
 

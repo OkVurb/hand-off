@@ -31,6 +31,31 @@ accordingly:
 - **Do not add unrequested work.** No extra docs, changelogs, formatting passes or coverage the
   task did not ask for.
 
+## Handoff sync (MANDATORY — do this before you finish, every session)
+
+Four agents work on this repo — Claude, ChatGPT/Codex, Gemini and whatever runs from
+`NEXT_SESSION_PROMPT.md`. They cannot see each other's sessions. The only thing that stops them
+duplicating work or acting on a stale picture is the files below, and those files rot the moment
+one session updates its own and leaves the rest describing a mod that no longer exists.
+
+**Before your final commit of a session, update all of these:**
+
+| File | What it must say |
+|---|---|
+| `PROGRESS.md` | What you did, what is next, a session-history row. **The single source of truth for state.** |
+| `docs/MISSING_MECHANICS.md` | Tick off what you finished; add what you discovered is missing. **The single source of truth for the backlog.** |
+| `CLAUDE.md`, `CODEX.md`, `GEMINI.md`, `NEXT_SESSION_PROMPT.md` | Only if a *rule* changed. |
+| `HANDOFF.md` | Only if the open-issues list changed. |
+
+**Do not restate current state inside the per-tool prompt files.** They point at `PROGRESS.md` and
+`docs/MISSING_MECHANICS.md` on purpose. Four copies of "here is what works today" is four things to
+forget to update, and the one that gets forgotten is the one the next agent reads. Describing state
+in exactly one place is what makes this maintainable rather than a discipline problem.
+
+If you changed something another agent is mid-way through — a shared file, a renamed class, a
+disabled mod — say so explicitly in `PROGRESS.md` under "What To Do Next". Assume they will not
+read your diff.
+
 ## Continuation prompt
 When continuing this project in a fresh session, read **PROGRESS.md** first (where the last session stopped), then read the prompt file for your tool:
 - **Claude** (Claude.ai, Claude Code, Claude in Antigravity): `CLAUDE.md`

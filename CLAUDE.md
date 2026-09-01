@@ -1,5 +1,13 @@
 # Claude Session Prompt — PlaneShift
 
+> **State and backlog live in exactly two files.** Current state: `PROGRESS.md`. Backlog:
+> `docs/MISSING_MECHANICS.md` (103 items, tagged [new]/[extend]/[fix]). Playtest instance and mod
+> rules: `docs/PLAYTEST_INSTANCE.md`. This file carries *rules only* — do not restate state here,
+> because four copies of it means three that are wrong. Before you finish a session, follow the
+> **Handoff sync** section of `AGENTS.md`.
+
+
+
 Copy-paste this into a new Claude session (Claude.ai, Claude Code, or Claude in Antigravity).
 
 ---
