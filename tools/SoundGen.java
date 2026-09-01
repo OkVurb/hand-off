@@ -680,6 +680,116 @@ public final class SoundGen {
         return b;
     }
 
+
+    /**
+     * Boss music: slow, heavy and harmonically unstable.
+     *
+     * <p>Deliberately the opposite of every other track here. Where the course themes are bright
+     * pulse leads over a walking bass, this is a low ostinato with a tritone sitting in it that
+     * never resolves, so the arena feels like somewhere the player should not be standing. The
+     * lead is sparse: the bass and the drums carry it, and the space between phrases is the point.
+     */
+    static Buf musicBoss() {
+        double bpm = 96.0;
+        double step = 60.0 / bpm / 4.0;
+        double bar = step * 16;
+        Buf b = new Buf(bar * 16 + 0.4);
+
+        // D locrian-ish: the flattened fifth (Ab) is the whole character.
+        String[] leadBars = {
+            "D4 . . . Ab4 . . . D4 . . . . . . .",
+            ". . . . F4 . Eb4 . D4 . . . . . . .",
+            "Bb4 . . . Ab4 . . . G4 . . . . . . .",
+            "F4 . Eb4 . D4 . . . . . . . . . . .",
+            "D5 . . . Ab4 . . . Bb4 . . . . . . .",
+            "C5 . Bb4 . Ab4 . . . G4 . . . . . . .",
+            "Eb5 . . . D5 . . . Ab4 . . . . . . .",
+            "F4 . . . Eb4 . . . D4 . . . . . . ."
+        };
+        String[] bassBars = {
+            "D1 . D1 . . . D1 . Ab1 . . . D1 . . .",
+            "D1 . D1 . . . D1 . Eb1 . . . D1 . . .",
+            "Bb1 . Bb1 . . . Bb1 . Ab1 . . . G1 . . .",
+            "D1 . D1 . . . Ab1 . D1 . . . . . . .",
+            "D1 . D1 . . . D1 . Bb1 . . . D1 . . .",
+            "Ab1 . Ab1 . . . Ab1 . G1 . . . D1 . . .",
+            "Eb1 . Eb1 . . . Eb1 . D1 . . . Ab1 . . .",
+            "D1 . D1 . Ab1 . Ab1 . D1 . . . . . . ."
+        };
+        String kit = "o . . . o . . x o . . . x . x x";
+
+        for (int i = 0; i < 16; i++) {
+            double t = i * bar;
+            // A narrow pulse for the lead: thin and reedy, so it cuts without sounding heroic.
+            seq(b, t, step, leadBars[i % 8], PULSE, 0.125, 0.130, -0.18, 0.90);
+            seq(b, t, step, bassBars[i % 8], TRIANGLE, 0.5, 0.34, 0.0, 0.75);
+            // The tritone shadow, quiet and wide. It is what makes the loop feel wrong.
+            if (i >= 2) {
+                seq(b, t, step, leadBars[i % 8], PULSE, 0.5, 0.045, 0.40, 0.70);
+            }
+            drums(b, t, step, kit, i >= 4 ? 0.46 : 0.30);
+        }
+        return b;
+    }
+
+    /**
+     * Star Power: the fastest thing in the mod, and short on purpose.
+     *
+     * <p>Invincibility music has one job — tell the player the clock is running. A long loop
+     * would hide that, so this is a tight cycle that comes round often enough to feel like it is
+     * counting down, with a rising chromatic run that resets every bar.
+     */
+    static Buf musicStarPower() {
+        double bpm = 200.0;
+        double step = 60.0 / bpm / 4.0;
+        double bar = step * 16;
+        Buf b = new Buf(bar * 8 + 0.3);
+
+        String[] leadBars = {
+            "C5 E5 G5 C6 G5 E5 C5 E5 G5 C6 E6 C6 G5 E5 C5 G4",
+            "D5 F5 A5 D6 A5 F5 D5 F5 A5 D6 F6 D6 A5 F5 D5 A4",
+            "E5 G5 B5 E6 B5 G5 E5 G5 B5 E6 G6 E6 B5 G5 E5 B4",
+            "F5 A5 C6 F6 C6 A5 F5 A5 C6 F6 A6 F6 C6 A5 F5 C5"
+        };
+        String[] bassBars = {
+            "C2 . C2 . G1 . G1 . C2 . C2 . G1 . G1 .",
+            "D2 . D2 . A1 . A1 . D2 . D2 . A1 . A1 .",
+            "E2 . E2 . B1 . B1 . E2 . E2 . B1 . B1 .",
+            "F2 . F2 . C2 . C2 . F2 . F2 . C2 . C2 ."
+        };
+        String kit = "o h x h o h x h o h x h o h x x";
+
+        for (int i = 0; i < 8; i++) {
+            double t = i * bar;
+            seq(b, t, step, leadBars[i % 4], PULSE, 0.25, 0.135, -0.22, 0.80);
+            seq(b, t, step, leadBars[i % 4], PULSE, 0.5, 0.055, 0.36, 0.60);
+            seq(b, t, step, bassBars[i % 4], TRIANGLE, 0.5, 0.28, 0.0, 0.85);
+            drums(b, t, step, kit, 0.42);
+        }
+        return b;
+    }
+
+    /**
+     * Toad's thank-you fanfare, played after a castle clear while he speaks.
+     *
+     * <p>A one-shot rather than a loop: it plays once under the dialogue and stops. Ends on the
+     * tonic so the silence afterwards reads as resolution rather than a cut.
+     */
+    static Buf toadFanfare() {
+        double bpm = 120.0;
+        double step = 60.0 / bpm / 4.0;
+        Buf b = new Buf(step * 40 + 0.6);
+
+        String lead = "G4 . C5 . E5 . G5 . C6 . . . E6 . . . C6 - - - . . . . G5 - - - C6 - - - - - - -";
+        String harmony = "E4 . G4 . C5 . E5 . G5 . . . C6 . . . G5 - - - . . . . E5 - - - G5 - - - - - - -";
+        String bass = "C3 . . . C3 . . . G2 . . . G2 . . . C3 . . . . . . . G2 . . . C3 - - - - - - -";
+
+        seq(b, 0, step, lead, PULSE, 0.5, 0.170, -0.16, 0.94);
+        seq(b, 0, step, harmony, PULSE, 0.25, 0.085, 0.28, 0.94);
+        seq(b, 0, step, bass, TRIANGLE, 0.5, 0.26, 0.0, 0.90);
+        return b;
+    }
+
     // ================================================================= main
 
     public static void main(String[] args) throws IOException {
@@ -708,12 +818,15 @@ public final class SoundGen {
         write(out.resolve("spring.wav"), spring(), false, 0.82);
         write(out.resolve("warp.wav"), warp(), false, 0.80);
         write(out.resolve("bowser_roar.wav"), bowserRoar(), false, 0.88);
+        write(out.resolve("toad_fanfare.wav"), toadFanfare(), false, 0.84);
 
         System.out.println("music:");
         write(out.resolve("music_hub.wav"), musicHub(), true, 0.72);
         write(out.resolve("music_course_2_5d.wav"), musicCourse2_5D(), true, 0.74);
         write(out.resolve("music_course_3d.wav"), musicCourse3D(), true, 0.72);
         write(out.resolve("music_combat.wav"), musicCombat(), true, 0.74);
+        write(out.resolve("music_boss.wav"), musicBoss(), true, 0.76);
+        write(out.resolve("music_star_power.wav"), musicStarPower(), true, 0.74);
     }
 
     private SoundGen() {

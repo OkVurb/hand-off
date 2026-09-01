@@ -84,6 +84,7 @@ public final class ServerEvents {
             LeafFlightService.tick(player);
             CourseTimerService.tick(player);
             CourseProgressService.tick(player);
+            ToadDialogueService.tick(player);
             // Task 59: Ambient ash and spark particles for lava theme
             if (CourseStateAccess.get(player).inCourse()
                     && CourseThemeService.get(player) == com.studio.planeshift.common.course.CourseTheme.LAVA

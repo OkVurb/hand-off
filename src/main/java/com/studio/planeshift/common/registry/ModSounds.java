@@ -31,6 +31,10 @@ public final class ModSounds {
             register("music.hub");
     public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_COMBAT =
             register("music.combat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOSS =
+            register("music.boss");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_STAR_POWER =
+            register("music.star_power");
 
     public static final DeferredHolder<SoundEvent, SoundEvent> COIN_PICKUP =
             register("sound.coin");
@@ -68,6 +72,8 @@ public final class ModSounds {
             register("sound.warp");
     public static final DeferredHolder<SoundEvent, SoundEvent> BOWSER_ROAR =
             register("sound.bowser_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TOAD_FANFARE =
+            register("sound.toad_fanfare");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(PlaneShift.id(name)));

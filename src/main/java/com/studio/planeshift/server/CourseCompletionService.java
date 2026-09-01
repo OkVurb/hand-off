@@ -2,6 +2,8 @@ package com.studio.planeshift.server;
 
 import com.studio.planeshift.common.course.CourseProgress;
 import com.studio.planeshift.common.course.CourseState;
+import com.studio.planeshift.common.course.WorldDefinition;
+import com.studio.planeshift.common.course.WorldRegistry;
 import com.studio.planeshift.common.mode.PlaneMode;
 import com.studio.planeshift.common.mode.PlayState;
 import com.studio.planeshift.common.network.CourseResultsPayload;
@@ -64,6 +66,15 @@ public final class CourseCompletionService {
                 progress.starCoins(courseId),
                 state.lives(),
                 results.finalScore() > previousBest));
+
+        // A castle clear earns a send-off. Everything else just returns to the map: making a
+        // routine clear stop for dialogue would wear out very fast across fifty courses.
+        WorldDefinition world = WorldRegistry.worldForCourse(courseId);
+        if (world != null && courseId.equals(world.bossCourseId())) {
+            boolean lastWorld = WorldRegistry.worldIndex(world.worldId())
+                    == WorldRegistry.worldCount() - 1;
+            ToadDialogueService.begin(player, lastWorld);
+        }
 
         ProgressionService.leaveCourse(player);
     }

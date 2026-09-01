@@ -250,5 +250,15 @@
   "course.planeshift.w47_sky_7": "5-7 Vanishing Platforms",
   "course.planeshift.w48_sky_8": "5-8 The Long Fall",
   "course.planeshift.w49_sky_9": "5-9 Above the Storm",
-  "course.planeshift.w50_sky_10": "5-10 Castle in the Clouds"
+  "course.planeshift.w50_sky_10": "5-10 Castle in the Clouds",
+  "subtitles.planeshift.music_boss": "Boss theme",
+  "subtitles.planeshift.music_star_power": "Invincibility theme",
+  "subtitles.planeshift.toad_fanfare": "Toad celebrates",
+  "message.planeshift.toad.thanks_1": "§dToad:§r Thank you! The castle is ours again.",
+  "message.planeshift.toad.thanks_2": "§dToad:§r But our princess is in another castle...",
+  "message.planeshift.toad.thanks_3": "§dToad:§r Rest a moment. The next world is waiting.",
+  "message.planeshift.toad.final_1": "§dToad:§r You did it! Every castle, every world.",
+  "message.planeshift.toad.final_2": "§dToad:§r Nobody has ever run them all the way through.",
+  "message.planeshift.toad.final_3": "§dToad:§r The Kingdom is safe, and it is safe because of you.",
+  "message.planeshift.toad.final_4": "§6Thank you for playing PlaneShift!"
 }

@@ -112,6 +112,8 @@ public final class CourseService {
         ));
         CourseScoringService.startCourse(player);
         ProgressionService.enterCourse(player, courseId);
+        // A player who has moved on should not still be being thanked for the last course.
+        ToadDialogueService.clear(player);
         return true;
     }
 
