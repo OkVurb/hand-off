@@ -1,0 +1,12 @@
+{
+    "dimension":  "planeshift:course",
+    "start_pos":  [
+                      9984,
+                      64,
+                      0
+                  ],
+    "start_mode":  "side_on",
+    "theme":  "lava",
+    "kill_y":  40,
+    "length":  224
+}

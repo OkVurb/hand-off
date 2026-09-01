@@ -1,0 +1,8 @@
+{
+  "dimension": "planeshift:course",
+  "start_pos": [6912, 64, 0],
+  "start_mode": "side_on",
+  "theme": "underground",
+  "kill_y": 40,
+  "length": 216
+}

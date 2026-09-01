@@ -1,0 +1,8 @@
+{
+  "dimension": "planeshift:course",
+  "start_pos": [10496, 64, 0],
+  "start_mode": "side_on",
+  "theme": "snow",
+  "kill_y": 40,
+  "length": 158
+}
