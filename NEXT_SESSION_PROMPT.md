@@ -28,9 +28,9 @@ Current state:
   static-feeling pixel skybox rendered correctly. `runServer` reached `Done` cleanly.
 - Six real course terrain blocks use the successful Mew atlas. Entity skins use the original Mew
   character sheet. Source/provenance is in `tools/art_sources/` and `ASSET_LICENSES.md`.
-- Enemies use `AnimatedCourseEnemyModel` plus `EnemyRigProfile`, with articulated body parts and
-  procedural walk/idle/wing/special animations. This is a working shared rig, not final bespoke
-  geometry.
+- Eleven hostile enemies use independently baked `BespokeEnemyModel` meshes and 128x128 UVs.
+  Toad has a dedicated lantern-cap shopkeeper rig, and all six projectile entities use real voxel
+  meshes instead of camera-facing item billboards.
 - Three detailed original enemy turnaround sheets and exact visual/animation requirements are in
   `tools/art_sources/enemy_turnaround_01.png` through `_03.png` and
   `docs/ENEMY_ART_DIRECTION.md`.
@@ -41,7 +41,22 @@ Current state:
   pass locks both visible body and head to the last attempted A/D travel direction, so mouse
   movement cannot turn the head toward/away from camera. It deliberately does not alter `yRot`,
   preserving movement projection and gameplay action aim.
-- The full unit suite has 38 passing cases: input projection plus generated-course safety/gaps.
+- The full build passes with 147 unit tests and all six build checks; the latest runtime smoke
+  test rendered Toad and the rotating 3D hammer with no renderer, layer, model or resource errors.
+- Progression is persisted: `CourseProgress` records cleared courses, star coins per course and
+  best scores. Unlock gating is enforced server-side and mirrored by the world map screen, which
+  draws five worlds of ten nodes with locked/open/cleared/boss states. Clearing a course opens a
+  results screen with the score breakdown.
+- Course layout is data-driven. A course JSON may carry a `layout` block listing its pits or
+  asking for a count, capping pit width, and naming which set pieces to build. Pit and set-piece
+  counts otherwise scale with course length. See `CourseLayout`.
+- Movement was badly broken until 51bd8ce: the course jump and run boost were gated on a role
+  that nothing ever selects, so every course had been played at vanilla jump height, which cannot
+  reach the platforms the generator builds. They now live in `CourseMovementService` and apply on
+  course entry. Anything concluded about gap fairness before that commit was measured against the
+  wrong physics.
+- Audio covers boss, Star Power and Toad-fanfare tracks, plus a hurry-up pitch shift on the track
+  already playing when the clock goes critical.
 
 Priority work:
 
@@ -49,13 +64,12 @@ Priority work:
    head must face only left/right; movement and action aim must remain stable.
 2. Play all five courses end-to-end and fix practical layout/gameplay problems. Test coyote time,
    glider, switches, checkpoint/death at kill Y=40, rewards, shop, flag finish and leave flow.
-3. Create bespoke Blockbench models and keyframed clips for each enemy from the turnaround sheets.
-   Preserve the original sky-island designs; do not copy protected franchise characters. Keep
-   the current Java rig as a fallback until replacements work in-game.
+3. Replace the moving-platform placeholder mesh, then perform a close-range silhouette/animation
+   review of the complete hostile, shopkeeper and projectile cast.
 4. Add GameTests for QuestionBlock, PSwitchBlock and OnOffSwitch. Existing `build.gradle` already
    configures `gameTestServer` but no GameTests exist.
-5. Continue final art: per-theme skyboxes and remaining item/effect textures. The current skybox
-   is intentionally shared by all courses.
+5. Continue final art: per-theme skyboxes and remaining item/effect/particle textures. The current
+   skybox is intentionally shared by all courses.
 
 Rules:
 
