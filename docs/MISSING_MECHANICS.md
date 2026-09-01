@@ -56,8 +56,9 @@ Bullet Bill, Piranha Plant, Bowser. All ground walkers now patrol rather than ch
 
 16. **Koopa Paratroopa.** [new] A winged Koopa that hops; stomping it removes the wings and leaves
     an ordinary Koopa. High value — it reuses `KoopaEntity` almost entirely.
-17. **Red vs green Koopa.** [extend] Green walks off ledges, red turns at them. One boolean on
-    `LanePatrolGoal`, and it doubles the enemy's expressive range.
+~~17. **Red vs green Koopa.** [extend] Green walks off ledges, red turns at them. One boolean on
+    `LanePatrolGoal`, and it doubles the enemy's expressive range.~~ Done: `LanePatrolGoal` takes
+    `turnsAtLedge`; `KoopaEntity` has a synced `Red` tag (default `true`, use `Red:0b` NBT for green).
 18. **Dry Bones.** [new] Collapses when stomped and reassembles after a few seconds.
 19. **Bob-omb.** [new] Walks, then flashes and explodes; can be picked up and thrown.
 20. **Cheep-Cheep.** [new] Jumps in arcs out of water or lava.

@@ -18,11 +18,17 @@ public class LanePatrolGoal extends Goal {
 
     private final PathfinderMob mob;
     private final double speedModifier;
+    private final boolean turnsAtLedge;
     private Direction lane;
 
     public LanePatrolGoal(PathfinderMob mob, double speedModifier) {
+        this(mob, speedModifier, true);
+    }
+
+    public LanePatrolGoal(PathfinderMob mob, double speedModifier, boolean turnsAtLedge) {
         this.mob = mob;
         this.speedModifier = speedModifier;
+        this.turnsAtLedge = turnsAtLedge;
         setFlags(EnumSet.of(Goal.Flag.MOVE));
     }
 
@@ -61,6 +67,9 @@ public class LanePatrolGoal extends Goal {
     private boolean shouldTurn() {
         if (mob.horizontalCollision) {
             return true;
+        }
+        if (!turnsAtLedge) {
+            return false;
         }
         // Ledge check: is there ground one block ahead (at foot level or one below)?
         BlockPos footAhead = mob.blockPosition().relative(lane);

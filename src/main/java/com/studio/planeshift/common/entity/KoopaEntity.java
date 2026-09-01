@@ -39,6 +39,8 @@ public class KoopaEntity extends CourseEnemyEntity {
             SynchedEntityData.defineId(KoopaEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> SLIDING =
             SynchedEntityData.defineId(KoopaEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> RED =
+            SynchedEntityData.defineId(KoopaEntity.class, EntityDataSerializers.BOOLEAN);
 
     /** Horizontal speed of a kicked shell. Fast enough to outrun the player. */
     private static final double SHELL_SPEED = 0.62D;
@@ -67,6 +69,23 @@ public class KoopaEntity extends CourseEnemyEntity {
         super.defineSynchedData(builder);
         builder.define(IN_SHELL, false);
         builder.define(SLIDING, false);
+        builder.define(RED, true);
+    }
+
+    public boolean isRed() {
+        return entityData.get(RED);
+    }
+
+    public void setRed(boolean red) {
+        entityData.set(RED, red);
+        updatePatrolGoal();
+    }
+
+    private void updatePatrolGoal() {
+        goalSelector.removeAllGoals(g -> g instanceof LanePatrolGoal);
+        if (!inShell()) {
+            goalSelector.addGoal(1, new LanePatrolGoal(this, 1.0D, isRed()));
+        }
     }
 
     public boolean inShell() {
@@ -82,7 +101,7 @@ public class KoopaEntity extends CourseEnemyEntity {
         // Walks its lane like the rest of the ground cast; the shell states are what make a
         // Koopa a Koopa, not pursuit.
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(1, new LanePatrolGoal(this, 1.0D));
+        updatePatrolGoal();
     }
 
     /**
@@ -209,6 +228,7 @@ public class KoopaEntity extends CourseEnemyEntity {
         super.addAdditionalSaveData(output);
         output.putBoolean("InShell", inShell());
         output.putBoolean("Sliding", sliding());
+        output.putBoolean("Red", isRed());
     }
 
     @Override
@@ -217,10 +237,9 @@ public class KoopaEntity extends CourseEnemyEntity {
         boolean shell = input.getBooleanOr("InShell", false);
         entityData.set(IN_SHELL, shell);
         entityData.set(SLIDING, input.getBooleanOr("Sliding", false));
+        setRed(input.getBooleanOr("Red", true));
         if (shell) {
             shellSince = KICK_GRACE_TICKS;
-            goalSelector.removeAllGoals(g -> true);
-            targetSelector.removeAllGoals(g -> true);
         }
     }
 

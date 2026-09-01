@@ -24,8 +24,9 @@
 - Added `testAirDrop` (CourseEnemy air-drop immunity flag), `testCoinBrick` (SPENT state and break behaviour), and `testHammerBroPerch` (perch clamp at 2.5 blocks) to `PlaneShiftGameTests`.
 - `runGameTestServer` now reports **all 7 required tests passed**.
 - Fixed `testAirDrop` flakiness: give the spawned Goomba a stone floor so it lands and `CourseEnemyEntity.tick()` clears `airDropped`.
-- Extended `.github/workflows/build.yml` to run `runGameTestServer` and a headless `runServer` smoke test that waits for `Done (Xs)!` before terminating.
-- Added `CourseLayoutPlanTest` JUnit coverage for deterministic layout seeding (`sameSeedProducesSameLayout`, `differentSeedsProduceDifferentLayouts`).
+- Implemented red/green Koopa ledge behavior (#17): `LanePatrolGoal` now accepts a `turnsAtLedge` boolean; `KoopaEntity` carries a synced `Red` tag (default `true`), saves/loads it, and passes it to the goal. Red Koopas turn at ledges, green Koopas (`Red:0b`) walk off.
+- Replaced `flag_pole.png`, `checkpoint_beacon.png`, and `checkpoint_beacon_lit.png` with 2D pole-and-flag sprites (no more deadbush look).
+- Stabilised `testAirDrop` again by placing a floor and using `succeedWhen` for the final `assertFalse`.
 
 ### ChatGPT session — shopkeeper, projectile and conveyor art
 

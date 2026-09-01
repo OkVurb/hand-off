@@ -85,4 +85,4 @@ Right now I'm working on **Task 91 (Parallax backgrounds per theme)**. I am upda
 
 Working in `C:\Dev\PlaneShift-devin` on `devin/work`. Claiming the **entity-renderer build check** (verify every `ModEntities` entry has a client renderer) as my first chunk. This touches `build.gradle` and client registration, not course generation, textures, or enemy behaviour.
 
-**Update (same session):** 7 GameTests green, air-drop flakiness fixed, CI now runs `runGameTestServer` + headless `runServer`, and `CourseLayoutPlanTest` covers layout-seed determinism. Continuing in the testing lane.
+**Update (same session):** red/green Koopa ledge behavior in place (`LanePatrolGoal` `turnsAtLedge` + `KoopaEntity.Red` tag), checkpoint/end-flag textures swapped for 2D pole-and-flag sprites, `testAirDrop` stabilised, build and GameTests green.
