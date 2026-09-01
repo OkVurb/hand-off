@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 public class ConveyorBlock extends HorizontalDirectionalBlock {
 
     public static final MapCodec<ConveyorBlock> CODEC = simpleCodec(ConveyorBlock::new);
-    public static final double SPEED = 0.18D;
+    public static final double SPEED = 0.06D;
 
     public ConveyorBlock(Properties properties) {
         super(properties);
@@ -44,11 +44,15 @@ public class ConveyorBlock extends HorizontalDirectionalBlock {
             return;
         }
         Direction facing = state.getValue(FACING);
-        entity.setDeltaMovement(
-                facing.getStepX() * SPEED,
-                entity.getDeltaMovement().y,
-                facing.getStepZ() * SPEED
-        );
+        net.minecraft.world.phys.Vec3 current = entity.getDeltaMovement();
+        
+        double targetX = current.x;
+        double targetZ = current.z;
+        
+        if (Math.abs(current.x) < 0.2D) targetX += facing.getStepX() * SPEED;
+        if (Math.abs(current.z) < 0.2D) targetZ += facing.getStepZ() * SPEED;
+        
+        entity.setDeltaMovement(targetX, current.y, targetZ);
         entity.hurtMarked = true;
     }
 }
