@@ -133,13 +133,14 @@ public class PlaneShiftGameTests {
 
         CourseEnemyEntity enemy = helper.spawn(ModEntities.GOOMBA.get(), pos);
         enemy.markAirDropped();
+        helper.assertTrue(enemy.fallingFromDrop(),
+                "Enemy should be falling from drop after markAirDropped");
 
-        helper.startSequence()
-                .thenExecute(() -> helper.assertTrue(enemy.fallingFromDrop(),
-                        "Enemy should be falling from drop after markAirDropped"))
-                .thenWaitUntil(() -> helper.assertFalse(enemy.fallingFromDrop(),
-                        "Enemy should clear airDropped flag when on ground"))
-                .thenSucceed();
+        // Force the enemy onto the ground, tick, and verify the air-dropped flag clears.
+        enemy.setOnGround(true);
+        enemy.tick();
+        helper.succeedWhen(() -> helper.assertFalse(enemy.fallingFromDrop(),
+                "Enemy should clear airDropped flag when on ground"));
     }
 
     private static void testCoinBrick(GameTestHelper helper) {

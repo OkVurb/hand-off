@@ -20,3 +20,23 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Run GameTest server
+      run: ./gradlew runGameTestServer
+    - name: Headless dedicated server smoke test
+      run: |
+        ./gradlew runServer > /tmp/runserver.log 2>&1 &
+        pid=$!
+        for i in $(seq 1 180); do
+          if grep -qE 'Done \([0-9.]+s\)!' /tmp/runserver.log; then
+            echo "Dedicated server started cleanly"
+            kill $pid
+            wait $pid 2>/dev/null || true
+            exit 0
+          fi
+          sleep 1
+        done
+        echo "Dedicated server did not start in time; last 50 lines:"
+        tail -n 50 /tmp/runserver.log
+        kill $pid
+        wait $pid 2>/dev/null || true
+        exit 1
