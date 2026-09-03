@@ -822,6 +822,87 @@ public final class SegmentLibrary {
         }
     };
 
+    /** Dual Bullet Bill blaster towers firing across the corridor. */
+    static final Segment BULLET_BILL_GAUNTLET = new Segment() {
+        public SegmentSpec spec() {
+            return def("bullet_bill_gauntlet", 18, 0, 2, Tag.ENEMY, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 18, y, ctx);
+            BlockState cannonWest = ModBlocks.BULLET_BILL_CANNON.get().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, Direction.WEST);
+            BlockState hard = ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState();
+            c.setLane(x + 6, y + 1, hard, ctx.halfWidth());
+            c.set(x + 6, y + 2, 0, cannonWest);
+            c.setLane(x + 12, y + 1, hard, ctx.halfWidth());
+            c.setLane(x + 12, y + 2, hard, ctx.halfWidth());
+            c.set(x + 12, y + 3, 0, cannonWest);
+            coinTrail(c, x + 8, 3, y + 4, 1);
+        }
+    };
+
+    /** A pit carpeted with hungry Munchers spanned by precision stone stepping stones. */
+    static final Segment MUNCHER_PIT_HOP = new Segment() {
+        public SegmentSpec spec() {
+            return def("muncher_pit_hop", 16, 0, 2, Tag.GAP, Tag.UNSTABLE);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 3, y, ctx);
+            BlockState muncher = ModBlocks.MUNCHER.get().defaultBlockState();
+            BlockState stone = ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState();
+            for (int i = 3; i <= 12; i++) {
+                c.setLane(x + i, y - 3, stone, ctx.halfWidth());
+                c.set(x + i, y - 2, 0, muncher);
+            }
+            c.setLane(x + 5, y, stone, ctx.halfWidth());
+            c.item(ModItems.COIN.get(), x + 5.5D, y + 1.5D, 0.5D);
+
+            c.setLane(x + 8, y + 1, stone, ctx.halfWidth());
+            c.item(ModItems.COIN.get(), x + 8.5D, y + 2.5D, 0.5D);
+
+            c.setLane(x + 11, y, stone, ctx.halfWidth());
+            c.item(ModItems.COIN.get(), x + 11.5D, y + 1.5D, 0.5D);
+
+            floor(c, x + 13, 3, y, ctx);
+        }
+    };
+
+    /** A super trampoline launching the player to a high cloud ledge with coin arcs. */
+    static final Segment TRAMPOLINE_SKY_LAUNCH = new Segment() {
+        public SegmentSpec spec() {
+            return def("trampoline_sky_launch", 16, 0, 1, Tag.CLIMB, Tag.REST);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            c.set(x + 4, y + 1, 0, ModBlocks.TRAMPOLINE.get().defaultBlockState());
+            coinTrail(c, x + 4, 1, y + 3, 1);
+            coinTrail(c, x + 4, 1, y + 5, 1);
+            coinTrail(c, x + 4, 1, y + 7, 1);
+            coinTrail(c, x + 5, 1, y + 8, 1);
+            platform(c, x + 7, 5, y + 6, ctx);
+            c.set(x + 9, y + 9, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+        }
+    };
+
+    /** A long slick runway of ice blocks built for high-speed P-Speed sliding. */
+    static final Segment FROST_ICE_SLIDE = new Segment() {
+        public SegmentSpec spec() {
+            return def("frost_ice_slide", 18, 0, 2, Tag.UNSTABLE, Tag.REST);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 3, y, ctx);
+            BlockState ice = ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState();
+            for (int i = 0; i < 12; i++) {
+                c.setLane(x + 3 + i, y, ice, ctx.halfWidth());
+            }
+            coinTrail(c, x + 4, 10, y + 1, 1);
+            floor(c, x + 15, 3, y, ctx);
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -862,6 +943,10 @@ public final class SegmentLibrary {
         list.add(P_SWITCH_BONUS_ROOM);
         list.add(HIDDEN_SPRING_HIGHWAY);
         list.add(ILLUSORY_PIPE_CACHE);
+        list.add(BULLET_BILL_GAUNTLET);
+        list.add(MUNCHER_PIT_HOP);
+        list.add(TRAMPOLINE_SKY_LAUNCH);
+        list.add(FROST_ICE_SLIDE);
         return list;
     }
 

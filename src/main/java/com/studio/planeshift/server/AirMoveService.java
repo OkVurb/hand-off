@@ -63,6 +63,11 @@ public final class AirMoveService {
 
     /** Tracks if the player is currently executing a ground pound. */
     private static final Map<ServerPlayer, Boolean> GROUND_POUNDING = new WeakHashMap<>();
+    private static final Map<ServerPlayer, Boolean> SPIN_JUMPING = new WeakHashMap<>();
+
+    public static boolean isSpinJumping(net.minecraft.world.entity.player.Player player) {
+        return SPIN_JUMPING.getOrDefault(player, false);
+    }
 
     private AirMoveService() {
     }
@@ -72,12 +77,40 @@ public final class AirMoveService {
             return;
         }
 
-                // Variable jump: if the player is still moving upward, keep giving a tiny boost.
+        // Spin jump: Jump while sneaking on ground
+        if (player.onGround() && player.isShiftKeyDown() && player.getLastClientInput().jump()) {
+            SPIN_JUMPING.put(player, true);
+            player.level().playSound(null, player.blockPosition(), com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.7F, 1.6F);
+        } else if (player.onGround()) {
+            SPIN_JUMPING.remove(player);
+        }
+
+        if (SPIN_JUMPING.getOrDefault(player, false) && !player.onGround()) {
+            if (player.level() instanceof net.minecraft.server.level.ServerLevel sl && player.level().getGameTime() % 2 == 0) {
+                sl.sendParticles(com.studio.planeshift.common.registry.ModParticles.COIN_SPARKLE.get(), player.getX(), player.getY() + 0.5D, player.getZ(), 2, 0.2D, 0.2D, 0.2D, 0.05D);
+            }
+        }
+
+        // Variable jump: if the player is still moving upward, keep giving a tiny boost.
         // Holding space = longer air time = higher jump in practice.
         if (!player.onGround() && player.getLastClientInput().jump() && player.getDeltaMovement().y > 0.0D && player.getDeltaMovement().y < 0.45D) {
             Vec3 vel = player.getDeltaMovement();
             player.setDeltaMovement(vel.x, vel.y + HOLD_JUMP_BOOST, vel.z);
             player.hurtMarked = true;
+        }
+
+        // Ledge Clamber / Mantle
+        if (!player.onGround() && player.getDeltaMovement().y < 0.1D && player.getDeltaMovement().y > -0.35D) {
+            Vec3 vel = player.getDeltaMovement();
+            double speed = Math.abs(vel.x) + Math.abs(vel.z);
+            if (speed > 0.05D) {
+                BlockPos waistPos = BlockPos.containing(player.getX() + Math.signum(vel.x) * 0.45D, player.getY() + 0.5D, player.getZ() + Math.signum(vel.z) * 0.45D);
+                BlockPos headPos = waistPos.above();
+                if (player.level().getBlockState(waistPos).isSolid() && player.level().getBlockState(headPos).isAir()) {
+                    player.setDeltaMovement(vel.x * 1.1D, 0.28D, vel.z * 1.1D);
+                    player.hurtMarked = true;
+                }
+            }
         }
 
         // Ground pound mechanics
@@ -93,8 +126,8 @@ public final class AirMoveService {
                 BlockPos below = pos.below();
                 BlockState state = player.level().getBlockState(below);
                 if (state.getBlock() instanceof com.studio.planeshift.common.block.BrickBlock || 
-                    state.getBlock() instanceof com.studio.planeshift.common.block.QuestionBlock) {
-                    // Task 56: Brick debris particles
+                    state.getBlock() instanceof com.studio.planeshift.common.block.QuestionBlock ||
+                    state.getBlock() instanceof com.studio.planeshift.common.block.RotatingBlock) {
                     if (player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                         serverLevel.sendParticles(
                                 net.minecraft.core.particles.ParticleTypes.CRIT,

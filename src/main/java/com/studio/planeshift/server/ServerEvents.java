@@ -112,17 +112,30 @@ public final class ServerEvents {
             CourseProgressService.tick(player);
             ToadDialogueService.tick(player);
             CatFormService.tick(player);
-            // Task 59: Ambient ash and spark particles for lava theme
+            // Ambient weather and theme particles
             if (CourseStateAccess.get(player).inCourse()
-                    && CourseThemeService.get(player) == com.studio.planeshift.common.course.CourseTheme.LAVA
-                    && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel
-                    && player.getRandom().nextInt(5) == 0) {
-                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA,
-                        player.getX(), player.getY() + 3.0D, player.getZ(),
-                        2, 4.0D, 2.0D, 4.0D, 0.0D);
-                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,
-                        player.getX(), player.getY() + 1.0D, player.getZ(),
-                        1, 3.0D, 1.0D, 3.0D, 0.01D);
+                    && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                var theme = CourseThemeService.get(player);
+                if (theme == com.studio.planeshift.common.course.CourseTheme.LAVA && player.getRandom().nextInt(5) == 0) {
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA,
+                            player.getX(), player.getY() + 3.0D, player.getZ(),
+                            2, 4.0D, 2.0D, 4.0D, 0.0D);
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,
+                            player.getX(), player.getY() + 1.0D, player.getZ(),
+                            1, 3.0D, 1.0D, 3.0D, 0.01D);
+                } else if (theme == com.studio.planeshift.common.course.CourseTheme.SNOW && player.getRandom().nextInt(4) == 0) {
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SNOWFLAKE,
+                            player.getX(), player.getY() + 4.0D, player.getZ(),
+                            3, 5.0D, 1.0D, 5.0D, 0.02D);
+                } else if (theme == com.studio.planeshift.common.course.CourseTheme.DESERT && player.getRandom().nextInt(6) == 0) {
+                    serverLevel.sendParticles(com.studio.planeshift.common.registry.ModParticles.THEME_DUST.get(),
+                            player.getX(), player.getY() + 1.5D, player.getZ(),
+                            2, 4.0D, 1.5D, 4.0D, 0.01D);
+                } else if (theme == com.studio.planeshift.common.course.CourseTheme.GHOST_HOUSE && player.getRandom().nextInt(6) == 0) {
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SOUL,
+                            player.getX(), player.getY() + 1.0D, player.getZ(),
+                            1, 3.0D, 1.0D, 3.0D, 0.01D);
+                }
             }
             if (player.onGround()) {
                 // Landing closes any airborne stomp chain, so the combo ladder only rewards

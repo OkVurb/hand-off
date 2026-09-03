@@ -188,6 +188,14 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.WARP_PIPE);
     public static final DeferredItem<?> SECRET_PASSAGE_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.SECRET_PASSAGE);
+    public static final DeferredItem<?> BULLET_BILL_CANNON_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.BULLET_BILL_CANNON);
+    public static final DeferredItem<?> COURSE_ICE_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_ICE_BLOCK);
+    public static final DeferredItem<?> MUNCHER_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.MUNCHER);
+    public static final DeferredItem<?> TRAMPOLINE_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.TRAMPOLINE);
 
     private static DeferredItem<FormCharmItem> registerCharm(String name, String formPath) {
         return ITEMS.registerItem(name,

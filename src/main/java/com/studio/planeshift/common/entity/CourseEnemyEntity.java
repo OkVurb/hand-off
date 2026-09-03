@@ -226,9 +226,15 @@ public abstract class CourseEnemyEntity extends Monster {
             }
         } else {
             // Armored top: the silhouette warned them.
-            player.hurtServer((ServerLevel) level(), damageSources().mobAttack(this), 2.0F);
-            bounce(player);
-            level().playSound(null, blockPosition(), ModSounds.DAMAGE.get(), SoundSource.HOSTILE, 0.8F, 0.9F);
+            if (com.studio.planeshift.server.AirMoveService.isSpinJumping(player)) {
+                bounce(player);
+                level().playSound(null, blockPosition(), ModSounds.STOMP.get(), SoundSource.HOSTILE, 1.0F, 1.5F);
+                spawnHitParticles(6);
+            } else {
+                player.hurtServer((ServerLevel) level(), damageSources().mobAttack(this), 2.0F);
+                bounce(player);
+                level().playSound(null, blockPosition(), ModSounds.DAMAGE.get(), SoundSource.HOSTILE, 0.8F, 0.9F);
+            }
         }
     }
 

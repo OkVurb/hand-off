@@ -23,6 +23,9 @@ public final class MovementRuleService {
      */
     private static final double DEPTH_FOLD_THRESHOLD = 0.08D;
 
+    private static final java.util.Map<ServerPlayer, Integer> SPRINT_TICKS = new java.util.WeakHashMap<>();
+    private static final java.util.Map<ServerPlayer, Double> LAST_VEL_X = new java.util.WeakHashMap<>();
+
     private MovementRuleService() {
     }
 
@@ -38,6 +41,35 @@ public final class MovementRuleService {
             DamageService.down(player, player.damageSources().fellOutOfWorld());
             return;
         }
+
+        // P-Speed running meter
+        if (player.onGround() && player.isSprinting()) {
+            int ticks = SPRINT_TICKS.getOrDefault(player, 0) + 1;
+            SPRINT_TICKS.put(player, ticks);
+            if (ticks == 30) {
+                player.level().playSound(null, player.blockPosition(), com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.6F, 1.8F);
+            }
+            if (ticks >= 30) {
+                Vec3 v = player.getDeltaMovement();
+                player.setDeltaMovement(v.x * 1.05D, v.y, v.z * 1.05D);
+                if (player.level() instanceof net.minecraft.server.level.ServerLevel sl && player.level().getGameTime() % 2 == 0) {
+                    sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, player.getX(), player.getY() + 0.1D, player.getZ(), 1, 0.05D, 0.02D, 0.05D, 0.01D);
+                }
+            }
+        } else if (!player.isSprinting()) {
+            SPRINT_TICKS.remove(player);
+        }
+
+        // Skid turnaround
+        double vx = player.getDeltaMovement().x;
+        Double lastVx = LAST_VEL_X.get(player);
+        if (lastVx != null && player.onGround() && Math.abs(lastVx) > 0.15D && (vx * lastVx < -0.01D)) {
+            if (player.level() instanceof net.minecraft.server.level.ServerLevel sl) {
+                sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE, player.getX(), player.getY() + 0.1D, player.getZ(), 4, 0.1D, 0.05D, 0.1D, 0.02D);
+                player.level().playSound(null, player.blockPosition(), com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.4F, 1.6F);
+            }
+        }
+        LAST_VEL_X.put(player, vx);
 
         if (state.in2_5D() && state.rail().isPresent()) {
             constrainToRail(player, state.rail().get());

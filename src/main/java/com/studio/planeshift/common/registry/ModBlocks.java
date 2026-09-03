@@ -2,10 +2,12 @@ package com.studio.planeshift.common.registry;
 
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.block.BrickBlock;
+import com.studio.planeshift.common.block.BulletBillCannonBlock;
 import com.studio.planeshift.common.block.CheckpointBeaconBlock;
 import com.studio.planeshift.common.block.CoinBlock;
 import com.studio.planeshift.common.block.CoinRingBlock;
 import com.studio.planeshift.common.block.ConveyorBlock;
+import com.studio.planeshift.common.block.CourseIceBlock;
 import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.block.AxeBlock;
 import com.studio.planeshift.common.block.CourseVineBlock;
@@ -13,6 +15,7 @@ import com.studio.planeshift.common.block.DonutBlock;
 import com.studio.planeshift.common.block.SecretVineBlock;
 import com.studio.planeshift.common.block.HiddenQuestionBlock;
 import com.studio.planeshift.common.block.LoopTriggerBlock;
+import com.studio.planeshift.common.block.MuncherBlock;
 import com.studio.planeshift.common.block.MusicBlock;
 import com.studio.planeshift.common.block.OnOffBlock;
 import com.studio.planeshift.common.block.OnOffSwitchBlock;
@@ -25,6 +28,7 @@ import com.studio.planeshift.common.block.SecretPassageBlock;
 import com.studio.planeshift.common.block.ShiftGateBlock;
 import com.studio.planeshift.common.block.SpikeBlock;
 import com.studio.planeshift.common.block.SpringPadBlock;
+import com.studio.planeshift.common.block.TrampolineBlock;
 import com.studio.planeshift.common.block.WarpPipeBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -281,6 +285,34 @@ public final class ModBlocks {
                     .noOcclusion()
                     .noLootTable()
                     .sound(SoundType.STONE));
+
+    public static final DeferredBlock<BulletBillCannonBlock> BULLET_BILL_CANNON =
+            BLOCKS.registerBlock("bullet_bill_cannon", BulletBillCannonBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(3.5F, 12.0F)
+                    .sound(SoundType.ANVIL));
+
+    public static final DeferredBlock<CourseIceBlock> COURSE_ICE_BLOCK =
+            BLOCKS.registerBlock("course_ice_block", CourseIceBlock::new, p -> p
+                    .mapColor(MapColor.ICE)
+                    .strength(0.5F)
+                    .friction(0.98F)
+                    .noOcclusion()
+                    .sound(SoundType.GLASS));
+
+    public static final DeferredBlock<MuncherBlock> MUNCHER =
+            BLOCKS.registerBlock("muncher", MuncherBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(1.5F, 10.0F)
+                    .noOcclusion()
+                    .sound(SoundType.GRASS));
+
+    public static final DeferredBlock<TrampolineBlock> TRAMPOLINE =
+            BLOCKS.registerBlock("trampoline", TrampolineBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_ORANGE)
+                    .strength(0.8F)
+                    .noOcclusion()
+                    .sound(SoundType.WOOL));
 
     private static DeferredBlock<Block> courseBlock(String name, MapColor mapColor,
                                                      SoundType sound) {
