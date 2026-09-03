@@ -115,6 +115,7 @@ public final class ModBlocks {
                     .noCollision()
                     .noLootTable()
                     .lightLevel(state -> 11)
+                    .noOcclusion()
                     .sound(SoundType.AMETHYST));
 
     public static final DeferredBlock<CheckpointBeaconBlock> CHECKPOINT_BEACON =

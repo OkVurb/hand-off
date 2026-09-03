@@ -175,16 +175,44 @@ Enter a course and check `logs/latest.log`:
   real bug in `CourseSkyboxRenderer` and a different investigation. The likely suspect is the
   `RenderPipelines.END_SKY` pipeline combined with `setupFog.run()`.
 
-### If it is the shaders
+### It is NOT that the renderer never runs — measured
 
-There is no clean fix from the mod side; a shaderpack that owns sky rendering owns it. The options,
-in order of how much they cost:
+The diagnostic line fired on the very next play-test:
 
-1. Play courses with shaders off. The art is authored flat and 2D anyway, and Complementary's
-   lighting is doing very little for a side-on camera.
-2. Build the backdrop as real geometry — a wall of blocks a long way behind the lane — so it is
-   part of the world the shader is rendering rather than part of the sky it replaces. Expensive in
-   blocks, but it would survive any shader pack and would pick up the pack's lighting instead of
-   fighting it.
-3. Ship an Iris shader pack of our own for the course dimension. The most correct and by far the
-   most work.
+```
+Course skybox renderer active, drawing planeshift:textures/environment/course_skybox_grass.png
+```
+
+So the earlier reasoning was wrong. `CustomSkyboxRenderer` **is** called with a shaderpack loaded;
+Iris does not simply skip the hook. That rules out the easy explanation and leaves two:
+
+1. **The cube is drawn and then painted over.** Iris runs its own sky pass through the pack's
+   programs after the NeoForge hook, so our 200-unit cube is written and then covered by
+   Complementary's atmospheric sky. Consistent with a flat grey gradient plus vanilla clouds
+   (clouds are a separate pass from sky, so they survive either way — the visible clouds are not
+   evidence of anything).
+2. **The draw itself produces nothing.** `renderSky` builds a ±100 cube and submits it through
+   `RenderPipelines.END_SKY` with `OptionalDouble.empty()` for the depth clear, so the existing
+   depth buffer is kept. If anything has already written depth nearer than 100 units when the hook
+   runs, every face is rejected and the framebuffer keeps whatever clear colour it had — which
+   would look exactly like the reported grey.
+
+Both produce an identical screenshot, and the log line cannot tell them apart. The next step is to
+separate them, and it is one keypress: **press `K` to toggle Iris off and look at the sky.**
+
+- Backdrop appears with shaders off → cause 1, the shader owns the final sky.
+- Still grey with shaders off → cause 2, and the bug is in `CourseSkyboxRenderer`. Start by
+  clearing depth in the render pass and by checking the cube against the active projection's far
+  plane.
+
+### If it turns out to be the shaders
+
+There is no clean fix from the mod side; a shaderpack that owns sky rendering owns it. Options, in
+order of cost:
+
+1. Play courses with shaders off. The art is authored flat and 2D, and Complementary's lighting is
+   doing very little for a side-on camera.
+2. Build the backdrop as real geometry — a wall of blocks well behind the lane — so it is part of
+   the world the shader renders rather than part of the sky it replaces. Expensive in blocks, but
+   it survives any pack and picks up the pack's lighting instead of fighting it.
+3. Ship an Iris shader pack of our own for the course dimension. Most correct, by far the most work.

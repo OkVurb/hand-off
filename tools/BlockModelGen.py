@@ -287,6 +287,38 @@ def flag_pole_top():
     ], "minecraft:cutout")
 
 
+def shift_gate():
+    """Matches ShiftGateBlock.SHAPE_NS/EW: a 2/16-thick panel, not a cube.
+
+    The third model that disagreed with its own hitbox (see R9). A shift gate is a doorway the
+    player walks through to change plane; drawn as a solid cube it looks like a wall you are
+    somehow passing into, which is the opposite of the thing it is trying to communicate.
+    """
+    tex = {"particle": t("shift_gate"), "all": t("shift_gate")}
+    return model(tex, [
+        # The frame reads first, so it gets the outer band and the panel sits recessed behind it.
+        box((0, 0, 6), (16, 2, 10), {"*": "#all"}),
+        box((0, 14, 6), (16, 16, 10), {"*": "#all"}),
+        box((0, 2, 6), (2, 14, 10), {"*": "#all"}),
+        box((14, 2, 6), (16, 14, 10), {"*": "#all"}),
+        box((2, 2, 7), (14, 14, 9), {"*": "#all"}, shade=False),
+    ], "minecraft:cutout")
+
+
+def axe_block_taken():
+    """The empty plinth, after the axe has been taken.
+
+    Was a cross model still pointing at an axe-shaped texture, so a taken axe looked exactly like
+    an untaken one. The state exists precisely so the player can see the bridge is already
+    collapsing; drawing it identically throws that away.
+    """
+    tex = {"particle": t("axe_block_taken"), "stone": t("course_hard_block"),
+           "mark": t("axe_block_taken")}
+    return model(tex, [
+        box((3, 0, 3), (13, 3, 13), {"*": "#stone", "up": "#mark"}, cullfaces=("down",)),
+    ])
+
+
 BUILDERS = {
     "trampoline": trampoline,
     "spring_pad": spring_pad,
@@ -307,6 +339,8 @@ BUILDERS = {
     "on_off_switch_powered": lambda: on_off_switch(True),
     "spike_block": spike_block,
     "flag_pole_top": flag_pole_top,
+    "shift_gate": shift_gate,
+    "axe_block_taken": axe_block_taken,
 }
 
 

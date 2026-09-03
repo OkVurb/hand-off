@@ -1,6 +1,267 @@
 {
-  "parent": "minecraft:item/generated",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "layer0": "planeshift:item/star_coin"
-  }
+    "layer0": "planeshift:item/star_coin",
+    "particle": "planeshift:item/star_coin"
+  },
+  "elements": [
+    {
+      "from": [
+        5.5,
+        1,
+        7.5
+      ],
+      "to": [
+        10.5,
+        14,
+        8.5
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            5.5,
+            7.5,
+            10.5,
+            8.5
+          ],
+          "texture": "#layer0"
+        },
+        "up": {
+          "uv": [
+            5.5,
+            7.5,
+            10.5,
+            8.5
+          ],
+          "texture": "#layer0"
+        },
+        "north": {
+          "uv": [
+            5.5,
+            2,
+            10.5,
+            15
+          ],
+          "texture": "#layer0"
+        },
+        "south": {
+          "uv": [
+            5.5,
+            2,
+            10.5,
+            15
+          ],
+          "texture": "#layer0"
+        },
+        "east": {
+          "uv": [
+            7.5,
+            2,
+            8.5,
+            15
+          ],
+          "texture": "#layer0"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            2,
+            8.5,
+            15
+          ],
+          "texture": "#layer0"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        3,
+        7.5
+      ],
+      "to": [
+        11.5,
+        12,
+        8.5
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            4.5,
+            7.5,
+            11.5,
+            8.5
+          ],
+          "texture": "#layer0"
+        },
+        "up": {
+          "uv": [
+            4.5,
+            7.5,
+            11.5,
+            8.5
+          ],
+          "texture": "#layer0"
+        },
+        "north": {
+          "uv": [
+            4.5,
+            4,
+            11.5,
+            13
+          ],
+          "texture": "#layer0"
+        },
+        "south": {
+          "uv": [
+            4.5,
+            4,
+            11.5,
+            13
+          ],
+          "texture": "#layer0"
+        },
+        "east": {
+          "uv": [
+            7.5,
+            4,
+            8.5,
+            13
+          ],
+          "texture": "#layer0"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            4,
+            8.5,
+            13
+          ],
+          "texture": "#layer0"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  },
+  "gui_light": "front"
 }
