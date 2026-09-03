@@ -36,6 +36,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.HAMMER.get());
                         output.accept(ModItems.BOOMERANG.get());
                         output.accept(ModItems.TANOOKI.get());
+                        output.accept(ModItems.CAT_SUIT.get());
                         output.accept(ModItems.STAR_COIN.get());
                         output.accept(ModItems.EMBER_CHARM.get());
                         output.accept(ModItems.GALE_CHARM.get());

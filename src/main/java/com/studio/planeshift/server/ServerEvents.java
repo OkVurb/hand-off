@@ -29,6 +29,7 @@ import com.studio.planeshift.common.item.MiniMushroomItem;
 import com.studio.planeshift.common.item.StarCoinItem;
 import com.studio.planeshift.common.item.StarPowerItem;
 import com.studio.planeshift.common.item.SuperMushroomItem;
+import com.studio.planeshift.common.item.CatSuitItem;
 import com.studio.planeshift.common.item.TanookiSuitItem;
 import com.studio.planeshift.common.item.ThreeUpItem;
 import net.minecraft.server.level.ServerPlayer;
@@ -110,6 +111,7 @@ public final class ServerEvents {
             CourseTimerService.tick(player);
             CourseProgressService.tick(player);
             ToadDialogueService.tick(player);
+            CatFormService.tick(player);
             // Task 59: Ambient ash and spark particles for lava theme
             if (CourseStateAccess.get(player).inCourse()
                     && CourseThemeService.get(player) == com.studio.planeshift.common.course.CourseTheme.LAVA
@@ -503,6 +505,13 @@ public final class ServerEvents {
             FormService.grant(player, PlaneShift.id("boomerang"));
             level.playSound(null, player.blockPosition(),
                     ModSounds.POWER_UP.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
+        } else if (item instanceof CatSuitItem) {
+            entity.discard();
+            CourseStateAccess.update(player, s -> s.withPips(CourseState.MAX_PIPS, 0L));
+            FormService.grant(player, PlaneShift.id("cat"));
+            player.addEffect(new MobEffectInstance(ModEffects.CAT_AURA, 1200, 0, false, false, true));
+            level.playSound(null, player.blockPosition(),
+                    ModSounds.POWER_UP.get(), SoundSource.PLAYERS, 0.9F, 1.1F);
         } else if (item instanceof TanookiSuitItem) {
             entity.discard();
             CourseStateAccess.update(player, s -> s.withPips(CourseState.MAX_PIPS, 0L));

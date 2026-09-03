@@ -1,0 +1,9 @@
+{
+  "category": "offense",
+  "action": "claw_swipe",
+  "max_charges": 40,
+  "cooldown_ticks": 5,
+  "action_power": 1.0,
+  "reserve_eligible": true,
+  "accent_color": 4294945024
+}

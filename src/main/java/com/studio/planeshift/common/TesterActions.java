@@ -32,7 +32,7 @@ public final class TesterActions {
             "super_mushroom", "mega_mushroom", "mini_mushroom",
             "fire_flower", "ice_flower", "leaf",
             "propeller_mushroom", "cloud_flower", "tanooki_suit",
-            "hammer", "boomerang", "acorn",
+            "hammer", "boomerang", "acorn", "cat_suit",
             "star_power", "poison_mushroom", "extra_pip",
             "three_up", "five_up", "coin", "star_coin");
 

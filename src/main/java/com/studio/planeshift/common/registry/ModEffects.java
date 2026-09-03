@@ -90,6 +90,22 @@ public final class ModEffects {
                 return effect;
             });
 
+    /**
+     * Cat Suit. Faster on the ground and a slightly stronger jump, because the suit is about
+     * momentum and reach rather than about raw power — the offence comes from the dive and the
+     * claw, not from the stat line.
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> CAT_AURA =
+            EFFECTS.register("cat_aura", () -> {
+                MobEffect effect = new MobEffect(MobEffectCategory.BENEFICIAL, 0xF2A93B) {};
+                effect.addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                        PlaneShift.id("cat_speed"), 0.12D,
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                effect.addAttributeModifier(Attributes.JUMP_STRENGTH,
+                        PlaneShift.id("cat_jump"), 0.1D, AttributeModifier.Operation.ADD_VALUE);
+                return effect;
+            });
+
     private ModEffects() {
     }
 }

@@ -59,6 +59,7 @@ public final class TesterService {
         map.put("propeller_mushroom", ModItems.PROPELLER_MUSHROOM);
         map.put("cloud_flower", ModItems.CLOUD_FLOWER);
         map.put("tanooki_suit", ModItems.TANOOKI);
+        map.put("cat_suit", ModItems.CAT_SUIT);
         map.put("hammer", ModItems.HAMMER);
         map.put("boomerang", ModItems.BOOMERANG);
         map.put("acorn", ModItems.ACORN);

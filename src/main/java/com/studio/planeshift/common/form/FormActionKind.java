@@ -27,6 +27,14 @@ public enum FormActionKind implements StringRepresentable {
     HAMMER_THROW("hammer_throw"),
     /** Throws a boomerang that damages enemies and returns. */
     BOOMERANG_THROW("boomerang_throw"),
+    /**
+     * Cat Suit claw swipe: a fast, short, two-hit arc in front of the player.
+     *
+     * <p>Deliberately shorter-ranged and faster than {@link #TAIL_WHACK}. The tail is a crowd
+     * clearer; the claw is a commitment at close range, which is what makes carrying both worth
+     * doing.
+     */
+    CLAW_SWIPE("claw_swipe"),
     /** Short-range tail swipe that damages enemies in front of the player. */
     TAIL_WHACK("tail_whack"),
     /** Propeller hat launch straight up. */

@@ -167,6 +167,7 @@ public final class FormService {
             case ICE_SHOT -> fireIceball(player, aim, form);
             case HAMMER_THROW -> throwHammer(player, aim, form);
             case BOOMERANG_THROW -> throwBoomerang(player, aim, form);
+            case CLAW_SWIPE -> clawSwipe(player, form);
             case TAIL_WHACK -> tailWhack(player, form);
             case PROPELLER_SPIN -> propellerSpin(player, form);
             case ACORN_GLIDE -> acornGlide(player, aim, form);
@@ -261,6 +262,40 @@ public final class FormService {
         player.level().addFreshEntity(boomerang);
         player.level().playSound(null, player.blockPosition(), SoundEvents.EGG_THROW,
                 SoundSource.PLAYERS, 0.6F, 1.1F);
+        return true;
+    }
+
+    /**
+     * The Cat Suit claw: two quick arcs in front of the player.
+     *
+     * <p>Shorter reach than the tail whack and a tighter box, but it hits twice and applies no
+     * knockback. That difference is the whole point of having both — the tail pushes a crowd away,
+     * the claw kills the thing in front of you. Knockback would undo the second hit by shoving the
+     * target out of the box, so it is left off deliberately rather than forgotten.
+     */
+    private static boolean clawSwipe(ServerPlayer player, FormDefinition form) {
+        Vec3 look = player.getLookAngle();
+        Vec3 center = player.position()
+                .add(look.scale(1.1D))
+                .add(0.0D, player.getBbHeight() / 2.0D, 0.0D);
+        AABB box = new AABB(center, center).inflate(0.85D);
+
+        boolean hit = false;
+        for (LivingEntity target : player.level().getEntitiesOfClass(LivingEntity.class, box,
+                e -> e != player && e.canBeHitByProjectile())) {
+            // Two strikes, resolved in one action so the cooldown still governs the rate.
+            float damage = 3.0F + form.actionPower();
+            target.hurtServer(player.level(), player.damageSources().playerAttack(player), damage);
+            target.invulnerableTime = 0;
+            target.hurtServer(player.level(), player.damageSources().playerAttack(player), damage);
+            hit = true;
+        }
+        player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP,
+                SoundSource.PLAYERS, 0.8F, 1.7F);
+        if (player.level() instanceof net.minecraft.server.level.ServerLevel level) {
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.SWEEP_ATTACK,
+                    center.x, center.y, center.z, 2, 0.2D, 0.2D, 0.2D, 0.0D);
+        }
         return true;
     }
 

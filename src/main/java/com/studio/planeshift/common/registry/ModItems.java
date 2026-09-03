@@ -19,6 +19,7 @@ import com.studio.planeshift.common.item.PropellerMushroomItem;
 import com.studio.planeshift.common.item.StarCoinItem;
 import com.studio.planeshift.common.item.StarPowerItem;
 import com.studio.planeshift.common.item.SuperMushroomItem;
+import com.studio.planeshift.common.item.CatSuitItem;
 import com.studio.planeshift.common.item.TanookiSuitItem;
 import com.studio.planeshift.common.item.ThreeUpItem;
 import net.minecraft.world.entity.EntityType;
@@ -74,6 +75,13 @@ public final class ModItems {
             ITEMS.registerItem("hammer", HammerItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<BoomerangItem> BOOMERANG =
             ITEMS.registerItem("boomerang", BoomerangItem::new, p -> p.stacksTo(16));
+    /**
+     * Cat Suit. Claw swipe, pounce dive and wall cling; the climbing and all-fours animation come
+     * from Player Animation Library and ParCool rather than from here.
+     */
+    public static final DeferredItem<CatSuitItem> CAT_SUIT =
+            ITEMS.registerItem("cat_suit", CatSuitItem::new, p -> p.stacksTo(16));
+
     public static final DeferredItem<TanookiSuitItem> TANOOKI =
             ITEMS.registerItem("tanooki", TanookiSuitItem::new, p -> p.stacksTo(16));
 

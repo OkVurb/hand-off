@@ -300,5 +300,9 @@
   "gui.planeshift.tester.unlock_all": "Unlock all courses",
   "gui.planeshift.tester.reset_progress": "Reset progress",
   "message.planeshift.tester.denied": "The tester menu is disabled on this server.",
-  "message.planeshift.tester.unlocked": "Unlocked all %s courses."
+  "message.planeshift.tester.unlocked": "Unlocked all %s courses.",
+  "item.planeshift.cat_suit": "Cat Suit",
+  "effect.planeshift.cat_aura": "Cat Suit",
+  "form.planeshift.cat": "Cat",
+  "gui.planeshift.tester.cat_suit": "Cat Suit"
 }
