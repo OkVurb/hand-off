@@ -1,6 +1,12 @@
 package com.studio.planeshift.common.entity;
 
+import com.studio.planeshift.common.block.BrickBlock;
+import com.studio.planeshift.common.block.QuestionBlock;
 import com.studio.planeshift.common.registry.ModSounds;
+import com.studio.planeshift.server.CourseScoringService;
+import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -14,6 +20,8 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -52,6 +60,8 @@ public class KoopaEntity extends CourseEnemyEntity {
     private static final int KICK_GRACE_TICKS = 10;
 
     private int shellSince = -1;
+    private UUID kickerUuid;
+    private int shellCombo;
 
     public KoopaEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -136,6 +146,33 @@ public class KoopaEntity extends CourseEnemyEntity {
     private void tickSlide() {
         Vec3 velocity = getDeltaMovement();
         if (horizontalCollision) {
+            // Check for breakable bricks or question blocks in the path of the shell
+            if (velocity.lengthSqr() > 1.0E-4) {
+                Direction dir = Direction.getNearest(velocity.x, 0.0D, velocity.z);
+                BlockPos wallPos = blockPosition().relative(dir);
+                BlockState wallState = level().getBlockState(wallPos);
+                if (wallState.getBlock() instanceof BrickBlock) {
+                    if (BrickBlock.isCoinBrick(wallPos)) {
+                        if (!wallState.getValue(BrickBlock.SPENT)) {
+                            level().setBlock(wallPos, wallState.setValue(BrickBlock.SPENT, true), Block.UPDATE_ALL);
+                            BrickBlock.payCoin(level(), wallPos);
+                        } else {
+                            level().playSound(null, wallPos, ModSounds.QUESTION_BUMP.get(), SoundSource.BLOCKS, 0.8F, 1.0F);
+                        }
+                    } else {
+                        level().destroyBlock(wallPos, false);
+                        level().playSound(null, wallPos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                    }
+                } else if (wallState.getBlock() instanceof QuestionBlock questionBlock) {
+                    if (!wallState.getValue(QuestionBlock.SPENT) && kickerUuid != null && level() instanceof ServerLevel sl) {
+                        ServerPlayer kicker = sl.getServer().getPlayerList().getPlayer(kickerUuid);
+                        if (kicker != null) {
+                            questionBlock.attemptHitFromBelow(wallState, level(), wallPos, kicker);
+                        }
+                    }
+                }
+            }
+
             // Bounce off walls so a shell ricochets down a corridor instead of stalling.
             setDeltaMovement(-velocity.x, velocity.y, -velocity.z);
             setYRot(getYRot() + 180.0F);
@@ -147,6 +184,14 @@ public class KoopaEntity extends CourseEnemyEntity {
             victim.hurtServer((ServerLevel) level(), damageSources().mobAttack(this), SHELL_DAMAGE);
             level().playSound(null, blockPosition(), ModSounds.ENEMY_DEFEAT.get(),
                     SoundSource.HOSTILE, 0.9F, 1.1F);
+
+            if (kickerUuid != null && level() instanceof ServerLevel sl) {
+                ServerPlayer kicker = sl.getServer().getPlayerList().getPlayer(kickerUuid);
+                if (kicker != null && kicker.isAlive()) {
+                    CourseScoringService.awardShellKill(kicker, victim.getX(), victim.getY(), victim.getZ(), shellCombo);
+                    shellCombo++;
+                }
+            }
         }
     }
 
@@ -188,6 +233,8 @@ public class KoopaEntity extends CourseEnemyEntity {
         entityData.set(IN_SHELL, true);
         entityData.set(SLIDING, false);
         shellSince = 0;
+        kickerUuid = null;
+        shellCombo = 0;
         setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
         goalSelector.removeAllGoals(g -> true);
         targetSelector.removeAllGoals(g -> true);
@@ -210,6 +257,8 @@ public class KoopaEntity extends CourseEnemyEntity {
         }
         direction = direction.normalize().scale(SHELL_SPEED);
 
+        this.kickerUuid = player.getUUID();
+        this.shellCombo = 0;
         entityData.set(SLIDING, true);
         setDeltaMovement(direction.x, 0.0D, direction.z);
         hurtMarked = true;
@@ -220,6 +269,8 @@ public class KoopaEntity extends CourseEnemyEntity {
         entityData.set(SLIDING, false);
         setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
         shellSince = 0;
+        kickerUuid = null;
+        shellCombo = 0;
         level().playSound(null, blockPosition(), ModSounds.STOMP.get(), SoundSource.HOSTILE, 0.9F, 1.0F);
     }
 

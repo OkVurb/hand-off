@@ -84,8 +84,12 @@ public final class ModBlocks {
                     .sound(SoundType.LANTERN)
                     .lightLevel(state -> 14));
 
-    public static final DeferredBlock<Block> COURSE_SNOW_BLOCK = courseBlock(
-            "course_snow_block", MapColor.ICE, SoundType.SNOW);
+    public static final DeferredBlock<Block> COURSE_SNOW_BLOCK =
+            BLOCKS.registerSimpleBlock("course_snow_block", properties -> properties
+                    .mapColor(MapColor.ICE)
+                    .strength(1.5F, 6.0F)
+                    .sound(SoundType.SNOW)
+                    .friction(0.98F));
     public static final DeferredBlock<Block> COURSE_CASTLE_BLOCK = courseBlock(
             "course_castle_block", MapColor.DEEPSLATE, SoundType.DEEPSLATE_BRICKS);
     public static final DeferredBlock<Block> COURSE_MAGMA_BLOCK = courseBlock(

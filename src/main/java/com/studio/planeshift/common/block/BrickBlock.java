@@ -92,7 +92,7 @@ public class BrickBlock extends Block implements HitFromBelowBlock {
     }
 
     /** Pops a coin out of the top of the brick, the way a question block does. */
-    private static void payCoin(Level level, BlockPos pos) {
+    public static void payCoin(Level level, BlockPos pos) {
         ItemEntity coin = new ItemEntity(level,
                 pos.getX() + 0.5D, pos.getY() + 1.05D, pos.getZ() + 0.5D,
                 new ItemStack(ModItems.COIN.get()));

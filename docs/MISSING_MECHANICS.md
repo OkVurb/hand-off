@@ -82,8 +82,8 @@ Bullet Bill, Piranha Plant, Bowser. All ground walkers now patrol rather than ch
 35. **Bullet Bill launcher block.** [new] Currently Bullet Bills have no source; a cannon block
     would make them part of the level rather than spawned from nowhere.
 36. **Rex** — takes two stomps, flattening on the first. [new]
-37. **Enemy shell interactions.** [extend] A kicked Koopa shell should defeat other enemies it
-    passes through and build a combo. `KoopaEntity` has the shell; it does not hit other enemies.
+~~37. **Enemy shell interactions.** [extend] A kicked Koopa shell should defeat other enemies it
+    passes through and build a combo. `KoopaEntity` has the shell; it does not hit other enemies.~~
 38. **Enemies knocked off by a shell falling into pits.** [extend]
 ~~39. **Stomp chains across different enemy types.** [fix] Verify `CourseScoringService` counts a
     mixed chain; it currently counts defeats, which may not match a shell-kill chain.~~

@@ -6,6 +6,7 @@ import com.studio.planeshift.common.registry.ModSounds;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -140,6 +141,33 @@ public final class CourseScoringService {
     private static void sendPopup(ServerPlayer player, int amount) {
         PacketDistributor.sendToPlayer(player,
                 new ScorePopupPayload(player.getX(), player.getY() + 1.6D, player.getZ(), amount));
+    }
+
+    private static void sendPopup(ServerPlayer player, int amount, double x, double y, double z) {
+        PacketDistributor.sendToPlayer(player,
+                new ScorePopupPayload(x, y + 1.2D, z, amount));
+    }
+
+    /**
+     * Scores an enemy defeated by a sliding shell. Consecutive enemies defeated by the same
+     * kicked shell advance along the combo ladder (100 -> 200 -> 400 ... -> 1-Up).
+     *
+     * @param comboStep 0-indexed count of enemies defeated on this shell slide
+     */
+    public static int awardShellKill(ServerPlayer player, double x, double y, double z, int comboStep) {
+        DEFEATED.put(player.getUUID(), DEFEATED.getOrDefault(player.getUUID(), 0) + 1);
+        int points = stompValue(Math.max(0, comboStep));
+        sendPopup(player, points == ONE_UP_INSTEAD ? 0 : points, x, y, z);
+
+        if (points == ONE_UP_INSTEAD) {
+            CourseStateAccess.update(player, s -> s.withLives(s.lives() + 1));
+            player.level().playSound(null, BlockPos.containing(x, y, z), ModSounds.ONE_UP.get(),
+                    SoundSource.PLAYERS, 0.9F, 1.0F);
+            return 0;
+        }
+
+        addScore(player, points);
+        return points;
     }
 
     /**
