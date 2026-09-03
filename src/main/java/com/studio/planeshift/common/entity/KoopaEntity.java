@@ -148,7 +148,7 @@ public class KoopaEntity extends CourseEnemyEntity {
         if (horizontalCollision) {
             // Check for breakable bricks or question blocks in the path of the shell
             if (velocity.lengthSqr() > 1.0E-4) {
-                Direction dir = Direction.getNearest(velocity.x, 0.0D, velocity.z);
+                Direction dir = Direction.getApproximateNearest(velocity.x, 0.0D, velocity.z);
                 BlockPos wallPos = blockPosition().relative(dir);
                 BlockState wallState = level().getBlockState(wallPos);
                 if (wallState.getBlock() instanceof BrickBlock) {
@@ -164,7 +164,7 @@ public class KoopaEntity extends CourseEnemyEntity {
                         level().playSound(null, wallPos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                     }
                 } else if (wallState.getBlock() instanceof QuestionBlock questionBlock) {
-                    if (!wallState.getValue(QuestionBlock.SPENT) && kickerUuid != null && level() instanceof ServerLevel sl) {
+                    if (!wallState.getValue(QuestionBlock.USED) && kickerUuid != null && level() instanceof ServerLevel sl) {
                         ServerPlayer kicker = sl.getServer().getPlayerList().getPlayer(kickerUuid);
                         if (kicker != null) {
                             questionBlock.attemptHitFromBelow(wallState, level(), wallPos, kicker);
