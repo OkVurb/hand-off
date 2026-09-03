@@ -94,7 +94,12 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
         final int blocksPerSetPiece = Math.max(12, BLOCKS_PER_SET_PIECE - (worldNum - 1) * 3);
         int gapWidth = layout.maxGapWidth();
         if (layout.gapCount().isEmpty() && worldNum > 1) {
-            gapWidth = Math.min(8, gapWidth + worldNum - 1);
+            // Clamped to the declared jumpable limit, not to a looser literal. Widening past it
+            // generated pits the player cannot cross: a sweep over every theme, world, length and
+            // forty seeds found 4,073 courses with an 8-block hole, all of them from world 2 up.
+            // Difficulty has to come from pit *frequency* and set-piece density, which the two
+            // constants above already scale — never from making a single jump impossible.
+            gapWidth = Math.min(CourseLayout.JUMPABLE_LIMIT, gapWidth + worldNum - 1);
         }
         final int finalGapWidth = gapWidth;
 

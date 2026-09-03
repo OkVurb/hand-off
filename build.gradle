@@ -375,6 +375,7 @@ tasks.register('checkTextureAssets') {
 
         // Distinctness and non-emptiness across the whole tree.
         def byDigest = [:].withDefault { [] }
+        def pixelsByFile = [:]
         texturesDir.eachFileRecurse { f ->
             if (!f.name.endsWith('.png')) return
             def rel = texturesDir.toPath().relativize(f.toPath()).toString().replace('\\', '/')
@@ -384,10 +385,55 @@ tasks.register('checkTextureAssets') {
             }
             def digest = java.security.MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString()
             byDigest[digest] << rel
+            pixelsByFile[rel] = f
         }
         byDigest.each { digest, files ->
             if (files.size() > 1) {
                 problems << "identical textures, cannot be told apart in game: " + files.sort().join(', ')
+            }
+        }
+
+        // Near-duplicate detection.
+        //
+        // A byte hash only catches *identical* files, and that is a check worth defeating by
+        // accident: at one point all 37 item textures were the same banana with two pixels altered
+        // per file, which passed the hash while leaving every power-up, coin and spawn egg
+        // indistinguishable in the hotbar. Comparing pixels catches the thing the hash was
+        // actually meant to prevent — two textures the player cannot tell apart.
+        //
+        // Only same-directory, same-size pairs are compared, so this stays O(n^2) over small
+        // groups rather than over every texture in the mod.
+        def NEAR_DUPLICATE_PERCENT = 4.0d
+        def readPixels = { java.io.File f ->
+            def img = javax.imageio.ImageIO.read(f)
+            if (img == null) return null
+            int w = img.width, h = img.height
+            int[] px = new int[w * h]
+            img.getRGB(0, 0, w, h, px, 0, w)
+            return [w: w, h: h, px: px]
+        }
+        def cache = [:]
+        def byGroup = [:].withDefault { [] }
+        pixelsByFile.each { rel, f -> byGroup[rel.substring(0, rel.lastIndexOf('/') + 1)] << rel }
+        byGroup.each { dir, rels ->
+            rels.sort()
+            for (int i = 0; i < rels.size(); i++) {
+                for (int j = i + 1; j < rels.size(); j++) {
+                    def a = cache.computeIfAbsent(rels[i]) { readPixels(pixelsByFile[it]) }
+                    def b = cache.computeIfAbsent(rels[j]) { readPixels(pixelsByFile[it]) }
+                    if (a == null || b == null) continue
+                    if (a.w != b.w || a.h != b.h) continue
+                    int differing = 0
+                    for (int k = 0; k < a.px.length; k++) {
+                        if (a.px[k] != b.px[k]) differing++
+                    }
+                    double pct = 100.0d * differing / a.px.length
+                    if (pct < NEAR_DUPLICATE_PERCENT) {
+                        problems << String.format(
+                                "near-identical textures (%.1f%% of pixels differ, need %.1f%%): %s, %s",
+                                pct, NEAR_DUPLICATE_PERCENT, rels[i], rels[j])
+                    }
+                }
             }
         }
 
