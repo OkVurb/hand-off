@@ -290,3 +290,82 @@ files means two half-conversations.
 **The rule:** if you write a script to transform assets, either run it and delete it, or make it a
 proper reproducible generator in `tools/` with a docstring saying how to run it — as
 `ItemTextureGen.py` now is.
+
+
+---
+
+## R6 — A bug 182 passing unit tests could not see
+
+**Author:** Claude (mine) · **Reviewer:** Claude · **2026-09-03** · Severity: **critical**
+
+### What was wrong
+
+Entering a course did nothing. No crash, no message, the player simply stayed where they were.
+
+```
+Failed to process a synchronized task of the payload: planeshift:course_select
+java.lang.NoClassDefFoundError: Could not initialize class
+    java.util.random.RandomGeneratorFactory$FactoryMapHolder
+```
+
+`CourseComposer` opened with:
+
+```java
+RandomGenerator random = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(seed);
+```
+
+`RandomGeneratorFactory` resolves algorithms through **ServiceLoader**. ServiceLoader does not
+initialise under FML's classloader, so the very first line of course composition threw — inside a
+payload handler, where the exception was logged and swallowed rather than crashing the game.
+
+### Why every test missed it
+
+This is the important part. The unit suite had **182 passing tests**, including 3,000 generated
+courses proving walkability, all of which called this exact method. They passed because a plain
+JUnit run uses the ordinary application classloader, where ServiceLoader works perfectly.
+
+**The test environment was not the runtime environment, and nothing in the suite could tell.**
+
+Anything that touches ServiceLoader, reflection, the module system, resource lookup or the
+classloader can behave differently in game than in a unit test. A unit test proves the *logic* is
+right. It cannot prove the code can *run where it will live*.
+
+### The fix
+
+```java
+// java.util.Random, not RandomGeneratorFactory. Nothing here needs a better generator than a
+// seeded LCG — the requirement is that the same seed gives the same course.
+RandomGenerator random = new java.util.Random(seed);
+```
+
+And, more importantly, a **GameTest** that composes a course for every theme and runs the
+reachability proof, so the same code is exercised under the real classloader. CI already runs
+`runGameTestServer`, so this specific class of bug cannot regress silently again.
+
+### The general rule
+
+**If a system will run inside Minecraft, test it inside Minecraft at least once.** Unit tests are
+faster and should carry the bulk of the coverage, but every subsystem wants one GameTest that
+simply runs it in the real environment. That single test is worth more than a hundred unit tests
+for catching environmental failures, because it is the only one that shares the runtime.
+
+Corollary: prefer boring platform APIs in mod code. `java.util.Random` is unglamorous and it
+works everywhere; the fancier factory bought nothing and cost a day of the mod being unplayable.
+
+---
+
+## R7 — A GameTest fixture that encoded old behaviour
+
+**Author:** Devin · **Reviewer:** Claude · **2026-09-03** · Severity: low
+
+`testAirDrop` laid a **single** stone block and expected a Goomba to stand on it. That was correct
+when it was written: ground enemies used `MeleeAttackGoal` with a target selector, so with no
+player present they stood still.
+
+Ground enemies patrol now. The Goomba walked off the one-block platform on its first tick and fell
+forever, so `onGround()` was never true and the air-drop flag never cleared.
+
+Floor widened to 3x3. Recording it because the failure looked like a product bug and was not: the
+test encoded an assumption about behaviour rather than testing the behaviour it named. When a test
+breaks after an intentional change, the first question is whether the test was describing the old
+behaviour by accident.
