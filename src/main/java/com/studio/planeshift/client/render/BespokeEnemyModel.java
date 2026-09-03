@@ -1,5 +1,6 @@
 package com.studio.planeshift.client.render;
 
+import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.PlaneShift;
 import java.util.EnumMap;
 import java.util.Map;

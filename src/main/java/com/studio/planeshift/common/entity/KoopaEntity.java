@@ -1,7 +1,6 @@
 package com.studio.planeshift.common.entity;
 
-import com.studio.planeshift.common.block.BrickBlock;
-import com.studio.planeshift.common.block.QuestionBlock;
+import com.studio.planeshift.common.block.HitFromBelowBlock;
 import com.studio.planeshift.common.registry.ModSounds;
 import com.studio.planeshift.server.CourseScoringService;
 import java.util.UUID;
@@ -153,23 +152,10 @@ public class KoopaEntity extends CourseEnemyEntity {
             // Check for breakable bricks or question blocks in the path of the shell
             if (velocity.lengthSqr() > 1.0E-4) {
                 Direction dir = Direction.getApproximateNearest(velocity.x, 0.0D, velocity.z);
-                BlockPos wallPos = blockPosition().relative(dir);
-                BlockState wallState = level().getBlockState(wallPos);
-                if (wallState.getBlock() instanceof BrickBlock) {
-                    if (BrickBlock.isCoinBrick(wallPos)) {
-                        if (!wallState.getValue(BrickBlock.SPENT)) {
-                            BrickBlock.payCoin(level(), wallPos);
-                            level().setBlock(wallPos, wallState.setValue(BrickBlock.SPENT, true), Block.UPDATE_ALL);
-                        } else {
-                            level().playSound(null, wallPos, ModSounds.QUESTION_BUMP.get(), SoundSource.BLOCKS, 0.8F, 1.0F);
-                        }
-                    } else {
-                        level().destroyBlock(wallPos, false);
-                        level().playSound(null, wallPos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
-                    }
-                } else if (wallState.getBlock() instanceof QuestionBlock questionBlock) {
-                    questionBlock.triggerFromImpact(wallState, level(), wallPos);
-                }
+                // One dispatcher for every non-head-bump impact, shared with the ground pound.
+                // This was a hand-rolled copy of BrickBlock's own rules, and it had already
+                // drifted: it knew nothing about coin blocks or rotating blocks.
+                HitFromBelowBlock.impact(level(), blockPosition().relative(dir));
             }
 
             // Bounce off walls so a shell ricochets down a corridor instead of stalling.

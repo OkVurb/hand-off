@@ -1,5 +1,6 @@
 package com.studio.planeshift.client.render;
 
+import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.PlaneShift;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;

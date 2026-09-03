@@ -91,6 +91,31 @@ public class BrickBlock extends Block implements HitFromBelowBlock {
         level.playSound(null, pos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
+    /**
+     * Reacts to an impact that is not a head bump — a ground pound, or a sliding shell.
+     *
+     * <p>Same rules as a bump: a coin brick pays a coin and becomes spent, a plain brick breaks,
+     * an already-spent brick just thuds. It breaks with {@code destroyBlock(pos, false)}, and the
+     * {@code false} matters — a brick that drops itself as a placeable item turns a level hazard
+     * into inventory, which is not what breaking a brick means here.
+     *
+     * @return true if the brick did anything at all
+     */
+    public static boolean impact(BlockState state, Level level, BlockPos pos) {
+        if (state.getValue(SPENT)) {
+            level.playSound(null, pos, ModSounds.QUESTION_BUMP.get(), SoundSource.BLOCKS, 0.8F, 1.0F);
+            return true;
+        }
+        if (isCoinBrick(pos)) {
+            payCoin(level, pos);
+            level.setBlock(pos, state.setValue(SPENT, true), Block.UPDATE_ALL);
+            return true;
+        }
+        level.destroyBlock(pos, false);
+        level.playSound(null, pos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        return true;
+    }
+
     /** Pops a coin out of the top of the brick, the way a question block does. */
     public static void payCoin(Level level, BlockPos pos) {
         ItemEntity coin = new ItemEntity(level,

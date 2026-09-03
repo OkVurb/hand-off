@@ -81,7 +81,14 @@ public final class SegmentLibrary {
     }
 
     /** Enemies suited to a theme, so a snow course is not full of Hammer Bros. */
-    private static List<EntityType<?>> cast(CourseTheme theme) {
+    /**
+     * The enemies a theme may use.
+     *
+     * <p>Public because the composer's roaming pass needs the same list the segments use. If they
+     * drew from different rosters a course would contain two disjoint casts, and the player would
+     * read that as the level being assembled from two different games.
+     */
+    public static List<EntityType<?>> cast(CourseTheme theme) {
         return switch (theme) {
             case GRASS -> List.of(ModEntities.GOOMBA.get(), ModEntities.KOOPA.get());
             case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.GOOMBA.get());

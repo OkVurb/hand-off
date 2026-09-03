@@ -32,6 +32,46 @@ public interface HitFromBelowBlock {
     void attemptHitFromBelow(BlockState state, Level level, BlockPos pos, Player player);
 
     /**
+     * Triggers whatever the block at {@code pos} does when something hits it that is <em>not</em>
+     * a head bump: a ground pound landing on top of it, or a kicked Koopa shell running into it.
+     *
+     * <p>Exists because {@link #attemptHitFromBelow} cannot serve those callers. It takes a
+     * {@link Player} — a shell has none — and every implementation gates on
+     * {@link #isHeadContact}, which a ground pound fails by definition, since the whole point is
+     * that the player is above the block rather than beneath it.
+     *
+     * <p>Before this existed the ground pound simply called {@code level.destroyBlock(pos, true)}
+     * on anything it landed on. That is wrong twice over: a question block dropped <em>itself</em>
+     * as an item instead of paying out its power-up, and a coin block was deleted along with
+     * every coin still inside it. A block's reward should not depend on which side you hit it
+     * from.
+     *
+     * @return true if the block reacted, so the caller can decide whether to play its own effects
+     */
+    static boolean impact(Level level, BlockPos pos) {
+        if (level.isClientSide()) {
+            return false;
+        }
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof QuestionBlock question) {
+            question.triggerFromImpact(state, level, pos);
+            return true;
+        }
+        if (state.getBlock() instanceof CoinBlock) {
+            CoinBlock.payOne(state, level, pos);
+            return true;
+        }
+        if (state.getBlock() instanceof RotatingBlock rotating) {
+            rotating.triggerSpin(state, level, pos);
+            return true;
+        }
+        if (state.getBlock() instanceof BrickBlock) {
+            return BrickBlock.impact(state, level, pos);
+        }
+        return false;
+    }
+
+    /**
      * Whether {@code player} is underneath {@code pos} and close enough for the hit to read as
      * a head bump.
      *

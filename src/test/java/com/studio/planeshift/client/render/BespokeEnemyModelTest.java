@@ -1,5 +1,6 @@
 package com.studio.planeshift.client.render;
 
+import com.studio.planeshift.common.entity.EnemyRigProfile;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

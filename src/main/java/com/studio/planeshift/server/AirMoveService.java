@@ -118,25 +118,42 @@ public final class AirMoveService {
             }
         }
 
-        // Variable jump: if the player is still moving upward, keep giving a tiny boost.
-        // Holding space = longer air time = higher jump in practice.
-        if (!player.onGround() && player.getLastClientInput().jump() && player.getDeltaMovement().y > 0.0D && player.getDeltaMovement().y < 0.45D) {
-            Vec3 vel = player.getDeltaMovement();
-            player.setDeltaMovement(vel.x, vel.y + HOLD_JUMP_BOOST, vel.z);
-            player.hurtMarked = true;
-        }
-
-        // Ledge clamber / mantle.
+        // Measured per-tick movement.
         //
-        // Direction comes from measured position change rather than getDeltaMovement(). The client
-        // drives player movement, so a ServerPlayer's delta is routinely stale or zero while the
-        // player is visibly running — the same reason the head-bump check below measures Y instead
-        // of reading velocity. Reading the delta here made the assist fire toward the wrong face,
-        // or not at all.
+        // Hoisted above every velocity write below, because all of them need it. The client owns
+        // player movement and the server applies it from position packets, so a ServerPlayer's
+        // getDeltaMovement() is routinely stale — most visibly in its horizontal components,
+        // which the server rebuilds from lagging input flags. The difference between two
+        // consecutive positions is the one thing the server definitely knows.
         double[] lastXz = LAST_XZ.get(player);
         double moveX = lastXz == null ? 0.0D : player.getX() - lastXz[0];
         double moveZ = lastXz == null ? 0.0D : player.getZ() - lastXz[1];
         LAST_XZ.put(player, new double[] {player.getX(), player.getZ()});
+        double measuredRise = player.getY() - LAST_Y.getOrDefault(player, player.getY());
+
+        // Variable jump: while the player is still rising and still holding jump, top up the
+        // climb. Holding space = longer air time = higher jump in practice.
+        //
+        // The boost has to be *added* to what the player actually has, not to what the server
+        // thinks they have. hurtMarked sends a velocity packet the client applies as an absolute
+        // override, so writing getDeltaMovement() straight back out replaced the client's real
+        // velocity with the server's stale copy on every tick of the rise. Two things broke as a
+        // result: a player moving left or right lost their horizontal speed each tick — the jump
+        // "didn't work well while moving" — and a client-side double jump from a movement mod was
+        // flattened the tick after it fired, because the server had never seen the extra height
+        // and cheerfully overwrote it with its own smaller number.
+        //
+        // Building the vector out of the measured deltas, and never sending a rise smaller than
+        // the one just measured, makes the packet agree with what the client already did instead
+        // of arguing with it.
+        if (!player.onGround() && player.getLastClientInput().jump()
+                && measuredRise > 0.0D && measuredRise < 0.45D) {
+            double rise = Math.max(player.getDeltaMovement().y, measuredRise) + HOLD_JUMP_BOOST;
+            player.setDeltaMovement(moveX, rise, moveZ);
+            player.hurtMarked = true;
+        }
+
+        // Ledge clamber / mantle. Direction from the same measured movement, for the same reason.
 
         int clamberCooldown = CLAMBER_COOLDOWN.getOrDefault(player, 0);
         if (player.onGround()) {
@@ -155,8 +172,7 @@ public final class AirMoveService {
             BlockPos headPos = waistPos.above();
             if (player.level().getBlockState(waistPos).isSolid()
                     && player.level().getBlockState(headPos).isAir()) {
-                Vec3 vel = player.getDeltaMovement();
-                player.setDeltaMovement(vel.x * 1.1D, 0.28D, vel.z * 1.1D);
+                player.setDeltaMovement(moveX * 1.1D, 0.28D, moveZ * 1.1D);
                 player.hurtMarked = true;
                 clamberCooldown = CLAMBER_COOLDOWN_TICKS;
             }
@@ -176,21 +192,21 @@ public final class AirMoveService {
             GROUND_POUNDING.put(player, true);
         } else if (player.onGround()) {
             if (GROUND_POUNDING.remove(player) != null) {
-                // Just landed from a ground pound. Break bricks below!
-                BlockPos pos = player.blockPosition();
-                BlockPos below = pos.below();
-                BlockState state = player.level().getBlockState(below);
-                if (state.getBlock() instanceof com.studio.planeshift.common.block.BrickBlock || 
-                    state.getBlock() instanceof com.studio.planeshift.common.block.QuestionBlock ||
-                    state.getBlock() instanceof com.studio.planeshift.common.block.RotatingBlock) {
-                    if (player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                        serverLevel.sendParticles(
-                                net.minecraft.core.particles.ParticleTypes.CRIT,
-                                below.getX() + 0.5D, below.getY() + 0.5D, below.getZ() + 0.5D,
-                                20, 0.3D, 0.3D, 0.3D, 0.1D);
-                    }
-                    player.level().destroyBlock(below, true);
-                    player.level().playSound(null, below, com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                // Landed from a ground pound: trigger whatever is underfoot.
+                //
+                // This used to call destroyBlock(below, true) on any brick, question or rotating
+                // block. That deleted the block and dropped it as an *item*, so pounding a
+                // question block handed the player a question block instead of the power-up
+                // inside it, and pounding a coin block threw away every coin still in it. A
+                // block's reward must not depend on which side it was hit from, so both this and
+                // the Koopa shell now go through the same dispatcher.
+                BlockPos below = player.blockPosition().below();
+                if (com.studio.planeshift.common.block.HitFromBelowBlock.impact(player.level(), below)
+                        && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                    serverLevel.sendParticles(
+                            net.minecraft.core.particles.ParticleTypes.CRIT,
+                            below.getX() + 0.5D, below.getY() + 1.0D, below.getZ() + 0.5D,
+                            20, 0.3D, 0.1D, 0.3D, 0.1D);
                 }
             }
         }
@@ -209,9 +225,8 @@ public final class AirMoveService {
         // Comparing this tick's Y against last tick's answers the real question — is this player
         // going up — from data the server definitely has. The grace window keeps the contact tick
         // eligible after the rise has already been stopped by the block itself.
-        double previousY = LAST_Y.getOrDefault(player, player.getY());
         LAST_Y.put(player, player.getY());
-        boolean rising = player.getY() - previousY > 0.001D;
+        boolean rising = measuredRise > 0.001D;
         if (rising) {
             RISING_GRACE.put(player, HEAD_BUMP_GRACE_TICKS);
         } else {

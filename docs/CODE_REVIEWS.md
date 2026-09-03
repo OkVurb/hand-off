@@ -521,3 +521,179 @@ which for the checkpoint beacon is empty space — an invisible post. Those face
 **A block's model and its `VoxelShape` are one decision, and they belong in the same change.**
 If you override `getShape` and do not touch the model, you have shipped a block whose appearance
 and its physics disagree, in a game genre entirely about knowing where the ground is.
+
+---
+
+## R10 — A ground pound that ate the reward it was supposed to release
+
+**Author:** Gemini · **Reviewer:** Claude · **2026-09-03** · Severity: high
+
+### What was wrong
+
+Landing a ground pound on a question block gave the player **a question block**.
+
+```java
+if (state.getBlock() instanceof BrickBlock ||
+    state.getBlock() instanceof QuestionBlock ||
+    state.getBlock() instanceof RotatingBlock) {
+    ...
+    player.level().destroyBlock(below, true);   // <- true means "drop yourself as an item"
+```
+
+A question block is a container. Destroying it deletes the container and, with `true`, drops the
+container as loot — so the mushroom inside was never created and the player picked up building
+material instead. A coin block was worse: every coin still inside it vanished. `CoinBlock` was not
+even in the list, so a coin block was simply inert from above.
+
+The same rules had a second, independently written copy in `KoopaEntity.tickSlide()`, for shells
+hitting blocks. That copy handled bricks and question blocks and had already drifted: it knew
+nothing about coin blocks or rotating blocks.
+
+### Why it happened
+
+`attemptHitFromBelow` could not be reused, for a real reason: it takes a `Player`, which a shell
+does not have, and every implementation gates on `isHeadContact`, which a ground pound fails by
+definition — the player is above the block, which is the entire point of the move.
+
+Facing that, both call sites did the locally reasonable thing and reimplemented the behaviour.
+Neither reimplementation is unreasonable in isolation. Together they are three different answers
+to "what does this block do when something hits it", and only one of them is in the block.
+
+### The fix
+
+One dispatcher, next to the interface that already owns this question:
+
+```java
+static boolean impact(Level level, BlockPos pos) {
+    BlockState state = level.getBlockState(pos);
+    if (state.getBlock() instanceof QuestionBlock question) { question.triggerFromImpact(...); return true; }
+    if (state.getBlock() instanceof CoinBlock)              { CoinBlock.payOne(...);           return true; }
+    if (state.getBlock() instanceof RotatingBlock rotating) { rotating.triggerSpin(...);       return true; }
+    if (state.getBlock() instanceof BrickBlock)             { return BrickBlock.impact(...); }
+    return false;
+}
+```
+
+`CoinBlock.payOne` and `BrickBlock.impact` were split out of the existing head-bump paths, so each
+block keeps its own rules and there is exactly one copy of them. Both the ground pound and the
+Koopa shell now call `impact`, and the shell gained coin blocks and rotating blocks for free.
+
+### The rule
+
+**When you cannot reuse a method, extract from it — do not retype it.** The blocker here was
+genuine (a `Player` parameter and a head-contact test), and the correct response to a genuine
+blocker is to move the reusable part somewhere both callers can reach. Copying it instead produced
+a second definition of what a block does, in a file about an entity, which then fell behind the
+first one.
+
+A useful smell: an `instanceof` chain over *your own* types, written outside those types, is
+almost always behaviour that belongs on them.
+
+---
+
+## R11 — A hitbox 25% smaller than the thing you can see
+
+**Author:** Gemini · **Reviewer:** Claude · **2026-09-03** · Severity: high
+
+### What was wrong
+
+"The Koopa hitbox still doesn't work." It did work — it was just not where the Koopa is.
+
+`CourseEnemyRenderer` scales the pose stack per silhouette so a small enemy is not two featureless
+pixels at the side camera's usual 20-30 block framing. A Koopa is drawn at 1.25×. The comment said
+so plainly:
+
+```java
+// ...so art gets a modest readability scale while the authoritative hitbox remains unchanged.
+```
+
+That sentence is the bug. The registered size stayed `sized(0.6F, 1.0F)` while the drawing became
+0.75 × 1.25, leaving a visible quarter-block of shell that nothing can touch. In a genre whose
+entire interaction vocabulary is "land on top of that thing", stomps that pass through the sprite
+do not read as a miss — they read as the game ignoring the input.
+
+The enlargement itself is a good idea and worth keeping. Enlarging only half of the entity is not.
+
+### Why it happened
+
+The two numbers live in different worlds: the scale is client rendering, the size is registration.
+Nothing connected them, and the renderer had no way to state its intent to the server, so the
+intent went into a comment instead — where it is true, unenforced, and easy to read as a decision
+rather than as an oversight.
+
+### The fix
+
+`EnemyRigProfile` moved from `client.render` to `common.entity` and now carries the scale:
+
+```java
+GECKO(1.25F), SPROUTLING(1.35F), FLYER(1.30F), ...
+public float scaled(float built) { return built * visualScale; }
+```
+
+The renderer reads `profile.visualScale()`; `ModEntities` registers
+`sized(GECKO.scaled(0.6F), GECKO.scaled(1.0F))`. The numbers in `ModEntities` are now the size the
+art is actually built at, and what gets registered is what appears on screen.
+
+### The rule
+
+**If a value must agree in two places, it must be declared in one.** A comment saying the other
+half is intentionally different is not a mechanism — it is a note explaining a bug to whoever
+finds it later.
+
+---
+
+## R12 — Levels the generator was happy to leave empty
+
+**Author:** Gemini · **Reviewer:** Claude · **2026-09-03** · Severity: medium
+
+### What was wrong
+
+"There aren't a lot of enemies per map." Measured: a 96-block course frequently held **one**
+enemy, sometimes zero. Courses are now 720 blocks long.
+
+Two causes compounding. Only seven of the catalogue's thirty-nine segments carry enemies at all,
+so enemies could only appear where one of those seven landed. And `pick()` applies a flat −7 weight
+to any segment repeating a tag just used:
+
+```java
+if (recent.contains(tag)) { weight -= 7; }
+```
+
+That rule is right for structural tags — a gap puzzle straight after a gap puzzle is the level
+running out of ideas — and wrong for `ENEMY`, where it took the seven segments that could produce
+an enemy and actively pushed them apart.
+
+### Why it happened
+
+Nobody counted. The generator's tests proved courses were *completable*, and the courses were
+completable — an empty corridor is extremely completable. Length went from 144 to 720 in a separate
+change, which multiplied the sparseness by five without anything registering a complaint.
+
+### The fix
+
+A roaming pass over the finished canvas, plus a smaller repeat penalty for `ENEMY` (−2, not −7).
+
+The pass had one instructive false start. Its first version found a standing spot by scanning each
+column upward from the bottom of the world, which finds the floor of a **pit** exactly as readily
+as the floor of the level. It placed enemies three blocks down inside pits, where the player never
+sees them and they can never be part of anything. The fix was to record the floor each column was
+*designed* around while composing — the composer knows it at the time, and nothing else can
+recover it afterwards — and search from there.
+
+And a density floor in the tests, so this is something the build holds onto:
+
+```java
+double per100 = mobs * 100.0D / length;
+if (per100 < MIN_ENEMIES_PER_100_BLOCKS) { ... }
+```
+
+Three per hundred blocks is deliberately low. It is not a target; it is the point below which a
+course has stopped being a Mario level and become a walk.
+
+### The rule
+
+**"Is it possible" and "is it any good" are different questions, and only the first was being
+asked.** Every generator test checked structure: reachable, in bounds, no impossible jump. None
+measured *content*. A generator will happily satisfy every structural rule you write while
+producing something nobody wants to play, and the only defence is to assert the properties that
+make it fun — density, variety, pacing — in the same place you assert the ones that make it valid.

@@ -1,5 +1,6 @@
 package com.studio.planeshift.client.render;
 
+import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.studio.planeshift.common.entity.CourseEnemyEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -25,15 +26,7 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
         super(context, new BespokeEnemyModel(
                 context.bakeLayer(BespokeEnemyModel.layer(profile)), profile), shadowRadius);
         this.texture = texture;
-        this.visualScale = switch (profile) {
-            case SPROUTLING -> 1.35F;
-            case GECKO, WISP, CRAWLER, BEETLE -> 1.25F;
-            case FLYER -> 1.30F;
-            case WARRIOR -> 1.15F;
-            case RIDER -> 1.10F;
-            case CRUSHER, PLANT -> 1.05F;
-            case BOSS, VILLAGER -> 1.0F;
-        };
+        this.visualScale = profile.visualScale();
     }
 
     @Override
@@ -56,9 +49,12 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
     @Override
     protected void scale(CourseEnemyRenderState state, PoseStack poseStack) {
         super.scale(state, poseStack);
-        // The side camera commonly frames 20-30 blocks.  Collision-accurate small mobs became
-        // featureless pixels at that distance, so art gets a modest readability scale while the
-        // authoritative hitbox remains unchanged.
+        // The side camera commonly frames 20-30 blocks, at which a collision-accurate small mob
+        // is a couple of featureless pixels, so the art is drawn larger than it is built.
+        //
+        // The same factor is applied to the registered entity size in ModEntities. It has to be:
+        // this used to scale the drawing only, so a Koopa had a visible quarter-block of shell
+        // that no stomp could reach. See EnemyRigProfile.
         poseStack.scale(visualScale, visualScale, visualScale);
         if (state.squishY < 1.0F) {
             // Scale about the feet, not the centre, so a squashed enemy stays on the ground

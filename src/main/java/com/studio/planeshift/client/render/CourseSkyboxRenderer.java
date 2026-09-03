@@ -44,10 +44,25 @@ public final class CourseSkyboxRenderer implements CustomSkyboxRenderer {
 
     private GpuBuffer cubeBuffer;
 
+    /**
+     * Whether this renderer has ever actually run.
+     *
+     * <p>Logged once, because "the sky is grey" has two completely different causes and no way to
+     * tell them apart by looking. Either this renderer is never called — Iris takes over sky
+     * rendering wholesale when a shaderpack is loaded, and a NeoForge custom skybox is not part of
+     * that pipeline — or it is called and something about the draw is wrong. One log line settles
+     * it, and costs nothing after the first frame.
+     */
+    private static boolean announced;
+
     @Override
     public boolean renderSky(LevelRenderState levelRenderState, SkyRenderState skyRenderState,
                              Matrix4f modelViewMatrix, Runnable setupFog) {
         setupFog.run();
+        if (!announced) {
+            announced = true;
+            PlaneShift.LOGGER.info("Course skybox renderer active, drawing {}", getTexture());
+        }
         if (cubeBuffer == null) {
             cubeBuffer = buildCube();
         }

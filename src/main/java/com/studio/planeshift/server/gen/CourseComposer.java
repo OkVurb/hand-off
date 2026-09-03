@@ -9,6 +9,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.random.RandomGenerator;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Arranges segments into a course.
@@ -48,6 +51,12 @@ public final class CourseComposer {
     private static final int SPAWN_RUN = 10;
     /** Flat ground before the flag, so the finish is never a blind jump. */
     private static final int FINISH_RUN = 12;
+
+    /** Slack on each end of the per-column floor map, since content starts a little before x=0. */
+    private static final int FLOOR_MAP_MARGIN = 16;
+
+    /** How far above the design floor a roaming enemy may be placed, in blocks. */
+    private static final int ROAM_MAX_CLIMB = 6;
 
     private CourseComposer() {
     }
@@ -106,6 +115,16 @@ public final class CourseComposer {
         }
         cursor = SPAWN_RUN;
 
+        // The floor height each column was *designed* around.
+        //
+        // Needed by the roaming pass, and it has to be recorded here because it cannot be
+        // recovered afterwards. Asking the finished canvas "what is the lowest solid block in this
+        // column" finds the bottom of a pit as readily as the floor, and the first version of the
+        // roaming pass did exactly that — it cheerfully placed enemies three blocks down inside
+        // pits, where the player never sees them and they can never be part of the level. The
+        // composer knows the answer while it is placing segments; nothing else ever does.
+        int[] floorAt = new int[length + FLOOR_MAP_MARGIN * 2 + 8];
+
         List<Placed> placed = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         Set<Segment.Tag> taught = EnumSet.noneOf(Segment.Tag.class);
@@ -153,12 +172,14 @@ public final class CourseComposer {
                 for (int i = 0; i < remaining; i++) {
                     ctx.ground(canvas, cursor + i, floorY);
                 }
+                recordFloor(floorAt, cursor, remaining, floorY, length);
                 cursor = contentEnd;
                 break;
             }
 
             Segment.SegmentSpec s = chosen.spec();
             chosen.build(canvas, cursor, floorY, ctx);
+            recordFloor(floorAt, cursor, s.width(), floorY, length);
             placed.add(new Placed(chosen, cursor, floorY));
             ids.add(s.id());
 
@@ -175,6 +196,7 @@ public final class CourseComposer {
         for (int i = cursor; i <= length + 6; i++) {
             ctx.ground(canvas, i, floorY);
         }
+        recordFloor(floorAt, cursor, length + 7 - cursor, floorY, length);
         int flagX = length;
         canvas.set(flagX, floorY + 1, 0, ModBlocks.FLAG_POLE.get().defaultBlockState()
                 .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.BASE));
@@ -188,6 +210,7 @@ public final class CourseComposer {
 
         int checkpointX = placeCheckpoint(canvas, placed, length);
         placeStarCoins(canvas, placed, ctx);
+        populate(canvas, ctx, floorAt, SPAWN_RUN, contentEnd, length);
 
         // spawnY is a standing position, which is one above the surface block: ground(x, 0)
         // fills y=0 with solid, so the player's feet are at y=1. Reporting the surface height
@@ -256,10 +279,16 @@ public final class CourseComposer {
             int weight = 10;
             // Prefer segments near the top of the allowed band, so the envelope is actually felt.
             weight += 6 * (s.difficulty() - Math.max(0, allowed - 1));
-            // Discourage repeating what was just played.
+            // Discourage repeating what was just played — but not equally for every tag.
+            //
+            // A gap puzzle immediately after a gap puzzle is the level running out of ideas. Two
+            // stretches with enemies in a row is just a level with enemies in it, which is the
+            // normal state of a Mario course. Penalising ENEMY as hard as everything else is a
+            // large part of why courses felt so empty: only seven of the catalogue's segments
+            // carry enemies at all, and the repeat rule then pushed those seven apart.
             for (Segment.Tag tag : s.tags()) {
                 if (recent.contains(tag)) {
-                    weight -= 7;
+                    weight -= tag == Segment.Tag.ENEMY ? 2 : 7;
                 }
                 if (!taught.contains(tag)) {
                     weight += 5;
@@ -352,4 +381,143 @@ public final class CourseComposer {
             canvas.item(ModItems.STAR_COIN.get(), SPAWN_RUN + i * 3 + 0.5D, 5.5D, 0.5D);
         }
     }
+
+    /**
+     * Scatters roaming enemies across the finished course.
+     *
+     * <p>Segments own the enemies that are part of a <em>designed</em> encounter — a patrol on a
+     * ledge between two pits, a Hammer Bro on a perch — and those stay exactly as they are. This
+     * pass fills in the space between them.
+     *
+     * <p>It exists because tagging enemies onto segments alone produces a course that is empty
+     * and then briefly dangerous and then empty again. Only seven of the catalogue's segments
+     * carry enemies, so across a 720-block course a player crosses long stretches with nothing to
+     * do. Real Mario levels are not built that way: enemies are the ambient texture, and the
+     * designed encounters are the moments that stand out <em>against</em> that texture. Without
+     * something in the background there is no foreground.
+     *
+     * <p>Runs on the finished canvas rather than inside the segments for two reasons. It can see
+     * the actual ground, including ground a segment raised or lowered, so an enemy is never
+     * placed inside rock or floating over a pit. And it cannot disturb a segment's own design,
+     * because it only ever adds to flat, empty, unclaimed ground.
+     */
+    private static void populate(CourseCanvas canvas, GenContext ctx, int[] floorAt,
+                                 int from, int to, int length) {
+        List<EntityType<?>> roster = SegmentLibrary.cast(ctx.theme());
+        if (roster.isEmpty()) {
+            return;
+        }
+
+        // Spacing shrinks with difficulty: an early course breathes, a late one crowds.
+        int spacing = Math.clamp(16 - 2 * ctx.difficulty(), 7, 16);
+        // ...and is capped against the course's own length, so a short course is not simply a long
+        // course with most of it cut off. Density is what the player feels; a fixed stride turns a
+        // 96-block course into three enemies and a walk.
+        spacing = Math.min(spacing, Math.max(6, (to - from) / 8));
+
+        // Not right at the start — the opening seconds are for orienting, and an enemy standing in
+        // the spawn apron is a death the player had no chance to read.
+        int cursor = from + 6;
+        int index = ctx.random().nextInt(roster.size());
+
+        while (cursor < to - 6) {
+            // Jitter, so the course does not tick like a metronome. Each slot gets a few tries,
+            // because a single sample lands on a pit or a wall often enough to leave whole
+            // stretches empty, and an empty stretch is exactly what this pass exists to prevent.
+            for (int attempt = 0; attempt < 4; attempt++) {
+                int x = cursor + ctx.random().nextInt(Math.max(1, spacing - 1));
+                if (x >= to - 6) {
+                    break;
+                }
+                int y = standingY(canvas, floorAt, x, length);
+                if (y == Integer.MIN_VALUE || occupied(canvas, x)) {
+                    continue;
+                }
+                // Facing back down the course, so the player meets it head-on rather than
+                // catching up with its back.
+                canvas.spawn(roster.get(index % roster.size()),
+                        x + 0.5D, y, 0.5D, 90.0F, SegmentLibrary.GENERATED_TAG);
+                index++;
+                break;
+            }
+            cursor += spacing;
+        }
+    }
+
+    /** Records the floor a stretch of course was designed around. */
+    private static void recordFloor(int[] floorAt, int from, int width, int floorY, int length) {
+        for (int x = from; x < from + width; x++) {
+            int slot = x + FLOOR_MAP_MARGIN;
+            if (slot >= 0 && slot < floorAt.length) {
+                floorAt[slot] = floorY;
+            }
+        }
+    }
+
+    /**
+     * A standing position in column {@code x} at or just above the designed floor, or
+     * {@link Integer#MIN_VALUE} if the column has none.
+     *
+     * <p>Searches upward from the design floor rather than from the bottom of the world, which is
+     * the whole reason {@code floorAt} exists. It allows a few blocks of climb so an enemy can sit
+     * on a low platform the segment built, but not so many that it ends up on a roof.
+     *
+     * <p>Requires floor under at least one neighbouring column too. An enemy dropped onto a single
+     * block walks straight off it — that is the same failure the air-drop GameTest caught — and a
+     * one-second cameo is not an obstacle.
+     */
+    private static int standingY(CourseCanvas canvas, int[] floorAt, int x, int length) {
+        int slot = x + FLOOR_MAP_MARGIN;
+        if (slot < 0 || slot >= floorAt.length) {
+            return Integer.MIN_VALUE;
+        }
+        int base = floorAt[slot];
+        for (int y = base + 1; y <= base + ROAM_MAX_CLIMB; y++) {
+            if (!solid(canvas, x, y - 1)) {
+                continue;
+            }
+            if (!solid(canvas, x - 1, y - 1) && !solid(canvas, x + 1, y - 1)) {
+                continue;
+            }
+            if (canvas.isEmpty(x, y, 0) && canvas.isEmpty(x, y + 1, 0)) {
+                return y;
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
+    /** Solid, and not something an enemy standing on it would die on or be carried off by. */
+    private static boolean solid(CourseCanvas canvas, int x, int y) {
+        BlockState state = canvas.get(x, y, 0);
+        return state != null && !ROAM_EXCLUDED.contains(state.getBlock());
+    }
+
+    /** Whether a segment already put something within a few blocks of this column. */
+    private static boolean occupied(CourseCanvas canvas, int x) {
+        for (CourseCanvas.EntitySpawn spawn : canvas.entities()) {
+            if (Math.abs(spawn.x() - x) < 4.0D) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Blocks a roaming enemy must not be dropped onto.
+     *
+     * <p>Hazards, because an enemy standing in a Muncher is a corpse rather than an obstacle, and
+     * moving or vanishing surfaces, because an enemy placed on one is gone by the time the player
+     * arrives. Segments may still place enemies on any of these deliberately; this is only about
+     * what the automatic pass is allowed to guess at.
+     */
+    private static final Set<Block> ROAM_EXCLUDED = Set.of(
+            ModBlocks.MUNCHER.get(),
+            ModBlocks.SPIKE_BLOCK.get(),
+            ModBlocks.DONUT_BLOCK.get(),
+            ModBlocks.CONVEYOR_BELT.get(),
+            ModBlocks.TRAMPOLINE.get(),
+            ModBlocks.SPRING_PAD.get(),
+            ModBlocks.FLAG_POLE.get(),
+            ModBlocks.COURSE_ICE_BLOCK.get());
+
 }

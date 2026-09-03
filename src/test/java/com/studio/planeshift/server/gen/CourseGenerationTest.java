@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.studio.planeshift.common.course.CourseTheme;
+import com.studio.planeshift.common.registry.ModEntities;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,9 +33,57 @@ class CourseGenerationTest {
     private static final int[] LENGTHS = {96, 144, 180, 224, 240, 720};
     private static final int SEEDS = 25;
 
+    /**
+     * The density floor, per hundred blocks.
+     *
+     * <p>Three is deliberately low. It is not a target — it is the point below which a course has
+     * stopped being a Mario level and become a walk, and the composer should have to try quite
+     * hard to go under it.
+     */
+    private static final double MIN_ENEMIES_PER_100_BLOCKS = 3.0D;
+
     private static CourseComposer.Composition compose(CourseTheme theme, int length, int difficulty,
                                                       long seed) {
         return CourseComposer.compose(theme, length, difficulty, seed);
+    }
+
+    /**
+     * Every course has enemies at a playable density.
+     *
+     * <p>This exists because "there aren't a lot of enemies per map" was a play-test report, not a
+     * build failure — the generator was perfectly happy producing 700 blocks of empty platforming.
+     * Only seven of the catalogue's segments carry enemies at all, so before the roaming pass a
+     * long course could contain a handful. A density floor turns a matter of taste into something
+     * the build can hold onto, and stops the next person tuning the composer's weights from
+     * silently emptying the levels again.
+     *
+     * <p>Expressed per hundred blocks rather than as a total, because the number that matters is
+     * how long the player goes without meeting anything.
+     */
+    @ParameterizedTest
+    @EnumSource(CourseTheme.class)
+    void coursesAreInhabited(CourseTheme theme) {
+        List<Failure> failures = new ArrayList<>();
+        int total = 0;
+        for (int length : LENGTHS) {
+            for (int difficulty = 1; difficulty <= 5; difficulty++) {
+                for (long seed = 0; seed < SEEDS; seed++) {
+                    total++;
+                    CourseComposer.Composition composition = compose(theme, length, difficulty, seed);
+                    long mobs = composition.canvas().entities().stream()
+                            .filter(e -> e.type() != ModEntities.MOVING_PLATFORM.get()
+                                    && e.type() != ModEntities.FIREBAR.get())
+                            .count();
+                    double per100 = mobs * 100.0D / length;
+                    if (per100 < MIN_ENEMIES_PER_100_BLOCKS) {
+                        failures.add(new Failure(theme, difficulty, length, seed,
+                                String.format("only %d enemies over %d blocks (%.1f per 100)",
+                                        mobs, length, per100)));
+                    }
+                }
+            }
+        }
+        report(failures, total);
     }
 
     /** One failing course, described well enough to reproduce it without rerunning the sweep. */

@@ -43,6 +43,19 @@ public class CoinBlock extends Block implements HitFromBelowBlock {
         if (level.isClientSide() || !(player instanceof ServerPlayer)) {
             return;
         }
+        payOne(state, level, pos);
+    }
+
+    /**
+     * Pays out one coin, if any are left.
+     *
+     * <p>Split out from {@link #attemptHitFromBelow} so an impact that is not a head bump — a
+     * ground pound landing on the block, a Koopa shell running into it — can trigger the same
+     * behaviour. Those callers cannot go through {@code attemptHitFromBelow} because it requires
+     * a {@link Player} and, for most of these blocks, a head-contact test the impacting thing
+     * fails by definition.
+     */
+    public static void payOne(BlockState state, Level level, BlockPos pos) {
         int remaining = state.getValue(COINS);
         if (remaining > 0) {
             ItemEntity drop = new ItemEntity(level,

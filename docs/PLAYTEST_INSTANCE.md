@@ -137,3 +137,54 @@ Asset index `29` is 1.21.11 (from `Install/versions/1.21.11/1.21.11.json`).
 
 This is only good for reproducing load-time failures. Anything past the main menu needs a real
 session.
+
+## The grey sky
+
+Reported from a play-test: the course sky is a flat grey gradient with a cloud layer, instead of
+the painted Mario backdrop.
+
+The mod side is wired correctly and has been checked end to end:
+
+- `data/planeshift/dimension_type/course.json` sets `"neoforge:custom_skybox": "planeshift:course"`,
+  and both `planeshift:course` and `planeshift:course_seasonal` use that dimension type.
+- `ClientModEvents` registers `CourseSkyboxRenderer` under `planeshift:course`.
+- All six `textures/environment/course_skybox_*.png` exist at 512×512 and are correct images —
+  blue sky, clouds, a green hill line. A missing texture would render magenta, not grey.
+
+That leaves the shader pack. **Iris takes over sky rendering wholesale when a shaderpack is
+loaded**, drawing the sky through the pack's own programs; a NeoForge `CustomSkyboxRenderer` is not
+part of that pipeline and is simply never called. Complementary Reimagined draws an atmospheric
+sky, which is exactly what a flat grey gradient with vanilla clouds looks like from inside a
+fixed-time dimension. The dimension type also sets `cloud_color` to `#00ffffff` — fully
+transparent — and clouds are visible anyway, which is a second sign that nothing in the dimension
+type is reaching the renderer.
+
+### Confirming it
+
+`CourseSkyboxRenderer` now logs once, the first time it actually draws:
+
+```
+Course skybox renderer active, drawing planeshift:textures/environment/course_skybox_grass.png
+```
+
+Enter a course and check `logs/latest.log`:
+
+- **Line absent** — the shader pack is drawing the sky. Press `K` (Iris: disable shaders) and the
+  backdrop should appear immediately.
+- **Line present but the sky is still grey** — the renderer runs and the draw is wrong, which is a
+  real bug in `CourseSkyboxRenderer` and a different investigation. The likely suspect is the
+  `RenderPipelines.END_SKY` pipeline combined with `setupFog.run()`.
+
+### If it is the shaders
+
+There is no clean fix from the mod side; a shaderpack that owns sky rendering owns it. The options,
+in order of how much they cost:
+
+1. Play courses with shaders off. The art is authored flat and 2D anyway, and Complementary's
+   lighting is doing very little for a side-on camera.
+2. Build the backdrop as real geometry — a wall of blocks a long way behind the lane — so it is
+   part of the world the shader is rendering rather than part of the sky it replaces. Expensive in
+   blocks, but it would survive any shader pack and would pick up the pack's lighting instead of
+   fighting it.
+3. Ship an Iris shader pack of our own for the course dimension. The most correct and by far the
+   most work.

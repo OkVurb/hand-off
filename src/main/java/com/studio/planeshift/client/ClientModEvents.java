@@ -11,7 +11,7 @@ import com.studio.planeshift.client.render.AnimatedCourseEnemyModel;
 import com.studio.planeshift.client.render.BespokeEnemyModel;
 import com.studio.planeshift.client.render.BespokeProjectileModel;
 import com.studio.planeshift.client.render.BespokeProjectileRenderer;
-import com.studio.planeshift.client.render.EnemyRigProfile;
+import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.client.render.FirebarRenderer;
 import com.studio.planeshift.client.render.MovingPlatformRenderer;
 import com.studio.planeshift.client.render.PlaceholderRigModel;
