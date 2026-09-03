@@ -139,6 +139,12 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_VINE);
     public static final DeferredItem<?> COURSE_MAGMA_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_MAGMA_BLOCK);
+    public static final DeferredItem<?> COURSE_WOOD_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_WOOD_BLOCK);
+    public static final DeferredItem<?> COURSE_HARD_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_HARD_BLOCK);
+    public static final DeferredItem<?> ROTATING_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.ROTATING_BLOCK);
 
     public static final DeferredItem<?> SHIFT_GATE_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.SHIFT_GATE);

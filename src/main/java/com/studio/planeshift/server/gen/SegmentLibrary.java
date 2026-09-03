@@ -644,6 +644,104 @@ public final class SegmentLibrary {
         }
     };
 
+    /** Wooden platform trellis crossing with upper and lower routes over a pit. */
+    static final Segment WOODEN_TRELLIS_CROSSING = new Segment() {
+        public SegmentSpec spec() {
+            return def("wooden_trellis_crossing", 16, 0, 2, Tag.CLIMB, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 3, y, ctx);
+            BlockState wood = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
+            for (int i = 0; i < 3; i++) {
+                c.setLane(x + 3 + i, y + 1, wood, ctx.halfWidth());
+            }
+            for (int i = 0; i < 3; i++) {
+                c.setLane(x + 7 + i, y + 3, wood, ctx.halfWidth());
+                c.item(ModItems.COIN.get(), x + 7 + i + 0.5D, y + 4.5D, 0.5D);
+            }
+            for (int i = 0; i < 3; i++) {
+                c.setLane(x + 11 + i, y + 1, wood, ctx.halfWidth());
+            }
+            floor(c, x + 14, 2, y, ctx);
+        }
+    };
+
+    /** Stepping stone pillars across a gap with coin rewards atop each pillar. */
+    static final Segment STEPPING_STONE_HOPS = new Segment() {
+        public SegmentSpec spec() {
+            return def("stepping_stone_hops", 17, 0, 2, Tag.CLIMB, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 3, y, ctx);
+            BlockState stone = ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState();
+            for (int h = -2; h <= 1; h++) {
+                c.setLane(x + 4, y + h, stone, ctx.halfWidth());
+                c.setLane(x + 5, y + h, stone, ctx.halfWidth());
+            }
+            c.item(ModItems.COIN.get(), x + 4.5D, y + 2.5D, 0.5D);
+
+            for (int h = -2; h <= 2; h++) {
+                c.setLane(x + 7, y + h, stone, ctx.halfWidth());
+                c.setLane(x + 8, y + h, stone, ctx.halfWidth());
+            }
+            c.item(ModItems.COIN.get(), x + 7.5D, y + 3.5D, 0.5D);
+
+            for (int h = -2; h <= 2; h++) {
+                c.setLane(x + 10, y + h, stone, ctx.halfWidth());
+                c.setLane(x + 11, y + h, stone, ctx.halfWidth());
+            }
+            c.item(ModItems.COIN.get(), x + 10.5D, y + 3.5D, 0.5D);
+
+            for (int h = -2; h <= 1; h++) {
+                c.setLane(x + 13, y + h, stone, ctx.halfWidth());
+                c.setLane(x + 14, y + h, stone, ctx.halfWidth());
+            }
+            c.item(ModItems.COIN.get(), x + 13.5D, y + 2.5D, 0.5D);
+
+            floor(c, x + 15, 2, y, ctx);
+        }
+    };
+
+    /** A bridge made of Rotating Blocks: runs solid unless hit or ground-pounded. */
+    static final Segment ROTATING_BRIDGE = new Segment() {
+        public SegmentSpec spec() {
+            return def("rotating_bridge", 15, 0, 2, Tag.BLOCKS, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 3, y, ctx);
+            BlockState rot = ModBlocks.ROTATING_BLOCK.get().defaultBlockState();
+            for (int i = 0; i < 9; i++) {
+                c.set(x + 3 + i, y, 0, rot);
+                c.item(ModItems.COIN.get(), x + 3 + i + 0.5D, y + 1.5D, 0.5D);
+            }
+            floor(c, x + 12, 3, y, ctx);
+        }
+    };
+
+    /** Multi-tier canopy with an elevated floating platform route over enemies below. */
+    static final Segment MULTI_TIER_CANOPY = new Segment() {
+        public SegmentSpec spec() {
+            return def("multi_tier_canopy", 18, 0, 3, Tag.CLIMB, Tag.ENEMY);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 18, y, ctx);
+            List<EntityType<?>> enemies = cast(ctx.theme());
+            if (!enemies.isEmpty()) {
+                mob(c, enemies.get(ctx.random().nextInt(enemies.size())), x + 9, y + 1, 0.0F);
+            }
+            platform(c, x + 3, 3, y + 3, ctx);
+            coinTrail(c, x + 3, 3, y + 4, 1);
+            platform(c, x + 7, 4, y + 5, ctx);
+            c.set(x + 9, y + 6, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+            platform(c, x + 12, 3, y + 3, ctx);
+            coinTrail(c, x + 12, 3, y + 4, 1);
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -676,6 +774,10 @@ public final class SegmentLibrary {
         list.add(THWOMP_HALL);
         list.add(FIREBAR_GATE);
         list.add(VINE_SECRET);
+        list.add(WOODEN_TRELLIS_CROSSING);
+        list.add(STEPPING_STONE_HOPS);
+        list.add(ROTATING_BRIDGE);
+        list.add(MULTI_TIER_CANOPY);
         return list;
     }
 

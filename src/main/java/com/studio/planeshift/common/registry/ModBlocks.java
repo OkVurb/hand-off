@@ -20,6 +20,7 @@ import com.studio.planeshift.common.block.PrizeCacheBlock;
 import com.studio.planeshift.common.block.PSwitchBlock;
 import com.studio.planeshift.common.block.PlaneshiftNoteBlock;
 import com.studio.planeshift.common.block.QuestionBlock;
+import com.studio.planeshift.common.block.RotatingBlock;
 import com.studio.planeshift.common.block.SecretPassageBlock;
 import com.studio.planeshift.common.block.ShiftGateBlock;
 import com.studio.planeshift.common.block.SpikeBlock;
@@ -94,6 +95,10 @@ public final class ModBlocks {
             "course_castle_block", MapColor.DEEPSLATE, SoundType.DEEPSLATE_BRICKS);
     public static final DeferredBlock<Block> COURSE_MAGMA_BLOCK = courseBlock(
             "course_magma_block", MapColor.FIRE, SoundType.NETHER_BRICKS);
+    public static final DeferredBlock<Block> COURSE_WOOD_BLOCK = courseBlock(
+            "course_wood_block", MapColor.WOOD, SoundType.WOOD);
+    public static final DeferredBlock<Block> COURSE_HARD_BLOCK = courseBlock(
+            "course_hard_block", MapColor.STONE, SoundType.STONE);
 
     public static final DeferredBlock<ShiftGateBlock> SHIFT_GATE =
             BLOCKS.registerBlock("shift_gate", ShiftGateBlock::new, p -> p
@@ -149,6 +154,12 @@ public final class ModBlocks {
                     .strength(1.0F)
                     .noLootTable()
                     .sound(SoundType.STONE));
+
+    public static final DeferredBlock<RotatingBlock> ROTATING_BLOCK =
+            BLOCKS.registerBlock("rotating_block", RotatingBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_YELLOW)
+                    .strength(1.2F)
+                    .sound(SoundType.WOOD));
 
     /** Course mechanics and hazards. */
     public static final DeferredBlock<ConveyorBlock> CONVEYOR_BELT =

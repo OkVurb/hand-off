@@ -48,6 +48,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.COURSE_SNOW_BLOCK_ITEM.get());
                         output.accept(ModItems.COURSE_CASTLE_BLOCK_ITEM.get());
                         output.accept(ModItems.COURSE_MAGMA_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_WOOD_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_HARD_BLOCK_ITEM.get());
                         output.accept(ModItems.SHIFT_GATE_ITEM.get());
                         output.accept(ModItems.CHECKPOINT_BEACON_ITEM.get());
                         output.accept(ModItems.SPRING_PAD_ITEM.get());
@@ -57,6 +59,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.QUESTION_BLOCK_ITEM.get());
                         output.accept(ModItems.HIDDEN_QUESTION_BLOCK_ITEM.get());
                         output.accept(ModItems.BRICK_BLOCK_ITEM.get());
+                        output.accept(ModItems.ROTATING_BLOCK_ITEM.get());
                         output.accept(ModItems.CONVEYOR_BELT_ITEM.get());
                         output.accept(ModItems.NOTE_BLOCK_ITEM.get());
                         output.accept(ModItems.MUSIC_BLOCK_ITEM.get());

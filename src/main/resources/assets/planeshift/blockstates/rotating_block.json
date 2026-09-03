@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "spinning=false": {
+      "model": "planeshift:block/rotating_block"
+    },
+    "spinning=true": {
+      "model": "planeshift:block/rotating_block_spinning"
+    }
+  }
+}

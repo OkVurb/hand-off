@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "planeshift:block/course_hard_block"
+    }
+  }
+}
