@@ -2,6 +2,9 @@ package com.studio.planeshift.server;
 
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.course.CourseDefinition;
+import com.studio.planeshift.server.gen.CourseCanvas;
+import com.studio.planeshift.server.gen.CourseComposer;
+import com.studio.planeshift.server.gen.CourseWriter;
 import com.studio.planeshift.common.course.CourseLayout;
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.entity.FirebarEntity;
@@ -75,69 +78,29 @@ public final class CourseStructureService {
         return true;
     }
 
+    /**
+     * Builds the course.
+     *
+     * <p>Delegates to the segment composer in {@code server.gen}. The old implementation wrote
+     * blocks into the world as it decided them, which meant a course could only be checked by
+     * loading it and walking it — so nobody did, and courses shipped with pits nobody could cross
+     * and platforms nobody could reach. Composition now produces a {@link CourseCanvas} first: an
+     * ordinary data structure a test can flood-fill and prove traversable before a block is
+     * placed. See {@code CourseReachability}.
+     */
     private static void placeGenerated(ServerLevel level, CourseDefinition course, String courseId) {
         BlockPos start = course.startPos();
-        // Seeded from the save as well as the course, so a new world is a new set of courses.
-        CourseLayoutPlan plan = CourseLayoutPlan.forCourse(course, courseId, level.getSeed());
-        int floorY = start.getY() - 1;
+        int difficulty = CourseLayoutPlan.difficultyOf(courseId);
+        long seed = CourseLayoutPlan.seedOf(courseId, level.getSeed());
 
-        clearCorridor(level, start, plan.length());
-        clearGeneratedEntities(level, start, plan.length());
+        CourseComposer.Composition composition =
+                CourseComposer.compose(course.theme(), course.length(), difficulty, seed);
 
-        Palette palette = Palette.forTheme(course.theme());
-        for (int offset = -4; offset <= plan.length() + 6; offset++) {
-            if (!plan.hasGroundAt(offset)) {
-                placePitAccent(level, start, floorY, offset, course.theme());
-                continue;
-            }
-            placeGroundSlice(level, start, floorY, offset, palette);
-        }
+        CourseWriter.write(level, start, composition.canvas(), course.length());
 
-        buildStartLandmark(level, start, palette);
-        buildRewardRun(level, start);
-        buildPlatformSet(level, start, plan, palette);
-        buildMechanicSet(level, start, plan);
-        buildFinish(level, start, plan, palette);
-        spawnRewards(level, start, plan);
-        spawnCast(level, start, plan, course.theme());
-
-        // Set pieces are opt-in per course now rather than switched on the theme, so two courses
-        // sharing a theme can differ in what they actually ask the player to do.
-        if (plan.has(CourseLayout.Feature.DONUT_BRIDGE) || plan.has(CourseLayout.Feature.DONUT_GAUNTLET)) {
-            buildDonutBridge(level, start, plan);
-        }
-        if (plan.has(CourseLayout.Feature.NOTE_BLOCK_RUN)) {
-            buildNoteBlockRun(level, start, plan);
-        }
-        if (plan.has(CourseLayout.Feature.SECRET_VINE)) {
-            buildSecretVine(level, start, plan);
-        }
-        if (plan.has(CourseLayout.Feature.COIN_HEAVEN)) {
-            buildCoinHeaven(level, start, plan, palette);
-        }
-        if (plan.has(CourseLayout.Feature.VERTICAL_CLIMB)) {
-            buildVerticalClimb(level, start, plan);
-        }
-        if (plan.has(CourseLayout.Feature.CONVEYOR_GAUNTLET)) {
-            buildConveyorGauntlet(level, start, plan);
-        }
-        if (plan.has(CourseLayout.Feature.STAIRCASE)) {
-            buildStaircaseObstacle(level, start, plan, palette);
-        }
-        if (plan.has(CourseLayout.Feature.MOVING_PLATFORMS)) {
-            spawnMovingPlatforms(level, start, plan);
-        }
-        if (plan.has(CourseLayout.Feature.CASTLE_FINALE)) {
-            buildCastleFinale(level, start, plan, palette);
-        }
-        if (plan.has(CourseLayout.Feature.GHOST_LOOP)) {
-            buildGhostHouseLoop(level, start, plan);
-        }
-
-        PlaneShift.LOGGER.info(
-                "Generated {} course at {} ({} blocks long, {} pits, {} set pieces, floor y={}, kill y={})",
-                course.theme().getSerializedName(), start, plan.length(), plan.gaps().length,
-                plan.setPieceCount(), floorY, course.killY());
+        PlaneShift.LOGGER.info("Generated {} course at {}: {} blocks long, difficulty {}, {} segments {}",
+                course.theme().getSerializedName(), start, course.length(), difficulty,
+                composition.segmentIds().size(), composition.segmentIds());
     }
 
     private static void clearCorridor(ServerLevel level, BlockPos start, int length) {

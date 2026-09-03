@@ -30,6 +30,16 @@ record CourseLayoutPlan(int length, int[][] gaps, Set<CourseLayout.Feature> feat
     /** Roughly one set piece per this many blocks when the course does not say otherwise. */
     private static final int BLOCKS_PER_SET_PIECE = 24;
 
+    /**
+     * Course difficulty, 0 (first world) to 4 (last), for the segment composer.
+     *
+     * <p>Wraps {@link #worldOf} so callers outside this class do not each re-derive the world
+     * number from the id, which is exactly the kind of duplication that drifts.
+     */
+    static int difficultyOf(String courseId) {
+        return Math.clamp(worldOf(courseId) - 1, 0, 4);
+    }
+
     private static int worldOf(String courseId) {
         if (courseId == null || !courseId.startsWith("w")) return 1;
         try {
