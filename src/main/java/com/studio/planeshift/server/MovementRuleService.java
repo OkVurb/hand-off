@@ -24,7 +24,28 @@ public final class MovementRuleService {
     private static final double DEPTH_FOLD_THRESHOLD = 0.08D;
 
     private static final java.util.Map<ServerPlayer, Integer> SPRINT_TICKS = new java.util.WeakHashMap<>();
-    private static final java.util.Map<ServerPlayer, Double> LAST_VEL_X = new java.util.WeakHashMap<>();
+
+    /** Last measured X position, so the skid check reads movement the server can trust. */
+    private static final java.util.Map<ServerPlayer, Double> LAST_X = new java.util.WeakHashMap<>();
+
+    /** Smoothed measured X velocity, so a single jittery packet does not read as a turnaround. */
+    private static final java.util.Map<ServerPlayer, Double> SMOOTH_VEL_X = new java.util.WeakHashMap<>();
+
+    /** Ticks left before another skid puff may play. */
+    private static final java.util.Map<ServerPlayer, Integer> SKID_COOLDOWN = new java.util.WeakHashMap<>();
+
+    /**
+     * How long the skid stays quiet after firing.
+     *
+     * <p>A skid is a one-shot flourish, but its trigger — the sign of horizontal velocity flipping
+     * — is true on a large fraction of ticks for a player tapping left and right. Without a
+     * cooldown that is a sound effect several times a second, which reads as a bug rather than as
+     * feedback.
+     */
+    private static final int SKID_COOLDOWN_TICKS = 12;
+
+    /** Speed the measured velocity must exceed before a reversal counts as a skid, not a nudge. */
+    private static final double SKID_MIN_SPEED = 0.12D;
 
     private MovementRuleService() {
     }
@@ -60,16 +81,35 @@ public final class MovementRuleService {
             SPRINT_TICKS.remove(player);
         }
 
-        // Skid turnaround
-        double vx = player.getDeltaMovement().x;
-        Double lastVx = LAST_VEL_X.get(player);
-        if (lastVx != null && player.onGround() && Math.abs(lastVx) > 0.15D && (vx * lastVx < -0.01D)) {
-            if (player.level() instanceof net.minecraft.server.level.ServerLevel sl) {
-                sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE, player.getX(), player.getY() + 0.1D, player.getZ(), 4, 0.1D, 0.05D, 0.1D, 0.02D);
-                player.level().playSound(null, player.blockPosition(), com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.4F, 1.6F);
-            }
+        // Skid turnaround.
+        //
+        // Measured from position rather than from getDeltaMovement(): the client owns player
+        // movement, so the server's delta is often stale or zero while the player is plainly
+        // running, and a stale delta never flips sign — the effect simply would not fire.
+        Double lastX = LAST_X.get(player);
+        double measuredVx = lastX == null ? 0.0D : player.getX() - lastX;
+        LAST_X.put(player, player.getX());
+
+        double previousVx = SMOOTH_VEL_X.getOrDefault(player, 0.0D);
+        int skidCooldown = SKID_COOLDOWN.getOrDefault(player, 0);
+        if (skidCooldown > 0) {
+            skidCooldown--;
+        } else if (player.onGround()
+                && Math.abs(previousVx) > SKID_MIN_SPEED
+                && Math.abs(measuredVx) > SKID_MIN_SPEED * 0.5D
+                && measuredVx * previousVx < 0.0D
+                && player.level() instanceof net.minecraft.server.level.ServerLevel sl) {
+            sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                    player.getX(), player.getY() + 0.1D, player.getZ(), 4, 0.1D, 0.05D, 0.1D, 0.02D);
+            sl.playSound(null, player.blockPosition(),
+                    com.studio.planeshift.common.registry.ModSounds.BRICK_BREAK.get(),
+                    net.minecraft.sounds.SoundSource.PLAYERS, 0.4F, 1.6F);
+            skidCooldown = SKID_COOLDOWN_TICKS;
         }
-        LAST_VEL_X.put(player, vx);
+        SKID_COOLDOWN.put(player, skidCooldown);
+        // Exponential smoothing: one dropped or duplicated movement packet should not be able to
+        // manufacture a direction change on its own.
+        SMOOTH_VEL_X.put(player, previousVx * 0.6D + measuredVx * 0.4D);
 
         if (state.in2_5D() && state.rail().isPresent()) {
             constrainToRail(player, state.rail().get());

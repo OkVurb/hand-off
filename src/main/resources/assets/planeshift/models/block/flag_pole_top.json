@@ -1,132 +1,76 @@
 {
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "planeshift:block/flag_pole",
     "pole": "planeshift:block/flag_pole",
-    "flag": "planeshift:block/flag_pole"
+    "flag": "planeshift:block/flag_pole_flag",
+    "finial": "planeshift:block/flag_pole_base"
   },
   "elements": [
     {
       "from": [
-        7.0,
-        0.0,
-        7.0
+        7,
+        0,
+        7
       ],
       "to": [
-        9.0,
-        14.0,
-        9.0
+        9,
+        13,
+        9
       ],
       "faces": {
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            4
-          ],
-          "texture": "#pole"
-        },
-        "north": {
-          "uv": [
-            0,
-            2,
-            4,
-            16
-          ],
-          "texture": "#pole"
-        },
-        "south": {
-          "uv": [
-            0,
-            2,
-            4,
-            16
-          ],
-          "texture": "#pole"
-        },
-        "west": {
-          "uv": [
-            0,
-            2,
-            4,
-            16
-          ],
-          "texture": "#pole"
-        },
-        "east": {
-          "uv": [
-            0,
-            2,
-            4,
-            16
-          ],
-          "texture": "#pole"
-        }
-      }
-    },
-    {
-      "from": [
-        5.5,
-        11.0,
-        5.5
-      ],
-      "to": [
-        10.5,
-        16.0,
-        10.5
-      ],
-      "faces": {
-        "down": {
-          "uv": [
-            0,
-            0,
-            4,
-            4
+            7,
+            7,
+            9,
+            9
           ],
           "texture": "#pole"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            4
+            7,
+            7,
+            9,
+            9
           ],
           "texture": "#pole"
         },
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            4
+            7,
+            3,
+            9,
+            16
           ],
           "texture": "#pole"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            4
-          ],
-          "texture": "#pole"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            4,
-            4
+            7,
+            3,
+            9,
+            16
           ],
           "texture": "#pole"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            4
+            7,
+            3,
+            9,
+            16
+          ],
+          "texture": "#pole"
+        },
+        "west": {
+          "uv": [
+            7,
+            3,
+            9,
+            16
           ],
           "texture": "#pole"
         }
@@ -134,71 +78,140 @@
     },
     {
       "from": [
-        0.0,
-        2.0,
+        6,
+        13,
+        6
+      ],
+      "to": [
+        10,
+        16,
+        10
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#finial"
+        },
+        "up": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#finial"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            10,
+            3
+          ],
+          "texture": "#finial"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            10,
+            3
+          ],
+          "texture": "#finial"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            10,
+            3
+          ],
+          "texture": "#finial"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            10,
+            3
+          ],
+          "texture": "#finial"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        5,
         7.5
       ],
       "to": [
-        7.0,
-        13.0,
+        16,
+        12,
         8.5
       ],
       "faces": {
-        "up": {
+        "down": {
           "uv": [
-            4,
-            2,
+            9,
+            7.5,
             16,
-            3
+            8.5
           ],
           "texture": "#flag"
         },
-        "down": {
+        "up": {
           "uv": [
-            4,
-            13,
+            9,
+            7.5,
             16,
-            14
+            8.5
           ],
           "texture": "#flag"
         },
         "north": {
           "uv": [
-            16,
-            2,
+            0,
             4,
-            14
+            7,
+            11
           ],
           "texture": "#flag"
         },
         "south": {
           "uv": [
+            9,
             4,
-            2,
             16,
-            14
-          ],
-          "texture": "#flag"
-        },
-        "west": {
-          "uv": [
-            15,
-            2,
-            16,
-            14
+            11
           ],
           "texture": "#flag"
         },
         "east": {
           "uv": [
+            7.5,
             4,
-            2,
-            5,
-            14
+            8.5,
+            11
+          ],
+          "texture": "#flag"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            4,
+            8.5,
+            11
           ],
           "texture": "#flag"
         }
-      }
+      },
+      "shade": false
     }
   ]
 }

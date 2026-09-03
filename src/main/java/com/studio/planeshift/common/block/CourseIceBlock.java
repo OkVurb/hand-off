@@ -1,15 +1,17 @@
 package com.studio.planeshift.common.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Course Ice Block: Low friction, translucent, melts when in hot environments or struck with fire.
+ * Course ice: low friction and translucent, so a slide reads as a slide before the player steps on
+ * it.
+ *
+ * <p>Deliberately does <em>not</em> melt. Vanilla ice melts under light, which in a hand-placed
+ * course means an ice run silently disappearing between two visits — a platformer surface has to
+ * still be there when the player comes back to it.
  */
 public class CourseIceBlock extends HalfTransparentBlock {
 
@@ -22,9 +24,5 @@ public class CourseIceBlock extends HalfTransparentBlock {
     @Override
     protected MapCodec<? extends HalfTransparentBlock> codec() {
         return CODEC;
-    }
-
-    public void melt(Level level, BlockPos pos) {
-        level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
     }
 }

@@ -95,6 +95,23 @@ public final class CourseReachability {
             // not read as a wall standing between them and the end of the bridge.
             ModBlocks.AXE_BLOCK.get());
 
+    /**
+     * Solid blocks the solver refuses to stand on.
+     *
+     * <p>These hold weight, so without this set the flood fill happily walks a player across a
+     * carpet of Munchers and declares the course completable. It is completable, in the sense that
+     * a course you cross by absorbing damage is completable — which is not what the proof is
+     * supposed to be asserting. A hazard has to be an obstacle to the solver or the guarantee is
+     * about geometry only, and geometry was never the interesting part.
+     *
+     * <p>They stay <em>solid</em> rather than joining {@link #PASSABLE}: a Muncher does block a
+     * jump arc, so pretending the player passes through it would trade one wrong answer for
+     * another.
+     */
+    private static final Set<Block> HAZARD = Set.of(
+            ModBlocks.MUNCHER.get(),
+            ModBlocks.SPIKE_BLOCK.get());
+
     private boolean solid(int x, int y) {
         BlockState state = canvas.get(x, y, laneZ);
         return state != null && !PASSABLE.contains(state.getBlock());
@@ -106,6 +123,10 @@ public final class CourseReachability {
      */
     public boolean isStand(int x, int y) {
         if (!solid(x, y - 1)) {
+            return false;
+        }
+        BlockState floor = canvas.get(x, y - 1, laneZ);
+        if (floor != null && HAZARD.contains(floor.getBlock())) {
             return false;
         }
         for (int h = 0; h < PLAYER_HEIGHT; h++) {

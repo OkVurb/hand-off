@@ -369,3 +369,155 @@ Floor widened to 3x3. Recording it because the failure looked like a product bug
 test encoded an assumption about behaviour rather than testing the behaviour it named. When a test
 breaks after an intentional change, the first question is whether the test was describing the old
 behaviour by accident.
+
+---
+
+## R8 — Two sneak-bound moves, one of which could never happen
+
+**Author:** Gemini · **Reviewer:** Claude · **2026-09-03** · Severity: high
+
+### What was wrong
+
+The spin jump was added to `AirMoveService` so that a player could bounce safely off armoured
+enemies — `CourseEnemyEntity` was changed in the same commit to check
+`AirMoveService.isSpinJumping(player)` before dealing contact damage. It could not fire. Both the
+spin jump and the ground pound are bound to sneak:
+
+```java
+// spin jump
+if (player.onGround() && player.isShiftKeyDown() && player.getLastClientInput().jump()) { ... }
+
+// ground pound, thirty lines later, same tick
+if (!player.onGround() && player.isShiftKeyDown() && player.getDeltaMovement().y <= 0.0D) {
+    player.setDeltaMovement(new Vec3(0.0D, GROUND_POUND_SPEED, 0.0D));
+```
+
+A spin jump is *entered* by holding sneak, so sneak is still held on the way up. The moment the
+rise ends — which is the moment before you land on the Spiny — the second block fires, replaces
+the velocity with a downward slam and the player arrives as a ground pound. The Spiny check was
+live, correct and unreachable.
+
+Three more defects in the same block:
+
+- The spin jump was level-triggered, so standing on the ground holding sneak and jump replayed
+  `POWER_UP` **every tick**. Most audible under a low ceiling, where the jump cannot start.
+- The ledge clamber re-armed itself. It sets `y = 0.28`, which decays back below its own `< 0.1`
+  trigger within a few ticks; pressed against the same ledge, it fires again. Any one-block lip
+  was a lift. That is not a cosmetic bug: `CourseReachability` proves courses walkable against a
+  fixed jump height, and an unbounded climb makes that proof describe a game nobody is playing.
+- The clamber and the skid both read `player.getDeltaMovement()` for horizontal direction.
+
+### How it was found
+
+Reading the two conditions next to each other. Neither is wrong alone; they are wrong because they
+share an input and the file never says so.
+
+### Why it happened
+
+Each feature was written as its own self-contained `if` against the current input state, appended
+to `tick()`. That is a reasonable shape for one feature and it does not compose: with six of them
+in one method, the sixth silently overrides the first, and nothing in the code marks the
+relationship. `tick()` had become a list of independent claims about the same player.
+
+### The fix
+
+Make the state explicit and let the later feature defer to the earlier one.
+
+```java
+boolean spinning = SPIN_JUMPING.getOrDefault(player, false);
+if (player.onGround() && player.isShiftKeyDown() && player.getLastClientInput().jump()) {
+    if (!spinning) {                       // edge-triggered: the sound plays once
+        SPIN_JUMPING.put(player, true);
+        spinning = true;
+        ...
+    }
+} else if (player.onGround()) {
+    SPIN_JUMPING.remove(player);
+    spinning = false;
+}
+...
+if (!player.onGround() && !spinning && player.isShiftKeyDown() && ...) {   // ground pound
+```
+
+`spinning` is now a local read once at the top and consulted by everything downstream, so the
+precedence between the two moves is written down in one place instead of being an accident of
+statement order.
+
+The clamber gained a cooldown (`CLAMBER_COOLDOWN`, 12 ticks, cleared on landing) so it is one
+assist per airborne stint. The skid gained a cooldown too, plus a smoothed velocity, because its
+trigger — the sign of horizontal velocity flipping — is true on a large fraction of ticks for a
+player tapping left and right, and a sound several times a second reads as a bug, not as feedback.
+
+### The velocity thing, again
+
+`AirMoveService` already carries a long comment explaining that a `ServerPlayer`'s
+`getDeltaMovement()` is unreliable — the client owns player movement and the server applies it
+from position packets, so the delta is routinely stale or zero while the player is visibly moving.
+That is why the head-bump check measures the change in Y instead. Both new features read the delta
+anyway. Both now measure position:
+
+```java
+double[] lastXz = LAST_XZ.get(player);
+double moveX = lastXz == null ? 0.0D : player.getX() - lastXz[0];
+```
+
+### The rule
+
+**When a feature reads the same input as an existing one, the new code has to name the old one.**
+`isShiftKeyDown()` was already spoken for. Adding a second meaning to it without an explicit guard
+does not create a conflict the player can discover — it creates one where the newer code always
+wins and the older code becomes decoration.
+
+And: a per-tick condition is a *state machine written badly*. If the effect should happen once —
+a sound, a launch, a puff of smoke — the trigger is an edge, not a level. Ask "what happens on the
+second tick this is true?" before merging any `if` inside a tick handler.
+
+---
+
+## R9 — Models that disagreed with their own hitboxes
+
+**Author:** Gemini · **Reviewer:** Claude · **2026-09-03** · Severity: medium
+
+### What was wrong
+
+`TrampolineBlock` declares a 0.6-high `VoxelShape` and `SpringPadBlock` a 0.5-high one. Both used
+`minecraft:block/cube_all`, so both drew a full cube: the player stands six pixels inside a block
+whose top face is drawn above their feet. `CheckpointBeaconBlock` has a 0.5-wide post shape and
+drew `minecraft:block/cross`, a flat X.
+
+Seven blocks with non-cube shapes were also missing `noOcclusion()` — checkpoint beacon, coin
+ring, both switches, spike block, spring pad, warp pipe and the flag pole. An occluding block tells
+the renderer "nothing behind me is visible", so its neighbours' faces get culled and a hole opens
+up behind a model that does not actually fill the cube.
+
+And `flag_pole_top.json` — the model added for the "waving checkered pennant" — pointed its
+`#flag` variable at `planeshift:block/flag_pole`, the pole texture. The pennant was a grey
+rectangle.
+
+### Why it happened
+
+`cube_all` is the path of least resistance: it compiles, it loads, it is one line, and it looks
+fine in the creative menu. The mismatch only shows up while *standing on the block*, which is a
+thing a build never does. It is the same failure as R6 — the check that would have caught it is
+the one nobody runs.
+
+The flag texture is the more instructive one. Model JSON has no validation for a texture variable
+pointing at the wrong image: any existing path resolves. Only pointing at a *missing* path
+produces an error, so the failure mode of "plausible but wrong" is completely silent.
+
+### The fix
+
+`tools/BlockModelGen.py` builds the shaped models from boxes in 16ths, with each model's geometry
+sitting next to the `VoxelShape` it has to match, and `TrampolineBlock.SHAPE` moved from 0.6 to
+0.625 so the hitbox lands on a model pixel boundary rather than mid-pixel.
+
+One subtlety worth stating, since it is the thing that goes wrong when hand-writing these: auto-UV
+(a face sampling its own footprint) is right for a tiling surface and wrong for a mostly
+transparent one. A 4-wide post inside a 16px sheet samples whatever sits at those coordinates,
+which for the checkpoint beacon is empty space — an invisible post. Those faces get explicit UVs.
+
+### The rule
+
+**A block's model and its `VoxelShape` are one decision, and they belong in the same change.**
+If you override `getShape` and do not touch the model, you have shipped a block whose appearance
+and its physics disagree, in a game genre entirely about knowing where the ground is.

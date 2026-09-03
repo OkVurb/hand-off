@@ -1,6 +1,146 @@
 {
-  "parent": "minecraft:block/cross",
+  "parent": "minecraft:block/block",
   "textures": {
-    "cross": "planeshift:block/on_off_switch_powered"
-  }
+    "particle": "planeshift:block/on_off_switch_powered",
+    "all": "planeshift:block/on_off_switch_powered"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        0,
+        6
+      ],
+      "to": [
+        10,
+        5,
+        10
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#all",
+          "cullface": "down"
+        },
+        "up": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#all"
+        },
+        "north": {
+          "uv": [
+            6,
+            11,
+            10,
+            16
+          ],
+          "texture": "#all"
+        },
+        "south": {
+          "uv": [
+            6,
+            11,
+            10,
+            16
+          ],
+          "texture": "#all"
+        },
+        "east": {
+          "uv": [
+            6,
+            11,
+            10,
+            16
+          ],
+          "texture": "#all"
+        },
+        "west": {
+          "uv": [
+            6,
+            11,
+            10,
+            16
+          ],
+          "texture": "#all"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        5,
+        3
+      ],
+      "to": [
+        13,
+        14,
+        13
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#all"
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#all"
+        },
+        "north": {
+          "uv": [
+            3,
+            2,
+            13,
+            11
+          ],
+          "texture": "#all"
+        },
+        "south": {
+          "uv": [
+            3,
+            2,
+            13,
+            11
+          ],
+          "texture": "#all"
+        },
+        "east": {
+          "uv": [
+            3,
+            2,
+            13,
+            11
+          ],
+          "texture": "#all"
+        },
+        "west": {
+          "uv": [
+            3,
+            2,
+            13,
+            11
+          ],
+          "texture": "#all"
+        }
+      }
+    }
+  ]
 }

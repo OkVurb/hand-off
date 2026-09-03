@@ -94,7 +94,11 @@ public final class ModBlocks {
                     .mapColor(MapColor.ICE)
                     .strength(1.5F, 6.0F)
                     .sound(SoundType.SNOW)
-                    .friction(0.98F));
+                    // 0.98 is vanilla ice. Snow is not ice: giving both the same figure meant every
+                    // snow course was a single uninterruptible slide, and left COURSE_ICE_BLOCK with
+                    // nothing to say. 0.85 is slippery enough to feel like footing you have to
+                    // respect, loose enough to still stop on a ledge.
+                    .friction(0.85F));
     public static final DeferredBlock<Block> COURSE_CASTLE_BLOCK = courseBlock(
             "course_castle_block", MapColor.DEEPSLATE, SoundType.DEEPSLATE_BRICKS);
     public static final DeferredBlock<Block> COURSE_MAGMA_BLOCK = courseBlock(
@@ -119,12 +123,14 @@ public final class ModBlocks {
                     .strength(1.5F)
                     .lightLevel(state -> state.getValue(CheckpointBeaconBlock.LIT) ? 13 : 4)
                     .noCollision()
+                    .noOcclusion()
                     .sound(SoundType.COPPER));
 
     public static final DeferredBlock<SpringPadBlock> SPRING_PAD =
             BLOCKS.registerBlock("spring_pad", SpringPadBlock::new, p -> p
                     .mapColor(MapColor.COLOR_LIGHT_GREEN)
                     .strength(0.8F)
+                    .noOcclusion()
                     .sound(SoundType.SLIME_BLOCK));
 
     public static final DeferredBlock<PrizeCacheBlock> PRIZE_CACHE =
@@ -144,6 +150,7 @@ public final class ModBlocks {
             BLOCKS.registerBlock("coin_ring_block", CoinRingBlock::new, p -> p
                     .mapColor(MapColor.GOLD)
                     .strength(0.8F)
+                    .noOcclusion()
                     .sound(SoundType.WOOD));
 
     public static final DeferredBlock<QuestionBlock> QUESTION_BLOCK =
@@ -196,18 +203,21 @@ public final class ModBlocks {
             BLOCKS.registerBlock("on_off_switch", OnOffSwitchBlock::new, p -> p
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)
                     .strength(1.0F)
+                    .noOcclusion()
                     .sound(SoundType.METAL));
 
     public static final DeferredBlock<PSwitchBlock> P_SWITCH =
             BLOCKS.registerBlock("p_switch", PSwitchBlock::new, p -> p
                     .mapColor(MapColor.COLOR_BLUE)
                     .strength(1.0F)
+                    .noOcclusion()
                     .sound(SoundType.STONE));
 
     public static final DeferredBlock<SpikeBlock> SPIKE_BLOCK =
             BLOCKS.registerBlock("spike_block", SpikeBlock::new, p -> p
                     .mapColor(MapColor.COLOR_RED)
                     .strength(1.0F)
+                    .noOcclusion()
                     .sound(SoundType.STONE));
 
     /** Hidden question block - invisible until hit from below. */
@@ -258,6 +268,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)
                     .strength(0.4F)
                     .noCollision()
+                    .noOcclusion()
                     .sound(SoundType.METAL));
 
     /** Mario-style transport. */
@@ -265,6 +276,7 @@ public final class ModBlocks {
             BLOCKS.registerBlock("warp_pipe", WarpPipeBlock::new, p -> p
                     .mapColor(MapColor.COLOR_GREEN)
                     .strength(1.5F)
+                    .noOcclusion()
                     .sound(SoundType.METAL));
 
     /** Secret area block — looks solid, has no collision. */

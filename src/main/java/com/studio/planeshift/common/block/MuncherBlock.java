@@ -22,7 +22,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class MuncherBlock extends Block {
 
     public static final MapCodec<MuncherBlock> CODEC = simpleCodec(MuncherBlock::new);
-    private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
+    private static final VoxelShape SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 16.0D, 14.0D);
 
     public MuncherBlock(Properties properties) {
         super(properties);

@@ -1,6 +1,148 @@
 {
-  "parent": "minecraft:block/cross",
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "cross": "planeshift:block/checkpoint_beacon_lit"
-  }
+    "particle": "planeshift:block/checkpoint_beacon_lit",
+    "post": "planeshift:block/checkpoint_beacon_lit",
+    "flag": "planeshift:block/checkpoint_beacon_lit"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        16,
+        12
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#post"
+        },
+        "up": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#post"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "texture": "#post"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "texture": "#post"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "texture": "#post"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "texture": "#post"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        9,
+        7
+      ],
+      "to": [
+        16,
+        15,
+        8
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            10,
+            2,
+            15,
+            8
+          ],
+          "texture": "#flag"
+        },
+        "up": {
+          "uv": [
+            10,
+            2,
+            15,
+            8
+          ],
+          "texture": "#flag"
+        },
+        "north": {
+          "uv": [
+            10,
+            2,
+            15,
+            8
+          ],
+          "texture": "#flag"
+        },
+        "south": {
+          "uv": [
+            10,
+            2,
+            15,
+            8
+          ],
+          "texture": "#flag"
+        },
+        "east": {
+          "uv": [
+            10,
+            2,
+            15,
+            8
+          ],
+          "texture": "#flag"
+        },
+        "west": {
+          "uv": [
+            10,
+            2,
+            15,
+            8
+          ],
+          "texture": "#flag"
+        }
+      },
+      "shade": false
+    }
+  ]
 }

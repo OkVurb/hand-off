@@ -80,22 +80,31 @@ implement **conclude**.
 24. **Course intro card** — "World 1-1" before play starts.
 25. **Enemy art pass.** `BespokeEnemyModel` covers the hostile cast; the Toad shopkeeper and the
     projectiles could use a close-range silhouette review.
-26. **Block textures.** The eight new decorative blocks are procedurally generated and adequate,
-    not good. `tools/` has generators for every asset class if you want to regenerate rather than
-    hand-draw.
+26. **Item models.** Blocks now have shaped models (`tools/BlockModelGen.py`); the *items* are
+    still flat 16×16 sprites. The power-ups in particular would carry a lot from a small amount
+    of depth. Same generator shape as the block one.
+27. **The remaining `cube_all` blocks.** `course_lamp`, `shift_gate`, `secret_passage`,
+    `prize_cache` and the theme blocks are still painted cubes. For the theme blocks that is
+    correct — they are walls. For the other four it is not; they are objects.
+28. **Animate the rotating block.** `RotatingBlock` swaps to a smeared texture while spinning.
+    A real spin would be a model with a `y` rotation driven per-frame, which needs a block entity
+    renderer.
 
 ## Group F — Systems and correctness
 
-27. **Co-op.** `CourseCoopService` exists and has never been tested with two players. Either verify
+29. **Co-op.** `CourseCoopService` exists and has never been tested with two players. Either verify
     it or document precisely how it fails.
-28. **Mid-course disconnect and rejoin.** `CourseProgress.currentCourse` survives a relog, so the
+30. **Mid-course disconnect and rejoin.** `CourseProgress.currentCourse` survives a relog, so the
     pieces exist; the rejoin path does not.
-29. **A GameTest per subsystem.** See review R6: a bug that made the mod unplayable passed 182 unit
+31. **A GameTest per subsystem.** See review R6: a bug that made the mod unplayable passed 182 unit
     tests because ServiceLoader behaves differently under FML's classloader. Anything touching
     reflection, services, resources or the module system needs at least one test that runs in game.
-30. **Fix the skybox renderer properly.** `CourseSkyboxRenderer` maps the whole texture onto all six
+32. **Fix the skybox renderer properly.** `CourseSkyboxRenderer` maps the whole texture onto all six
     cube faces, so it is not a cubemap at all. Real per-face UVs would let the skyboxes have a
     proper sky above and ground below instead of the same image six times.
+33. **Shaped models are only half the job.** Every block whose model is not a full cube also needs
+    `noOcclusion()` in `ModBlocks`, or the renderer culls the faces of whatever is behind it and
+    a hole appears. Seven blocks were missing it; if you add a shaped model, check this. See R9.
 
 ---
 
@@ -109,6 +118,11 @@ implement **conclude**.
 - Cat Suit: claw swipe, pounce dive, wall cling. Climbing and all-fours animation are ParCool and
   Player Animation Library's job on purpose — do not reimplement them.
 - Item textures, coin block, cloud block, moving platform and all six skyboxes are regenerated.
+- Block textures are regenerated from `tools/BlockTextureGen.py` — 44 files, drawn from shape
+  functions, no placeholders left.
+- Nineteen blocks have real shaped models from `tools/BlockModelGen.py`, matched to their
+  `VoxelShape`s: trampoline, spring pad, muncher, blaster, checkpoint beacon, coin ring, axe,
+  warp pipe, pillar, lattice, banner, both switches, spikes and the flag pole pennant.
 - Mod configs are set: ParCool per-course via `ParCoolCompat`, Enhanced Movement dash off,
   Particle Effects borrowed by meaning, Serene Seasons on a second dimension.
 - Head bumps, coin bricks, air-drop immunity, Hammer Bro perch, patrolling ground enemies.

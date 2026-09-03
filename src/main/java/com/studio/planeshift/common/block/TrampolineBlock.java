@@ -21,7 +21,10 @@ public class TrampolineBlock extends Block {
 
     public static final MapCodec<TrampolineBlock> CODEC = simpleCodec(TrampolineBlock::new);
     public static final double LAUNCH_VELOCITY = 1.35D;
-    private static final VoxelShape SHAPE = Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, 0.6D, 1.0D);
+    // 0.625 rather than 0.6 so the hitbox lands on a model pixel boundary (10/16). A shape
+    // that ends mid-pixel cannot be drawn, and a platform you stand on has to be exactly
+    // where it looks like it is.
+    private static final VoxelShape SHAPE = Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, 0.625D, 1.0D);
 
     public TrampolineBlock(Properties properties) {
         super(properties);

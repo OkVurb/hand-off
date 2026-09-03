@@ -65,6 +65,22 @@ public final class AirMoveService {
     private static final Map<ServerPlayer, Boolean> GROUND_POUNDING = new WeakHashMap<>();
     private static final Map<ServerPlayer, Boolean> SPIN_JUMPING = new WeakHashMap<>();
 
+    /**
+     * Ticks left before the mantle may fire again.
+     *
+     * <p>Without this the clamber is a wall climb. The assist sets upward velocity to 0.28, which
+     * decays back under the 0.1 trigger threshold within a few ticks; if the player is still
+     * pressed into the same ledge the condition is true again and they get another 0.28. Repeat
+     * and any one-block lip becomes an elevator, which quietly invalidates every height the
+     * reachability solver reasons about. One assist per airborne stint is the whole feature.
+     */
+    private static final Map<ServerPlayer, Integer> CLAMBER_COOLDOWN = new WeakHashMap<>();
+
+    /** Last measured horizontal position, for a velocity the server can actually trust. */
+    private static final Map<ServerPlayer, double[]> LAST_XZ = new WeakHashMap<>();
+
+    private static final int CLAMBER_COOLDOWN_TICKS = 12;
+
     public static boolean isSpinJumping(net.minecraft.world.entity.player.Player player) {
         return SPIN_JUMPING.getOrDefault(player, false);
     }
@@ -77,15 +93,26 @@ public final class AirMoveService {
             return;
         }
 
-        // Spin jump: Jump while sneaking on ground
+        // Spin jump: jump while sneaking, from the ground.
+        //
+        // Edge-triggered on purpose. Written as a plain per-tick condition it re-fires — and
+        // re-plays its sound — every tick the player stands there holding both keys, which is
+        // most audible in exactly the case where the jump is blocked by a low ceiling.
+        boolean spinning = SPIN_JUMPING.getOrDefault(player, false);
         if (player.onGround() && player.isShiftKeyDown() && player.getLastClientInput().jump()) {
-            SPIN_JUMPING.put(player, true);
-            player.level().playSound(null, player.blockPosition(), com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.7F, 1.6F);
+            if (!spinning) {
+                SPIN_JUMPING.put(player, true);
+                spinning = true;
+                player.level().playSound(null, player.blockPosition(),
+                        com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(),
+                        net.minecraft.sounds.SoundSource.PLAYERS, 0.7F, 1.6F);
+            }
         } else if (player.onGround()) {
             SPIN_JUMPING.remove(player);
+            spinning = false;
         }
 
-        if (SPIN_JUMPING.getOrDefault(player, false) && !player.onGround()) {
+        if (spinning && !player.onGround()) {
             if (player.level() instanceof net.minecraft.server.level.ServerLevel sl && player.level().getGameTime() % 2 == 0) {
                 sl.sendParticles(com.studio.planeshift.common.registry.ModParticles.COIN_SPARKLE.get(), player.getX(), player.getY() + 0.5D, player.getZ(), 2, 0.2D, 0.2D, 0.2D, 0.05D);
             }
@@ -99,22 +126,50 @@ public final class AirMoveService {
             player.hurtMarked = true;
         }
 
-        // Ledge Clamber / Mantle
-        if (!player.onGround() && player.getDeltaMovement().y < 0.1D && player.getDeltaMovement().y > -0.35D) {
-            Vec3 vel = player.getDeltaMovement();
-            double speed = Math.abs(vel.x) + Math.abs(vel.z);
-            if (speed > 0.05D) {
-                BlockPos waistPos = BlockPos.containing(player.getX() + Math.signum(vel.x) * 0.45D, player.getY() + 0.5D, player.getZ() + Math.signum(vel.z) * 0.45D);
-                BlockPos headPos = waistPos.above();
-                if (player.level().getBlockState(waistPos).isSolid() && player.level().getBlockState(headPos).isAir()) {
-                    player.setDeltaMovement(vel.x * 1.1D, 0.28D, vel.z * 1.1D);
-                    player.hurtMarked = true;
-                }
-            }
+        // Ledge clamber / mantle.
+        //
+        // Direction comes from measured position change rather than getDeltaMovement(). The client
+        // drives player movement, so a ServerPlayer's delta is routinely stale or zero while the
+        // player is visibly running — the same reason the head-bump check below measures Y instead
+        // of reading velocity. Reading the delta here made the assist fire toward the wrong face,
+        // or not at all.
+        double[] lastXz = LAST_XZ.get(player);
+        double moveX = lastXz == null ? 0.0D : player.getX() - lastXz[0];
+        double moveZ = lastXz == null ? 0.0D : player.getZ() - lastXz[1];
+        LAST_XZ.put(player, new double[] {player.getX(), player.getZ()});
+
+        int clamberCooldown = CLAMBER_COOLDOWN.getOrDefault(player, 0);
+        if (player.onGround()) {
+            clamberCooldown = 0;
+        } else if (clamberCooldown > 0) {
+            clamberCooldown--;
         }
 
-        // Ground pound mechanics
-        if (!player.onGround() && player.isShiftKeyDown() && player.getDeltaMovement().y <= 0.0D) {
+        if (!player.onGround() && clamberCooldown == 0
+                && player.getDeltaMovement().y < 0.1D && player.getDeltaMovement().y > -0.35D
+                && Math.abs(moveX) + Math.abs(moveZ) > 0.02D) {
+            BlockPos waistPos = BlockPos.containing(
+                    player.getX() + Math.signum(moveX) * 0.45D,
+                    player.getY() + 0.5D,
+                    player.getZ() + Math.signum(moveZ) * 0.45D);
+            BlockPos headPos = waistPos.above();
+            if (player.level().getBlockState(waistPos).isSolid()
+                    && player.level().getBlockState(headPos).isAir()) {
+                Vec3 vel = player.getDeltaMovement();
+                player.setDeltaMovement(vel.x * 1.1D, 0.28D, vel.z * 1.1D);
+                player.hurtMarked = true;
+                clamberCooldown = CLAMBER_COOLDOWN_TICKS;
+            }
+        }
+        CLAMBER_COOLDOWN.put(player, clamberCooldown);
+
+        // Ground pound mechanics.
+        //
+        // Explicitly excludes a spin jump. Both are bound to sneak, so without this guard the
+        // spin jump converts into a ground pound the instant its rise ends — meaning the spin
+        // jump's whole reason to exist, bouncing safely off a Spiny, could never happen.
+        if (!player.onGround() && !spinning && player.isShiftKeyDown()
+                && player.getDeltaMovement().y <= 0.0D) {
             player.setDeltaMovement(new Vec3(0.0D, GROUND_POUND_SPEED, 0.0D));
             player.hurtMarked = true;
             player.resetFallDistance();
