@@ -39,6 +39,7 @@ public class PlaneShiftGameTests {
     public static final Identifier AIR_DROP_TEST = PlaneShift.id("air_drop_test");
     public static final Identifier COIN_BRICK_TEST = PlaneShift.id("coin_brick_test");
     public static final Identifier HAMMER_BRO_PERCH_TEST = PlaneShift.id("hammer_bro_perch_test");
+    public static final Identifier COURSE_GENERATION_TEST = PlaneShift.id("course_generation_test");
 
     public static void registerFunctions(RegisterEvent event) {
         event.register(Registries.TEST_FUNCTION, helper -> {
@@ -48,6 +49,7 @@ public class PlaneShiftGameTests {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), PlaneShiftGameTests::testAirDrop);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), PlaneShiftGameTests::testCoinBrick);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), PlaneShiftGameTests::testHammerBroPerch);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), PlaneShiftGameTests::testCourseGeneration);
         });
     }
 
@@ -61,6 +63,48 @@ public class PlaneShiftGameTests {
         event.registerTest(AIR_DROP_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), data));
         event.registerTest(COIN_BRICK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), data));
         event.registerTest(HAMMER_BRO_PERCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), data));
+        event.registerTest(COURSE_GENERATION_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), data));
+    }
+
+    /**
+     * Composes a course inside the running game.
+     *
+     * <p>This exists because of a bug the entire JUnit suite could not see. The composer used
+     * {@code RandomGeneratorFactory.of("Xoroshiro128PlusPlus")}, which resolves algorithms through
+     * ServiceLoader. ServiceLoader works perfectly in a plain JUnit run and does not initialise
+     * under FML's classloader, so 182 unit tests passed while every attempt to enter a course in
+     * game failed with NoClassDefFoundError and simply never teleported the player.
+     *
+     * <p>The lesson generalises past that one call: anything touching ServiceLoader, reflection,
+     * the module system or resource lookup can behave differently in game than in a unit test.
+     * The only way to catch that class of bug is to run the code where it will actually live, so
+     * course composition is now exercised by a GameTest as well — and CI runs
+     * {@code runGameTestServer}, which means it cannot regress silently again.
+     */
+    private static void testCourseGeneration(GameTestHelper helper) {
+        for (com.studio.planeshift.common.course.CourseTheme theme
+                : com.studio.planeshift.common.course.CourseTheme.values()) {
+            var composition = com.studio.planeshift.server.gen.CourseComposer.compose(
+                    theme, 144, 2, 12345L);
+            if (composition.canvas().blockCount() <= 0) {
+                helper.fail("course generation produced no blocks for theme " + theme);
+                return;
+            }
+            if (composition.segmentIds().isEmpty()) {
+                helper.fail("course generation placed no segments for theme " + theme);
+                return;
+            }
+            // The proof that runs in the unit suite, repeated here against the in-game classloader.
+            var reach = new com.studio.planeshift.server.gen.CourseReachability(
+                    composition.canvas(), 0);
+            var result = reach.search(0, composition.spawnY(), composition.flagX());
+            if (!result.reachable()) {
+                helper.fail("generated " + theme + " course is not walkable: "
+                        + result.describe(composition.flagX()));
+                return;
+            }
+        }
+        helper.succeed();
     }
 
     private static void testQuestionBlock(GameTestHelper helper) {
@@ -127,9 +171,19 @@ public class PlaneShiftGameTests {
     }
 
     private static void testAirDrop(GameTestHelper helper) {
-        BlockPos floorPos = new BlockPos(1, 1, 1);
+        // A floor wide enough to stand a patrolling enemy on.
+        //
+        // This was a single block, which worked while ground enemies used MeleeAttackGoal and had
+        // no target to chase, so they stood still. They patrol now — walk forward, turn at a wall
+        // or a ledge — so a one-block platform means the Goomba steps off on its first tick and
+        // falls forever, never touching ground, and the air-drop flag never clears. The product
+        // behaviour is correct; the fixture assumed an enemy that does not move.
         BlockPos pos = new BlockPos(1, 2, 1);
-        helper.setBlock(floorPos, Blocks.STONE);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                helper.setBlock(new BlockPos(1 + dx, 1, 1 + dz), Blocks.STONE);
+            }
+        }
 
         CourseEnemyEntity enemy = helper.spawn(ModEntities.GOOMBA.get(), pos);
         enemy.markAirDropped();

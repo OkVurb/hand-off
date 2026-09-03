@@ -90,6 +90,7 @@ public final class PlaneShiftConfig {
         public final ModConfigSpec.BooleanValue wallJump;
         public final ModConfigSpec.DoubleValue conveyorSpeed;
         public final ModConfigSpec.BooleanValue testerMenu;
+        public final ModConfigSpec.BooleanValue restrictParkourInCourses;
 
         Server(ModConfigSpec.Builder builder) {
             builder.push("transitions");
@@ -140,6 +141,17 @@ public final class PlaneShiftConfig {
                             "Intended for playtest instances. Turn off on any server where players",
                             "should not be able to hand themselves power-ups and unlock courses.")
                     .define("testerMenu", true);
+            builder.pop();
+
+            builder.push("compat");
+            restrictParkourInCourses = builder
+                    .comment("With ParCool installed, refuse charge jump and hide-in-block while",
+                            "inside a 2.5D course. Both defeat authored level geometry rather than",
+                            "interacting with it: a charge jump clears far more height than the",
+                            "generator plans for, turning a designed route into a skip.",
+                            "Everything else ParCool does is left alone, and nothing is restricted",
+                            "in the hub or in 3D courses.")
+                    .define("restrictParkourInCourses", true);
             builder.pop();
         }
     }

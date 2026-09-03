@@ -62,6 +62,10 @@ public final class PlaneShift {
         modBus.addListener(com.studio.planeshift.server.test.PlaneShiftGameTests::onRegisterGameTests);
 
         NeoForge.EVENT_BUS.addListener(PlaneShiftCommands::onRegisterCommands);
+        // Optional integration: no-op when ParCool is absent. Registered at construction so the
+        // listener exists before any player can move.
+        com.studio.planeshift.server.ParCoolCompat.register();
+
 
         container.registerConfig(ModConfig.Type.CLIENT, PlaneShiftConfig.CLIENT_SPEC);
         container.registerConfig(ModConfig.Type.SERVER, PlaneShiftConfig.SERVER_SPEC);

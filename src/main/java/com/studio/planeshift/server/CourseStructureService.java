@@ -93,8 +93,14 @@ public final class CourseStructureService {
         int difficulty = CourseLayoutPlan.difficultyOf(courseId);
         long seed = CourseLayoutPlan.seedOf(courseId, level.getSeed());
 
+        // A course declaring free_3d is built as a wide ribbon rather than a lane. Same segments,
+        // same proof, more room — see GenContext.WIDE_HALF_WIDTH.
+        int halfWidth = course.startMode() == com.studio.planeshift.common.mode.PlaneMode.FREE_3D
+                ? com.studio.planeshift.server.gen.GenContext.WIDE_HALF_WIDTH
+                : com.studio.planeshift.server.gen.GenContext.LANE_HALF_WIDTH;
+
         CourseComposer.Composition composition =
-                CourseComposer.compose(course.theme(), course.length(), difficulty, seed);
+                CourseComposer.compose(course.theme(), course.length(), difficulty, seed, halfWidth);
 
         CourseWriter.write(level, start, composition.canvas(), course.length());
 

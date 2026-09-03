@@ -36,8 +36,6 @@ public final class SegmentLibrary {
     /** Tag applied to every generated entity so a course reload can clear them. */
     public static final String GENERATED_TAG = "planeshift.generated_course";
 
-    private static final int HALF = GenContext.LANE_HALF_WIDTH;
-
     private SegmentLibrary() {
     }
 
@@ -58,7 +56,7 @@ public final class SegmentLibrary {
     /** A floating platform: one row of the theme's platform block. */
     private static void platform(CourseCanvas c, int x0, int width, int y, GenContext ctx) {
         for (int i = 0; i < width; i++) {
-            c.setLane(x0 + i, y, ctx.palette().platform(), HALF);
+            c.setLane(x0 + i, y, ctx.palette().platform(), ctx.halfWidth());
         }
     }
 
@@ -107,6 +105,7 @@ public final class SegmentLibrary {
             if (ctx.chance(0.5D)) {
                 coinTrail(c, x + 2, 4, y + 2, 1);
             }
+            ctx.decorate(c, x, 8, y);
         }
     };
 
@@ -131,12 +130,13 @@ public final class SegmentLibrary {
         }
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            ctx.decorate(c, x, 10, y);
             int[] profile = {0, 1, 1, 2, 2, 2, 1, 1, 0, 0};
             for (int i = 0; i < profile.length; i++) {
                 ctx.ground(c, x + i, y + profile[i]);
                 // Fill the step face so a rise never leaves a floating lip.
                 for (int fillY = y; fillY < y + profile[i]; fillY++) {
-                    c.setLane(x + i, fillY, ctx.palette().fill(), HALF);
+                    c.setLane(x + i, fillY, ctx.palette().fill(), ctx.halfWidth());
                 }
             }
         }
@@ -239,7 +239,7 @@ public final class SegmentLibrary {
                 int step = Math.min(i / 2, 4);
                 ctx.ground(c, x + i, y + step);
                 for (int fillY = y; fillY < y + step; fillY++) {
-                    c.setLane(x + i, fillY, ctx.palette().fill(), HALF);
+                    c.setLane(x + i, fillY, ctx.palette().fill(), ctx.halfWidth());
                 }
             }
         }
@@ -255,7 +255,7 @@ public final class SegmentLibrary {
                 int step = Math.min(i / 2, 4);
                 ctx.ground(c, x + i, y - step);
                 for (int fillY = y - step - 3; fillY < y - step; fillY++) {
-                    c.setLane(x + i, fillY, ctx.palette().fill(), HALF);
+                    c.setLane(x + i, fillY, ctx.palette().fill(), ctx.halfWidth());
                 }
             }
         }
@@ -309,7 +309,7 @@ public final class SegmentLibrary {
                 if (h == 1) {
                     continue;
                 }
-                c.setLane(x + 4, y + h, brick, HALF);
+                c.setLane(x + 4, y + h, brick, ctx.halfWidth());
             }
             c.set(x + 4, y + 1, 0, brick);
         }
@@ -402,7 +402,7 @@ public final class SegmentLibrary {
                 int px = x + 3 + i * 5;
                 int height = 2 + (i % 2);
                 for (int h = 1; h <= height; h++) {
-                    c.setLane(px, y + h, pipe, HALF);
+                    c.setLane(px, y + h, pipe, ctx.halfWidth());
                 }
                 mob(c, ModEntities.PIRANHA_PLANT.get(), px, y + height + 1, 0.0F);
             }
@@ -507,7 +507,7 @@ public final class SegmentLibrary {
             BlockState west = ModBlocks.CONVEYOR_BELT.get().defaultBlockState()
                     .setValue(HorizontalDirectionalBlock.FACING, Direction.WEST);
             for (int i = 0; i < 10; i++) {
-                c.setLane(x + 2 + i, y + 1, (i / 3) % 2 == 0 ? west : east, HALF);
+                c.setLane(x + 2 + i, y + 1, (i / 3) % 2 == 0 ? west : east, ctx.halfWidth());
             }
         }
     };
@@ -540,8 +540,8 @@ public final class SegmentLibrary {
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 10, y, ctx);
             for (int i = 3; i < 7; i++) {
-                c.setLane(x + i, y + 2, ctx.palette().accent(), HALF);
-                c.setLane(x + i, y + 3, ctx.palette().accent(), HALF);
+                c.setLane(x + i, y + 2, ctx.palette().accent(), ctx.halfWidth());
+                c.setLane(x + i, y + 3, ctx.palette().accent(), ctx.halfWidth());
             }
         }
     };
@@ -559,7 +559,7 @@ public final class SegmentLibrary {
             }
             // A ceiling to hang them from, so they read as part of the architecture.
             for (int i = 2; i < 14; i++) {
-                c.setLane(x + i, y + 9, ctx.palette().accent(), HALF);
+                c.setLane(x + i, y + 9, ctx.palette().accent(), ctx.halfWidth());
             }
         }
     };
@@ -574,7 +574,7 @@ public final class SegmentLibrary {
             floor(c, x, 14, y, ctx);
             // A pillar for the bar to pivot on, so the rotation has a visible centre.
             for (int h = 1; h <= 4; h++) {
-                c.setLane(x + 7, y + h, ctx.palette().accent(), HALF);
+                c.setLane(x + 7, y + h, ctx.palette().accent(), ctx.halfWidth());
             }
             c.spawn(ModEntities.FIREBAR.get(), x + 7.5D, y + 5, 0.5D, 0.0F, GENERATED_TAG);
         }
@@ -594,7 +594,7 @@ public final class SegmentLibrary {
             // The reward the vine leads to: a cloud shelf lined with coins.
             for (int i = 0; i < 10; i++) {
                 c.setLane(x + 2 + i, y + 18, ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
-                        HALF);
+                        ctx.halfWidth());
             }
             coinTrail(c, x + 3, 8, y + 19, 1);
         }
@@ -615,7 +615,7 @@ public final class SegmentLibrary {
             for (int i = 4; i < 20; i++) {
                 c.setLane(x + i, y - 4, ctx.palette().hazard() != null
                         ? ctx.palette().hazard()
-                        : ctx.palette().fill(), HALF);
+                        : ctx.palette().fill(), ctx.halfWidth());
                 c.set(x + i, y, 0, castle);
             }
             c.spawn(ModEntities.FIREBAR.get(), x + 11.5D, y + 5, 0.5D, 0.0F, GENERATED_TAG);
@@ -630,15 +630,15 @@ public final class SegmentLibrary {
             // does this) clips their head on the arch. Three blocks of clearance means the
             // doorway is passable from either approach height.
             for (int h = 4; h <= 7; h++) {
-                c.setLane(x + 2, y + h, castle, HALF);
-                c.setLane(x + 22, y + h, castle, HALF);
+                c.setLane(x + 2, y + h, castle, ctx.halfWidth());
+                c.setLane(x + 22, y + h, castle, ctx.halfWidth());
             }
             // Side pillars carry the arch down to the floor outside the walkable lane, so it still
             // reads as architecture rather than as a floating slab.
             for (int h = 1; h <= 7; h++) {
                 for (int side = -1; side <= 1; side += 2) {
-                    c.set(x + 2, y + h, side * (HALF + 1), castle);
-                    c.set(x + 22, y + h, side * (HALF + 1), castle);
+                    c.set(x + 2, y + h, side * (ctx.halfWidth() + 1), castle);
+                    c.set(x + 22, y + h, side * (ctx.halfWidth() + 1), castle);
                 }
             }
         }

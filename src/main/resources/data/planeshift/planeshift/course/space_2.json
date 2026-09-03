@@ -1,0 +1,10 @@
+{
+  "__comment": "A 3D course. start_mode free_3d makes the generator build a wide ribbon instead of a lane (GenContext.WIDE_HALF_WIDTH) and releases the camera from the rail. Same segments, same walkability proof.",
+  "dimension": "planeshift:course",
+  "start_pos": [14256, 64, 0],
+  "start_mode": "free_3d",
+  "theme": "desert",
+  "kill_y": 40,
+  "length": 160,
+  "time_limit_seconds": 400
+}

@@ -8,7 +8,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.random.RandomGenerator;
-import java.util.random.RandomGeneratorFactory;
 
 /**
  * Arranges segments into a course.
@@ -70,8 +69,30 @@ public final class CourseComposer {
     }
 
     public static Composition compose(CourseTheme theme, int length, int difficulty, long seed) {
-        RandomGenerator random = RandomGeneratorFactory.of("Xoroshiro128PlusPlus").create(seed);
-        GenContext ctx = new GenContext(theme, difficulty, random);
+        return compose(theme, length, difficulty, seed, GenContext.LANE_HALF_WIDTH);
+    }
+
+    /**
+     * Composes a course at a given width.
+     *
+     * <p>The only difference between a 2.5D course and a 3D one is this number. 3D Mario levels are
+     * linear ribbons with room to move, not open worlds, so widening the ribbon does not change
+     * what any segment means — a gap is still a gap, a staircase is still a staircase. That is why
+     * one segment library serves both modes rather than needing a second one, and it is the whole
+     * reason the 2.5D/3D shift can be a mechanic instead of two separate games.
+     */
+    public static Composition compose(CourseTheme theme, int length, int difficulty, long seed,
+                                      int halfWidth) {
+        // java.util.Random, not RandomGeneratorFactory.
+        //
+        // RandomGeneratorFactory resolves algorithms through ServiceLoader, and ServiceLoader does
+        // not initialise under FML's classloader: the factory's holder class fails with
+        // NoClassDefFoundError the first time a course is composed, which surfaced as
+        // "Failed to process payload: planeshift:course_select" and the player simply never being
+        // teleported. Nothing here needs a better generator than a seeded LCG — the requirement is
+        // that the same seed gives the same course, and Random satisfies that exactly.
+        RandomGenerator random = new java.util.Random(seed);
+        GenContext ctx = new GenContext(theme, difficulty, random, halfWidth);
         CourseCanvas canvas = new CourseCanvas();
 
         int floorY = 0;

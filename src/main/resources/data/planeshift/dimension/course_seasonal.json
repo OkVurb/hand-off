@@ -1,0 +1,17 @@
+{
+  "__comment": "A second course dimension, identical to planeshift:course except that it is whitelisted in SereneSeasons. Serene Seasons applies per dimension, not per course, so the only way to let some courses have seasons and not others is to give them somewhere else to live. Courses opt in by setting \"dimension\": \"planeshift:course_seasonal\".",
+  "type": "planeshift:course",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:plains",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        { "block": "minecraft:bedrock", "height": 1 },
+        { "block": "minecraft:stone", "height": 5 }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

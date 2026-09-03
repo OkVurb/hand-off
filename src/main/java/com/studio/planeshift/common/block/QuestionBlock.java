@@ -78,6 +78,7 @@ public class QuestionBlock extends Block implements HitFromBelowBlock {
             case 18 -> ModItems.POISON_MUSHROOM.get();
             case 16 -> ModItems.THREE_UP.get();
             case 17 -> ModItems.FIVE_UP.get();
+            case 19 -> ModItems.CAT_SUIT.get();
             default -> ModItems.STAR_POWER.get();
         };
         ItemEntity drop = new ItemEntity(level,

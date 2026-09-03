@@ -46,6 +46,21 @@ public final class AirMoveService {
     /** Weak keys so a disconnected player cannot keep an entry alive. */
     private static final Map<ServerPlayer, LastHit> LAST_HIT = new WeakHashMap<>();
 
+    /** Previous tick's Y, so upward movement can be measured rather than read from velocity. */
+    private static final Map<ServerPlayer, Double> LAST_Y = new WeakHashMap<>();
+
+    /** Ticks a player still counts as rising after their climb has been stopped. */
+    private static final Map<ServerPlayer, Integer> RISING_GRACE = new WeakHashMap<>();
+
+    /**
+     * How long a bump stays eligible after upward movement stops.
+     *
+     * <p>Three ticks. The block that ends a jump also ends the rise, so without a window the
+     * contact tick is never eligible; long enough to survive a dropped movement packet, short
+     * enough that a falling player cannot trigger a block above them.
+     */
+    private static final int HEAD_BUMP_GRACE_TICKS = 3;
+
     /** Tracks if the player is currently executing a ground pound. */
     private static final Map<ServerPlayer, Boolean> GROUND_POUNDING = new WeakHashMap<>();
 
@@ -93,7 +108,33 @@ public final class AirMoveService {
         }
 
         // Head-hit question blocks from below.
-        if (player.getDeltaMovement().y > 0.0D) {
+        //
+        // Gated on measured upward movement, not on getDeltaMovement().
+        //
+        // Two separate problems with reading velocity here. The client drives player movement and
+        // the server applies it from position packets, so a ServerPlayer's delta is frequently
+        // stale or zero even while the player is visibly rising. And on the exact tick the head
+        // meets a block, the collision has already zeroed the upward velocity — so the one tick
+        // that matters is the one tick the old condition rejected. Between them, most bumps were
+        // simply never seen, which is why question blocks and coin blocks so often did nothing.
+        //
+        // Comparing this tick's Y against last tick's answers the real question — is this player
+        // going up — from data the server definitely has. The grace window keeps the contact tick
+        // eligible after the rise has already been stopped by the block itself.
+        double previousY = LAST_Y.getOrDefault(player, player.getY());
+        LAST_Y.put(player, player.getY());
+        boolean rising = player.getY() - previousY > 0.001D;
+        if (rising) {
+            RISING_GRACE.put(player, HEAD_BUMP_GRACE_TICKS);
+        } else {
+            int grace = RISING_GRACE.getOrDefault(player, 0);
+            if (grace > 0) {
+                RISING_GRACE.put(player, grace - 1);
+            }
+        }
+        boolean recentlyRising = rising || RISING_GRACE.getOrDefault(player, 0) > 0;
+
+        if (recentlyRising && !player.onGround()) {
             // The block the top of the head is entering.
             //
             // This used to be eye height plus a tenth, then .above(). Eye height sits about 1.62
@@ -205,6 +246,8 @@ public final class AirMoveService {
     /** Cleans up the debounce entry when a player disconnects. */
     public static void forget(ServerPlayer player) {
         LAST_HIT.remove(player);
+        LAST_Y.remove(player);
+        RISING_GRACE.remove(player);
         WALL_CONTACT.remove(player);
         GROUND_POUNDING.remove(player);
     }

@@ -47,6 +47,43 @@ public final class ModBlocks {
             "course_cloud_block", MapColor.SNOW, SoundType.WOOL);
     public static final DeferredBlock<Block> COURSE_SAND_BLOCK = courseBlock(
             "course_sand_block", MapColor.SAND, SoundType.SAND);
+    // ------------------------------------------------------------------ decoration
+    //
+    // Blocks with no behaviour at all. A course made only of blocks that do something reads as a
+    // machine rather than as a place: every surface is a promise, so the player stops trusting
+    // that anything is just scenery. These exist to be ignored, which is what makes the blocks
+    // that matter stand out.
+
+    /** Patterned floor tile. */
+    public static final DeferredBlock<Block> COURSE_TILE = courseBlock(
+            "course_tile", MapColor.STONE, SoundType.STONE);
+    /** Fluted column, for framing an arena or a doorway. */
+    public static final DeferredBlock<Block> COURSE_PILLAR = courseBlock(
+            "course_pillar", MapColor.STONE, SoundType.STONE);
+    /** Open lattice, useful as a railing or a window. */
+    public static final DeferredBlock<Block> COURSE_LATTICE = courseBlock(
+            "course_lattice", MapColor.WOOD, SoundType.WOOD);
+    /** Wooden crate. Reads as "someone lives here" more than any amount of terrain does. */
+    public static final DeferredBlock<Block> COURSE_CRATE = courseBlock(
+            "course_crate", MapColor.WOOD, SoundType.WOOD);
+    /** Hanging cloth banner. */
+    public static final DeferredBlock<Block> COURSE_BANNER = courseBlock(
+            "course_banner", MapColor.COLOR_RED, SoundType.WOOL);
+    /** Clipped hedge. */
+    public static final DeferredBlock<Block> COURSE_HEDGE = courseBlock(
+            "course_hedge", MapColor.PLANT, SoundType.GRASS);
+    /** Carved trim, for the top of a wall. */
+    public static final DeferredBlock<Block> COURSE_TRIM = courseBlock(
+            "course_trim", MapColor.STONE, SoundType.STONE);
+
+    /** Lamp. The only decorative block that emits light, so it doubles as a signpost. */
+    public static final DeferredBlock<Block> COURSE_LAMP =
+            BLOCKS.registerSimpleBlock("course_lamp", properties -> properties
+                    .mapColor(MapColor.COLOR_YELLOW)
+                    .strength(1.0F, 3.0F)
+                    .sound(SoundType.LANTERN)
+                    .lightLevel(state -> 14));
+
     public static final DeferredBlock<Block> COURSE_SNOW_BLOCK = courseBlock(
             "course_snow_block", MapColor.ICE, SoundType.SNOW);
     public static final DeferredBlock<Block> COURSE_CASTLE_BLOCK = courseBlock(

@@ -22,6 +22,8 @@ import com.studio.planeshift.common.item.ThreeUpItem;
 import com.studio.planeshift.common.registry.ModParticles;
 import java.util.Map;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,6 +53,78 @@ public final class PickupParticles {
      * @param speed  per-particle speed passed to the client
      */
     public record Burst(ParticleOptions type, int count, double spread, double speed) {
+    }
+
+    /**
+     * Particles borrowed from the Particle Effects mod, when it is installed.
+     *
+     * <p>Looked up by id from the particle registry rather than compiled against, so PlaneShift
+     * runs identically with or without the mod: if a lookup misses, the built-in burst is used and
+     * nothing announces itself. That matters because a mod that hard-depends on an optional mod is
+     * not an optional dependency, it is a required one with extra steps.
+     *
+     * <p>The mappings are chosen so the borrowed particle means the same thing it means in its
+     * home mod. Particle Effects draws one particle per status effect, so a Fire Flower borrowing
+     * its fire-resistance swirl reads as "fire" to anyone who has seen it before; a Star Power
+     * borrowing absorption reads as "you are protected". Borrowing at random would just be noise
+     * with someone else's art.
+     */
+    private static final Map<String, String> BORROWED = Map.ofEntries(
+            Map.entry("fire_flower", "particle_effects:fire_resistance"),
+            Map.entry("ice_flower", "particle_effects:slowness"),
+            Map.entry("star_power", "particle_effects:absorption"),
+            Map.entry("super_mushroom", "particle_effects:health_boost"),
+            Map.entry("mega_mushroom", "particle_effects:strength"),
+            Map.entry("mini_mushroom", "particle_effects:speed"),
+            Map.entry("propeller_mushroom", "particle_effects:jump_boost"),
+            Map.entry("cloud_flower", "particle_effects:slow_falling"),
+            Map.entry("leaf", "particle_effects:slow_falling"),
+            Map.entry("acorn", "particle_effects:haste"),
+            Map.entry("tanooki_suit", "particle_effects:resistance"),
+            Map.entry("cat_suit", "particle_effects:haste"),
+            Map.entry("hammer", "particle_effects:strength"),
+            Map.entry("boomerang", "particle_effects:luck"),
+            Map.entry("extra_pip", "particle_effects:instant_health"),
+            Map.entry("three_up", "particle_effects:regeneration"),
+            Map.entry("five_up", "particle_effects:regeneration"),
+            Map.entry("poison_mushroom", "particle_effects:poison"),
+            Map.entry("star_coin", "particle_effects:glowing"),
+            Map.entry("coin", "particle_effects:luck"));
+
+    /** Resolved once; empty when the mod is absent or an id has been renamed. */
+    private static final Map<String, ParticleOptions> BORROWED_RESOLVED = resolveBorrowed();
+
+    private static Map<String, ParticleOptions> resolveBorrowed() {
+        Map<String, ParticleOptions> resolved = new java.util.HashMap<>();
+        BORROWED.forEach((key, id) -> {
+            Identifier location = Identifier.tryParse(id);
+            if (location == null) {
+                return;
+            }
+            BuiltInRegistries.PARTICLE_TYPE.getOptional(location).ifPresent(type -> {
+                if (type instanceof ParticleOptions options) {
+                    resolved.put(key, options);
+                }
+            });
+        });
+        return Map.copyOf(resolved);
+    }
+
+    /**
+     * A second, borrowed layer for a pickup, or null when none applies.
+     *
+     * <p>Layered on top of the built-in burst rather than replacing it, so the shape language
+     * established in this class — Mega wide, Mini tight, poison dull — survives regardless of
+     * which optional mods are installed.
+     */
+    public static ParticleOptions borrowedLayer(String key) {
+        return BORROWED_RESOLVED.get(key);
+    }
+
+    /** Which pickup key an item corresponds to, for the borrowed-particle lookup. */
+    private static String keyOf(Item item) {
+        Identifier id = BuiltInRegistries.ITEM.getKey(item);
+        return id == null ? "" : id.getPath();
     }
 
     /** The generic burst, used by anything without a specific identity of its own. */
@@ -136,6 +210,10 @@ public final class PickupParticles {
         emit(player, level, burst);
         if (item instanceof StarPowerItem) {
             emit(player, level, new Burst(ModParticles.PICKUP_GLOW.get(), 12, 0.4D, 0.10D));
+        }
+        ParticleOptions borrowed = borrowedLayer(keyOf(item));
+        if (borrowed != null) {
+            emit(player, level, new Burst(borrowed, 10, burst.spread() * 1.3D, burst.speed()));
         }
     }
 

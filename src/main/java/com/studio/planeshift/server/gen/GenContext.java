@@ -16,19 +16,48 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class GenContext {
 
-    /** Half-width of the playable lane, in blocks either side of centre. */
+    /**
+     * Half-width of a 2.5D lane: three blocks wide, which is exactly enough to walk down and not
+     * enough to have opinions about depth.
+     */
     public static final int LANE_HALF_WIDTH = 1;
+
+    /**
+     * Half-width of a 3D course.
+     *
+     * <p>Nine blocks across. 3D Mario levels are still linear ribbons rather than open worlds —
+     * 3D World in particular is a corridor with width — so a 3D course here is the same segment
+     * spine with room to move around in. That is why the two modes can share one segment library
+     * instead of needing two: widening the ribbon does not change what any piece of it means.
+     */
+    public static final int WIDE_HALF_WIDTH = 4;
 
     private final CourseTheme theme;
     private final Palette palette;
     private final int difficulty;
     private final RandomGenerator random;
+    private final int halfWidth;
 
     public GenContext(CourseTheme theme, int difficulty, RandomGenerator random) {
+        this(theme, difficulty, random, LANE_HALF_WIDTH);
+    }
+
+    public GenContext(CourseTheme theme, int difficulty, RandomGenerator random, int halfWidth) {
         this.theme = theme;
         this.palette = Palette.forTheme(theme);
         this.difficulty = Math.clamp(difficulty, 0, 4);
         this.random = random;
+        this.halfWidth = halfWidth;
+    }
+
+    /** How wide the course is, either side of the centre line. */
+    public int halfWidth() {
+        return halfWidth;
+    }
+
+    /** Whether this course is being built wide enough to move around in. */
+    public boolean isWide() {
+        return halfWidth > LANE_HALF_WIDTH;
     }
 
     public CourseTheme theme() {
@@ -117,11 +146,47 @@ public final class GenContext {
         }
     }
 
-    /** Lays solid ground across the lane at one column, with fill beneath it. */
+    /** Lays solid ground across the full course width at one column, with fill beneath it. */
     public void ground(CourseCanvas canvas, int x, int topY) {
-        canvas.setLane(x, topY, palette.surface(), LANE_HALF_WIDTH);
+        canvas.setLane(x, topY, palette.surface(), halfWidth);
         for (int depth = 1; depth <= 3; depth++) {
-            canvas.setLane(x, topY - depth, palette.fill(), LANE_HALF_WIDTH);
+            canvas.setLane(x, topY - depth, palette.fill(), halfWidth);
+        }
+    }
+
+    /**
+     * Scatters purely decorative blocks along a stretch of ground.
+     *
+     * <p>None of these do anything, which is the point. A course built only from blocks that all
+     * do something reads as a machine rather than a place — every surface becomes a promise, and
+     * the player stops trusting that anything is just scenery. Giving them things to correctly
+     * ignore is what makes the question block worth looking at.
+     *
+     * <p>Placed with {@code setIfEmpty} so decoration never overwrites a segment's real geometry,
+     * and driven by the seeded random so it is part of the course's identity rather than noise
+     * that changes on a retry.
+     */
+    public void decorate(CourseCanvas canvas, int x0, int width, int topY) {
+        for (int i = 0; i < width; i++) {
+            if (!random.nextBoolean() || !random.nextBoolean()) {
+                continue;
+            }
+            int x = x0 + i;
+            int edge = halfWidth;
+            BlockState piece = switch (random.nextInt(6)) {
+                case 0 -> ModBlocks.COURSE_CRATE.get().defaultBlockState();
+                case 1 -> ModBlocks.COURSE_HEDGE.get().defaultBlockState();
+                case 2 -> ModBlocks.COURSE_LAMP.get().defaultBlockState();
+                case 3 -> ModBlocks.COURSE_PILLAR.get().defaultBlockState();
+                case 4 -> ModBlocks.COURSE_LATTICE.get().defaultBlockState();
+                default -> ModBlocks.COURSE_TRIM.get().defaultBlockState();
+            };
+            // Against the back edge of the lane, never in the middle: decoration the player has to
+            // walk around is not decoration, it is an obstacle that looks like decoration.
+            canvas.setIfEmpty(x, topY + 1, -edge, piece);
+            if (isWide() && random.nextInt(3) == 0) {
+                canvas.setIfEmpty(x, topY + 1, edge, piece);
+            }
         }
     }
 
@@ -130,6 +195,6 @@ public final class GenContext {
         if (palette.hazard() == null) {
             return;
         }
-        canvas.setLane(x, floorY - 4, palette.hazard(), LANE_HALF_WIDTH);
+        canvas.setLane(x, floorY - 4, palette.hazard(), halfWidth);
     }
 }

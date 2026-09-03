@@ -304,5 +304,19 @@
   "item.planeshift.cat_suit": "Cat Suit",
   "effect.planeshift.cat_aura": "Cat Suit",
   "form.planeshift.cat": "Cat",
-  "gui.planeshift.tester.cat_suit": "Cat Suit"
+  "gui.planeshift.tester.cat_suit": "Cat Suit",
+  "course.planeshift.space_1": "3D-1 Open Meadow",
+  "course.planeshift.space_2": "3D-2 Wide Dunes",
+  "course.planeshift.space_3": "3D-3 Frozen Plateau",
+  "gui.planeshift.title.courses_3d": "3D Courses",
+  "gui.planeshift.course_map.mode_2_5d": "2.5D Courses",
+  "gui.planeshift.course_map.mode_3d": "3D Courses",
+  "block.planeshift.course_tile": "Course Tile",
+  "block.planeshift.course_pillar": "Course Pillar",
+  "block.planeshift.course_lattice": "Course Lattice",
+  "block.planeshift.course_crate": "Course Crate",
+  "block.planeshift.course_banner": "Course Banner",
+  "block.planeshift.course_hedge": "Course Hedge",
+  "block.planeshift.course_trim": "Course Trim",
+  "block.planeshift.course_lamp": "Course Lamp"
 }

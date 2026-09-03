@@ -2,6 +2,7 @@ package com.studio.planeshift.client.gui;
 
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.client.screen.CourseMapScreen;
+import com.studio.planeshift.client.screen.ThreeDCourseScreen;
 import com.studio.planeshift.client.gui.PlaneShiftGui;
 import com.studio.planeshift.common.network.CourseSelectPayload;
 import net.minecraft.client.gui.GuiGraphics;
@@ -37,9 +38,16 @@ public class PlaneShiftTitleScreen extends Screen {
                 .bounds(centerX - 100, centerY + 10, 200, 20)
                 .build());
 
+        // 3D courses are the same generator at a wider ribbon with the camera off the rail, so
+        // they belong beside the 2.5D map rather than in a separate game mode.
+        addRenderableWidget(Button.builder(Component.translatable("gui.planeshift.title.courses_3d"),
+                b -> this.minecraft.setScreen(new ThreeDCourseScreen()))
+                .bounds(centerX - 100, centerY + 40, 200, 20)
+                .build());
+
         addRenderableWidget(Button.builder(Component.translatable("gui.planeshift.close"),
                 b -> this.minecraft.setScreen(null))
-                .bounds(centerX - 100, centerY + 40, 200, 20)
+                .bounds(centerX - 100, centerY + 70, 200, 20)
                 .build());
     }
 
