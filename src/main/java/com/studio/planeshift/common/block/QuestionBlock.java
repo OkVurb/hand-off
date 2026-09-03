@@ -59,6 +59,20 @@ public class QuestionBlock extends Block implements HitFromBelowBlock {
         attack(state, level, pos, player);
     }
 
+    /**
+     * Triggers the block from a non-player impact (e.g. a sliding Koopa shell).
+     * Bypasses the {@link HitFromBelowBlock#isHeadContact} check since the impacting
+     * entity is not a player standing beneath the block.
+     */
+    public void triggerFromImpact(BlockState state, Level level, BlockPos pos) {
+        if (level.isClientSide() || state.getValue(USED)) {
+            return;
+        }
+        level.setBlock(pos, state.setValue(USED, true), Block.UPDATE_ALL);
+        popPickup(level, pos);
+        level.playSound(null, pos, ModSounds.QUESTION_BUMP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
     static void popPickup(Level level, BlockPos pos) {
         net.minecraft.world.item.Item pickup = switch (level.getRandom().nextInt(20)) {
             case 0, 1, 2 -> ModItems.COIN.get();

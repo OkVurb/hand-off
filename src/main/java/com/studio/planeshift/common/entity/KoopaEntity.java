@@ -144,6 +144,10 @@ public class KoopaEntity extends CourseEnemyEntity {
     }
 
     private void tickSlide() {
+        if (level().isClientSide()) {
+            return;
+        }
+        ServerLevel serverLevel = (ServerLevel) level();
         Vec3 velocity = getDeltaMovement();
         if (horizontalCollision) {
             // Check for breakable bricks or question blocks in the path of the shell
@@ -154,8 +158,8 @@ public class KoopaEntity extends CourseEnemyEntity {
                 if (wallState.getBlock() instanceof BrickBlock) {
                     if (BrickBlock.isCoinBrick(wallPos)) {
                         if (!wallState.getValue(BrickBlock.SPENT)) {
-                            level().setBlock(wallPos, wallState.setValue(BrickBlock.SPENT, true), Block.UPDATE_ALL);
                             BrickBlock.payCoin(level(), wallPos);
+                            level().setBlock(wallPos, wallState.setValue(BrickBlock.SPENT, true), Block.UPDATE_ALL);
                         } else {
                             level().playSound(null, wallPos, ModSounds.QUESTION_BUMP.get(), SoundSource.BLOCKS, 0.8F, 1.0F);
                         }
@@ -164,12 +168,7 @@ public class KoopaEntity extends CourseEnemyEntity {
                         level().playSound(null, wallPos, ModSounds.BRICK_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                     }
                 } else if (wallState.getBlock() instanceof QuestionBlock questionBlock) {
-                    if (!wallState.getValue(QuestionBlock.USED) && kickerUuid != null && level() instanceof ServerLevel sl) {
-                        ServerPlayer kicker = sl.getServer().getPlayerList().getPlayer(kickerUuid);
-                        if (kicker != null) {
-                            questionBlock.attemptHitFromBelow(wallState, level(), wallPos, kicker);
-                        }
-                    }
+                    questionBlock.triggerFromImpact(wallState, level(), wallPos);
                 }
             }
 
@@ -181,12 +180,12 @@ public class KoopaEntity extends CourseEnemyEntity {
         // Anything the shell runs through is destroyed. This is the reward for kicking it.
         for (CourseEnemyEntity victim : level().getEntitiesOfClass(CourseEnemyEntity.class,
                 getBoundingBox().inflate(0.2D), e -> e != this && e.isAlive())) {
-            victim.hurtServer((ServerLevel) level(), damageSources().mobAttack(this), SHELL_DAMAGE);
+            victim.hurtServer(serverLevel, damageSources().mobAttack(this), SHELL_DAMAGE);
             level().playSound(null, blockPosition(), ModSounds.ENEMY_DEFEAT.get(),
                     SoundSource.HOSTILE, 0.9F, 1.1F);
 
-            if (kickerUuid != null && level() instanceof ServerLevel sl) {
-                ServerPlayer kicker = sl.getServer().getPlayerList().getPlayer(kickerUuid);
+            if (kickerUuid != null) {
+                ServerPlayer kicker = serverLevel.getServer().getPlayerList().getPlayer(kickerUuid);
                 if (kicker != null && kicker.isAlive()) {
                     CourseScoringService.awardShellKill(kicker, victim.getX(), victim.getY(), victim.getZ(), shellCombo);
                     shellCombo++;
