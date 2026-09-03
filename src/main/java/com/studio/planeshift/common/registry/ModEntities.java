@@ -48,7 +48,7 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<KoopaEntity>> KOOPA =
             ENTITY_TYPES.register("koopa", () -> EntityType.Builder
                     .of(KoopaEntity::new, MobCategory.MONSTER)
-                    .sized(0.5F, 0.8F)
+                    .sized(0.6F, 1.0F)
                     .clientTrackingRange(8)
                     .build(key("koopa")));
 
