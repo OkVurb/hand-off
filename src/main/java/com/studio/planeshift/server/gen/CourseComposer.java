@@ -1,5 +1,6 @@
 package com.studio.planeshift.server.gen;
 
+import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModItems;
@@ -175,9 +176,14 @@ public final class CourseComposer {
             ctx.ground(canvas, i, floorY);
         }
         int flagX = length;
-        for (int h = 1; h <= 8; h++) {
-            canvas.set(flagX, floorY + h, 0, ModBlocks.FLAG_POLE.get().defaultBlockState());
+        canvas.set(flagX, floorY + 1, 0, ModBlocks.FLAG_POLE.get().defaultBlockState()
+                .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.BASE));
+        for (int h = 2; h <= 7; h++) {
+            canvas.set(flagX, floorY + h, 0, ModBlocks.FLAG_POLE.get().defaultBlockState()
+                    .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.POLE));
         }
+        canvas.set(flagX, floorY + 8, 0, ModBlocks.FLAG_POLE.get().defaultBlockState()
+                .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.TOP));
         canvas.marker("flag", flagX, floorY + 1, 0);
 
         int checkpointX = placeCheckpoint(canvas, placed, length);

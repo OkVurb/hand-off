@@ -1,6 +1,7 @@
 package com.studio.planeshift.server;
 
 import com.studio.planeshift.PlaneShift;
+import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.course.CourseDefinition;
 import com.studio.planeshift.server.gen.CourseCanvas;
 import com.studio.planeshift.server.gen.CourseComposer;
@@ -254,9 +255,14 @@ public final class CourseStructureService {
     private static void buildFinish(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
                                     Palette palette) {
         int finish = plan.length();
-        for (int y = 1; y <= 7; y++) {
-            set(level, start.offset(finish, y, 0), ModBlocks.FLAG_POLE.get().defaultBlockState());
+        set(level, start.offset(finish, 1, 0), ModBlocks.FLAG_POLE.get().defaultBlockState()
+                .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.BASE));
+        for (int y = 2; y <= 6; y++) {
+            set(level, start.offset(finish, y, 0), ModBlocks.FLAG_POLE.get().defaultBlockState()
+                    .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.POLE));
         }
+        set(level, start.offset(finish, 7, 0), ModBlocks.FLAG_POLE.get().defaultBlockState()
+                .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.TOP));
         for (int step = 0; step < 5; step++) {
             for (int x = finish - 10 + step; x <= finish - 6 + step; x++) {
                 set(level, start.offset(x, step + 1, 0), palette.accent());

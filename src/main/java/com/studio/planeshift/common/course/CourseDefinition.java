@@ -26,10 +26,10 @@ public record CourseDefinition(
         boolean autoScroll,
         Optional<CourseLayout> layout
 ) {
-    public static final int DEFAULT_LENGTH = 240;
+    public static final int DEFAULT_LENGTH = 720;
 
     /** Classic arcade clock length. Zero means the course is untimed. */
-    public static final int DEFAULT_TIME_LIMIT_SECONDS = 500;
+    public static final int DEFAULT_TIME_LIMIT_SECONDS = 900;
 
     public CourseDefinition(Identifier dimension, BlockPos startPos, PlaneMode startMode,
                             CourseTheme theme, double killY) {
@@ -44,7 +44,7 @@ public record CourseDefinition(
             CourseTheme.CODEC.fieldOf("theme").orElse(CourseTheme.GRASS).forGetter(CourseDefinition::theme),
             Codec.DOUBLE.fieldOf("kill_y").orElse(CourseState.DEFAULT_KILL_Y).forGetter(CourseDefinition::killY),
             Identifier.CODEC.optionalFieldOf("structure").forGetter(CourseDefinition::structure),
-            Codec.intRange(64, 512).optionalFieldOf("length", DEFAULT_LENGTH).forGetter(CourseDefinition::length),
+            Codec.intRange(64, 2048).optionalFieldOf("length", DEFAULT_LENGTH).forGetter(CourseDefinition::length),
             Codec.intRange(0, 9999).optionalFieldOf("time_limit_seconds", DEFAULT_TIME_LIMIT_SECONDS)
                     .forGetter(CourseDefinition::timeLimitSeconds),
             Codec.BOOL.optionalFieldOf("auto_scroll", false).forGetter(CourseDefinition::autoScroll),

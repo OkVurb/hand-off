@@ -742,6 +742,86 @@ public final class SegmentLibrary {
         }
     };
 
+    /** Hidden prize vault behind an illusory secret passage wall. */
+    static final Segment SECRET_PRIZE_VAULT = new Segment() {
+        public SegmentSpec spec() {
+            return def("secret_prize_vault", 14, 0, 1, Tag.SECRET, Tag.BLOCKS);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 14, y, ctx);
+            BlockState brick = ModBlocks.BRICK_BLOCK.get().defaultBlockState();
+            BlockState fake = ModBlocks.SECRET_PASSAGE.get().defaultBlockState();
+            c.setLane(x + 5, y + 1, fake, ctx.halfWidth());
+            c.setLane(x + 5, y + 2, fake, ctx.halfWidth());
+            c.setLane(x + 5, y + 3, brick, ctx.halfWidth());
+            c.setLane(x + 5, y + 4, brick, ctx.halfWidth());
+            c.set(x + 8, y + 1, 0, ModBlocks.PRIZE_CACHE.get().defaultBlockState());
+            c.set(x + 10, y + 4, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+            c.item(ModItems.EXTRA_PIP.get(), x + 8.5D, y + 2.5D, 0.5D);
+            coinTrail(c, x + 7, 3, y + 2, 1);
+        }
+    };
+
+    /** A P-Switch room where hitting the switch converts bricks into a coin field. */
+    static final Segment P_SWITCH_BONUS_ROOM = new Segment() {
+        public SegmentSpec spec() {
+            return def("p_switch_bonus_room", 16, 0, 2, Tag.SECRET, Tag.UNSTABLE);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            c.set(x + 3, y + 1, 0, ModBlocks.P_SWITCH.get().defaultBlockState());
+            BlockState brick = ModBlocks.BRICK_BLOCK.get().defaultBlockState();
+            for (int i = 0; i < 8; i++) {
+                c.set(x + 6 + i, y + 2, 0, brick);
+                c.set(x + 6 + i, y + 4, 0, brick);
+            }
+            c.set(x + 10, y + 5, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+        }
+    };
+
+    /** An invisible block revealing a spring pad launching player to an elevated cloud highway. */
+    static final Segment HIDDEN_SPRING_HIGHWAY = new Segment() {
+        public SegmentSpec spec() {
+            return def("hidden_spring_highway", 18, 0, 2, Tag.SECRET, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 18, y, ctx);
+            c.set(x + 4, y + 3, 0, ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
+            c.set(x + 4, y + 1, 0, ModBlocks.SPRING_PAD.get().defaultBlockState());
+            BlockState cloud = ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState();
+            for (int i = 0; i < 10; i++) {
+                c.setLane(x + 6 + i, y + 8, cloud, ctx.halfWidth());
+            }
+            coinTrail(c, x + 7, 6, y + 9, 1);
+            c.item(ModItems.THREE_UP.get(), x + 14.5D, y + 9.5D, 0.5D);
+        }
+    };
+
+    /** Illusory secret passage between pipes hiding an invincibility star. */
+    static final Segment ILLUSORY_PIPE_CACHE = new Segment() {
+        public SegmentSpec spec() {
+            return def("illusory_pipe_cache", 15, 0, 1, Tag.SECRET, Tag.PIPE);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 15, y, ctx);
+            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+            BlockState fake = ModBlocks.SECRET_PASSAGE.get().defaultBlockState();
+            BlockState stone = ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState();
+            c.setLane(x + 3, y + 1, pipe, ctx.halfWidth());
+            c.setLane(x + 3, y + 2, pipe, ctx.halfWidth());
+            c.setLane(x + 6, y + 1, fake, ctx.halfWidth());
+            c.setLane(x + 6, y + 2, fake, ctx.halfWidth());
+            c.setLane(x + 6, y + 3, stone, ctx.halfWidth());
+            c.set(x + 8, y + 1, 0, ModBlocks.COIN_BLOCK.get().defaultBlockState());
+            c.item(ModItems.STAR_POWER.get(), x + 10.5D, y + 1.5D, 0.5D);
+            c.setLane(x + 12, y + 1, pipe, ctx.halfWidth());
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -778,6 +858,10 @@ public final class SegmentLibrary {
         list.add(STEPPING_STONE_HOPS);
         list.add(ROTATING_BRIDGE);
         list.add(MULTI_TIER_CANOPY);
+        list.add(SECRET_PRIZE_VAULT);
+        list.add(P_SWITCH_BONUS_ROOM);
+        list.add(HIDDEN_SPRING_HIGHWAY);
+        list.add(ILLUSORY_PIPE_CACHE);
         return list;
     }
 

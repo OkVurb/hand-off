@@ -1,5 +1,13 @@
 {
   "variants": {
-    "": { "model": "planeshift:block/flag_pole" }
+    "part=base": {
+      "model": "planeshift:block/flag_pole_base"
+    },
+    "part=pole": {
+      "model": "planeshift:block/flag_pole"
+    },
+    "part=top": {
+      "model": "planeshift:block/flag_pole_top"
+    }
   }
 }

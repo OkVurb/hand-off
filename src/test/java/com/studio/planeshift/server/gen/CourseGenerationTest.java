@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.EnumSource;
  */
 class CourseGenerationTest {
 
-    private static final int[] LENGTHS = {96, 144, 180, 224, 240};
+    private static final int[] LENGTHS = {96, 144, 180, 224, 240, 720};
     private static final int SEEDS = 25;
 
     private static CourseComposer.Composition compose(CourseTheme theme, int length, int difficulty,

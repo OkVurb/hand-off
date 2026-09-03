@@ -4,7 +4,7 @@
   "start_mode": "side_on",
   "theme": "grass",
   "kill_y": 40.0,
-  "length": 240,
+  "length": 720,
   "layout": {
     "gap_count": 3,
     "max_gap_width": 4,

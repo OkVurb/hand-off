@@ -92,7 +92,9 @@ public final class CourseWriter {
             for (int z = -CLEAR_HALF_WIDTH; z <= CLEAR_HALF_WIDTH; z++) {
                 for (int y = bottom; y <= top; y++) {
                     cursor.set(origin.getX() + x, origin.getY() + y, origin.getZ() + z);
-                    level.setBlock(cursor, Blocks.AIR.defaultBlockState(), UPDATE_FLAGS);
+                    if (!level.getBlockState(cursor).isAir()) {
+                        level.setBlock(cursor, Blocks.AIR.defaultBlockState(), UPDATE_FLAGS);
+                    }
                 }
             }
         }
