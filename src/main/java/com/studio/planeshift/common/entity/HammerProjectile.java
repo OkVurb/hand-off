@@ -76,7 +76,7 @@ public class HammerProjectile extends ThrowableItemProjectile {
     private void spawnHitEffects() {
         if (level() instanceof ServerLevel level) {
             level.playSound(null, blockPosition(), ModSounds.HAMMER_THROW.get(), SoundSource.HOSTILE, 0.7F, 1.0F);
-            level.sendParticles(ModParticles.HIT_BURST.get(), getX(), getY(), getZ(), 5, 0.15D, 0.15D, 0.15D, 0.05D);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT, getX(), getY(), getZ(), 5, 0.15D, 0.15D, 0.15D, 0.05D);
         }
     }
 

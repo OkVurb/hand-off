@@ -58,7 +58,7 @@ public class TrampolineBlock extends Block {
         entity.hurtMarked = true;
         if (entity.level() instanceof ServerLevel sl) {
             sl.playSound(null, entity.blockPosition(), ModSounds.SPRING.get(), SoundSource.BLOCKS, 1.2F, 1.4F);
-            sl.sendParticles(ModParticles.HIT_BURST.get(), entity.getX(), entity.getY() + 0.5D, entity.getZ(), 8, 0.2D, 0.1D, 0.2D, 0.05D);
+            sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, entity.getX(), entity.getY() + 0.5D, entity.getZ(), 8, 0.2D, 0.1D, 0.2D, 0.05D);
         }
     }
 }

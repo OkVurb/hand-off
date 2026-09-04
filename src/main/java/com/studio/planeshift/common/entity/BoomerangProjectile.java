@@ -124,7 +124,7 @@ public class BoomerangProjectile extends ThrowableItemProjectile {
         }
         if (level() instanceof ServerLevel level) {
             level.playSound(null, blockPosition(), ModSounds.BOOMERANG_THROW.get(), SoundSource.PLAYERS, 0.5F, 1.0F);
-            level.sendParticles(ModParticles.HIT_BURST.get(), getX(), getY(), getZ(), 3, 0.1D, 0.1D, 0.1D, 0.05D);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT, getX(), getY(), getZ(), 3, 0.1D, 0.1D, 0.1D, 0.05D);
         }
         lastHit = target;
         lastHitTick = tickCount;

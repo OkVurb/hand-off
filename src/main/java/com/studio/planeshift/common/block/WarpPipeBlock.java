@@ -80,7 +80,7 @@ public class WarpPipeBlock extends Block {
             double y = pos.getY() + 1.1;
             double z = pos.getZ() + 0.5;
             if (hasLink) {
-                level.addParticle(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, x, y, z, 0, 0.05, 0);
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, x, y, z, 0, 0.05, 0);
             } else {
                 level.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE, x, y, z, 0, 0.05, 0);
             }

@@ -148,7 +148,7 @@ public final class PickupParticles {
             // stays tight, so which mushroom was taken is legible without reading the HUD.
             Map.entry(MegaMushroomItem.class, new Burst(ParticleTypes.EXPLOSION, 8, 0.6D, 0.0D)),
             Map.entry(MiniMushroomItem.class, new Burst(ParticleTypes.END_ROD, 8, 0.12D, 0.02D)),
-            Map.entry(SuperMushroomItem.class, new Burst(ParticleTypes.HAPPY_VILLAGER, 10, 0.3D, 0.05D)),
+            Map.entry(SuperMushroomItem.class, new Burst(ParticleTypes.END_ROD, 10, 0.3D, 0.05D)),
 
             // Elemental Forms throw the element they grant.
             Map.entry(FireFlowerItem.class, new Burst(ParticleTypes.FLAME, 14, 0.3D, 0.06D)),

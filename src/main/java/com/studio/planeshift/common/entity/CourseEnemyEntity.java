@@ -209,8 +209,9 @@ public abstract class CourseEnemyEntity extends Monster {
         lastStompGameTime = now;
 
         if (isStompable()) {
+            this.invulnerableTime = 0; // Remove vanilla i-frames BEFORE applying damage so consecutive hits work
             hurtServer((ServerLevel) level(), damageSources().playerAttack(player), stompDamage());
-            this.invulnerableTime = 0; // Remove vanilla i-frames so player can stomp again immediately
+            this.invulnerableTime = 0; // Ensure it stays 0
             bounce(player);
             startSquish();
             if (!isAlive()) {
@@ -247,7 +248,7 @@ public abstract class CourseEnemyEntity extends Monster {
                 double ox = random.nextGaussian() * 0.15D;
                 double oy = random.nextGaussian() * 0.15D;
                 double oz = random.nextGaussian() * 0.15D;
-                serverLevel.sendParticles(ModParticles.HIT_BURST.get(),
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,
                         getX(), getY(0.5D), getZ(), 1, ox, oy, oz, 0.05D);
             }
         }

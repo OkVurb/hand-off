@@ -90,7 +90,7 @@ public class FireballProjectile extends ThrowableItemProjectile {
     private void spawnHitEffects() {
         if (level() instanceof ServerLevel level) {
             level.playSound(null, blockPosition(), ModSounds.FIREBALL.get(), SoundSource.PLAYERS, 0.6F, 1.4F);
-            level.sendParticles(ModParticles.HIT_BURST.get(), getX(), getY(), getZ(), 6, 0.2D, 0.2D, 0.2D, 0.05D);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, getX(), getY(), getZ(), 6, 0.2D, 0.2D, 0.2D, 0.05D);
         }
     }
 
