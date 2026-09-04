@@ -135,48 +135,36 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return PartPose.offsetAndRotation(x, y, z, xr, yr, zr);
     }
 
-    private static LayerDefinition sproutling() {
+    private static LayerDefinition sproutling() { // Goomba
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -6, -9, -4, 12, 9, 8), pose(0, 21, 0));
-        r.addOrReplaceChild("head", box(0, 80, -5, -3, -0.5F, 10, 6, 1), pose(0, 16, -4));
-        r.addOrReplaceChild("left_leg", box(0, 40, -4.5F, 0, -3.5F, 5, 3, 7), pose(0, 21, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -0.5F, 0, -3.5F, 5, 3, 7), pose(0, 21, 0));
-        r.addOrReplaceChild("detail_1", box(64, 40, -1.5F, -8, -0.5F, 3, 8, 1), pose(0, 13, 0));
-        r.addOrReplaceChild("detail_2", box(64, 40, -1, -7, -0.5F, 2, 7, 1),
-                pose(-3, 14, 0, 0, 0, -0.82F));
-        r.addOrReplaceChild("detail_3", box(64, 40, -1, -7, -0.5F, 2, 7, 1),
-                pose(3, 14, 0, 0, 0, 0.82F));
+        r.addOrReplaceChild("body", box(0, 0, -5, -5, -5, 10, 10, 10), pose(0, 14, 0));
+        r.addOrReplaceChild("left_leg", box(0, 40, -1, 0, -3, 4, 3, 6), pose(2, 21, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -3, 0, -3, 4, 3, 6), pose(-2, 21, 0));
         return finish(mesh);
     }
 
-    private static LayerDefinition gecko() {
+    private static LayerDefinition gecko() { // Koopa
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -4, -8, -3, 8, 8, 6), pose(0, 18, 0));
-        r.addOrReplaceChild("head", box(64, 0, -4, -6, -4, 8, 6, 7), pose(0, 11, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -3, -2, -4, 6, 3, 4), pose(0, 9, -3));
-        r.addOrReplaceChild("shell", box(64, 40, -4, -5, -1, 8, 10, 3), pose(0, 14, 3));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -1.5F, 3, 7, 3), pose(4, 11, 0, 0, 0, -0.12F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -3, 0, -1.5F, 3, 7, 3), pose(-4, 11, 0, 0, 0, 0.12F));
-        r.addOrReplaceChild("left_leg", box(0, 40, -1.5F, 0, -2, 3, 6, 4), pose(2.5F, 18, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -1.5F, 0, -2, 3, 6, 4), pose(-2.5F, 18, 0));
-        r.addOrReplaceChild("tail", box(64, 40, -2, -2, 0, 4, 4, 8), pose(0, 17, 3, 0.35F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 40, -1.5F, -1.5F, 0, 3, 3, 7), pose(0, 19, 10, 0.62F, 0, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.7F, 8.5F, -3.5F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.7F, 8.5F, -3.5F));
+        r.addOrReplaceChild("body", box(0, 16, -4, 0, -2, 8, 10, 4), pose(0, 4, 0));
+        r.addOrReplaceChild("shell", box(64, 0, -5, 1, 2, 10, 12, 6), pose(0, 4, 0));
+        r.addOrReplaceChild("head", box(0, 0, -4, -4, -4, 8, 8, 8), pose(0, 4, -2));
+        r.addOrReplaceChild("left_arm", box(32, 48, -1, -1, -2, 3, 8, 3), pose(5, 6, 0));
+        r.addOrReplaceChild("right_arm", box(32, 48, -2, -1, -2, 3, 8, 3), pose(-5, 6, 0));
+        r.addOrReplaceChild("left_leg", box(0, 48, -2, 0, -2, 4, 10, 4), pose(2, 14, 0));
+        r.addOrReplaceChild("right_leg", box(0, 48, -2, 0, -2, 4, 10, 4), pose(-2, 14, 0));
         return finish(mesh);
     }
 
-    private static LayerDefinition crusher() {
+    private static LayerDefinition crusher() { // Thwomp
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -8, -16, -8, 16, 16, 16), pose(0, 24, 0));
-        // Remove arms/legs. Just a solid block.
+        r.addOrReplaceChild("body", box(0, 0, -8, -8, -8, 16, 16, 16), pose(0, 8, 0));
         return finish(mesh);
     }
 
-    private static LayerDefinition torpedoMoth() {
+    private static LayerDefinition torpedoMoth() { // Bullet Bill
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         r.addOrReplaceChild("body", box(0, 0, -7, -7, -8, 14, 14, 16), pose(0, 17, 0));
@@ -185,136 +173,85 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition moonWisp() {
+    private static LayerDefinition moonWisp() { // Boo
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -6, -6, -5, 12, 10, 10), pose(0, 14, 0));
-        r.addOrReplaceChild("head", box(0, 80, -4, -3, -0.5F, 8, 5, 1), pose(0, 13, -5));
-        for (int i = 0; i < 6; i++) {
-            float x = -4.5F + i * 1.8F;
-            int height = 4 + (i % 3);
-            r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -0.75F, 0, -0.75F, 1.5F, height, 1.5F),
-                    pose(x, 18, 0, 0, 0, (i - 2.5F) * 0.04F));
-        }
-        r.addOrReplaceChild("left_arm", box(64, 80, -1, -1, -1, 2, 2, 2), pose(8, 15, 0));
-        r.addOrReplaceChild("right_arm", box(64, 80, -1, -1, -1, 2, 2, 2), pose(-8, 15, 0));
+        r.addOrReplaceChild("body", box(0, 0, -6, -6, -6, 12, 12, 12), pose(0, 14, 0));
+        r.addOrReplaceChild("left_arm", box(64, 0, -2, -2, -3, 4, 4, 6), pose(7, 13, -3));
+        r.addOrReplaceChild("right_arm", box(64, 0, -2, -2, -3, 4, 4, 6), pose(-7, 13, -3));
+        r.addOrReplaceChild("tail", box(64, 16, -3, -3, 0, 6, 6, 6), pose(0, 17, 6));
         return finish(mesh);
     }
 
-    private static LayerDefinition mantaRider() {
+    private static LayerDefinition mantaRider() { // Lakitu
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -7, -2, -5, 14, 4, 10), pose(0, 20, 0));
-        r.addOrReplaceChild("left_wing", box(0, 0, 0, -1, -5, 9, 2, 10), pose(6, 20, 0, 0, 0, -0.08F));
-        r.addOrReplaceChild("right_wing", box(0, 0, -9, -1, -5, 9, 2, 10), pose(-6, 20, 0, 0, 0, 0.08F));
-        r.addOrReplaceChild("tail", box(0, 40, -1.5F, -1.5F, 0, 3, 3, 9), pose(0, 20, 5, 0.16F, 0, 0));
-        r.addOrReplaceChild("shell", box(64, 40, -4, -5, -3, 8, 5, 6), pose(0, 17, 0));
-        r.addOrReplaceChild("head", box(64, 0, -3.5F, -6, -3, 7, 6, 6), pose(0, 12, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -2.5F, -2, -2, 5, 3, 2), pose(0, 10, -3));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -1, 2, 5, 2), pose(3.5F, 13, 0, -0.65F, 0, -0.25F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -2, 0, -1, 2, 5, 2), pose(-3.5F, 13, 0, -0.65F, 0, 0.25F));
-        r.addOrReplaceChild("detail_1", box(64, 80, -3, -1, -0.5F, 6, 2, 1), pose(0, 8.5F, -3.1F));
-        r.addOrReplaceChild("detail_2", box(64, 40, 0, -0.5F, -0.5F, 8, 1, 1), pose(2, 13, 2, 0, 0.35F, 0.12F));
+        r.addOrReplaceChild("shell", box(64, 0, -12, -4, -12, 24, 8, 24), pose(0, 20, 0)); // Cloud
+        r.addOrReplaceChild("body", box(0, 16, -4, 0, -2, 8, 8, 4), pose(0, 8, 0));
+        r.addOrReplaceChild("head", box(0, 0, -4, -4, -4, 8, 8, 8), pose(0, 8, -2));
+        r.addOrReplaceChild("left_arm", box(32, 48, -1, -1, -2, 3, 8, 3), pose(5, 10, 0, -0.5F, 0, 0));
+        r.addOrReplaceChild("right_arm", box(32, 48, -2, -1, -2, 3, 8, 3), pose(-5, 10, 0, -0.5F, 0, 0));
         return finish(mesh);
     }
 
-    private static LayerDefinition pangolin() {
+    private static LayerDefinition pangolin() { // Hammer Bro
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -5, -9, -3.5F, 10, 9, 7), pose(0, 19, 0));
-        r.addOrReplaceChild("shell", box(64, 40, -5.5F, -8, -1, 11, 10, 4), pose(0, 17, 2));
-        r.addOrReplaceChild("head", box(64, 0, -4, -6, -4, 8, 6, 7), pose(0, 10, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -3, -2, -4, 6, 3, 4), pose(0, 9, -3));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -2, 4, 8, 4), pose(5, 11, 0, 0, 0, -0.18F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -4, 0, -2, 4, 8, 4), pose(-5, 11, 0, 0, 0, 0.18F));
-        r.addOrReplaceChild("left_leg", box(0, 40, -2, 0, -2.5F, 4, 5, 5), pose(3, 19, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -2, 0, -2.5F, 4, 5, 5), pose(-3, 19, 0));
-        r.addOrReplaceChild("tail", box(64, 40, -3, -3, 0, 6, 6, 8), pose(0, 17, 3, 0.42F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 40, -2, -2, 0, 4, 4, 7), pose(0, 20, 10, 0.62F, 0, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -4.5F, -1, -0.5F, 9, 2, 1), pose(0, 6, -3.8F));
+        r.addOrReplaceChild("body", box(0, 16, -4, 0, -2, 8, 10, 4), pose(0, 4, 0));
+        r.addOrReplaceChild("shell", box(64, 0, -5, 1, 2, 10, 12, 6), pose(0, 4, 0));
+        r.addOrReplaceChild("head", box(0, 0, -4, -4, -4, 8, 8, 8), pose(0, 4, -2));
+        r.addOrReplaceChild("left_arm", box(32, 48, -1, -1, -2, 3, 8, 3), pose(5, 6, 0));
+        r.addOrReplaceChild("right_arm", box(32, 48, -2, -1, -2, 3, 8, 3), pose(-5, 6, 0));
+        r.addOrReplaceChild("left_leg", box(0, 48, -2, 0, -2, 4, 10, 4), pose(2, 14, 0));
+        r.addOrReplaceChild("right_leg", box(0, 48, -2, 0, -2, 4, 10, 4), pose(-2, 14, 0));
         return finish(mesh);
     }
 
-    private static LayerDefinition pincushionCrab() {
+    private static LayerDefinition pincushionCrab() { // Spiny
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -7, -5, -5, 14, 7, 10), pose(0, 18, 0));
-        r.addOrReplaceChild("head", box(0, 80, -4, -2, -0.5F, 8, 4, 1), pose(0, 17, -5));
-        r.addOrReplaceChild("left_arm", box(64, 0, 0, -2, -2, 6, 5, 5), pose(7, 19, -2, 0, 0, -0.18F));
-        r.addOrReplaceChild("right_arm", box(64, 0, -6, -2, -2, 6, 5, 5), pose(-7, 19, -2, 0, 0, 0.18F));
-        for (int i = 0; i < 6; i++) {
-            boolean left = i >= 3;
-            int lane = i % 3;
-            float x = left ? 6 : -6;
-            float z = -3 + lane * 3;
-            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, left ? 0 : -5, -1, -1, 5, 2, 2),
-                    pose(x, 21, z, 0, (lane - 1) * 0.2F, left ? 0.32F : -0.32F));
-        }
-        r.addOrReplaceChild("left_leg", box(64, 80, -1, -5, -1, 2, 5, 2), pose(4, 14, -1, -0.3F, 0, 0.35F));
-        r.addOrReplaceChild("right_leg", box(64, 80, -1, -5, -1, 2, 5, 2), pose(-4, 14, -1, -0.3F, 0, -0.35F));
-        r.addOrReplaceChild("tail", box(64, 80, -1, -6, -1, 2, 6, 2), pose(0, 14, 1, 0.25F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 80, -1, -5, -1, 2, 5, 2), pose(0, 15, -3, -0.35F, 0, 0));
+        r.addOrReplaceChild("body", box(0, 0, -6, -6, -6, 12, 10, 12), pose(0, 17, 0)); // Spiked shell
+        r.addOrReplaceChild("head", box(0, 32, -4, -3, -4, 8, 6, 6), pose(0, 17, -6));
+        r.addOrReplaceChild("left_arm", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(4, 18, -4)); // front left
+        r.addOrReplaceChild("right_arm", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(-4, 18, -4)); // front right
+        r.addOrReplaceChild("left_leg", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(4, 18, 4)); // back left
+        r.addOrReplaceChild("right_leg", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(-4, 18, 4)); // back right
         return finish(mesh);
     }
 
-    private static LayerDefinition burrowingBeetle() {
+    private static LayerDefinition burrowingBeetle() { // Buzzy Beetle
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -7, -5, -7, 14, 8, 14), pose(0, 18, 1));
-        r.addOrReplaceChild("shell", box(64, 40, -6, -3, -6, 12, 5, 13), pose(0, 15, 2));
-        r.addOrReplaceChild("head", box(64, 0, -5, -4, -5, 10, 7, 7), pose(0, 19, -6));
-        r.addOrReplaceChild("snout", box(0, 80, -4, -1.5F, -2, 8, 3, 2), pose(0, 20, -11));
-        for (int i = 0; i < 6; i++) {
-            boolean left = i >= 3;
-            int lane = i % 3;
-            float x = left ? 6 : -6;
-            float z = -3 + lane * 4;
-            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, left ? 0 : -5, -1, -1, 5, 2, 2),
-                    pose(x, 21, z, 0, (lane - 1) * 0.18F, left ? 0.38F : -0.38F));
-        }
-        r.addOrReplaceChild("left_arm", box(64, 80, 0, -1, -1, 4, 2, 2), pose(2, 21, -11, 0, -0.32F, 0.18F));
-        r.addOrReplaceChild("right_arm", box(64, 80, -4, -1, -1, 4, 2, 2), pose(-2, 21, -11, 0, 0.32F, -0.18F));
+        r.addOrReplaceChild("body", box(0, 0, -6, -6, -6, 12, 10, 12), pose(0, 17, 0));
+        r.addOrReplaceChild("head", box(0, 32, -4, -3, -4, 8, 6, 6), pose(0, 17, -6));
+        r.addOrReplaceChild("left_arm", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(4, 18, -4));
+        r.addOrReplaceChild("right_arm", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(-4, 18, -4));
+        r.addOrReplaceChild("left_leg", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(4, 18, 4));
+        r.addOrReplaceChild("right_leg", box(0, 48, -1.5F, 0, -1.5F, 3, 6, 3), pose(-4, 18, 4));
         return finish(mesh);
     }
 
-    private static LayerDefinition trumpetVine() {
+    private static LayerDefinition trumpetVine() { // Piranha Plant
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("shell", box(64, 40, -6, -3, -5, 12, 5, 10), pose(0, 22, 0));
-        r.addOrReplaceChild("body", box(0, 0, -3, -13, -3, 6, 13, 6), pose(0, 21, 0));
-        r.addOrReplaceChild("head", box(64, 0, -6, -6, -5, 12, 7, 10), pose(0, 7, 0, -0.08F, 0, 0));
-        r.addOrReplaceChild("jaw", box(64, 0, -6, -1, -5, 12, 5, 10), pose(0, 8, 0, 0.18F, 0, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -5, -4, -0.5F, 10, 8, 1), pose(0, 7, -5));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -3, 8, 2, 6), pose(2.5F, 16, 0, 0, 0, 0.38F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -8, -1, -3, 8, 2, 6), pose(-2.5F, 16, 0, 0, 0, -0.38F));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1, -3, -1, 2, 3, 2), pose(-3.5F, 5, -4.5F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1, -3, -1, 2, 3, 2), pose(0, 4, -4.5F));
-        r.addOrReplaceChild("detail_3", box(64, 80, -1, -3, -1, 2, 3, 2), pose(3.5F, 5, -4.5F));
-        r.addOrReplaceChild("detail_4", box(64, 80, -1, 0, -1, 2, 3, 2), pose(-3.5F, 10, -4.5F));
-        r.addOrReplaceChild("detail_5", box(64, 80, -1, 0, -1, 2, 3, 2), pose(0, 11, -4.5F));
-        r.addOrReplaceChild("detail_6", box(64, 80, -1, 0, -1, 2, 3, 2), pose(3.5F, 10, -4.5F));
+        r.addOrReplaceChild("body", box(0, 0, -2, -12, -2, 4, 12, 4), pose(0, 24, 0)); // Stem
+        r.addOrReplaceChild("head", box(0, 32, -6, -10, -6, 12, 12, 12), pose(0, 12, 0, -0.3F, 0, 0)); // Big head
+        r.addOrReplaceChild("left_arm", box(0, 16, 0, 0, -3, 8, 0, 6), pose(2, 22, 0, 0, 0, 0.5F)); // Leaf
+        r.addOrReplaceChild("right_arm", box(0, 16, -8, 0, -3, 8, 0, 6), pose(-2, 22, 0, 0, 0, -0.5F)); // Leaf
         return finish(mesh);
     }
 
-    private static LayerDefinition salamanderMonarch() {
+    private static LayerDefinition salamanderMonarch() { // Bowser
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -8, -13, -5, 16, 13, 10), pose(0, 20, 0));
-        r.addOrReplaceChild("shell", box(64, 40, -9, -12, -2, 18, 14, 6), pose(0, 17, 4));
-        r.addOrReplaceChild("head", box(64, 0, -6, -8, -6, 12, 8, 10), pose(0, 7, -1));
-        r.addOrReplaceChild("snout", box(0, 80, -5, -3, -6, 10, 5, 6), pose(0, 4, -6));
-        r.addOrReplaceChild("jaw", box(0, 80, -5, -1, -6, 10, 4, 6), pose(0, 7, -6, 0.1F, 0, 0));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, -3, -3, 6, 13, 6), pose(8, 9, 0, -0.12F, 0, -0.22F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -6, -3, -3, 6, 13, 6), pose(-8, 9, 0, -0.12F, 0, 0.22F));
-        r.addOrReplaceChild("left_leg", box(0, 40, -3, -2, -4, 6, 8, 8), pose(6, 18, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -3, -2, -4, 6, 8, 8), pose(-6, 18, 0));
-        r.addOrReplaceChild("tail", box(64, 40, -4, -4, 0, 8, 8, 12), pose(0, 17, 5, 0.35F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 40, -3, -3, 0, 6, 6, 11), pose(0, 20, 15, 0.5F, 0, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1.5F, -7, -1.5F, 3, 7, 3), pose(-4, 0, -2, 0, 0, -0.3F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -7, -1.5F, 3, 7, 3), pose(4, 0, -2, 0, 0, 0.3F));
-        r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -6, -1.5F, 3, 6, 3), pose(0, 4, 8, -0.4F, 0, 0));
-        r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -6, -1.5F, 3, 6, 3), pose(0, 8, 10, -0.2F, 0, 0));
-        r.addOrReplaceChild("detail_5", box(64, 80, -1.5F, -5, -1.5F, 3, 5, 3), pose(0, 12, 11, 0, 0, 0));
+        r.addOrReplaceChild("body", box(0, 0, -8, -6, -6, 16, 14, 12), pose(0, 4, 0, 0.2F, 0, 0)); // Big torso
+        r.addOrReplaceChild("shell", box(64, 0, -10, -8, 6, 20, 18, 8), pose(0, 4, 0, 0.2F, 0, 0)); // Spiked shell
+        r.addOrReplaceChild("head", box(0, 32, -6, -6, -8, 12, 12, 12), pose(0, -3, -6));
+        r.addOrReplaceChild("left_arm", box(48, 48, -2, -2, -3, 6, 14, 6), pose(8, 2, -4, -0.3F, 0, -0.2F));
+        r.addOrReplaceChild("right_arm", box(48, 48, -4, -2, -3, 6, 14, 6), pose(-8, 2, -4, -0.3F, 0, 0.2F));
+        r.addOrReplaceChild("left_leg", box(0, 48, -4, 0, -4, 8, 12, 8), pose(6, 12, 2));
+        r.addOrReplaceChild("right_leg", box(0, 48, -4, 0, -4, 8, 12, 8), pose(-6, 12, 2));
+        r.addOrReplaceChild("tail", box(64, 48, -3, 0, -3, 6, 10, 6), pose(0, 14, 6, 0.6F, 0, 0));
         return finish(mesh);
     }
 
@@ -335,75 +272,46 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 leftLeg.xRot = opposite;
                 rightLeg.xRot = step;
                 body.y += Math.abs(Mth.sin(phase)) * speed * -0.8F + idle * 0.12F;
-                details[0].zRot += idle * 0.08F;
-                details[1].zRot += idle * 0.06F;
-                details[2].zRot -= idle * 0.06F;
             }
             case GECKO -> {
                 walk(step, opposite, 0.75F);
-                tail.yRot = Mth.sin(state.ageInTicks * 0.13F) * 0.22F - step * 0.12F;
-                tailTip.yRot = tail.yRot * 1.35F;
             }
             case CRUSHER -> {
-                // A solid block.
-                // Animate rotation to shake before slamming? 
-                // The entity handles falling. Here we just shake slightly if it's not idle.
-                // Actually, just let it be solid. The user said "dont make the crushing animation unreadable".
             }
             case FLYER -> {
-                // Bullet Bill flies straight. No flapping needed.
             }
             case WISP -> {
                 body.y += idle * 0.8F;
-                head.y += idle * 0.8F;
-                leftArm.y += -idle * 0.35F;
-                rightArm.y += idle * 0.35F;
-                for (int i = 0; i < details.length; i++) {
-                    details[i].xRot = Mth.sin(state.ageInTicks * 0.16F + i * 0.7F) * 0.12F;
-                }
+                leftArm.zRot += idle * 0.15F;
+                rightArm.zRot -= idle * 0.15F;
+                tail.yRot = Mth.sin(state.ageInTicks * 0.15F) * 0.2F;
             }
             case RIDER -> {
-                float flap = Mth.sin(state.ageInTicks * 0.32F) * 0.22F;
-                leftWing.zRot += flap;
-                rightWing.zRot -= flap;
-                leftArm.xRot += -flap * 0.7F;
-                rightArm.xRot += flap * 0.7F;
-                details[1].yRot = Mth.sin(state.ageInTicks * 0.18F) * 0.18F;
+                leftArm.xRot = -0.5F;
+                rightArm.xRot = -0.5F;
             }
             case WARRIOR -> {
                 walk(step, opposite, 0.82F);
-                tail.yRot = -step * 0.12F;
-                tailTip.yRot = -step * 0.18F;
-                leftArm.zRot -= 0.08F;
-                rightArm.zRot += 0.08F;
             }
             case CRAWLER, BEETLE -> {
-                for (int i = 0; i < details.length; i++) {
-                    float cycle = Mth.sin(phase * 1.35F + (i % 3) * 0.85F + (i >= 3 ? Mth.PI : 0));
-                    details[i].yRot += cycle * 0.25F * speed;
-                }
-                leftArm.yRot += step * 0.16F;
-                rightArm.yRot -= step * 0.16F;
+                leftArm.yRot = step * 0.16F;
+                rightArm.yRot = -step * 0.16F;
+                leftLeg.yRot = -opposite * 0.16F;
+                rightLeg.yRot = opposite * 0.16F;
                 body.y += Math.abs(Mth.sin(phase * 1.35F)) * speed * -0.18F;
             }
             case PLANT -> {
-                body.zRot = idle * 0.06F;
-                head.zRot = Mth.sin(state.ageInTicks * 0.11F + 0.6F) * 0.09F;
-                jaw.xRot += 0.12F + (Mth.sin(state.ageInTicks * 0.17F) + 1) * 0.08F;
-                leftArm.zRot += idle * 0.12F;
-                rightArm.zRot -= idle * 0.12F;
+                head.xRot = -0.3F + Mth.sin(state.ageInTicks * 0.11F + 0.6F) * 0.09F;
+                leftArm.zRot = 0.5F + idle * 0.12F;
+                rightArm.zRot = -0.5F - idle * 0.12F;
             }
             case BOSS -> {
                 walk(step, opposite, 0.42F);
                 body.y += Math.abs(Mth.sin(phase)) * speed * -0.22F;
                 tail.yRot = Mth.sin(state.ageInTicks * 0.08F) * 0.16F;
-                tailTip.yRot = Mth.sin(state.ageInTicks * 0.08F + 0.5F) * 0.22F;
-                jaw.xRot += (Mth.sin(state.ageInTicks * 0.075F) + 1) * 0.035F;
                 shell.xRot = idle * 0.012F;
             }
-            case VILLAGER -> {
-                // Dedicated ToadModel handles the non-hostile shopkeeper.
-            }
+            case VILLAGER -> {}
         }
     }
 

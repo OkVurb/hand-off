@@ -59,7 +59,9 @@ public class BooGoal extends Goal {
             boo.setYRot(awayYaw);
             boo.setYHeadRot(awayYaw);
         } else {
-            Vec3 toPlayer = target.position().subtract(boo.position());
+            // Target the player's upper body so the ghost actually flies and floats up.
+            Vec3 targetPos = target.position().add(0, 1.2D, 0);
+            Vec3 toPlayer = targetPos.subtract(boo.position());
             if (toPlayer.lengthSqr() > 1.0E-6D) {
                 Vec3 move = toPlayer.normalize().scale(CHASE_SPEED);
                 boo.setDeltaMovement(move);
