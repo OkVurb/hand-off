@@ -46,21 +46,33 @@ public class WarpPipeBlock extends Block {
     public void stepOn(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.Entity entity) {
         if (!level.isClientSide() && entity instanceof ServerPlayer player && player.isCrouching()) {
             long lastWarp = COOLDOWNS.getOrDefault(player.getUUID(), 0L);
-            if (level.getGameTime() - lastWarp > 20) { // 1 second cooldown
+            if (level.getGameTime() - lastWarp > 40) { // 2 second cooldown
                 boolean isReturnPipe = level.getBlockState(pos.above(50)).getBlock() == this;
                 BlockPos targetPos = isReturnPipe ? pos.above(50) : pos.below(50);
     
                 if (!isReturnPipe && level.getBlockState(targetPos).isAir()) {
-                    // Generate a simple platform and return pipe
-                    level.setBlockAndUpdate(targetPos, this.defaultBlockState());
-                    for (int x = -1; x <= 1; x++) {
-                        for (int z = -1; z <= 1; z++) {
-                            level.setBlockAndUpdate(targetPos.below().offset(x, 0, z), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                    // Generate an underground sub-room (9x6x9)
+                    for (int x = -4; x <= 4; x++) {
+                        for (int y = -1; y <= 4; y++) {
+                            for (int z = -4; z <= 4; z++) {
+                                BlockPos p = targetPos.offset(x, y, z);
+                                if (x == -4 || x == 4 || y == -1 || y == 4 || z == -4 || z == 4) {
+                                    level.setBlockAndUpdate(p, net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState());
+                                } else {
+                                    level.setBlockAndUpdate(p, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                                }
+                            }
                         }
                     }
-                    // clear some space above
-                    for (int y = 1; y <= 3; y++) {
-                        level.setBlockAndUpdate(targetPos.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    // Place the return pipe
+                    level.setBlockAndUpdate(targetPos, this.defaultBlockState());
+                    // Add some coins to the room
+                    for (int x = -2; x <= 2; x += 2) {
+                        for (int z = -2; z <= 2; z += 2) {
+                            if (x != 0 || z != 0) { // Don't place on the pipe
+                                level.setBlockAndUpdate(targetPos.offset(x, 1, z), com.studio.planeshift.common.registry.ModBlocks.COIN.get().defaultBlockState());
+                            }
+                        }
                     }
                 }
     
