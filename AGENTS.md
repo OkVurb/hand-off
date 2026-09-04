@@ -31,6 +31,22 @@ accordingly:
 - **Do not add unrequested work.** No extra docs, changelogs, formatting passes or coverage the
   task did not ask for.
 
+## Working alongside another agent (MANDATORY when one is running)
+
+More than one agent can be working on this repo at the same time. When that happens:
+
+- **`docs/AGENT_CHANNEL.md` is the channel.** Read it before starting a chunk; post your claim
+  before you start, not after. It names who owns which area and which working directory.
+- **Do not share a working directory.** A claims file cannot stop two processes writing the same
+  file — that is a race, not a coordination problem. The second agent takes a git worktree
+  (`git worktree add ../PlaneShift-<agent> -b <agent>/work`) and merges into `main`. Whoever holds
+  `main` should never have to stop for a merge.
+- **Never use blind find-and-replace on a file another agent may be editing.** An anchor that
+  silently misses leaves a half-applied edit, and a half-applied edit to a record signature or a
+  method signature breaks the other agent's build in a file they believe they own. Assert that
+  every replacement matched, or read-verify after writing.
+- **Claim by area, not by file.** Work always spreads to neighbouring classes.
+
 ## Handoff sync (MANDATORY — do this before you finish, every session)
 
 Four agents work on this repo — Claude, ChatGPT/Codex, Gemini and whatever runs from
