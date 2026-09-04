@@ -76,6 +76,35 @@ When continuing this project in a fresh session, read **PROGRESS.md** first (whe
 - Unit tests: `.\gradlew test` (JUnit 5 via MDG `neoForge.unitTest`, sources in `src/test/java`).
 - Client class leak check: `.\gradlew checkClientClassLeak`.
 - Raw cuboid scan check: `.\gradlew checkNoRawCuboidScan`.
+
+### When a Gradle build fails
+
+Re-run it with `--scan` before changing anything:
+
+```
+.\gradlew build --scan
+```
+
+The console error is often the last symptom rather than the cause, and guessing from it is how a
+one-line brace error turns into three speculative edits. The scan gives the full task graph and the
+real failure.
+
+### Never push a commit you have not built
+
+This is not a style preference. `main` has been pushed broken twice now, once with a missing closing
+brace and once with a reference to a registry entry that does not exist (`ModBlocks.COIN` — coins are
+items). Both would have been caught by a single `.\gradlew build`, which takes under a minute.
+
+A green build is the floor, not the goal: it does not prove the mod works (review R6), and it does
+not prove a change is right (R8-R12). But a red build proves nothing else you did that session can be
+trusted, because none of it ever ran.
+
+### Never edit a test to match code you just changed
+
+If a test fails after your change, the default assumption is that your change is wrong. Update the
+expectation only when you can say, in the file, exactly what behaviour you deliberately changed and
+why the new number is correct. Silently rewriting expected values to make red go green removes the
+only thing standing between the project and a regression — see R13.
 - Sound asset check: `.\gradlew checkSoundAssets`.
 - Data range check: `.\gradlew checkDataRanges`.
 - Texture asset check: `.\gradlew checkTextureAssets`.

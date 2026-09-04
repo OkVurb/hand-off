@@ -182,35 +182,85 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
+    /**
+     * The flying artillery shell.
+     *
+     * <p>Rebuilt because the previous rig was a moth: it had two 10-long wings, a tail fin and a
+     * separate snout, and the silhouette that produced was an insect, not a projectile. A shell
+     * reads from exactly two things — a long smooth barrel and a blunt rounded nose with a face on
+     * it — and everything sticking off the sides was working against both.
+     *
+     * <p>What is left of the wings is a pair of short side fins, kept only because the FLYER
+     * animation flaps {@code leftWing}/{@code rightWing} and a tiny bob at the fin sells "hovering
+     * under power" better than a rigid bar does.
+     *
+     * <p>UV origins are one of the six material regions the 128x128 sheet is divided into —
+     * (0,0), (64,0), (0,40), (64,40), (0,80), (64,80) — and the face is painted into (64,0), so
+     * the nose is the part that samples it. A box whose UV starts anywhere else lands between
+     * regions and samples two materials at once.
+     */
     private static LayerDefinition torpedoMoth() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -4, -4, -8, 8, 8, 16), pose(0, 15, 0));
-        r.addOrReplaceChild("head", box(64, 0, -5, -5, -4, 10, 10, 5), pose(0, 15, -8));
-        r.addOrReplaceChild("snout", box(0, 80, -4, -3, -2, 8, 6, 2), pose(0, 15, -12));
-        r.addOrReplaceChild("left_wing", box(64, 40, 0, -1, -4, 10, 2, 7), pose(3, 13, 0, 0, -0.16F, -0.38F));
-        r.addOrReplaceChild("right_wing", box(64, 40, -10, -1, -4, 10, 2, 7), pose(-3, 13, 0, 0, 0.16F, 0.38F));
-        r.addOrReplaceChild("left_arm", box(64, 40, 0, -1, -3, 7, 2, 5), pose(3, 17, 1, 0, 0.2F, 0.24F));
-        r.addOrReplaceChild("right_arm", box(64, 40, -7, -1, -3, 7, 2, 5), pose(-3, 17, 1, 0, -0.2F, -0.24F));
-        r.addOrReplaceChild("tail", box(0, 40, -1.5F, -5, 0, 3, 10, 4), pose(0, 15, 8));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1, -2, -1, 2, 4, 2), pose(-2.2F, 14.5F, -12.8F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1, -2, -1, 2, 4, 2), pose(2.2F, 14.5F, -12.8F));
+        // Barrel: long, round-ish, unbroken. This is the whole read.
+        r.addOrReplaceChild("body", box(0, 0, -5, -5, -7, 10, 10, 16), pose(0, 15, 0));
+        // Nose cap, wider than the barrel so the profile blunts instead of tapering, and on the
+        // face material so the eyes land here.
+        r.addOrReplaceChild("head", box(64, 0, -6, -6, -4, 12, 12, 5), pose(0, 15, -8));
+        // Tail flare, shorter and narrower — a shell is fatter at the front.
+        r.addOrReplaceChild("tail", box(64, 40, -4, -4, 0, 8, 8, 3), pose(0, 15, 9));
+        // Side fins where the arms were. Small on purpose.
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -2, 4, 2, 6), pose(5, 15, 1, 0, 0, -0.18F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -4, -1, -2, 4, 2, 6), pose(-5, 15, 1, 0, 0, 0.18F));
+        // Vestigial wings, kept so the FLYER flap animation has something to move.
+        r.addOrReplaceChild("left_wing", box(0, 40, 0, -0.5F, -1.5F, 3, 1, 4), pose(5, 12, 2, 0, 0, -0.42F));
+        r.addOrReplaceChild("right_wing", box(0, 40, -3, -0.5F, -1.5F, 3, 1, 4), pose(-5, 12, 2, 0, 0, 0.42F));
+        // Rivets on the nose ring, so the cap reads as a separate cast piece.
+        r.addOrReplaceChild("detail_1", box(64, 80, -1, -1, -0.5F, 2, 2, 1), pose(-4, 15, -12.2F));
+        r.addOrReplaceChild("detail_2", box(64, 80, -1, -1, -0.5F, 2, 2, 1), pose(4, 15, -12.2F));
         return finish(mesh);
     }
 
+    /**
+     * The shy ghost.
+     *
+     * <p>The previous rig was a box with six posts hanging off the bottom, and the feedback on it
+     * was that it did not look like a ghost at all. Three things were missing and all three are
+     * cheap.
+     *
+     * <p>A ghost has <em>no flat bottom</em>. The body now narrows in two stages toward the tail
+     * so the silhouette rounds off, and the fringe posts taper from the middle outward instead of
+     * all being the same stub, which is what turns a row of pegs into a ragged hem.
+     *
+     * <p>A ghost is <em>front-heavy</em>: the face is most of the character, so the face plate is
+     * larger and sits proud of the body rather than flush with it, and the little arms are held
+     * forward and inward — the pose that reads as "reaching", which is the only thing this
+     * creature does.
+     *
+     * <p>The bobbing is already in the WISP branch of the animation; what it had to bob was the
+     * problem.
+     */
     private static LayerDefinition moonWisp() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -6, -6, -5, 12, 10, 10), pose(0, 14, 0));
-        r.addOrReplaceChild("head", box(0, 80, -4, -3, -0.5F, 8, 5, 1), pose(0, 13, -5));
-        for (int i = 0; i < 6; i++) {
-            float x = -4.5F + i * 1.8F;
-            int height = 4 + (i % 3);
-            r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -0.75F, 0, -0.75F, 1.5F, height, 1.5F),
-                    pose(x, 18, 0, 0, 0, (i - 2.5F) * 0.04F));
+        // Round main mass, taller than the old one so it is not a floating plate.
+        r.addOrReplaceChild("body", box(0, 0, -6, -7, -5, 12, 12, 10), pose(0, 13, 0));
+        // Shoulders, narrower and set back — the two-stage taper is what rounds the silhouette.
+        r.addOrReplaceChild("shell", box(0, 40, -5, -2, -4, 10, 5, 8), pose(0, 18, 0.5F));
+        // Face plate: large, and pushed forward so it catches light separately from the body.
+        r.addOrReplaceChild("head", box(64, 0, -5, -4, -0.5F, 10, 8, 1), pose(0, 12, -5.4F));
+        // Ragged hem: tallest in the middle, shortest at the edges.
+        for (int i = 0; i < 5; i++) {
+            float x = -4.0F + i * 2.0F;
+            int height = 5 - Math.abs(i - 2);
+            r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -1, 0, -1, 2, height, 2),
+                    pose(x, 21, 0, 0, 0, (i - 2) * 0.09F));
         }
-        r.addOrReplaceChild("left_arm", box(64, 80, -1, -1, -1, 2, 2, 2), pose(8, 15, 0));
-        r.addOrReplaceChild("right_arm", box(64, 80, -1, -1, -1, 2, 2, 2), pose(-8, 15, 0));
+        // Small arms, forward and turned in.
+        r.addOrReplaceChild("left_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+                pose(6.5F, 14, -2.5F, 0, -0.5F, 0));
+        r.addOrReplaceChild("right_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+                pose(-6.5F, 14, -2.5F, 0, 0.5F, 0));
         return finish(mesh);
     }
 

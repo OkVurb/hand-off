@@ -15,7 +15,11 @@ class BespokeEnemyModelTest {
             Map.entry(EnemyRigProfile.SPROUTLING, 7L),
             Map.entry(EnemyRigProfile.GECKO, 12L),
             Map.entry(EnemyRigProfile.CRUSHER, 8L),
-            Map.entry(EnemyRigProfile.FLYER, 10L),
+            // 9, not 10: the Bullet Bill rig lost its separate snout when it was rebuilt from a
+            // moth into a shell. Changed deliberately and recorded here on purpose — the previous
+            // pass through this file halved every number in it to make a broken rewrite pass,
+            // which is the one thing these constants exist to prevent.
+            Map.entry(EnemyRigProfile.FLYER, 9L),
             Map.entry(EnemyRigProfile.WISP, 10L),
             Map.entry(EnemyRigProfile.RIDER, 11L),
             Map.entry(EnemyRigProfile.WARRIOR, 11L),
