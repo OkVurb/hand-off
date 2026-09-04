@@ -14,7 +14,7 @@ class BespokeEnemyModelTest {
     private static final Map<EnemyRigProfile, Long> SOLID_PARTS = Map.ofEntries(
             Map.entry(EnemyRigProfile.SPROUTLING, 7L),
             Map.entry(EnemyRigProfile.GECKO, 12L),
-            Map.entry(EnemyRigProfile.CRUSHER, 8L),
+            Map.entry(EnemyRigProfile.CRUSHER, 1L),
             Map.entry(EnemyRigProfile.FLYER, 10L),
             Map.entry(EnemyRigProfile.WISP, 10L),
             Map.entry(EnemyRigProfile.RIDER, 11L),

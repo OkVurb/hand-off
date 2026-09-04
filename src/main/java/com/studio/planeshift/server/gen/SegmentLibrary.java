@@ -807,6 +807,22 @@ public final class SegmentLibrary {
         }
     };
 
+    static final Segment WARP_PIPE_SECRET_ENTRANCE = new Segment() {
+        public SegmentSpec spec() {
+            return def("warp_pipe_secret_entrance", 12, 0, 1, Tag.SECRET, Tag.PIPE);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 12, y, ctx);
+            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+            // A solitary pipe the player can crouch into to find the generated underground room.
+            c.setLane(x + 5, y + 1, pipe, ctx.halfWidth());
+            c.setLane(x + 5, y + 2, pipe, ctx.halfWidth());
+            // Encourage the player to check it out.
+            c.set(x + 5, y + 5, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+        }
+    };
+
     /** Illusory secret passage between pipes hiding an invincibility star. */
     static final Segment ILLUSORY_PIPE_CACHE = new Segment() {
         public SegmentSpec spec() {
@@ -949,6 +965,7 @@ public final class SegmentLibrary {
         list.add(SECRET_PRIZE_VAULT);
         list.add(P_SWITCH_BONUS_ROOM);
         list.add(HIDDEN_SPRING_HIGHWAY);
+        list.add(WARP_PIPE_SECRET_ENTRANCE);
         list.add(ILLUSORY_PIPE_CACHE);
         list.add(BULLET_BILL_GAUNTLET);
         list.add(MUNCHER_PIT_HOP);

@@ -108,7 +108,7 @@ public final class GenContext {
             return switch (theme) {
                 case GRASS -> new Palette(
                         ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
-                        Blocks.DIRT.defaultBlockState(),
+                        ModBlocks.COURSE_DIRT_BLOCK.get().defaultBlockState(),
                         ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
                         null);

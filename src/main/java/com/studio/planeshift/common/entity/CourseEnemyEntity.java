@@ -32,7 +32,7 @@ public abstract class CourseEnemyEntity extends Monster {
     /** Predictable bounce applied to the stomper. */
     private static final double STOMP_BOUNCE = 0.55D;
     /** Per-target cooldown so one landing cannot double-hit. */
-    private static final int STOMP_COOLDOWN_TICKS = 10;
+    private static final int STOMP_COOLDOWN_TICKS = 0;
 
     private long lastStompGameTime = -STOMP_COOLDOWN_TICKS;
 
@@ -177,7 +177,9 @@ public abstract class CourseEnemyEntity extends Monster {
 
     private boolean isStompContact(ServerPlayer player) {
         // Contact normal check: the player's feet must be in the top band of our box.
-        boolean fromAbove = player.getBoundingBox().minY >= getBoundingBox().maxY - 0.25D;
+        // We use 0.5D instead of 0.25D because the scaled hitboxes (up to 1.35x) mean 0.25D is too tight
+        // when the player is falling fast, causing them to tunnel past the top band on the collision tick.
+        boolean fromAbove = player.getBoundingBox().minY >= getBoundingBox().maxY - 0.5D;
         // Relative velocity check: falling onto us, not brushing past.
         boolean falling = player.getDeltaMovement().y - getDeltaMovement().y < -STOMP_MIN_FALL_SPEED;
         return fromAbove && falling;
@@ -208,6 +210,7 @@ public abstract class CourseEnemyEntity extends Monster {
 
         if (isStompable()) {
             hurtServer((ServerLevel) level(), damageSources().playerAttack(player), stompDamage());
+            this.invulnerableTime = 0; // Remove vanilla i-frames so player can stomp again immediately
             bounce(player);
             startSquish();
             if (!isAlive()) {

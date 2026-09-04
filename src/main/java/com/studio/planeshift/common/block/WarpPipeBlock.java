@@ -40,32 +40,50 @@ public class WarpPipeBlock extends Block {
         return InteractionResult.SUCCESS;
     }
 
+    private static final java.util.Map<java.util.UUID, Long> COOLDOWNS = new java.util.concurrent.ConcurrentHashMap<>();
+
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.Entity entity) {
         if (!level.isClientSide() && entity instanceof ServerPlayer player && player.isCrouching()) {
-            // Determine if we are going down or up
-            // Using a simple logic: if we are high up, go down. If low, go up.
-            // But an easier way is to check blockstate or just use a fixed offset.
-            // Let's use an offset of 50. If there's a WarpPipeBlock 50 blocks above, we go up. Otherwise go down.
-            boolean isReturnPipe = level.getBlockState(pos.above(50)).getBlock() == this;
-            BlockPos targetPos = isReturnPipe ? pos.above(50) : pos.below(50);
-
-            if (!isReturnPipe && level.getBlockState(targetPos).isAir()) {
-                // Generate a simple platform and return pipe
-                level.setBlockAndUpdate(targetPos, this.defaultBlockState());
-                for (int x = -1; x <= 1; x++) {
-                    for (int z = -1; z <= 1; z++) {
-                        level.setBlockAndUpdate(targetPos.below().offset(x, 0, z), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+            long lastWarp = COOLDOWNS.getOrDefault(player.getUUID(), 0L);
+            if (level.getGameTime() - lastWarp > 20) { // 1 second cooldown
+                boolean isReturnPipe = level.getBlockState(pos.above(50)).getBlock() == this;
+                BlockPos targetPos = isReturnPipe ? pos.above(50) : pos.below(50);
+    
+                if (!isReturnPipe && level.getBlockState(targetPos).isAir()) {
+                    // Generate a simple platform and return pipe
+                    level.setBlockAndUpdate(targetPos, this.defaultBlockState());
+                    for (int x = -1; x <= 1; x++) {
+                        for (int z = -1; z <= 1; z++) {
+                            level.setBlockAndUpdate(targetPos.below().offset(x, 0, z), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                        }
+                    }
+                    // clear some space above
+                    for (int y = 1; y <= 3; y++) {
+                        level.setBlockAndUpdate(targetPos.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                     }
                 }
-                // clear some space above
-                for (int y = 1; y <= 3; y++) {
-                    level.setBlockAndUpdate(targetPos.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                }
+    
+                COOLDOWNS.put(player.getUUID(), level.getGameTime());
+                player.teleportTo(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
+                level.playSound(null, targetPos, net.minecraft.sounds.SoundEvents.UI_TOAST_IN, net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
             }
-
-            player.teleportTo(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
         }
         super.stepOn(level, pos, state, entity);
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        if (random.nextInt(5) == 0) {
+            boolean hasLink = level.getBlockState(pos.above(50)).getBlock() == this || level.getBlockState(pos.below(50)).getBlock() == this;
+            double x = pos.getX() + 0.5;
+            double y = pos.getY() + 1.1;
+            double z = pos.getZ() + 0.5;
+            if (hasLink) {
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, x, y, z, 0, 0.05, 0);
+            } else {
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE, x, y, z, 0, 0.05, 0);
+            }
+        }
     }
 }

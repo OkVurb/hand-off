@@ -165,6 +165,24 @@ public final class CourseHud {
         if (PlaneShiftConfig.CLIENT.showDebugHud.get()) {
             renderDebug(graphics, font, state, panelBottom + 6);
         }
+
+        renderKeybinds(graphics, font, usableWidth, usableHeight);
+    }
+
+    private static void renderKeybinds(GuiGraphics graphics, Font font, int usableWidth, int usableHeight) {
+        Minecraft mc = Minecraft.getInstance();
+        String[] binds = {
+            "[" + mc.options.keyJump.getTranslatedKeyMessage().getString() + "] Jump",
+            "[" + mc.options.keyShift.getTranslatedKeyMessage().getString() + "] Crouch / Spin / Pound",
+            "[" + com.studio.planeshift.client.PlaneShiftKeybinds.FORM_ACTION.getTranslatedKeyMessage().getString() + "] Action",
+            "[" + com.studio.planeshift.client.PlaneShiftKeybinds.SWAP_RESERVE.getTranslatedKeyMessage().getString() + "] Swap Item"
+        };
+        int y = usableHeight - 10 - (binds.length * 12);
+        for (String bind : binds) {
+            int width = font.width(bind);
+            graphics.drawString(font, bind, usableWidth - width - 8, y, 0xAAAAAAAA);
+            y += 12;
+        }
     }
 
     /** Trims {@code text} to {@code maxWidth} so a long form name cannot run past the panel. */

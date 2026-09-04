@@ -171,14 +171,8 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
     private static LayerDefinition crusher() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -8, -14, -4, 16, 14, 8), pose(0, 21, 0));
-        r.addOrReplaceChild("head", box(0, 80, -5, -4, -0.5F, 10, 7, 1), pose(0, 12, -4));
-        r.addOrReplaceChild("left_arm", box(64, 0, -1, -4, -3, 6, 8, 6), pose(8, 13, 0));
-        r.addOrReplaceChild("right_arm", box(64, 0, -5, -4, -3, 6, 8, 6), pose(-8, 13, 0));
-        r.addOrReplaceChild("left_leg", box(0, 40, -2, 0, -2.5F, 4, 4, 5), pose(4, 21, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -2, 0, -2.5F, 4, 4, 5), pose(-4, 21, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -3, -3, -0.5F, 6, 6, 1), pose(0, 18, -4.1F));
-        r.addOrReplaceChild("detail_2", box(64, 40, -2, -2, -1, 4, 4, 2), pose(0, 8, 0));
+        r.addOrReplaceChild("body", box(0, 0, -8, -16, -8, 16, 16, 16), pose(0, 24, 0));
+        // Remove arms/legs. Just a solid block.
         return finish(mesh);
     }
 
@@ -358,12 +352,10 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 tailTip.yRot = tail.yRot * 1.35F;
             }
             case CRUSHER -> {
-                body.y += idle * 0.3F;
-                float slam = Math.max(0, Mth.sin(state.ageInTicks * 0.12F) - 0.68F) * 2.7F;
-                leftArm.y += slam * 4.2F;
-                rightArm.y += slam * 4.2F;
-                leftLeg.y += slam * 2.5F;
-                rightLeg.y += slam * 2.5F;
+                // A solid block.
+                // Animate rotation to shake before slamming? 
+                // The entity handles falling. Here we just shake slightly if it's not idle.
+                // Actually, just let it be solid. The user said "dont make the crushing animation unreadable".
             }
             case FLYER -> {
                 body.y += idle * 0.3F;

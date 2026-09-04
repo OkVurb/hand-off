@@ -96,6 +96,19 @@ public class PSwitchBlock extends Block implements HitFromBelowBlock {
     }
 
     @Override
+    public void stepOn(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.Entity entity) {
+        if (!level.isClientSide() && entity instanceof Player player) {
+            if (player.getDeltaMovement().y < -0.1D && !state.getValue(PRESSED)) {
+                activate(level, pos, state);
+                // Give a small bounce back up
+                player.setDeltaMovement(player.getDeltaMovement().x, 0.5D, player.getDeltaMovement().z);
+                player.hurtMarked = true;
+            }
+        }
+        super.stepOn(level, pos, state, entity);
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() || !(player instanceof ServerPlayer)) {
             return InteractionResult.PASS;
@@ -129,8 +142,9 @@ public class PSwitchBlock extends Block implements HitFromBelowBlock {
         if (!state.getValue(PRESSED)) {
             return;
         }
-        level.setBlock(pos, state.setValue(PRESSED, false), Block.UPDATE_ALL);
+        // One-time use: the switch vanishes instead of resetting.
+        // Revert is handled automatically by affectNeighborsAfterRemoval.
+        level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         level.playSound(null, pos, SoundEvents.STONE_PRESSURE_PLATE_CLICK_OFF, SoundSource.BLOCKS, 1.0F, 0.8F);
-        revertConverted(level, pos);
     }
 }

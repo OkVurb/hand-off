@@ -48,6 +48,8 @@ public final class ModBlocks {
     /** Bright, durable terrain tiles used by the generated 2.5D courses. */
     public static final DeferredBlock<Block> COURSE_GRASS_BLOCK = courseBlock(
             "course_grass_block", MapColor.GRASS, SoundType.GRASS);
+    public static final DeferredBlock<Block> COURSE_DIRT_BLOCK = courseBlock(
+            "course_dirt_block", MapColor.DIRT, SoundType.GRAVEL);
     public static final DeferredBlock<Block> COURSE_CLOUD_BLOCK = courseBlock(
             "course_cloud_block", MapColor.SNOW, SoundType.WOOL);
     public static final DeferredBlock<Block> COURSE_SAND_BLOCK = courseBlock(

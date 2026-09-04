@@ -2,7 +2,7 @@
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
     "top": "planeshift:block/course_grass_block_top",
-    "bottom": "minecraft:block/dirt",
+    "bottom": "planeshift:block/course_dirt",
     "side": "planeshift:block/course_grass_block"
   }
 }

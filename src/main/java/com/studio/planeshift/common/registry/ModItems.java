@@ -121,6 +121,8 @@ public final class ModItems {
     // Block items.
     public static final DeferredItem<?> COURSE_GRASS_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_GRASS_BLOCK);
+    public static final DeferredItem<?> COURSE_DIRT_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_DIRT_BLOCK);
     public static final DeferredItem<?> COURSE_CLOUD_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_CLOUD_BLOCK);
     public static final DeferredItem<?> COURSE_SAND_BLOCK_ITEM =

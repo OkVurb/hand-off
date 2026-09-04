@@ -61,6 +61,20 @@ public class OnOffSwitchBlock extends Block implements HitFromBelowBlock {
     }
 
     @Override
+    public void stepOn(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.Entity entity) {
+        if (!level.isClientSide() && entity instanceof Player player) {
+            // Only trigger if falling fast enough to register as a stomp/landing
+            if (player.getDeltaMovement().y < -0.1D) {
+                toggle(level, pos, state);
+                // Give a small bounce back up
+                player.setDeltaMovement(player.getDeltaMovement().x, 0.5D, player.getDeltaMovement().z);
+                player.hurtMarked = true;
+            }
+        }
+        super.stepOn(level, pos, state, entity);
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() || !(player instanceof ServerPlayer)) {
             return InteractionResult.PASS;
