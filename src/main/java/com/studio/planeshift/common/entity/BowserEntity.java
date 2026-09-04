@@ -55,4 +55,20 @@ public class BowserEntity extends CourseEnemyEntity {
             this.yHeadRot = this.getYRot();
         }
     }
+
+    /** A boss must not be lockable by a move the player can repeat at will. */
+    @Override
+    public boolean canBeStaggered() {
+        return false;
+    }
+
+    /**
+     * A pound hurts Bowser but does not delete him. The default is four times max health, which
+     * exists so armour cannot let an ordinary enemy survive one; a boss needs a real health bar.
+     */
+    @Override
+    protected float groundPoundDamage() {
+        return 20.0F;
+    }
+
 }

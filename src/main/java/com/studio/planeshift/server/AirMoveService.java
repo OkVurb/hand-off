@@ -81,6 +81,17 @@ public final class AirMoveService {
 
     private static final int CLAMBER_COOLDOWN_TICKS = 12;
 
+    /**
+     * Whether this player is mid-ground-pound.
+     *
+     * <p>Read by {@code CourseEnemyEntity.playerTouch} so a pound that lands on an enemy resolves
+     * as a pound rather than as an ordinary stomp. Without it the armoured branch runs, and the
+     * move designed to beat armour would instead hurt the player using it.
+     */
+    public static boolean isGroundPounding(net.minecraft.world.entity.player.Player player) {
+        return GROUND_POUNDING.getOrDefault(player, false);
+    }
+
     public static boolean isSpinJumping(net.minecraft.world.entity.player.Player player) {
         return SPIN_JUMPING.getOrDefault(player, false);
     }
@@ -200,6 +211,12 @@ public final class AirMoveService {
                 // inside it, and pounding a coin block threw away every coin still in it. A
                 // block's reward must not depend on which side it was hit from, so both this and
                 // the Koopa shell now go through the same dispatcher.
+                // The shockwave fires first and unconditionally: it is the half of the move
+                // that works on open ground, where there is no block underfoot to trigger.
+                if (player.level() instanceof net.minecraft.server.level.ServerLevel shockLevel) {
+                    GroundPoundImpactService.shockwave(shockLevel, player.position(), player);
+                }
+
                 BlockPos below = player.blockPosition().below();
                 if (com.studio.planeshift.common.block.HitFromBelowBlock.impact(player.level(), below)
                         && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {

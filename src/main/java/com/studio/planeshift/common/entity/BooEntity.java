@@ -32,4 +32,11 @@ public class BooEntity extends CourseEnemyEntity {
     protected void registerGoals() {
         goalSelector.addGoal(0, new BooGoal(this));
     }
+
+    /** Airborne, and never touching the floor the wave travels along. */
+    @Override
+    public boolean canBeStaggered() {
+        return false;
+    }
+
 }

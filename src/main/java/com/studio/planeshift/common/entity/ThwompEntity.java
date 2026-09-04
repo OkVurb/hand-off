@@ -65,4 +65,11 @@ public class ThwompEntity extends CourseEnemyEntity {
         super.readAdditionalSaveData(input);
         this.homeY = input.getDoubleOr(HOME_Y_KEY, Double.NaN);
     }
+
+    /** A crusher hangs in the air and weighs several tonnes; nothing rocks it. */
+    @Override
+    public boolean canBeStaggered() {
+        return false;
+    }
+
 }

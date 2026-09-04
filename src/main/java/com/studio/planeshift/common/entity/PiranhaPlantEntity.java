@@ -176,4 +176,11 @@ public class PiranhaPlantEntity extends CourseEnemyEntity {
         cycle = input.getIntOr("Cycle", 0);
         baseY = input.getDoubleOr("BaseY", Double.NaN);
     }
+
+    /** Anchored in its pipe. Being knocked over is not available to it. */
+    @Override
+    public boolean canBeStaggered() {
+        return false;
+    }
+
 }

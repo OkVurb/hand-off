@@ -37,5 +37,15 @@ public class SpinyEntity extends CourseEnemyEntity {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new LanePatrolGoal(this, 1.0D));
     }
+
+    /**
+     * Flippable: the shell is the entire reason this enemy cannot simply be stomped, so taking it
+     * away is exactly what a ground pound is for.
+     */
+    @Override
+    public boolean canBeFlipped() {
+        return true;
+    }
+
 }
 

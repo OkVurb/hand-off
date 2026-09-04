@@ -110,6 +110,16 @@ public abstract class CourseEnemyEntity extends Monster {
     private static final EntityDataAccessor<Integer> SQUISH_TICKS =
             SynchedEntityData.defineId(CourseEnemyEntity.class, EntityDataSerializers.INT);
 
+    /**
+     * Ticks left on the back, synced because the client needs it to keep the model flattened.
+     *
+     * <p>Follows {@code SQUISH_TICKS} exactly rather than inventing a second mechanism - same
+     * accessor style, same decrement site, same base-class home, so every shelled enemy flips
+     * identically.
+     */
+    private static final EntityDataAccessor<Integer> FLIPPED_TICKS =
+            SynchedEntityData.defineId(CourseEnemyEntity.class, EntityDataSerializers.INT);
+
     /** How long the squish lasts. Short: it is a punctuation mark, not an animation to watch. */
     public static final int SQUISH_DURATION = 8;
     /** How flat the model gets at peak squish, as a fraction of normal height. */
@@ -119,6 +129,56 @@ public abstract class CourseEnemyEntity extends Monster {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(SQUISH_TICKS, 0);
+        builder.define(FLIPPED_TICKS, 0);
+    }
+
+    /** Ticks left of a stagger. Not synced: it has no visual of its own, it borrows the squish. */
+    private int staggerTicks;
+
+    /** On its back: harmless, stationary, and open to an ordinary stomp. */
+    public boolean flipped() {
+        return entityData.get(FLIPPED_TICKS) > 0;
+    }
+
+    /** Knocked off its feet for a moment. */
+    public boolean staggered() {
+        return staggerTicks > 0;
+    }
+
+    /**
+     * Whether a ground pound can flip this enemy onto its back.
+     *
+     * <p>False by default. Flipping is the answer to <em>armour</em>, so it should only apply to
+     * the enemies whose armour is the point - otherwise the move stops being a counter and becomes
+     * a universal delete button.
+     */
+    public boolean canBeFlipped() {
+        return false;
+    }
+
+    /** Whether a ground pound shockwave can knock this enemy off its feet. */
+    public boolean canBeStaggered() {
+        return true;
+    }
+
+    /** Damage a direct ground pound deals. Overridden by anything that should survive one. */
+    protected float groundPoundDamage() {
+        return getMaxHealth() * 4.0F;
+    }
+
+    /** Puts this enemy on its back: stationary, harmless, and stompable. */
+    public void flipOntoBack(int ticks) {
+        entityData.set(FLIPPED_TICKS, ticks);
+        setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
+        startSquish();
+        level().playSound(null, blockPosition(), ModSounds.STOMP.get(), SoundSource.HOSTILE, 0.9F, 0.7F);
+    }
+
+    /** Stops this enemy briefly. Reuses the squish for the visual rather than adding a second one. */
+    public void stagger(int ticks) {
+        staggerTicks = Math.max(staggerTicks, ticks);
+        setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
+        startSquish();
     }
 
     /** Starts the squish. Safe to call repeatedly; a fresh hit restarts it. */
@@ -179,10 +239,20 @@ public abstract class CourseEnemyEntity extends Monster {
             // exchange is simply postponed until the enemy has landed and can be seen coming.
             return;
         }
+        if (com.studio.planeshift.server.AirMoveService.isGroundPounding(serverPlayer)) {
+            // Checked before isStompContact, and the order is load-bearing. A pounding player is
+            // falling fast, so isStompContact is already true; without this the pound would fall
+            // through to the armoured branch and hurt the player for using the one move that is
+            // supposed to beat armour.
+            resolvePound(serverPlayer);
+            return;
+        }
         if (isStompContact(serverPlayer)) {
             resolveStomp(serverPlayer);
-        } else {
+        } else if (!flipped()) {
             // Side contact: ordinary touch damage; the pip damage model intercepts it.
+            // A flipped enemy is exempt - a Spiny on its back that could still spike you would
+            // make flipping it pointless.
             serverPlayer.hurtServer((ServerLevel) level(), damageSources().mobAttack(this), 2.0F);
         }
     }
@@ -209,7 +279,57 @@ public abstract class CourseEnemyEntity extends Monster {
                 entityData.set(SQUISH_TICKS, ticks - 1);
             }
             
+            int flip = entityData.get(FLIPPED_TICKS);
+            if (flip > 0) {
+                entityData.set(FLIPPED_TICKS, flip - 1);
+                // Re-squish as the previous one runs out. A flipped enemy that looks identical to
+                // an upright one is a state the player cannot act on, and the squish is the
+                // flattening cue this entity already has.
+                if (entityData.get(SQUISH_TICKS) <= 1) {
+                    startSquish();
+                }
+            }
+            if (staggerTicks > 0) {
+                staggerTicks--;
+            }
+            if (flip > 0 || staggerTicks > 0) {
+                // Parked, the same way KoopaEntity parks a resting shell.
+                setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
+            }
+
             holdLane();
+        }
+    }
+
+    /**
+     * A ground pound landing directly on this enemy.
+     *
+     * <p>Defeats it regardless of armour, which is the point of the move, and deliberately does
+     * <em>not</em> bounce the player: a bounce would end the pound in mid-air, and the shockwave
+     * that clears the rest of the crowd only fires when the pound reaches the ground.
+     */
+    private void resolvePound(ServerPlayer player) {
+        long now = level().getGameTime();
+        if (now - lastStompGameTime < STOMP_COOLDOWN_TICKS) {
+            return;
+        }
+        lastStompGameTime = now;
+
+        this.invulnerableTime = 0;
+        hurtServer((ServerLevel) level(), damageSources().playerAttack(player), groundPoundDamage());
+        this.invulnerableTime = 0;
+        startSquish();
+
+        if (!isAlive()) {
+            // Same reward path as a stomp, so the combo ladder stays one ladder.
+            CourseScoringService.awardStomp(player);
+            level().playSound(null, blockPosition(), ModSounds.ENEMY_DEFEAT.get(),
+                    SoundSource.HOSTILE, 1.0F, 0.8F);
+            spawnHitParticles(10);
+        } else {
+            level().playSound(null, blockPosition(), ModSounds.STOMP.get(),
+                    SoundSource.HOSTILE, 1.0F, 0.7F);
+            spawnHitParticles(6);
         }
     }
 
@@ -220,7 +340,9 @@ public abstract class CourseEnemyEntity extends Monster {
         }
         lastStompGameTime = now;
 
-        if (isStompable()) {
+        if (isStompable() || flipped()) {
+            // flipped() is the entire payoff of the flip: a Spiny on its back dies to an ordinary
+            // stomp without SpinyEntity.isStompable() having to lie about what a Spiny is.
             this.invulnerableTime = 0; // Remove vanilla i-frames BEFORE applying damage so consecutive hits work
             hurtServer((ServerLevel) level(), damageSources().playerAttack(player), stompDamage());
             this.invulnerableTime = 0; // Ensure it stays 0

@@ -32,4 +32,11 @@ public class LakituEntity extends CourseEnemyEntity {
     protected void registerGoals() {
         goalSelector.addGoal(0, new LakituGoal(this));
     }
+
+    /** Rides a cloud. There are no feet to sweep. */
+    @Override
+    public boolean canBeStaggered() {
+        return false;
+    }
+
 }

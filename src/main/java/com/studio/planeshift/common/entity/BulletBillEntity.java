@@ -27,4 +27,11 @@ public class BulletBillEntity extends CourseEnemyEntity {
     protected void registerGoals() {
         goalSelector.addGoal(0, new BulletBillGoal(this));
     }
+
+    /** Airborne, and ordnance rather than something with footing. */
+    @Override
+    public boolean canBeStaggered() {
+        return false;
+    }
+
 }
