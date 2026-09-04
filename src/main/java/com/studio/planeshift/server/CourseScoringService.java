@@ -132,6 +132,56 @@ public final class CourseScoringService {
     /** Sentinel returned by {@link #stompValue} when the chain earns a life rather than points. */
     static final int ONE_UP_INSTEAD = -1;
 
+    /**
+     * Score for touching the flag pole at each height band, lowest first.
+     *
+     * <p>The composer spends eight blocks building the pole — BASE, six POLE, TOP — and until now
+     * every one of them paid the same. A player who limped over the line on the ground and a player
+     * who launched off a trampoline into the top of the pole got an identical result, which makes
+     * the last eight blocks of every course decoration.
+     *
+     * <p>The curve is steep on purpose. A gentle one turns the pole into a rounding error nobody
+     * aims for; the point is that the top band is worth going out of your way and taking a risk
+     * for, so the finish line becomes the course's last skill test rather than its exit.
+     */
+    static final int[] FLAGPOLE_LADDER = {100, 200, 400, 800, 1000, 2000, 4000, 8000};
+
+    /** Clamped lookup into {@link #FLAGPOLE_LADDER}, so an unusual pole height cannot throw. */
+    static int flagpoleValue(int band) {
+        if (band <= 0) {
+            return FLAGPOLE_LADDER[0];
+        }
+        return band >= FLAGPOLE_LADDER.length
+                ? FLAGPOLE_LADDER[FLAGPOLE_LADDER.length - 1]
+                : FLAGPOLE_LADDER[band];
+    }
+
+    /** Whether this band is the top of the pole, and so pays a life as well as points. */
+    static boolean isTopBand(int band) {
+        return band >= FLAGPOLE_LADDER.length - 1;
+    }
+
+    /**
+     * Pays out the flag pole grab.
+     *
+     * <p>Must run <em>before</em> {@code CourseCompletionService.onComplete}, which reads the
+     * running score to compute the end-of-course bonuses and then resets the state. Awarding this
+     * afterwards would add the points to a total that has already been banked.
+     */
+    public static int awardFlagpole(ServerPlayer player, int band, double x, double y, double z) {
+        int points = flagpoleValue(band);
+        addScore(player, points);
+        sendPopup(player, points, x, y, z);
+
+        if (isTopBand(band)) {
+            // Top of the pole is a 1-Up, the same way the stomp ladder tops out.
+            CourseStateAccess.update(player, s -> s.withLives(s.lives() + 1));
+            player.level().playSound(null, BlockPos.containing(x, y, z), ModSounds.ONE_UP.get(),
+                    SoundSource.PLAYERS, 0.9F, 1.0F);
+        }
+        return points;
+    }
+
     /** The ladder length, for tests and tuning. */
     static int ladderLength() {
         return STOMP_LADDER.length;

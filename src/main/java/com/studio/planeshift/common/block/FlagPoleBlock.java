@@ -48,6 +48,9 @@ public class FlagPoleBlock extends Block {
     private static final Map<UUID, Long> LAST_TRIGGER = new HashMap<>();
     private static final long COOLDOWN = 40; // 2 seconds
 
+    /** Upper bound on the downward walk in {@link #heightBand}. The generator builds eight. */
+    private static final int MAX_BAND_SCAN = 16;
+
     public FlagPoleBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(PART, Part.POLE));
@@ -75,7 +78,32 @@ public class FlagPoleBlock extends Block {
             return;
         }
         LAST_TRIGGER.put(player.getUUID(), now);
+
+        // Pay for the height first: onComplete reads the running score to work out the end-of-course
+        // bonuses and then resets, so anything added after the slide is added to a banked total.
+        com.studio.planeshift.server.CourseScoringService.awardFlagpole(player, heightBand(level, pos),
+                pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
         CourseCompletionService.beginSlide(player, pos);
+    }
+
+    /**
+     * How far up the pole this block sits, counting from the base.
+     *
+     * <p>Measured by walking down rather than by reading {@link Part}, because PART only
+     * distinguishes BASE, POLE and TOP — six of the eight blocks share the POLE value, and those
+     * six are exactly the ones the player is choosing between. The information the payout needs is
+     * the height, and the height is only recoverable from the stack.
+     *
+     * <p>Bounded so a malformed or player-built pole cannot walk the world downward forever.
+     */
+    private static int heightBand(Level level, BlockPos pos) {
+        int band = 0;
+        BlockPos cursor = pos.below();
+        while (band < MAX_BAND_SCAN && level.getBlockState(cursor).getBlock() instanceof FlagPoleBlock) {
+            band++;
+            cursor = cursor.below();
+        }
+        return band;
     }
 
     public static void clear(UUID playerId) {
