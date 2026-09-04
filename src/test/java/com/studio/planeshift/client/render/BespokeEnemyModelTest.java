@@ -15,7 +15,7 @@ class BespokeEnemyModelTest {
             Map.entry(EnemyRigProfile.SPROUTLING, 7L),
             Map.entry(EnemyRigProfile.GECKO, 12L),
             Map.entry(EnemyRigProfile.CRUSHER, 1L),
-            Map.entry(EnemyRigProfile.FLYER, 10L),
+            Map.entry(EnemyRigProfile.FLYER, 3L),
             Map.entry(EnemyRigProfile.WISP, 10L),
             Map.entry(EnemyRigProfile.RIDER, 11L),
             Map.entry(EnemyRigProfile.WARRIOR, 11L),

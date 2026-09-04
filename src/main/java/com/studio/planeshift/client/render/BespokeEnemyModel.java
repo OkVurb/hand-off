@@ -179,16 +179,9 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
     private static LayerDefinition torpedoMoth() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -4, -4, -8, 8, 8, 16), pose(0, 15, 0));
-        r.addOrReplaceChild("head", box(64, 0, -5, -5, -4, 10, 10, 5), pose(0, 15, -8));
-        r.addOrReplaceChild("snout", box(0, 80, -4, -3, -2, 8, 6, 2), pose(0, 15, -12));
-        r.addOrReplaceChild("left_wing", box(64, 40, 0, -1, -4, 10, 2, 7), pose(3, 13, 0, 0, -0.16F, -0.38F));
-        r.addOrReplaceChild("right_wing", box(64, 40, -10, -1, -4, 10, 2, 7), pose(-3, 13, 0, 0, 0.16F, 0.38F));
-        r.addOrReplaceChild("left_arm", box(64, 40, 0, -1, -3, 7, 2, 5), pose(3, 17, 1, 0, 0.2F, 0.24F));
-        r.addOrReplaceChild("right_arm", box(64, 40, -7, -1, -3, 7, 2, 5), pose(-3, 17, 1, 0, -0.2F, -0.24F));
-        r.addOrReplaceChild("tail", box(0, 40, -1.5F, -5, 0, 3, 10, 4), pose(0, 15, 8));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1, -2, -1, 2, 4, 2), pose(-2.2F, 14.5F, -12.8F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1, -2, -1, 2, 4, 2), pose(2.2F, 14.5F, -12.8F));
+        r.addOrReplaceChild("body", box(0, 0, -7, -7, -8, 14, 14, 16), pose(0, 17, 0));
+        r.addOrReplaceChild("left_arm", box(64, 0, 0, -2, -3, 2, 4, 6), pose(7, 17, -2));
+        r.addOrReplaceChild("right_arm", box(64, 0, -2, -2, -3, 2, 4, 6), pose(-7, 17, -2));
         return finish(mesh);
     }
 
@@ -358,13 +351,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 // Actually, just let it be solid. The user said "dont make the crushing animation unreadable".
             }
             case FLYER -> {
-                body.y += idle * 0.3F;
-                float flap = Mth.sin(state.ageInTicks * 0.9F) * 0.48F;
-                leftWing.zRot += flap;
-                rightWing.zRot -= flap;
-                leftArm.zRot -= flap * 0.65F;
-                rightArm.zRot += flap * 0.65F;
-                tail.yRot = Mth.sin(state.ageInTicks * 0.18F) * 0.08F;
+                // Bullet Bill flies straight. No flapping needed.
             }
             case WISP -> {
                 body.y += idle * 0.8F;
