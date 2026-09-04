@@ -78,6 +78,10 @@ public final class CourseWriter {
             level.addFreshEntity(item);
         }
 
+        for (java.util.function.BiConsumer<ServerLevel, BlockPos> task : canvas.postBuildTasks) {
+            task.accept(level, origin);
+        }
+
         PlaneShift.LOGGER.info("Wrote course at {}: {} blocks, {} entities, {} items",
                 origin, canvas.blockCount(), canvas.entities().size(), canvas.items().size());
     }

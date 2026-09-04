@@ -917,12 +917,59 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 3, y, ctx);
-            BlockState ice = ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState();
+            BlockState ice = com.studio.planeshift.common.registry.ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState();
             for (int i = 0; i < 12; i++) {
                 c.setLane(x + 3 + i, y, ice, ctx.halfWidth());
             }
             coinTrail(c, x + 4, 10, y + 1, 1);
             floor(c, x + 15, 3, y, ctx);
+        }
+    };
+
+    /** A large gap crossed via a ParCool zipline. */
+    static final Segment ZIPLINE_GAP_TRAVERSAL = new Segment() {
+        public SegmentSpec spec() {
+            return def("zipline_gap_traversal", 22, 0, 1, Tag.GAP, Tag.CLIMB, Tag.SECRET);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 3, y, ctx);
+            floor(c, x + 19, 3, y, ctx);
+
+            java.util.Optional<net.minecraft.core.Holder.Reference<net.minecraft.world.level.block.Block>> hookOpt = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+                    net.minecraft.resources.Identifier.parse("parcool:wooden_zipline_hook"));
+            BlockState hook = hookOpt.isPresent() ? hookOpt.get().value().defaultBlockState() : net.minecraft.world.level.block.Blocks.OAK_FENCE.defaultBlockState();
+
+            // Pillar 1 with steps
+            c.set(x + 1, y, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
+            c.set(x + 1, y + 1, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
+            c.set(x + 1, y + 2, 0, hook);
+
+            // Pillar 2 with steps
+            c.set(x + 20, y, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
+            c.set(x + 20, y + 1, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
+            c.set(x + 20, y + 2, 0, hook);
+
+            // Add coins in the air over the gap
+            coinTrail(c, x + 5, 12, y + 2, 0);
+
+            // Add a virtual moving surface so the reachability test knows the gap is crossable
+            c.movingSurface(x + 1, x + 20, y + 2);
+
+            c.addPostBuildTask((level, origin) -> {
+                int ax1 = origin.getX() + x + 1;
+                int ay1 = origin.getY() + y + 2;
+                int az1 = origin.getZ();
+
+                int ax2 = origin.getX() + x + 20;
+                int ay2 = origin.getY() + y + 2;
+                int az2 = origin.getZ();
+
+                String cmd = String.format("parcool zipline set %d %d %d %d %d %d",
+                        ax1, ay1, az1, ax2, ay2, az2);
+                level.getServer().getCommands().performPrefixedCommand(
+                        level.getServer().createCommandSourceStack(), cmd);
+            });
         }
     };
 
@@ -971,6 +1018,7 @@ public final class SegmentLibrary {
         list.add(MUNCHER_PIT_HOP);
         list.add(TRAMPOLINE_SKY_LAUNCH);
         list.add(FROST_ICE_SLIDE);
+        list.add(ZIPLINE_GAP_TRAVERSAL);
         return list;
     }
 

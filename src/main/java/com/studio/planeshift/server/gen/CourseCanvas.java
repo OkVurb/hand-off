@@ -37,6 +37,12 @@ public final class CourseCanvas {
     /** Item pickups — coins, star coins, power-ups placed loose in the world. */
     private final List<ItemDrop> items = new ArrayList<>();
 
+    public final List<java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos>> postBuildTasks = new ArrayList<>();
+
+    public void addPostBuildTask(java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos> task) {
+        postBuildTasks.add(task);
+    }
+
     /** Named points other systems need: the checkpoint, the flag, sub-room links. */
     private final Map<String, BlockPos> markers = new HashMap<>();
 
