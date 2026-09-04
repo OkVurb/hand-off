@@ -98,7 +98,7 @@ public class PSwitchBlock extends Block implements HitFromBelowBlock {
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.Entity entity) {
         if (!level.isClientSide() && entity instanceof Player player) {
-            if (player.getDeltaMovement().y < -0.1D && !state.getValue(PRESSED)) {
+            if (!state.getValue(PRESSED)) {
                 activate(level, pos, state);
                 // Give a small bounce back up
                 player.setDeltaMovement(player.getDeltaMovement().x, 0.5D, player.getDeltaMovement().z);

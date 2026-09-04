@@ -411,7 +411,8 @@ public final class SegmentLibrary {
                 for (int h = 1; h <= height; h++) {
                     c.setLane(px, y + h, pipe, ctx.halfWidth());
                 }
-                mob(c, ModEntities.PIRANHA_PLANT.get(), px, y + height + 1, 0.0F);
+                // Spawn inside the top block of the pipe so baseY starts hidden
+                mob(c, ModEntities.PIRANHA_PLANT.get(), px, y + height, 0.0F);
             }
         }
     };

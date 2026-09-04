@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class ThwompGoal extends Goal {
 
-    private static final double DETECT_RANGE_XZ = 6.0D;
+    private static final double DETECT_RANGE_XZ = 1.0D; // Drops only when player is directly underneath
     private static final double DETECT_RANGE_Y_DOWN = 24.0D;
     private static final double FALL_SPEED = -1.4D;
     private static final double RISE_SPEED = 0.15D;
