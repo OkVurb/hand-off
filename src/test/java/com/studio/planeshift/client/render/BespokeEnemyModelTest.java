@@ -12,17 +12,17 @@ import org.junit.jupiter.params.provider.EnumSource;
 class BespokeEnemyModelTest {
 
     private static final Map<EnemyRigProfile, Long> SOLID_PARTS = Map.ofEntries(
-            Map.entry(EnemyRigProfile.SPROUTLING, 3L),
-            Map.entry(EnemyRigProfile.GECKO, 7L),
-            Map.entry(EnemyRigProfile.CRUSHER, 1L),
-            Map.entry(EnemyRigProfile.FLYER, 3L),
-            Map.entry(EnemyRigProfile.WISP, 4L),
-            Map.entry(EnemyRigProfile.RIDER, 5L),
-            Map.entry(EnemyRigProfile.WARRIOR, 7L),
-            Map.entry(EnemyRigProfile.CRAWLER, 6L),
-            Map.entry(EnemyRigProfile.BEETLE, 6L),
-            Map.entry(EnemyRigProfile.PLANT, 4L),
-            Map.entry(EnemyRigProfile.BOSS, 8L));
+            Map.entry(EnemyRigProfile.SPROUTLING, 7L),
+            Map.entry(EnemyRigProfile.GECKO, 12L),
+            Map.entry(EnemyRigProfile.CRUSHER, 8L),
+            Map.entry(EnemyRigProfile.FLYER, 10L),
+            Map.entry(EnemyRigProfile.WISP, 10L),
+            Map.entry(EnemyRigProfile.RIDER, 11L),
+            Map.entry(EnemyRigProfile.WARRIOR, 11L),
+            Map.entry(EnemyRigProfile.CRAWLER, 14L),
+            Map.entry(EnemyRigProfile.BEETLE, 12L),
+            Map.entry(EnemyRigProfile.PLANT, 13L),
+            Map.entry(EnemyRigProfile.BOSS, 16L));
 
     @ParameterizedTest(name = "{0} bakes as a complete bespoke mesh")
     @EnumSource(value = EnemyRigProfile.class, names = "VILLAGER", mode = EnumSource.Mode.EXCLUDE)

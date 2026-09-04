@@ -618,6 +618,64 @@ def switch(base, glyph, pressed):
     return img
 
 
+def note_block(base):
+    """A Mario note block: white face, black quaver, and — unlike the version this replaces — a
+    frame and the house lighting.
+
+    The concept was right and is kept. What was missing is that a flat white square with a glyph on
+    it is a sticker, not a block: with no darker frame and no lit top row it has no thickness, so a
+    row of them in a course reads as one white wall. The note is what identifies it; the frame and
+    the shading are what make it an object.
+    """
+    img = new(base)
+    d = ImageDraw.Draw(img)
+    grain(img, base, 81, 0.02)
+    d.rectangle([0, 0, S - 1, S - 1], outline=shade(base, 0.42))
+    d.rectangle([1, 1, S - 2, S - 2], outline=shade(base, 0.72))
+    ink = (26, 24, 34, 255)
+    # Quaver: filled head, stem, flag.
+    d.ellipse([4, 9, 8, 13], fill=ink)
+    d.rectangle([7, 3, 8, 11], fill=ink)
+    d.polygon([(9, 3), (12, 5), (12, 8), (9, 6)], fill=ink)
+    return lit(img, base)
+
+
+def dirt(base, seed):
+    """Clumped soil.
+
+    Replaces a version drawn as horizontal bands, which is the visual cue for *planks* — the block
+    it has to sit under is grass, and a striped brown block under a grass top reads as a wooden
+    crate with a lawn on it. Dirt has no direction, so the noise here is clumped and unaligned.
+    """
+    img = plain(base, seed, 0.10)
+    d = ImageDraw.Draw(img)
+    for cx, cy, r in ((3, 4, 2), (11, 3, 2), (7, 9, 2), (13, 11, 2), (2, 12, 1), (9, 13, 1)):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=shade(base, 0.82))
+    for cx, cy in ((5, 2), (12, 7), (4, 10), (14, 14)):
+        d.point((cx, cy), fill=shade(base, 1.22))
+    grain(img, base, seed + 3, 0.13, 2)
+    return lit(img, base)
+
+
+def donut(base, seed):
+    """A donut lift: a raised rim around a sunken centre.
+
+    Must read as *a platform that will fall*, which means it needs a visible rim to stand on and a
+    hole in the middle so it is never mistaken for solid ground. The version this replaces was a
+    flat orange square with a darker orange square inside it — two tones, no rim, no hole, and the
+    same silhouette as every other decorative block in the set.
+    """
+    img = plain(base, seed, 0.05)
+    d = ImageDraw.Draw(img)
+    d.ellipse([0, 0, S - 1, S - 1], fill=shade(base, 1.12), outline=shade(base, 0.5))
+    d.ellipse([2, 2, 13, 13], outline=shade(base, 0.68))
+    d.ellipse([5, 5, 10, 10], fill=shade(base, 0.34), outline=shade(base, 0.5))
+    # Rivets on the rim, so the shaking state has something to read against.
+    for cx, cy in ((8, 1), (14, 8), (8, 14), (1, 8)):
+        d.point((cx, cy), fill=shade(base, 1.35))
+    return lit(img, base)
+
+
 # ------------------------------------------------------------------ catalogue
 
 
@@ -640,6 +698,9 @@ def build():
     out["course_ice_block"] = ice((176, 216, 240))
     out["course_grass_block_top"] = grass_top((88, 158, 62), 24)
     out["course_grass_block"] = grass_side((124, 88, 58), (88, 158, 62), 25)
+    out["course_dirt"] = dirt((124, 88, 58), 26)
+    out["note_block"] = note_block((242, 242, 236))
+    out["donut_block"] = donut((196, 130, 62), 28)
 
     # Interactive blocks.
     out["coin_block"] = coin_block_side((236, 182, 46), 31)

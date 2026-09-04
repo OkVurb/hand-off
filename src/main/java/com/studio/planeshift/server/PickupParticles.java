@@ -148,7 +148,12 @@ public final class PickupParticles {
             // stays tight, so which mushroom was taken is legible without reading the HUD.
             Map.entry(MegaMushroomItem.class, new Burst(ParticleTypes.EXPLOSION, 8, 0.6D, 0.0D)),
             Map.entry(MiniMushroomItem.class, new Burst(ParticleTypes.END_ROD, 8, 0.12D, 0.02D)),
-            Map.entry(SuperMushroomItem.class, new Burst(ParticleTypes.END_ROD, 10, 0.3D, 0.05D)),
+            // Not END_ROD: MiniMushroomItem directly above already uses it, and this file's own
+            // comment promises that "which mushroom was taken is legible without reading the HUD".
+            // Two mushrooms with the same burst breaks that promise.
+            Map.entry(SuperMushroomItem.class,
+                    new Burst(com.studio.planeshift.common.registry.ModParticles.PICKUP_GLOW.get(),
+                            10, 0.3D, 0.05D)),
 
             // Elemental Forms throw the element they grant.
             Map.entry(FireFlowerItem.class, new Burst(ParticleTypes.FLAME, 14, 0.3D, 0.06D)),

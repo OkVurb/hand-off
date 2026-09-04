@@ -36,6 +36,26 @@ public final class SegmentLibrary {
     /** Tag applied to every generated entity so a course reload can clear them. */
     public static final String GENERATED_TAG = "planeshift.generated_course";
 
+    /**
+     * ParCool's zipline hook block, or null when ParCool is not installed.
+     *
+     * <p>Resolved once. Looking it up inside {@code build} meant a registry query per segment per
+     * course, and — more importantly — left the "is ParCool here?" question implicit. Making it a
+     * nullable constant lets the segment ask the question directly and behave differently, instead
+     * of silently substituting a fence and hoping.
+     */
+    static final BlockState PARCOOL_HOOK = resolveParcoolHook();
+
+    private static BlockState resolveParcoolHook() {
+        if (!net.neoforged.fml.ModList.get().isLoaded("parcool")) {
+            return null;
+        }
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                .get(net.minecraft.resources.Identifier.parse("parcool:wooden_zipline_hook"))
+                .map(h -> h.value().defaultBlockState())
+                .orElse(null);
+    }
+
     private SegmentLibrary() {
     }
 
@@ -927,50 +947,65 @@ public final class SegmentLibrary {
         }
     };
 
-    /** A large gap crossed via a ParCool zipline. */
+    /**
+     * A wide gap with a ParCool zipline strung across it — and a set of stepping platforms under
+     * it, so the gap is crossable either way.
+     *
+     * <p>The platforms are not decoration, they are the correctness fix. The first version of this
+     * segment declared {@code c.movingSurface(x + 1, x + 20, y + 2)}, which tells
+     * {@link CourseReachability} that every column across the span is standable. That is how it
+     * passed the completability tests: not by being crossable, but by telling the solver it was.
+     * If ParCool is absent the hook falls back to a fence, the {@code parcool zipline set} command
+     * does not exist, and the player arrives at a nineteen-block gap the generator has certified
+     * as fine. That is precisely the failure the whole {@code server/gen} package was built to
+     * make impossible (see review R4).
+     *
+     * <p>So the declared surface is gone and real geometry took its place. The solver now proves
+     * the crossing the same way it proves every other gap, the zipline is the fast and interesting
+     * route rather than the only one, and the segment is safe in a pack that does not have ParCool.
+     */
     static final Segment ZIPLINE_GAP_TRAVERSAL = new Segment() {
         public SegmentSpec spec() {
-            return def("zipline_gap_traversal", 22, 0, 1, Tag.GAP, Tag.CLIMB, Tag.SECRET);
+            // Difficulty 2, not 1. A long gap with a timing element is not an introduction.
+            return def("zipline_gap_traversal", 22, 0, 2, Tag.GAP, Tag.CLIMB);
         }
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 3, y, ctx);
             floor(c, x + 19, 3, y, ctx);
 
-            java.util.Optional<net.minecraft.core.Holder.Reference<net.minecraft.world.level.block.Block>> hookOpt = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
-                    net.minecraft.resources.Identifier.parse("parcool:wooden_zipline_hook"));
-            BlockState hook = hookOpt.isPresent() ? hookOpt.get().value().defaultBlockState() : net.minecraft.world.level.block.Blocks.OAK_FENCE.defaultBlockState();
+            BlockState hook = PARCOOL_HOOK != null
+                    ? PARCOOL_HOOK
+                    : net.minecraft.world.level.block.Blocks.OAK_FENCE.defaultBlockState();
 
-            // Pillar 1 with steps
-            c.set(x + 1, y, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
-            c.set(x + 1, y + 1, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
-            c.set(x + 1, y + 2, 0, hook);
+            // Towers, in the theme's own palette rather than vanilla oak — a course made of
+            // PlaneShift blocks with two oak logs in it reads as unfinished.
+            BlockState post = ctx.palette().accent();
+            for (int tower : new int[] {x + 1, x + 20}) {
+                c.set(tower, y, 0, post);
+                c.set(tower, y + 1, 0, post);
+                c.set(tower, y + 2, 0, hook);
+            }
 
-            // Pillar 2 with steps
-            c.set(x + 20, y, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
-            c.set(x + 20, y + 1, 0, net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState());
-            c.set(x + 20, y + 2, 0, hook);
+            // The honest route: three stepping platforms across the span. Spaced inside
+            // CourseReachability's jump limit, so the solver finds them without being told to.
+            for (int i = 1; i <= 3; i++) {
+                platform(c, x + 1 + i * 4, 2, y + 1, ctx);
+            }
 
-            // Add coins in the air over the gap
-            coinTrail(c, x + 5, 12, y + 2, 0);
+            coinTrail(c, x + 5, 12, y + 3, 0);
 
-            // Add a virtual moving surface so the reachability test knows the gap is crossable
-            c.movingSurface(x + 1, x + 20, y + 2);
-
-            c.addPostBuildTask((level, origin) -> {
-                int ax1 = origin.getX() + x + 1;
-                int ay1 = origin.getY() + y + 2;
-                int az1 = origin.getZ();
-
-                int ax2 = origin.getX() + x + 20;
-                int ay2 = origin.getY() + y + 2;
-                int az2 = origin.getZ();
-
-                String cmd = String.format("parcool zipline set %d %d %d %d %d %d",
-                        ax1, ay1, az1, ax2, ay2, az2);
-                level.getServer().getCommands().performPrefixedCommand(
-                        level.getServer().createCommandSourceStack(), cmd);
-            });
+            if (PARCOOL_HOOK != null) {
+                c.addPostBuildTask((level, origin) -> {
+                    int ax = origin.getX() + x + 1;
+                    int ay = origin.getY() + y + 2;
+                    int az = origin.getZ();
+                    String cmd = String.format("parcool zipline set %d %d %d %d %d %d",
+                            ax, ay, az, origin.getX() + x + 20, ay, az);
+                    level.getServer().getCommands().performPrefixedCommand(
+                            level.getServer().createCommandSourceStack(), cmd);
+                });
+            }
         }
     };
 

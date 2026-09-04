@@ -66,12 +66,30 @@ public class WarpPipeBlock extends Block {
                     }
                     // Place the return pipe
                     level.setBlockAndUpdate(targetPos, this.defaultBlockState());
-                    // Add some coins to the room
+                    // Coins in the room.
+                    //
+                    // Item entities, not blocks. There is no coin *block* — ModBlocks.COIN does
+                    // not exist, which is what stopped this file compiling. A coin in PlaneShift
+                    // is ModItems.COIN, picked up by walking into it, and the pickup path is what
+                    // credits the player's coin count. Spawned the same way CourseWriter spawns
+                    // the generator's own coins, including the generated tag, so the course
+                    // cleanup pass removes these along with everything else it built.
                     for (int x = -2; x <= 2; x += 2) {
                         for (int z = -2; z <= 2; z += 2) {
-                            if (x != 0 || z != 0) { // Don't place on the pipe
-                                level.setBlockAndUpdate(targetPos.offset(x, 1, z), com.studio.planeshift.common.registry.ModBlocks.COIN.get().defaultBlockState());
+                            if (x == 0 && z == 0) {
+                                continue; // leave the return pipe clear
                             }
+                            BlockPos coinPos = targetPos.offset(x, 1, z);
+                            net.minecraft.world.entity.item.ItemEntity coin =
+                                    new net.minecraft.world.entity.item.ItemEntity(level,
+                                            coinPos.getX() + 0.5D, coinPos.getY() + 0.25D,
+                                            coinPos.getZ() + 0.5D,
+                                            new net.minecraft.world.item.ItemStack(
+                                                    com.studio.planeshift.common.registry.ModItems.COIN.get()));
+                            coin.setPickUpDelay(0);
+                            coin.setDeltaMovement(0.0D, 0.0D, 0.0D);
+                            coin.addTag(com.studio.planeshift.server.gen.SegmentLibrary.GENERATED_TAG);
+                            level.addFreshEntity(coin);
                         }
                     }
                 }

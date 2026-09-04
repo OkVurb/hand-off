@@ -37,10 +37,24 @@ public final class CourseCanvas {
     /** Item pickups — coins, star coins, power-ups placed loose in the world. */
     private final List<ItemDrop> items = new ArrayList<>();
 
-    public final List<java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos>> postBuildTasks = new ArrayList<>();
+    /**
+     * Work deferred until the canvas has been written into a real level.
+     *
+     * <p>The canvas is a pure write buffer precisely so a course can be validated before anything
+     * touches the world; anything needing a live {@code ServerLevel} — running a command, talking
+     * to another mod — cannot run during composition. This is the escape hatch, and it is private
+     * with an accessor like every other collection here, rather than a public mutable field.
+     */
+    private final List<java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos>>
+            postBuildTasks = new ArrayList<>();
 
-    public void addPostBuildTask(java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos> task) {
+    public void addPostBuildTask(
+            java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos> task) {
         postBuildTasks.add(task);
+    }
+
+    public List<java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel, BlockPos>> postBuildTasks() {
+        return postBuildTasks;
     }
 
     /** Named points other systems need: the checkpoint, the flag, sub-room links. */

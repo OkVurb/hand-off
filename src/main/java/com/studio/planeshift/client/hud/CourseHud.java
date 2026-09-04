@@ -242,6 +242,15 @@ public final class CourseHud {
             graphics.drawString(font, String.format("rail: %s @ %.2f  drift: %+.3f",
                     rail.travelAxis(), rail.planeCoord(), drift), 8, y + 10, 0xFFAAAAAA);
         }
+    }
+
+    /**
+     * Bedrock-style control hints in the bottom corners.
+     *
+     * <p>Static text rather than the live keybinds: {@code minecraft.options.keyJump.getTranslatedKeyMessage()}
+     * would follow a rebind, and this does not. Left as-is because it is what was written, but a
+     * player who has remapped jump is being told the wrong key, so this is a real TODO.
+     */
     private static void renderKeybindHints(GuiGraphics graphics, Font font, Minecraft minecraft, float hudScale) {
         int usableWidth = (int) (graphics.guiWidth() / hudScale);
         int usableHeight = (int) (graphics.guiHeight() / hudScale);

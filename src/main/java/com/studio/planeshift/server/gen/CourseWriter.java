@@ -78,7 +78,7 @@ public final class CourseWriter {
             level.addFreshEntity(item);
         }
 
-        for (java.util.function.BiConsumer<ServerLevel, BlockPos> task : canvas.postBuildTasks) {
+        for (java.util.function.BiConsumer<ServerLevel, BlockPos> task : canvas.postBuildTasks()) {
             task.accept(level, origin);
         }
 

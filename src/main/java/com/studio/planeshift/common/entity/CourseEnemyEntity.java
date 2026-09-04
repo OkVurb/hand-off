@@ -31,8 +31,20 @@ public abstract class CourseEnemyEntity extends Monster {
     private static final double STOMP_MIN_FALL_SPEED = 0.08D;
     /** Predictable bounce applied to the stomper. */
     private static final double STOMP_BOUNCE = 0.55D;
-    /** Per-target cooldown so one landing cannot double-hit. */
-    private static final int STOMP_COOLDOWN_TICKS = 0;
+    /**
+     * Per-target cooldown so one landing cannot register as several stomps.
+     *
+     * <p>This was set to 0 to fix chain-bouncing, which disabled it completely: `now - last < 0`
+     * is never true, so every tick of contact was a separate stomp. Combined with the
+     * `invulnerableTime = 0` below — which is correct and necessary — that meant an enemy took
+     * full stomp damage twenty times a second while the player was touching it, so everything
+     * died instantly on contact.
+     *
+     * <p>Four ticks is the middle the fix was reaching for: one landing is one stomp, and a
+     * genuine second bounce (which cannot physically happen inside 0.2s) is never swallowed. The
+     * original 10 was the real problem — half a second is long enough to eat a real chain bounce.
+     */
+    private static final int STOMP_COOLDOWN_TICKS = 4;
 
     private long lastStompGameTime = -STOMP_COOLDOWN_TICKS;
 
@@ -248,7 +260,10 @@ public abstract class CourseEnemyEntity extends Monster {
                 double ox = random.nextGaussian() * 0.15D;
                 double oy = random.nextGaussian() * 0.15D;
                 double oz = random.nextGaussian() * 0.15D;
-                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,
+                // HIT_BURST, not vanilla CRIT. The brief here was to stop using generic vanilla
+                // particles for everything; swapping the mod's own hit particle for CRIT moves in
+                // exactly the wrong direction.
+                serverLevel.sendParticles(ModParticles.HIT_BURST.get(),
                         getX(), getY(0.5D), getZ(), 1, ox, oy, oz, 0.05D);
             }
         }
