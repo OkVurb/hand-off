@@ -226,6 +226,23 @@ public class KoopaEntity extends CourseEnemyEntity {
         level().playSound(null, blockPosition(), ModSounds.STOMP.get(), SoundSource.HOSTILE, 1.0F, 0.8F);
     }
 
+    /**
+     * Kick entry point for the spin attack.
+     *
+     * <p>{@link #kick} is private and guarded by a reach and grace check that only makes sense for
+     * a player who has walked into the shell. A spin has its own reach, already checked by the
+     * caller, so this exposes the launch without duplicating the rules — and returns whether it
+     * actually happened, so the spin can fall through to ordinary damage when there was no shell
+     * to kick.
+     */
+    public boolean kickFromSpin(ServerPlayer player) {
+        if (!inShell() || sliding()) {
+            return false;
+        }
+        kick(player);
+        return sliding();
+    }
+
     /** Launches the shell away from the player who touched it. */
     private void kick(ServerPlayer player) {
         if (shellSince >= 0 && shellSince < KICK_GRACE_TICKS) {

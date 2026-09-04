@@ -82,6 +82,22 @@ public final class AirMoveService {
     private static final int CLAMBER_COOLDOWN_TICKS = 12;
 
     /**
+     * Ticks of stall left, and whether this airborne stint has already spent its one stall.
+     *
+     * <p>The stall is the forgiveness half of the spin: a brief hover that lets a jump reach a
+     * platform it would otherwise fall just short of. Once per airborne stint, recharged only by
+     * landing, so it extends a jump rather than replacing gravity.
+     */
+    private static final Map<ServerPlayer, Integer> STALL_TICKS = new WeakHashMap<>();
+    private static final Map<ServerPlayer, Boolean> STALL_SPENT = new WeakHashMap<>();
+
+    /** How long the hover lasts. Short: it buys a block of reach, not a flight. */
+    private static final int STALL_DURATION = 8;
+
+    /** Downward speed held during a stall. Not zero — a dead stop reads as a bug, not a hover. */
+    private static final double STALL_FALL_SPEED = -0.045D;
+
+    /**
      * Whether this player is mid-ground-pound.
      *
      * <p>Read by {@code CourseEnemyEntity.playerTouch} so a pound that lands on an enemy resolves
@@ -117,6 +133,11 @@ public final class AirMoveService {
                 player.level().playSound(null, player.blockPosition(),
                         com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(),
                         net.minecraft.sounds.SoundSource.PLAYERS, 0.7F, 1.6F);
+                // The spin is an attack as well as a jump. Swept here, on the ground, on the edge
+                // — so it fires once per spin and hits what was beside you when you started it.
+                if (player.level() instanceof net.minecraft.server.level.ServerLevel spinLevel) {
+                    SpinAttackService.strike(spinLevel, player);
+                }
             }
         } else if (player.onGround()) {
             SPIN_JUMPING.remove(player);
@@ -163,6 +184,35 @@ public final class AirMoveService {
             player.setDeltaMovement(moveX, rise, moveZ);
             player.hurtMarked = true;
         }
+
+        // Spin stall.
+        //
+        // Built from the measured horizontal deltas for the same reason the variable jump is:
+        // hurtMarked sends an absolute velocity packet, so writing the server's stale x/z back out
+        // every tick of an eight-tick hover would strip the player's horizontal speed exactly when
+        // they are trying to cross a gap — which is the only situation a stall is ever used in.
+        int stall = STALL_TICKS.getOrDefault(player, 0);
+        if (player.onGround()) {
+            STALL_SPENT.remove(player);
+            stall = 0;
+        } else if (spinning && stall == 0 && !STALL_SPENT.getOrDefault(player, false)
+                && measuredRise < 0.0D) {
+            // Armed on the way down, not on the way up: stalling at the apex is what turns a jump
+            // into a glide, and one that fires before the player knows they are short is wasted.
+            STALL_SPENT.put(player, true);
+            stall = STALL_DURATION;
+        }
+        if (stall > 0) {
+            player.setDeltaMovement(moveX, STALL_FALL_SPEED, moveZ);
+            player.hurtMarked = true;
+            player.resetFallDistance();
+            stall--;
+            if (player.level() instanceof net.minecraft.server.level.ServerLevel stallLevel) {
+                stallLevel.sendParticles(com.studio.planeshift.common.registry.ModParticles.COIN_SPARKLE.get(),
+                        player.getX(), player.getY() + 0.2D, player.getZ(), 1, 0.2D, 0.0D, 0.2D, 0.01D);
+            }
+        }
+        STALL_TICKS.put(player, stall);
 
         // Ledge clamber / mantle. Direction from the same measured movement, for the same reason.
 
@@ -302,6 +352,8 @@ public final class AirMoveService {
         if (player.onGround()) {
             WALL_CONTACT.remove(player);
         GROUND_POUNDING.remove(player);
+        STALL_TICKS.remove(player);
+        STALL_SPENT.remove(player);
             return;
         }
 
@@ -327,6 +379,8 @@ public final class AirMoveService {
         if (since > WALL_JUMP_GRACE_TICKS) {
             WALL_CONTACT.remove(player);
         GROUND_POUNDING.remove(player);
+        STALL_TICKS.remove(player);
+        STALL_SPENT.remove(player);
             return;
         }
         // A jump pressed inside the grace window converts the slide into a fresh launch. The
@@ -344,6 +398,8 @@ public final class AirMoveService {
             player.resetFallDistance();
             WALL_CONTACT.remove(player);
         GROUND_POUNDING.remove(player);
+        STALL_TICKS.remove(player);
+        STALL_SPENT.remove(player);
         }
     }
 
@@ -370,6 +426,8 @@ public final class AirMoveService {
         RISING_GRACE.remove(player);
         WALL_CONTACT.remove(player);
         GROUND_POUNDING.remove(player);
+        STALL_TICKS.remove(player);
+        STALL_SPENT.remove(player);
     }
 
     private record LastHit(long pos, long tick) {
