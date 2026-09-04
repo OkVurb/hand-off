@@ -297,6 +297,9 @@ public abstract class CourseEnemyEntity extends Monster {
                 setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
             }
 
+            // Hazards kill enemies too. Cheap: the service skips three ticks in four.
+            com.studio.planeshift.server.EnemyHazardService.tick(this);
+
             holdLane();
         }
     }
