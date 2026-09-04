@@ -78,6 +78,7 @@ public final class CourseHud {
         }
         try {
             renderCluster(graphics, font, minecraft, state, x, y, hudScale);
+            renderKeybindHints(graphics, font, minecraft, hudScale);
         } finally {
             if (scaled) {
                 graphics.pose().popMatrix();
@@ -241,8 +242,24 @@ public final class CourseHud {
             graphics.drawString(font, String.format("rail: %s @ %.2f  drift: %+.3f",
                     rail.travelAxis(), rail.planeCoord(), drift), 8, y + 10, 0xFFAAAAAA);
         }
-        state.transition().ifPresent(sync -> graphics.drawString(font,
-                "tx: " + sync.txId() + " " + sync.fromMode() + " -> " + sync.toMode(),
-                8, y + 20, 0xFFAAAAAA));
+    private static void renderKeybindHints(GuiGraphics graphics, Font font, Minecraft minecraft, float hudScale) {
+        int usableWidth = (int) (graphics.guiWidth() / hudScale);
+        int usableHeight = (int) (graphics.guiHeight() / hudScale);
+        
+        // Bedrock-style controller hints in bottom corners
+        int bottomY = usableHeight - 15;
+        
+        // Bottom Left: Movement/Jump
+        graphics.drawString(font, "Jump [SPACE]", 10, bottomY - 12, 0xFFFFFFFF, true);
+        graphics.drawString(font, "Crouch / Warp [SHIFT]", 10, bottomY, 0xFFFFFFFF, true);
+        
+        // Bottom Right: Actions
+        String runStr = "Action / Run [L-CLICK]";
+        int runWidth = font.width(runStr);
+        graphics.drawString(font, runStr, usableWidth - runWidth - 10, bottomY - 12, 0xFFFFFFFF, true);
+        
+        String useStr = "Use [R-CLICK]";
+        int useWidth = font.width(useStr);
+        graphics.drawString(font, useStr, usableWidth - useWidth - 10, bottomY, 0xFFFFFFFF, true);
     }
 }
