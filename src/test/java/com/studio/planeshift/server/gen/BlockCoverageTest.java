@@ -38,7 +38,8 @@ class BlockCoverageTest {
                 ModBlocks.COURSE_VINE.get(),
                 ModBlocks.COURSE_TILE.get(),
                 ModBlocks.COURSE_BANNER.get(),
-                ModBlocks.SHIFT_GATE.get());
+                ModBlocks.SHIFT_GATE.get(),
+                ModBlocks.SPIKE_BLOCK.get());
     }
 
     @Test

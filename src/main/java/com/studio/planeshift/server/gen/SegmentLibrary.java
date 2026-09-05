@@ -1021,6 +1021,52 @@ public final class SegmentLibrary {
      * everywhere else, and a ball of molten rock leaping out of a grassland is not a thing that
      * should be possible just because the picker happened to reach for this one.
      */
+    /**
+     * A bed of spikes, crossed on stepping platforms.
+     *
+     * <p>{@code SpikeBlock} was fully implemented — damage, the hurt-immunity reasoning in its
+     * javadoc, a model, a loot table — and a coverage audit found it appeared in exactly zero
+     * generated courses. It was real to a player browsing the creative menu and imaginary to a
+     * player playing the game. This is the segment that makes it real.
+     *
+     * <p>Spikes rather than a pit on purpose, because they teach a different thing. A pit says
+     * "do not fall"; a spike bed says "do not touch the floor" while the floor is still visibly
+     * there, so the player has to keep reading ground they have been trained all course to trust.
+     *
+     * <p>{@code CourseReachability} already treats SPIKE_BLOCK as a hazard, so the solver routes
+     * over the bed rather than through it and will reject this segment outright if the stepping
+     * platforms are ever wrong. The safety argument is the solver's, not this method's.
+     */
+    static final Segment SPIKE_BED = new Segment() {
+        public SegmentSpec spec() {
+            return def("spike_bed", 16, 0, 2, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 4, y, ctx);
+            floor(c, x + 12, 4, y, ctx);
+
+            // Ordinary ground first, then the surface replaced. The fill underneath matters: a
+            // spike bed floating over nothing reads as a pit with decoration in it.
+            for (int i = 4; i < 12; i++) {
+                ctx.ground(c, x + i, y);
+                c.setLane(x + i, y, ModBlocks.SPIKE_BLOCK.get().defaultBlockState(),
+                        ctx.halfWidth());
+            }
+
+            // Two steps, low enough to be a hop rather than a climb, and spaced so neither jump
+            // can be taken from a standstill.
+            platform(c, x + 5, 2, y + 2, ctx);
+            platform(c, x + 9, 2, y + 2, ctx);
+
+            // Coins over the steps, not over the spikes. Coins are the generator's way of saying
+            // "here", and pointing them at the hazard would be a lie the player has no reason to
+            // doubt.
+            coinTrail(c, x + 5, 2, y + 4, 1);
+            coinTrail(c, x + 9, 2, y + 4, 1);
+        }
+    };
+
     static final Segment PODOBOO_PIT = new Segment() {
         public SegmentSpec spec() {
             return def("podoboo_pit", 18, 0, 3, Tag.GAP, Tag.OVERHEAD);
@@ -1376,6 +1422,7 @@ public final class SegmentLibrary {
         list.add(MUNCHER_PIT_HOP);
         list.add(TRAMPOLINE_SKY_LAUNCH);
         list.add(FROST_ICE_SLIDE);
+        list.add(SPIKE_BED);
         list.add(PODOBOO_PIT);
         list.add(ON_OFF_CORRIDOR);
         list.add(COIN_RING_ARC);
