@@ -132,6 +132,32 @@ def studded(base, stud, seed, inset=2):
     return lit(img, base)
 
 
+def toad_box(base, spot, seed):
+    """A prize box in a Toad House: pale field, cap spots, heavy frame.
+
+    Deliberately not a recoloured question block. The player has to be able to tell at a glance
+    that this is the thing they came here to open and not a block that happens to be in the room,
+    and inside a small bright room a question mark reads as "ordinary level furniture".
+    """
+    img = plain(base, seed, 0.05)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], outline=shade(base, 0.5))
+    d.rectangle([1, 1, S - 2, S - 2], outline=shade(base, 1.22))
+    for cx, cy, r in ((4, 4, 1), (10, 5, 2), (5, 10, 2), (12, 11, 1)):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=spot + (255,))
+    return lit(img, base)
+
+
+def toad_box_used(base, seed):
+    """Opened: the spots are gone and the field sinks, so a spent box reads from across the room."""
+    dim = shade(base, 0.68)[:3]
+    img = plain(dim, seed, 0.04)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], outline=shade(dim, 0.55))
+    d.rectangle([2, 2, S - 3, S - 3], outline=shade(dim, 0.8))
+    return lit(img, dim)
+
+
 # ------------------------------------------------------------------- emblems
 
 
@@ -777,6 +803,8 @@ def build():
     out["coin_block"] = coin_block_side((236, 182, 46), 31)
     out["coin_block_top"] = coin_block_top((236, 182, 46), 32)
     out["hidden_question_block"] = hidden_block()
+    out["toad_box"] = toad_box((238, 232, 222), (214, 62, 58), 61)
+    out["toad_box_used"] = toad_box_used((238, 232, 222), 62)
     out["rotating_block"] = rotating(False, 34)
     out["rotating_block_spinning"] = rotating(True, 35)
     out["conveyor_belt_top"] = conveyor_top()

@@ -202,6 +202,8 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.MUNCHER);
     public static final DeferredItem<?> KEYHOLE_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.KEYHOLE);
+    public static final DeferredItem<?> TOAD_BOX_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.TOAD_BOX);
     public static final DeferredItem<?> SEMISOLID_PLATFORM_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.SEMISOLID_PLATFORM);
     public static final DeferredItem<?> TRAMPOLINE_ITEM =

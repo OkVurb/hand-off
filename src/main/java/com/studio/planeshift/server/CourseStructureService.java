@@ -6,6 +6,7 @@ import com.studio.planeshift.common.course.CourseDefinition;
 import com.studio.planeshift.server.gen.CourseCanvas;
 import com.studio.planeshift.server.gen.CourseComposer;
 import com.studio.planeshift.server.gen.CourseWriter;
+import com.studio.planeshift.server.gen.ToadHouseRoom;
 import com.studio.planeshift.common.course.CourseLayout;
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.entity.FirebarEntity;
@@ -54,6 +55,14 @@ public final class CourseStructureService {
 
     public static void place(ServerLevel level, CourseDefinition course, String courseId) {
         if (course.structure().isPresent() && placeTemplate(level, course, course.structure().get())) {
+            return;
+        }
+        // The Toad House is a room, not a level. Sent through the composer it came out as a
+        // 64-block grass course with a flagpole on the end, which is the shortest level in the
+        // game rather than a place you have arrived at.
+        if (ToadHouseRoom.ID.equals(courseId)) {
+            CourseWriter.write(level, course.startPos(), ToadHouseRoom.build(), course.length());
+            PlaneShift.LOGGER.info("Placed Toad House room at {}", course.startPos());
             return;
         }
         placeGenerated(level, course, courseId);

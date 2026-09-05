@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "used=false": {
+      "model": "planeshift:block/toad_box"
+    },
+    "used=true": {
+      "model": "planeshift:block/toad_box_used"
+    }
+  }
+}

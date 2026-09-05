@@ -27,6 +27,7 @@ import com.studio.planeshift.common.block.QuestionBlock;
 import com.studio.planeshift.common.block.RotatingBlock;
 import com.studio.planeshift.common.block.SecretPassageBlock;
 import com.studio.planeshift.common.block.SemisolidBlock;
+import com.studio.planeshift.common.block.ToadBoxBlock;
 import com.studio.planeshift.common.block.ShiftGateBlock;
 import com.studio.planeshift.common.block.SpikeBlock;
 import com.studio.planeshift.common.block.SpringPadBlock;
@@ -357,6 +358,16 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> state.getValue(KeyholeBlock.UNLOCKED) ? 12 : 4)
                     .sound(SoundType.METAL));
+
+    /**
+     * The Toad House prize box. Hit from below like a question block, but opening one closes the
+     * others, so a Toad House is a choice rather than three rewards.
+     */
+    public static final DeferredBlock<ToadBoxBlock> TOAD_BOX =
+            BLOCKS.registerBlock("toad_box", ToadBoxBlock::new, p -> p
+                    .mapColor(MapColor.SNOW)
+                    .strength(-1.0F, 3_600_000.0F)
+                    .sound(SoundType.WOOD));
 
     public static final DeferredBlock<SemisolidBlock> SEMISOLID_PLATFORM =
             BLOCKS.registerBlock("semisolid_platform", SemisolidBlock::new, p -> p

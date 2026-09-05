@@ -1,5 +1,7 @@
 package com.studio.planeshift.server;
 
+import com.studio.planeshift.server.gen.ToadHouseRoom;
+import com.studio.planeshift.common.course.ToadHouseGifts;
 import com.studio.planeshift.common.course.CourseProgress;
 import com.studio.planeshift.common.course.WorldDefinition;
 import com.studio.planeshift.common.course.WorldMapLayout;
@@ -22,12 +24,6 @@ import net.minecraft.world.item.ItemStack;
  * a world the player has already reached.
  */
 public final class MapNodeService {
-
-    /** What a Toad House can hand out. The useful Forms, deliberately not the joke ones. */
-    private static final List<Supplier<? extends Item>> GIFTS = List.of(
-            ModItems.SUPER_MUSHROOM, ModItems.FIRE_FLOWER, ModItems.ICE_FLOWER,
-            ModItems.LEAF, ModItems.PROPELLER_MUSHROOM, ModItems.CAT_SUIT,
-            ModItems.TANOOKI, ModItems.THREE_UP);
 
     private MapNodeService() {
     }
@@ -83,20 +79,20 @@ public final class MapNodeService {
      * directly into a slot would skip the Form grant, the sound and the particles.
      */
     private static void visitToadHouse(ServerPlayer player, WorldMapLayout.Node node) {
-        // The gift is unconditional, and that ordering is the fix.
-        //
-        // Gating it on the room failing to load meant the happy path gave the player nothing at
-        // all: they were teleported into a small room and sent on their way empty-handed, with the
-        // power-up reachable only when the datapack was broken. A Toad House that pays out only
-        // when it is misconfigured is not a Toad House.
-        int roll = player.getRandom().nextInt(GIFTS.size());
-        player.drop(new ItemStack(GIFTS.get(roll).get()), false, false);
+        // The room pays out now, so the direct grant is the fallback again -- but only because
+        // ToadBoxBlock exists. This was previously written as "load the room, and grant a gift if
+        // that fails", which read as sensible and meant the happy path handed the player nothing
+        // at all: the room had no boxes in it, so the reward was reachable only when the datapack
+        // was broken. If the boxes are ever removed, this has to go back to being unconditional.
+        if (CourseService.loadCourse(player, ToadHouseRoom.ID)) {
+            player.sendSystemMessage(Component.translatable("message.planeshift.toad_house"));
+            return;
+        }
+
+        player.drop(new ItemStack(ToadHouseGifts.roll(player.getRandom())), false, false);
         player.level().playSound(null, player.blockPosition(), ModSounds.POWER_UP.get(),
                 SoundSource.PLAYERS, 0.9F, 1.0F);
         player.sendSystemMessage(Component.translatable("message.planeshift.toad_house"));
-
-        // The room is the presentation, so its absence costs the flavour and not the reward.
-        CourseService.loadCourse(player, "toad_house");
     }
 
     /**
