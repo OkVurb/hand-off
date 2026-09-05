@@ -196,6 +196,8 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_ICE_BLOCK);
     public static final DeferredItem<?> MUNCHER_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.MUNCHER);
+    public static final DeferredItem<?> SEMISOLID_PLATFORM_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.SEMISOLID_PLATFORM);
     public static final DeferredItem<?> TRAMPOLINE_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.TRAMPOLINE);
 

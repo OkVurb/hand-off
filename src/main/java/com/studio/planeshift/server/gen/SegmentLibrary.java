@@ -1219,6 +1219,45 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * Two routes stacked on top of each other, which is what semisolids are for.
+     *
+     * <p>Until this block existed a course could only ever be one ribbon of ground, because any
+     * platform above the player was also a ceiling. A semisolid is not a ceiling: the upper route
+     * can be jumped into from anywhere along the lower one, so the player chooses a level rather
+     * than being routed onto one.
+     *
+     * <p>The reward is on top and the safety is underneath, which is the standard bargain — the
+     * high road has the coins and the low road has the floor.
+     */
+    static final Segment SEMISOLID_TIERS = new Segment() {
+        public SegmentSpec spec() {
+            return def("semisolid_tiers", 20, 0, 2, Tag.CLIMB, Tag.REST);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 20, y, ctx);
+            BlockState semi = ModBlocks.SEMISOLID_PLATFORM.get().defaultBlockState();
+
+            // Upper deck, in two spans with a break in the middle so it is a route rather than a
+            // roof - and so the player can drop back down without walking to the end.
+            for (int i = 3; i <= 8; i++) {
+                c.setLane(x + i, y + 4, semi, ctx.halfWidth());
+            }
+            for (int i = 12; i <= 17; i++) {
+                c.setLane(x + i, y + 4, semi, ctx.halfWidth());
+            }
+            coinTrail(c, x + 4, 5, y + 6, 1);
+            coinTrail(c, x + 13, 4, y + 6, 1);
+
+            // A third tier, short, reachable only from the second. Depth for anyone who wants it.
+            for (int i = 8; i <= 11; i++) {
+                c.setLane(x + i, y + 8, semi, ctx.halfWidth());
+            }
+            c.set(x + 10, y + 9, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -1270,6 +1309,7 @@ public final class SegmentLibrary {
         list.add(VINE_WALL);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
+        list.add(SEMISOLID_TIERS);
         list.add(ZIPLINE_GAP_TRAVERSAL);
         return list;
     }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "planeshift:block/semisolid_platform_top",
+    "side": "planeshift:block/semisolid_platform",
+    "bottom": "planeshift:block/semisolid_platform"
+  }
+}

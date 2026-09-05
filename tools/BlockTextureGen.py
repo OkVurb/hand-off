@@ -618,6 +618,39 @@ def switch(base, glyph, pressed):
     return img
 
 
+def semisolid(base, seed):
+    """A platform whose top edge is the whole message.
+
+    A semisolid is passed through from below and landed on from above, so the player has to be
+    able to tell at a glance which surface is which. The top gets a heavy lit lip and the sides get
+    a hanging underside that reads as unsupported - deliberately unlike every other block in the
+    set, all of which are solid all the way round.
+    """
+    img = plain(base, seed, 0.06)
+    d = ImageDraw.Draw(img)
+    # Plank grain on the face.
+    for y in (5, 10, 15):
+        d.line([(0, y), (S - 1, y)], fill=shade(base, 0.66))
+    # The lip: three rows of it, much brighter than the house convention, because this is the one
+    # edge that has to be unmistakable.
+    d.rectangle([0, 0, S - 1, 2], fill=shade(base, 1.42))
+    d.line([(0, 3), (S - 1, 3)], fill=shade(base, 1.16))
+    # Hanging underside: broken, so the bottom does not read as resting on anything.
+    for x in range(0, S, 4):
+        d.rectangle([x, S - 2, x + 1, S - 1], fill=CLEAR)
+    return img
+
+
+def semisolid_top(base, seed):
+    """The walking surface: boards across, with a bright rim all round."""
+    img = plain(base, seed, 0.05)
+    d = ImageDraw.Draw(img)
+    for x in (4, 9, 14):
+        d.line([(x, 0), (x, S - 1)], fill=shade(base, 0.68))
+    d.rectangle([0, 0, S - 1, S - 1], outline=shade(base, 1.35))
+    return img
+
+
 def note_block(base):
     """A Mario note block: white face, black quaver, and — unlike the version this replaces — a
     frame and the house lighting.
@@ -699,6 +732,8 @@ def build():
     out["course_grass_block_top"] = grass_top((88, 158, 62), 24)
     out["course_grass_block"] = grass_side((124, 88, 58), (88, 158, 62), 25)
     out["course_dirt"] = dirt((124, 88, 58), 26)
+    out["semisolid_platform"] = semisolid((178, 132, 74), 29)
+    out["semisolid_platform_top"] = semisolid_top((198, 152, 92), 30)
     out["note_block"] = note_block((242, 242, 236))
     out["donut_block"] = donut((196, 130, 62), 28)
 

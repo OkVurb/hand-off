@@ -116,9 +116,31 @@ public final class CourseReachability {
             ModBlocks.MUNCHER.get(),
             ModBlocks.SPIKE_BLOCK.get());
 
-    private boolean solid(int x, int y) {
+    /**
+     * Blocks that hold weight from above but never stop a body.
+     *
+     * <p>These are why {@code solid} had to be split in two. It was serving two different
+     * questions with one answer — "is there floor here" and "is my body blocked here" — and for
+     * every block in the game until now those questions happened to agree. A semisolid platform is
+     * the first one where they do not: a jump arc passes straight through it and a descent lands
+     * on it. Adding it to PASSABLE would have made it passable *and* not floor, so the solver
+     * would refuse to stand on the most common platform in the genre.
+     */
+    private static final Set<Block> ONE_WAY = Set.of(
+            ModBlocks.SEMISOLID_PLATFORM.get());
+
+    /** Whether this cell can be stood on. */
+    private boolean isFloor(int x, int y) {
         BlockState state = canvas.get(x, y, laneZ);
         return state != null && !PASSABLE.contains(state.getBlock());
+    }
+
+    /** Whether this cell stops the player's body moving through it. */
+    private boolean blocksBody(int x, int y) {
+        BlockState state = canvas.get(x, y, laneZ);
+        return state != null
+                && !PASSABLE.contains(state.getBlock())
+                && !ONE_WAY.contains(state.getBlock());
     }
 
     /**
@@ -126,7 +148,7 @@ public final class CourseReachability {
      * the player's own body.
      */
     public boolean isStand(int x, int y) {
-        if (!solid(x, y - 1)) {
+        if (!isFloor(x, y - 1)) {
             return false;
         }
         BlockState floor = canvas.get(x, y - 1, laneZ);
@@ -134,7 +156,7 @@ public final class CourseReachability {
             return false;
         }
         for (int h = 0; h < PLAYER_HEIGHT; h++) {
-            if (solid(x, y + h)) {
+            if (blocksBody(x, y + h)) {
                 return false;
             }
         }
@@ -147,7 +169,7 @@ public final class CourseReachability {
      */
     private boolean passable(int x, int y) {
         for (int h = 0; h < PLAYER_HEIGHT; h++) {
-            if (solid(x, y + h)) {
+            if (blocksBody(x, y + h)) {
                 return false;
             }
         }

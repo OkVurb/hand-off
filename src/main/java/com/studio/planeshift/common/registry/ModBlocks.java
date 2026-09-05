@@ -25,6 +25,7 @@ import com.studio.planeshift.common.block.PlaneshiftNoteBlock;
 import com.studio.planeshift.common.block.QuestionBlock;
 import com.studio.planeshift.common.block.RotatingBlock;
 import com.studio.planeshift.common.block.SecretPassageBlock;
+import com.studio.planeshift.common.block.SemisolidBlock;
 import com.studio.planeshift.common.block.ShiftGateBlock;
 import com.studio.planeshift.common.block.SpikeBlock;
 import com.studio.planeshift.common.block.SpringPadBlock;
@@ -337,6 +338,20 @@ public final class ModBlocks {
                     .strength(1.5F, 10.0F)
                     .noOcclusion()
                     .sound(SoundType.GRASS));
+
+    /**
+     * The platform every 2D Mario level is built from: solid on top, open from below.
+     *
+     * <p>noOcclusion because the player is regularly inside one on the way up, and a block that
+     * occludes while you are standing in it culls the faces of everything behind it.
+     */
+    public static final DeferredBlock<SemisolidBlock> SEMISOLID_PLATFORM =
+            BLOCKS.registerBlock("semisolid_platform", SemisolidBlock::new, p -> p
+                    .mapColor(MapColor.WOOD)
+                    .strength(1.2F)
+                    .noOcclusion()
+                    .isViewBlocking((state, level, pos) -> false)
+                    .sound(SoundType.WOOD));
 
     public static final DeferredBlock<TrampolineBlock> TRAMPOLINE =
             BLOCKS.registerBlock("trampoline", TrampolineBlock::new, p -> p

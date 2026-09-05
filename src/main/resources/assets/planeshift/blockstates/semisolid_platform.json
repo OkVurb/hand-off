@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "planeshift:block/semisolid_platform"
+    }
+  }
+}
