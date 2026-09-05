@@ -605,8 +605,30 @@ def bowser():
     return img
 
 
+def paratroopa():
+    """A Koopa with white wings.
+
+    Same palette as the Koopa on purpose — this is meant to read as "that enemy, but flying", and
+    recolouring the body would break the two-hit lesson the creature exists to teach. The only
+    change is the trim region, which the Koopa spends on eyes and a shell rim and this one also
+    spends on the wings, so it goes pure white.
+    """
+    img = koopa()
+    # Repaint trim as clean white with a soft feathered edge: on this rig the region carries the
+    # wings, and a flat swatch would make them read as paper.
+    white = (252, 252, 255)
+    base(img, TRIM, white, 27, ramp=0.22)
+    dr = ImageDraw.Draw(img)
+    for row, yy in enumerate(range(TRIM[1] + 3, TRIM[1] + 40, 6)):
+        offset = 0 if row % 2 == 0 else 4
+        for xx in range(TRIM[0] + offset, TRIM[0] + 64, 8):
+            dr.arc([xx, yy - 3, xx + 7, yy + 3], 200, 340, fill=shade(white, 0.86))
+    return img
+
+
 CHARACTERS = {
     "goomba": goomba,
+    "paratroopa": paratroopa,
     "koopa": koopa,
     "thwomp": thwomp,
     "bullet_bill": bullet_bill,

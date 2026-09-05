@@ -132,6 +132,9 @@ public final class ClientModEvents {
                 CourseEnemyRenderer.provider(goomba, 0.25F, EnemyRigProfile.GOOMBA));
         event.registerEntityRenderer(ModEntities.KOOPA.get(),
                 CourseEnemyRenderer.provider(koopa, 0.22F, EnemyRigProfile.KOOPA));
+        event.registerEntityRenderer(ModEntities.PARATROOPA.get(),
+                CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/paratroopa.png"),
+                        0.22F, EnemyRigProfile.PARATROOPA));
         event.registerEntityRenderer(ModEntities.THWOMP.get(),
                 CourseEnemyRenderer.provider(thwomp, 0.55F, EnemyRigProfile.THWOMP));
         event.registerEntityRenderer(ModEntities.BULLET_BILL.get(),

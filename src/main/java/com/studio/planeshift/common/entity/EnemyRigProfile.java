@@ -25,6 +25,7 @@ package com.studio.planeshift.common.entity;
 public enum EnemyRigProfile {
     GOOMBA(1.35F),
     KOOPA(1.25F),
+    PARATROOPA(1.25F),
     THWOMP(1.05F),
     BULLET_BILL(1.30F),
     BOO(1.25F),

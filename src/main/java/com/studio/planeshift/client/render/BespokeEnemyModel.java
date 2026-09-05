@@ -99,6 +99,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return switch (profile) {
             case GOOMBA -> goomba();
             case KOOPA -> koopa();
+            case PARATROOPA -> paratroopa();
             case THWOMP -> thwomp();
             case BULLET_BILL -> bulletBill();
             case BOO -> boo();
@@ -220,6 +221,38 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         // Eyes, standing off the head.
         r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
         r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
+        return finish(mesh);
+    }
+
+    /**
+     * The Koopa rig plus wings.
+     *
+     * <p>Built by calling {@link #koopa()} would be neater and is not possible — a LayerDefinition
+     * is baked, not composable — so the shared parts are repeated here deliberately. The wings are
+     * the only difference, and they sit on the trim material, which for this palette is white.
+     *
+     * <p>Same face contract as the Koopa: the 8x6x7 head at (64,0).
+     */
+    private static LayerDefinition paratroopa() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -4, -9, -3, 8, 9, 6), pose(0, 19, 0));
+        r.addOrReplaceChild("shell", box(64, 40, -5.5F, -7, -1, 11, 11, 5), pose(0, 17, 2.5F));
+        r.addOrReplaceChild("head", box(64, 0, -4, -6, -3.5F, 8, 6, 7), pose(0, 11, -1));
+        r.addOrReplaceChild("snout", box(0, 80, -3, -1.5F, -3, 6, 3, 3), pose(0, 9.5F, -4));
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -1.5F, 3, 7, 3), pose(4, 12, 0, 0, 0, -0.14F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -3, -1, -1.5F, 3, 7, 3), pose(-4, 12, 0, 0, 0, 0.14F));
+        r.addOrReplaceChild("left_leg", box(0, 40, -1.5F, 0, -2, 3, 5, 5), pose(2.5F, 19, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -1.5F, 0, -2, 3, 5, 5), pose(-2.5F, 19, 0));
+        // The wings. Large and set high on the shell, because from the side they are the only
+        // thing distinguishing this from an ordinary Koopa, and that read has to be instant.
+        r.addOrReplaceChild("left_wing", box(64, 80, 0, -1, -1, 9, 2, 7),
+                pose(5, 12, 3, 0, -0.25F, -0.35F));
+        r.addOrReplaceChild("right_wing", box(64, 80, -9, -1, -1, 9, 2, 7),
+                pose(-5, 12, 3, 0, 0.25F, 0.35F));
+        r.addOrReplaceChild("detail_1", box(64, 80, -6, -1, -0.5F, 12, 2, 5), pose(0, 17.5F, 2.5F));
+        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
+        r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
         return finish(mesh);
     }
 
@@ -464,6 +497,14 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 details[0].zRot += idle * 0.08F;
                 details[1].zRot += idle * 0.06F;
                 details[2].zRot -= idle * 0.06F;
+            }
+            case PARATROOPA -> {
+                // The Koopa walk, plus wings that beat whether or not the creature is moving —
+                // a Paratroopa hovering with still wings looks broken rather than airborne.
+                walk(step, opposite, 0.75F);
+                float beat = Mth.sin(state.ageInTicks * 1.1F) * 0.55F;
+                leftWing.zRot -= beat;
+                rightWing.zRot += beat;
             }
             case KOOPA -> {
                 walk(step, opposite, 0.75F);

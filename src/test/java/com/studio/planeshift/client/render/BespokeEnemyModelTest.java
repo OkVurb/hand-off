@@ -27,6 +27,10 @@ class BespokeEnemyModelTest {
     private static final Map<EnemyRigProfile, Long> SOLID_PARTS = Map.ofEntries(
             Map.entry(EnemyRigProfile.GOOMBA, 11L),
             Map.entry(EnemyRigProfile.KOOPA, 14L),
+            // A Koopa minus the tail, plus two wings. Deliberately the same body: a Paratroopa is
+            // meant to read as "that enemy, but flying", and restyling it would break the two-hit
+            // lesson it exists to teach.
+            Map.entry(EnemyRigProfile.PARATROOPA, 13L),
             Map.entry(EnemyRigProfile.THWOMP, 11L),
             Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
             Map.entry(EnemyRigProfile.BOO, 11L),

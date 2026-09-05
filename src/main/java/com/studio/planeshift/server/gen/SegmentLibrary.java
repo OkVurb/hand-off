@@ -110,7 +110,8 @@ public final class SegmentLibrary {
      */
     public static List<EntityType<?>> cast(CourseTheme theme) {
         return switch (theme) {
-            case GRASS -> List.of(ModEntities.GOOMBA.get(), ModEntities.KOOPA.get());
+            case GRASS -> List.of(ModEntities.GOOMBA.get(), ModEntities.KOOPA.get(),
+                    ModEntities.PARATROOPA.get());
             case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.GOOMBA.get());
             case SNOW -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get());
