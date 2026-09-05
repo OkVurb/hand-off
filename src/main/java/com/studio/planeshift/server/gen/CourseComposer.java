@@ -47,6 +47,18 @@ public final class CourseComposer {
     /** Star coins hidden per course. */
     private static final int STAR_COINS = 3;
 
+    /**
+     * Steps in the finish staircase. Seven puts the top step at floorY+7, one below the top of the
+     * eight-block pole, so the top band is reachable at the peak of a jump and not by standing.
+     */
+    private static final int STAIR_STEPS = 7;
+
+    /**
+     * Columns between the top step and the pole. Wide enough that the jump has to be committed to,
+     * narrow enough that it is clearly the jump the staircase was asking for.
+     */
+    private static final int STAIR_GAP = 3;
+
     /** Flat ground at the spawn, before anything is asked. */
     private static final int SPAWN_RUN = 10;
     /** Flat ground before the flag, so the finish is never a blind jump. */
@@ -270,6 +282,7 @@ public final class CourseComposer {
         }
         recordFloor(floorAt, cursor, length + 7 - cursor, floorY, length);
         int flagX = length;
+        finishStaircase(canvas, ctx, flagX, floorY);
         canvas.set(flagX, floorY + 1, 0, ModBlocks.FLAG_POLE.get().defaultBlockState()
                 .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.BASE));
         for (int h = 2; h <= 7; h++) {
@@ -293,6 +306,39 @@ public final class CourseComposer {
         // fills y=0 with solid, so the player's feet are at y=1. Reporting the surface height
         // here instead was an off-by-one that made every reachability search start inside rock.
         return new Composition(canvas, ids, 1, checkpointX, flagX, lesson);
+    }
+
+    /**
+     * The staircase before the pole.
+     *
+     * <p>Fixes a mechanic that existed but could never fire. {@code FlagPoleBlock} pays by grab
+     * height across eight bands and gives a 1-Up for the top one, and the finish apron was flat
+     * ground — so from a standing run the player could only ever reach the bottom two or three.
+     * Six of the eight bands, and the 1-Up, were unreachable in every course the generator had
+     * ever produced. The scoring was not wrong; there was simply nothing to jump off.
+     *
+     * <p>Built as the solid triangle every 2D Mario level ends on, because the shape is the
+     * instruction: a player who has never been told the pole scores by height still climbs a
+     * staircase that points at one and jumps at the top of it.
+     *
+     * <p>The gap between the top step and the pole is deliberate and is the entire skill in it.
+     * Standing on the top step is not enough to touch the top of the pole — the player has to
+     * cross {@code STAIR_GAP} columns while at the peak of a jump. Mistiming it grabs lower down
+     * and still completes the course, which is what makes it a choice rather than a toll.
+     *
+     * <p>Writes only solid ground on top of the existing flat apron, so it adds no gap, no hazard
+     * and no ceiling: {@code CourseReachability}'s proof that the flag is reachable is unaffected,
+     * and a player who ignores the staircase entirely can still walk to the pole along the floor.
+     */
+    private static void finishStaircase(CourseCanvas canvas, GenContext ctx, int flagX, int floorY) {
+        int from = flagX - STAIR_GAP - STAIR_STEPS;
+        for (int step = 0; step < STAIR_STEPS; step++) {
+            // Solid to the ground rather than a floating ledge per step. A staircase you can walk
+            // under is a corridor with steps above it, and the player reads the two differently.
+            for (int y = floorY + 1; y <= floorY + step + 1; y++) {
+                canvas.setLane(from + step, y, ctx.palette().surface(), ctx.halfWidth());
+            }
+        }
     }
 
     /**
