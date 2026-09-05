@@ -18,6 +18,28 @@ public final class AirMoveService {
 
     /** Small extra upward boost each tick while the player is still rising. */
     private static final double HOLD_JUMP_BOOST = 0.04D;
+
+    /**
+     * How many ticks of variable-jump boost one press is worth.
+     *
+     * <p>This is the bug fix. The boost had no budget at all: it applied on every tick the player
+     * was rising slower than 0.45, and the boost it added fed straight back into the rise it was
+     * gated on. Because 0.04 per tick is a shade under what gravity takes away, the rise settled
+     * into an equilibrium *below* the 0.45 ceiling and simply never exceeded it, so holding jump
+     * climbed forever. A double jump made it trivial to reach, because it re-entered the rising
+     * state in mid-air with a fresh upward velocity.
+     *
+     * <p>Ten ticks is half a second, which is roughly the window a 2D Mario game gives you to
+     * decide how high a jump is — long enough that holding jump is visibly a taller jump, far
+     * short of flight.
+     */
+    private static final int MAX_BOOST_TICKS = 10;
+
+    /** Remaining boost ticks. Refilled on the ground and on a fresh press, never by holding. */
+    private static final Map<ServerPlayer, Integer> BOOST_BUDGET = new WeakHashMap<>();
+
+    /** Whether jump was held last tick, so a press can be told apart from a hold. */
+    private static final Map<ServerPlayer, Boolean> JUMP_HELD = new WeakHashMap<>();
     /** Downward speed during a ground pound. */
     private static final double GROUND_POUND_SPEED = -1.2D;
     /** Ticks a given block ignores repeat head-bumps from the same player. */
@@ -178,12 +200,28 @@ public final class AirMoveService {
         // Building the vector out of the measured deltas, and never sending a rise smaller than
         // the one just measured, makes the packet agree with what the client already did instead
         // of arguing with it.
-        if (!player.onGround() && player.getLastClientInput().jump()
+        //
+        // The budget is what stops this being flight. Standing on the ground refills it, and so
+        // does a *fresh* press in mid-air — which is exactly what a double jump is, so a double
+        // jump still gets its own variable height. Holding the key refills nothing, so the boost
+        // can only ever extend a jump by MAX_BOOST_TICKS before gravity gets it back.
+        boolean jumpDown = player.getLastClientInput().jump();
+        boolean freshPress = jumpDown && !JUMP_HELD.getOrDefault(player, false);
+        JUMP_HELD.put(player, jumpDown);
+
+        int budget = BOOST_BUDGET.getOrDefault(player, MAX_BOOST_TICKS);
+        if (player.onGround() || freshPress) {
+            budget = MAX_BOOST_TICKS;
+        }
+
+        if (!player.onGround() && jumpDown && budget > 0
                 && measuredRise > 0.0D && measuredRise < 0.45D) {
             double rise = Math.max(player.getDeltaMovement().y, measuredRise) + HOLD_JUMP_BOOST;
             player.setDeltaMovement(moveX, rise, moveZ);
             player.hurtMarked = true;
+            budget--;
         }
+        BOOST_BUDGET.put(player, budget);
 
         // Spin stall.
         //
@@ -423,6 +461,8 @@ public final class AirMoveService {
     public static void forget(ServerPlayer player) {
         LAST_HIT.remove(player);
         LAST_Y.remove(player);
+        BOOST_BUDGET.remove(player);
+        JUMP_HELD.remove(player);
         RISING_GRACE.remove(player);
         WALL_CONTACT.remove(player);
         GROUND_POUNDING.remove(player);
