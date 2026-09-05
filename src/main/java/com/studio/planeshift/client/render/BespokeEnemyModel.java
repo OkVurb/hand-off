@@ -100,6 +100,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case GOOMBA -> goomba();
             case KOOPA -> koopa();
             case PARATROOPA -> paratroopa();
+            case DRY_BONES -> dryBones();
             case THWOMP -> thwomp();
             case BULLET_BILL -> bulletBill();
             case BOO -> boo();
@@ -253,6 +254,43 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         r.addOrReplaceChild("detail_1", box(64, 80, -6, -1, -0.5F, 12, 2, 5), pose(0, 17.5F, 2.5F));
         r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
         r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
+        return finish(mesh);
+    }
+
+    /**
+     * A Koopa stripped to the frame.
+     *
+     * <p>Same proportions as the Koopa on purpose — the player should recognise the species before
+     * they recognise the threat. What changes is that the mass comes off: no shell dome, thin
+     * limbs, a skull instead of a head, and a visible ribcage where the body was. The silhouette
+     * has to say "this one is already dead" from across the room, because that is the cue that
+     * stomping it will not stick.
+     *
+     * <p>Face contract: the 8x6x7 skull at (64,0), the same box the Koopa uses.
+     */
+    private static LayerDefinition dryBones() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        // Spine and ribcage rather than a body.
+        r.addOrReplaceChild("body", box(0, 0, -2, -9, -1.5F, 4, 9, 3), pose(0, 19, 0));
+        r.addOrReplaceChild("head", box(64, 0, -4, -6, -3.5F, 8, 6, 7), pose(0, 11, -1));
+        r.addOrReplaceChild("jaw", box(0, 80, -3, 0, -3, 6, 2, 3), pose(0, 10.5F, -3.5F, 0.15F, 0, 0));
+        // Thin limbs: bone, not muscle.
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -1, 2, 7, 2), pose(3.5F, 12, 0, 0, 0, -0.18F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -2, -1, -1, 2, 7, 2), pose(-3.5F, 12, 0, 0, 0, 0.18F));
+        r.addOrReplaceChild("left_leg", box(0, 40, -1, 0, -1, 2, 5, 2), pose(2, 19, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -1, 0, -1, 2, 5, 2), pose(-2, 19, 0));
+        // Ribs. Four of them, widest in the middle, so the cage reads as a cage.
+        for (int i = 0; i < 4; i++) {
+            float w = i == 0 || i == 3 ? 6 : 8;
+            r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -w / 2, -1, -2, w, 1, 4),
+                    pose(0, 13 + i * 2, 0));
+        }
+        // The remains of a shell: a broken plate rather than a dome.
+        r.addOrReplaceChild("shell", box(64, 40, -4.5F, -5, -1, 9, 8, 2), pose(0, 17, 2.5F));
+        // Eye sockets, dark and deep-set.
+        r.addOrReplaceChild("detail_5", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
+        r.addOrReplaceChild("detail_6", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
         return finish(mesh);
     }
 
@@ -497,6 +535,12 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 details[0].zRot += idle * 0.08F;
                 details[1].zRot += idle * 0.06F;
                 details[2].zRot -= idle * 0.06F;
+            }
+            case DRY_BONES -> {
+                // A looser, more rattling walk than the Koopa's — the joints are not attached to
+                // anything. Same phase, wider swing, and the jaw hangs.
+                walk(step, opposite, 1.05F);
+                jaw.xRot = 0.15F + Math.abs(step) * 0.12F;
             }
             case PARATROOPA -> {
                 // The Koopa walk, plus wings that beat whether or not the creature is moving —

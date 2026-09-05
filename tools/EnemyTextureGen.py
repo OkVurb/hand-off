@@ -626,8 +626,47 @@ def paratroopa():
     return img
 
 
+def dry_bones():
+    """Bleached bone, and nothing else.
+
+    Almost monochrome on purpose. Every other enemy in the roster is defined by a colour contrast -
+    yellow against green, orange against red - and this one is defined by the absence of any: it is
+    what is left when the colour has gone. The only warm note is a faint ivory in the skull, so the
+    head does not disappear into the ribs at distance.
+    """
+    img = new_sheet()
+    bone = (232, 226, 206)
+
+    def striated(region, colour, seed, step=3):
+        base(img, region, colour, seed, ramp=0.30)
+        ox, oy = region
+        w, h = REGION_SIZE[region]
+        dr = ImageDraw.Draw(img)
+        for xx in range(ox, ox + w, step):
+            dr.line([(xx, oy), (xx, oy + h - 1)], fill=shade(colour, 0.84))
+        for i in range(w * h // 40):
+            k = _hash(i, seed, 3)
+            dr.point((ox + k % w, oy + (k >> 9) % h), fill=shade(colour, 0.70))
+
+    striated(BODY, bone, 121)
+    striated(LIMB, (218, 212, 192), 123)
+    striated(HARD, (206, 200, 180), 124)
+
+    # Skull: slightly warmer, with hollow sockets rather than eyes.
+    skull = (240, 234, 214)
+    base(img, HEAD, skull, 122, ramp=0.26)
+    at = front(HEAD, 8, 6, 7)
+    eyes(img, at, 8, 6, sclera=(40, 36, 34), pupil=(96, 200, 220), angry=True)
+
+    base(img, MUZZLE, (226, 220, 200), 125, ramp=0.20)
+    # Sockets and the darkest recesses.
+    base(img, TRIM, (46, 42, 40), 126, ramp=0.18)
+    return img
+
+
 CHARACTERS = {
     "goomba": goomba,
+    "dry_bones": dry_bones,
     "paratroopa": paratroopa,
     "koopa": koopa,
     "thwomp": thwomp,

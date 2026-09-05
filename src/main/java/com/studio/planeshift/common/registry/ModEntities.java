@@ -15,6 +15,7 @@ import com.studio.planeshift.common.entity.GoombaEntity;
 import com.studio.planeshift.common.entity.IceballProjectile;
 import com.studio.planeshift.common.entity.HammerBroEntity;
 import com.studio.planeshift.common.entity.HammerProjectile;
+import com.studio.planeshift.common.entity.DryBonesEntity;
 import com.studio.planeshift.common.entity.KoopaEntity;
 import com.studio.planeshift.common.entity.ParatroopaEntity;
 import com.studio.planeshift.common.entity.LakituEntity;
@@ -61,6 +62,14 @@ public final class ModEntities {
                             EnemyRigProfile.PARATROOPA.scaled(1.0F))
                     .clientTrackingRange(8)
                     .build(key("paratroopa")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DryBonesEntity>> DRY_BONES =
+            ENTITY_TYPES.register("dry_bones", () -> EntityType.Builder
+                    .of(DryBonesEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.DRY_BONES.scaled(0.6F),
+                            EnemyRigProfile.DRY_BONES.scaled(1.0F))
+                    .clientTrackingRange(8)
+                    .build(key("dry_bones")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ThwompEntity>> THWOMP =
             ENTITY_TYPES.register("thwomp", () -> EntityType.Builder
@@ -206,6 +215,7 @@ public final class ModEntities {
     public static void onCreateAttributes(EntityAttributeCreationEvent event) {
         event.put(GOOMBA.get(), GoombaEntity.createAttributes().build());
         event.put(PARATROOPA.get(), ParatroopaEntity.createAttributes().build());
+        event.put(DRY_BONES.get(), DryBonesEntity.createAttributes().build());
         event.put(KOOPA.get(), KoopaEntity.createAttributes().build());
         event.put(TOAD.get(), ToadEntity.createMobAttributes().build());
         event.put(THWOMP.get(), ThwompEntity.createAttributes().build());

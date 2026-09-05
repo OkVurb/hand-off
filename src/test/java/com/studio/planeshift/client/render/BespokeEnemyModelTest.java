@@ -31,6 +31,10 @@ class BespokeEnemyModelTest {
             // meant to read as "that enemy, but flying", and restyling it would break the two-hit
             // lesson it exists to teach.
             Map.entry(EnemyRigProfile.PARATROOPA, 13L),
+            // Koopa proportions with the mass taken off: spine instead of a body, four ribs, thin
+            // limbs, a broken shell plate. The player should recognise the species before they
+            // recognise that stomping it will not stick.
+            Map.entry(EnemyRigProfile.DRY_BONES, 14L),
             Map.entry(EnemyRigProfile.THWOMP, 11L),
             Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
             Map.entry(EnemyRigProfile.BOO, 11L),

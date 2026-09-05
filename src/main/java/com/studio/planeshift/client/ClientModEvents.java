@@ -135,6 +135,9 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.PARATROOPA.get(),
                 CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/paratroopa.png"),
                         0.22F, EnemyRigProfile.PARATROOPA));
+        event.registerEntityRenderer(ModEntities.DRY_BONES.get(),
+                CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/dry_bones.png"),
+                        0.22F, EnemyRigProfile.DRY_BONES));
         event.registerEntityRenderer(ModEntities.THWOMP.get(),
                 CourseEnemyRenderer.provider(thwomp, 0.55F, EnemyRigProfile.THWOMP));
         event.registerEntityRenderer(ModEntities.BULLET_BILL.get(),
