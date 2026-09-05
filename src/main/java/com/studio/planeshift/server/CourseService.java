@@ -133,6 +133,7 @@ public final class CourseService {
             return;
         }
         CourseScoringService.clear(player.getUUID());
+        MovementRuleService.clearMeter(player);
         ProgressionService.leaveCourse(player);
         ToadDialogueService.clear(player);
         returnToHub(player);

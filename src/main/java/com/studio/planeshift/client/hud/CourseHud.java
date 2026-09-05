@@ -26,6 +26,11 @@ import net.minecraft.world.item.Items;
  */
 public final class CourseHud {
 
+    /** P-meter segments: filled, topped out, and the empty track behind them. */
+    private static final int METER_FILLED = 0xFFE8C34A;
+    private static final int METER_FULL = 0xFFFF5A3C;
+    private static final int METER_EMPTY = 0x40202020;
+
     private static final int PIP_FULL = 0xFFE7514E;
     private static final int PIP_EMPTY = 0xFF3A2A2A;
     private static final int BADGE_SIDE = 0xFF3ECFCB;   // teal seam language
@@ -109,6 +114,8 @@ public final class CourseHud {
             }
             graphics.fill(pipLeft, y, pipLeft + 12, y + 12, color);
         }
+        renderPMeter(graphics, x, y + 16, panelRight);
+
         FormSlot slot = state.formSlot();
         if (slot.hasActive()) {
             Identifier form = slot.active().get();
@@ -271,4 +278,37 @@ public final class CourseHud {
         int useWidth = font.width(useStr);
         graphics.drawString(font, useStr, usableWidth - useWidth - 10, bottomY, 0xFFFFFFFF, true);
     }
+
+    /**
+     * The P-meter, as a row of segments between the pips and the clock.
+     *
+     * <p>Drawn at y+16 because that band is genuinely free: the pip row ends at y+12 and the clock
+     * starts at y+28, so this needs no change to PANEL_HEIGHT and cannot push anything off the
+     * panel — which is the bug the panel sizing comment above was written about.
+     *
+     * <p>Segments rather than a continuous bar, matching what the server actually sends. The value
+     * is quantised to PMeter.STEPS server-side so the sync fires on a segment change instead of
+     * every tick, and drawing it continuously would be inventing precision the client was never
+     * given.
+     *
+     * <p>Hidden entirely at zero. An always-visible empty gauge is clutter for the majority of a
+     * course when the player is not running.
+     */
+    private static void renderPMeter(GuiGraphics graphics, int x, int y, int panelRight) {
+        int step = com.studio.planeshift.client.ClientCourseState.pMeter();
+        if (step <= 0) {
+            return;
+        }
+        int total = com.studio.planeshift.server.PMeter.STEPS;
+        boolean full = step >= total;
+        for (int i = 0; i < total; i++) {
+            int left = x + i * 7;
+            if (left + 5 > panelRight) {
+                break;   // same rule as the pips: never spill past the panel edge
+            }
+            int colour = i < step ? (full ? METER_FULL : METER_FILLED) : METER_EMPTY;
+            graphics.fill(left, y, left + 5, y + 6, colour);
+        }
+    }
+
 }

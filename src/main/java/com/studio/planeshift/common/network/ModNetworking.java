@@ -56,6 +56,7 @@ public final class ModNetworking {
         registrar.playToClient(OpenCourseMapPayload.TYPE, OpenCourseMapPayload.STREAM_CODEC);
         registrar.playToClient(OpenToadShopPayload.TYPE, OpenToadShopPayload.STREAM_CODEC);
         registrar.playToClient(ScorePopupPayload.TYPE, ScorePopupPayload.STREAM_CODEC);
+        registrar.playToClient(PMeterPayload.TYPE, PMeterPayload.STREAM_CODEC);
         registrar.playToClient(CourseResultsPayload.TYPE, CourseResultsPayload.STREAM_CODEC);
         registrar.playToClient(GameOverPayload.TYPE, GameOverPayload.STREAM_CODEC);
         registrar.playToClient(OpenTesterPayload.TYPE, OpenTesterPayload.STREAM_CODEC);

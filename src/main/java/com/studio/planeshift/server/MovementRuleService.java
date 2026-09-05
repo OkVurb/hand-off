@@ -23,7 +23,34 @@ public final class MovementRuleService {
      */
     private static final double DEPTH_FOLD_THRESHOLD = 0.08D;
 
-    private static final java.util.Map<ServerPlayer, Integer> SPRINT_TICKS = new java.util.WeakHashMap<>();
+    /** Charge and hold, per player. See {@link com.studio.planeshift.server.PMeter}. */
+    private static final java.util.Map<ServerPlayer, Integer> METER_CHARGE = new java.util.WeakHashMap<>();
+    private static final java.util.Map<ServerPlayer, Integer> METER_HOLD = new java.util.WeakHashMap<>();
+
+    /**
+     * The last step sent to each client, and whether the speed bonus is currently applied.
+     *
+     * <p>Both exist to make this edge-triggered. Applying the attribute modifier every tick would
+     * remove and re-add it on all ~1200 ticks of a sustained run, dirtying the AttributeMap and
+     * re-broadcasting an attribute packet each time; CourseMovementService, the pattern this
+     * copies, is event-driven for exactly that reason.
+     */
+    private static final java.util.Map<ServerPlayer, Integer> METER_SENT = new java.util.WeakHashMap<>();
+    private static final java.util.Map<ServerPlayer, Boolean> METER_BOOSTED = new java.util.WeakHashMap<>();
+
+    /** Named so it can be removed by id, the way CourseMovementService names its own. */
+    private static final net.minecraft.resources.Identifier P_SPEED_MODIFIER_ID =
+            com.studio.planeshift.PlaneShift.id("p_speed");
+
+    /**
+     * Speed added at a full meter, as a share of base.
+     *
+     * <p>ADD_MULTIPLIED_BASE, matching CourseMovementService, so this stacks with the course run
+     * boost the same way that boost stacks with everything else rather than compounding on top of
+     * it. An attribute modifier also replaces what was here before - a per-tick
+     * setDeltaMovement with no hurtMarked, which the client never saw at all.
+     */
+    private static final double P_SPEED_BONUS = 0.18D;
 
     /** Last measured X position, so the skid check reads movement the server can trust. */
     private static final java.util.Map<ServerPlayer, Double> LAST_X = new java.util.WeakHashMap<>();
@@ -63,22 +90,41 @@ public final class MovementRuleService {
             return;
         }
 
-        // P-Speed running meter
-        if (player.onGround() && player.isSprinting()) {
-            int ticks = SPRINT_TICKS.getOrDefault(player, 0) + 1;
-            SPRINT_TICKS.put(player, ticks);
-            if (ticks == 30) {
-                player.level().playSound(null, player.blockPosition(), com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.6F, 1.8F);
+        // P-meter: fill, hold, drain.
+        //
+        // "Driving" is sprinting on the ground. The hold is what makes it a meter rather than a
+        // boolean: a jump, a turn or a moment in the air does not cost the run, so the skill is in
+        // stringing movement together instead of holding one key down.
+        int charge = METER_CHARGE.getOrDefault(player, 0);
+        int hold = METER_HOLD.getOrDefault(player, 0);
+        boolean wasFull = PMeter.atFull(charge);
+
+        long next = PMeter.advance(charge, hold, player.onGround() && player.isSprinting());
+        charge = PMeter.charge(next);
+        METER_CHARGE.put(player, charge);
+        METER_HOLD.put(player, PMeter.hold(next));
+
+        boolean full = PMeter.atFull(charge);
+        if (full != wasFull) {
+            applyPSpeed(player, full);
+            if (full) {
+                player.level().playSound(null, player.blockPosition(),
+                        com.studio.planeshift.common.registry.ModSounds.POWER_UP.get(),
+                        net.minecraft.sounds.SoundSource.PLAYERS, 0.6F, 1.8F);
             }
-            if (ticks >= 30) {
-                Vec3 v = player.getDeltaMovement();
-                player.setDeltaMovement(v.x * 1.05D, v.y, v.z * 1.05D);
-                if (player.level() instanceof net.minecraft.server.level.ServerLevel sl && player.level().getGameTime() % 2 == 0) {
-                    sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, player.getX(), player.getY() + 0.1D, player.getZ(), 1, 0.05D, 0.02D, 0.05D, 0.01D);
-                }
-            }
-        } else if (!player.isSprinting()) {
-            SPRINT_TICKS.remove(player);
+        }
+        if (full && player.level() instanceof net.minecraft.server.level.ServerLevel sl
+                && player.level().getGameTime() % 2 == 0) {
+            sl.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD,
+                    player.getX(), player.getY() + 0.1D, player.getZ(), 1, 0.05D, 0.02D, 0.05D, 0.01D);
+        }
+
+        // Sync only when the drawn segment count changes, not every tick.
+        int step = PMeter.step(charge);
+        if (METER_SENT.getOrDefault(player, -1) != step) {
+            METER_SENT.put(player, step);
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,
+                    new com.studio.planeshift.common.network.PMeterPayload(step));
         }
 
         // Skid turnaround.
@@ -198,4 +244,36 @@ public final class MovementRuleService {
             player.hurtMarked = true;
         }
     }
+
+    /**
+     * Adds or removes the top-speed bonus.
+     *
+     * <p>Called only when the full/not-full state actually changes. A transient modifier, so it
+     * never reaches the save file, and removed before adding so a desync cannot stack two.
+     */
+    private static void applyPSpeed(ServerPlayer player, boolean full) {
+        net.minecraft.world.entity.ai.attributes.AttributeInstance speed =
+                player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        if (speed == null) {
+            return;
+        }
+        speed.removeModifier(P_SPEED_MODIFIER_ID);
+        if (full) {
+            speed.addTransientModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(
+                    P_SPEED_MODIFIER_ID, P_SPEED_BONUS,
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+        }
+        METER_BOOSTED.put(player, full);
+    }
+
+    /** Drops the meter and anything it applied. Called when a player leaves a course. */
+    public static void clearMeter(ServerPlayer player) {
+        METER_CHARGE.remove(player);
+        METER_HOLD.remove(player);
+        METER_SENT.remove(player);
+        if (Boolean.TRUE.equals(METER_BOOSTED.remove(player))) {
+            applyPSpeed(player, false);
+        }
+    }
+
 }

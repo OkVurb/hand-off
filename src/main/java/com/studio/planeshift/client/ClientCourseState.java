@@ -63,4 +63,23 @@ public final class ClientCourseState {
                 .map(holder -> holder.value())
                 .orElse(fallback);
     }
+
+    /**
+     * The P-meter, 0..{@code PMeter.STEPS}, as last sent by the server.
+     *
+     * <p>Client-side and transient, matching what it is: a display value that the server
+     * recomputes every tick and that means nothing without a live connection. Deliberately not
+     * part of {@link CourseState}, which is serialized to disk with the player - see
+     * {@code PMeterPayload}.
+     */
+    private static int pMeter;
+
+    public static void setPMeter(int step) {
+        pMeter = step;
+    }
+
+    public static int pMeter() {
+        return pMeter;
+    }
+
 }

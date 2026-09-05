@@ -194,6 +194,9 @@ public final class ClientModEvents {
         event.register(OpenCourseMapPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new CourseMapScreen())));
+        event.register(com.studio.planeshift.common.network.PMeterPayload.TYPE,
+                (payload, context) -> context.enqueueWork(
+                        () -> ClientCourseState.setPMeter(payload.step())));
         event.register(ScorePopupPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         com.studio.planeshift.client.hud.ScorePopups.add(payload.amount())));
