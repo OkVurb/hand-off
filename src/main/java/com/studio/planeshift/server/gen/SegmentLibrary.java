@@ -1316,6 +1316,49 @@ public final class SegmentLibrary {
      * <p>The key is above the lane rather than behind a wall. A secret the player cannot see is a
      * secret they will not look for; one they can see and cannot immediately reach is a question.
      */
+    /**
+     * A ghost-house looping corridor that teleports the player back on contact.
+     *
+     * <p>The main path is perfectly walkable. Above it is a long dead-end corridor
+     * containing a LoopTriggerBlock. The loop contains a COURSE_KEY. Down on the
+     * main path, a KeyholeBlock guards a StarCoin.
+     */
+    static final Segment GHOST_LOOP = new Segment() {
+        public SegmentSpec spec() {
+            return def("ghost_loop", 26, 0, 2, Tag.SECRET, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 26, y, ctx);
+
+            // Guarded secret on the main path
+            c.set(x + 20, y + 1, 0, ModBlocks.KEYHOLE.get().defaultBlockState());
+            c.set(x + 20, y + 2, 0, ModBlocks.KEYHOLE.get().defaultBlockState());
+            c.item(ModItems.EXTRA_PIP.get(), x + 23.5D, y + 1.5D, 0.5D);
+            c.set(x + 20, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 21, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 22, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 23, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 24, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 24, y + 2, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 24, y + 1, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+
+            // The upper looping corridor (y + 5)
+            c.set(x + 5, y + 2, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            c.set(x + 8, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            
+            platform(c, x, 26, y + 5, ctx);
+            platform(c, x, 26, y + 9, ctx);
+
+            c.item(ModItems.COURSE_KEY.get(), x + 15.5D, y + 6.5D, 0.5D);
+            
+            BlockState loopTrigger = ModBlocks.LOOP_TRIGGER.get().defaultBlockState();
+            c.set(x + 25, y + 6, 0, loopTrigger);
+            c.set(x + 25, y + 7, 0, loopTrigger);
+            c.set(x + 25, y + 8, 0, loopTrigger);
+        }
+    };
+
     static final Segment KEY_HUNT = new Segment() {
         public SegmentSpec spec() {
             return def("key_hunt", 20, 0, 2, Tag.SECRET, Tag.CLIMB);
@@ -1430,6 +1473,7 @@ public final class SegmentLibrary {
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);
+        list.add(GHOST_LOOP);
         list.add(KEY_HUNT);
         list.add(PIPE_ROW);
         list.add(ZIPLINE_GAP_TRAVERSAL);
