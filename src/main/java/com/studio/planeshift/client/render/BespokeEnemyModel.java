@@ -47,6 +47,17 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         "detail_7", "detail_8", "detail_9", "detail_10", "detail_11", "detail_12"
     };
 
+    /**
+     * How far the shell sinks when the occupant pulls itself inside.
+     *
+     * <p>Added to the rig's own resting height instead of replacing it, so it stays correct for
+     * any profile whose shell sits somewhere else.
+     */
+    private static final float SHELL_SETTLE = 3.0F;
+
+    /** The shell's height as the rig poses it, captured so the animation can put it back. */
+    private final float shellRestY;
+
     private final EnemyRigProfile profile;
     private final ModelPart body;
     private final ModelPart head;
@@ -71,6 +82,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         jaw = root.getChild("jaw");
         snout = root.getChild("snout");
         shell = root.getChild("shell");
+        shellRestY = shell.y;
         leftArm = root.getChild("left_arm");
         rightArm = root.getChild("right_arm");
         leftLeg = root.getChild("left_leg");
@@ -113,6 +125,27 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case PIRANHA_PLANT -> piranhaPlant();
             case BOWSER -> bowser();
             case TOAD -> throw new IllegalArgumentException("Villager uses ToadModel");
+        };
+    }
+
+    /**
+     * How many of the leading detail slots belong to the shell rather than to the occupant.
+     *
+     * <p>There is no way to read this off the rig: details are flat children of the root with
+     * names that carry no meaning, so the model cannot tell a shell scute from an eye. The counts
+     * are per-profile because the two shelled rigs genuinely differ — the Koopa spends detail_1
+     * and detail_2 on the shell rim and its scutes, while the Paratroopa spends only detail_1 on
+     * the rim and puts its eyes in detail_2 and detail_3. Using one set for both would leave a
+     * Paratroopa's eye floating beside its empty shell.
+     *
+     * <p>Only these two profiles can ever be in a shell, because only KoopaEntity and its one
+     * subclass have the state; everything else returns zero and never asks.
+     */
+    private static int shellDetailSlots(EnemyRigProfile profile) {
+        return switch (profile) {
+            case KOOPA -> 2;
+            case PARATROOPA -> 1;
+            default -> 0;
         };
     }
 
@@ -584,6 +617,41 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
 
         head.yRot = state.yRot * Mth.DEG_TO_RAD * 0.55F;
         head.xRot += state.xRot * Mth.DEG_TO_RAD * 0.35F;
+
+        // Retreating into the shell: everything that is not the shell goes away.
+        //
+        // Safe to hide the body because "shell" is a child of the root, not of "body" — every rig
+        // is built from the flat part list in PARTS. If it were nested, hiding the body would take
+        // the shell with it and a retreating Koopa would vanish outright.
+        boolean shelled = state.inShell;
+        boolean showLimbs = !shelled;
+        head.visible = showLimbs;
+        snout.visible = showLimbs;
+        jaw.visible = showLimbs;
+        leftArm.visible = showLimbs;
+        rightArm.visible = showLimbs;
+        leftLeg.visible = showLimbs;
+        rightLeg.visible = showLimbs;
+        tail.visible = showLimbs;
+        tailTip.visible = showLimbs;
+        leftWing.visible = showLimbs;
+        rightWing.visible = showLimbs;
+        body.visible = showLimbs;
+
+        // The detail slots are the part that cannot be inferred. They are flat children of the
+        // root like everything else, so nothing in the rig says whether detail_3 is a scute on the
+        // shell or an eye on the head — and a Koopa that hid its body but kept its eyes left them
+        // hanging in the air above an empty shell.
+        int keep = shelled ? shellDetailSlots(profile) : details.length;
+        for (int i = 0; i < details.length; i++) {
+            details[i].visible = i < keep;
+        }
+
+        // Derived from the rig rather than written out. The previous version restored a literal
+        // 17.0F, which is the Koopa's and Paratroopa's shell pose duplicated into the animation
+        // code: retune either rig and the renderer would have gone on dragging the shell back to a
+        // number the model no longer used.
+        shell.y = shelled ? shellRestY + SHELL_SETTLE : shellRestY;
 
         switch (profile) {
             case GOOMBA -> {

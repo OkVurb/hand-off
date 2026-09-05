@@ -15,4 +15,6 @@ public class CourseEnemyRenderState extends LivingEntityRenderState {
     public float squishY = 1.0F;
     /** Horizontal scale, the inverse-root companion to {@link #squishY}. */
     public float squishXZ = 1.0F;
+    /** True if this is a Koopa inside its shell. */
+    public boolean inShell;
 }

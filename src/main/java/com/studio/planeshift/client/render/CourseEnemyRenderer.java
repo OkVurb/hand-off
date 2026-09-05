@@ -44,6 +44,7 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
         super.extractRenderState(entity, state, partialTick);
         state.squishY = entity.squishScaleY(partialTick);
         state.squishXZ = entity.squishScaleXZ(partialTick);
+        state.inShell = (entity instanceof com.studio.planeshift.common.entity.KoopaEntity k) && k.inShell();
     }
 
     @Override
