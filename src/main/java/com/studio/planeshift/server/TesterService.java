@@ -103,10 +103,15 @@ public final class TesterService {
             player.sendSystemMessage(Component.translatable("message.planeshift.tester.denied"));
             return;
         }
-        // Cheap actions, but still rate limited: every one of them is reachable from a packet, and
-        // "load a course" in particular rebuilds an entire corridor.
-        if (!PayloadRateLimiter.allow(player, PayloadRateLimiter.Action.LOAD_COURSE)
-                && action.equals(TesterActions.COURSE)) {
+        // Only course loads are rate limited, and the action is checked FIRST.
+        //
+        // This used to read `!allow(...) && action.equals(COURSE)`, which looks equivalent and is
+        // not: && evaluates left to right, so allow() ran - and consumed a token - on every single
+        // tester action. Give an item, spawn a mob, set the clock, and the course budget was gone;
+        // by the time the player pressed a course button it was silently refused. That is the
+        // "course button does nothing" bug.
+        if (action.equals(TesterActions.COURSE)
+                && !PayloadRateLimiter.allow(player, PayloadRateLimiter.Action.LOAD_COURSE)) {
             return;
         }
 

@@ -1,7 +1,6 @@
 package com.studio.planeshift.client.gui;
 
 import com.studio.planeshift.client.screen.CourseMapScreen;
-import com.studio.planeshift.client.screen.ThreeDCourseScreen;
 import com.studio.planeshift.common.network.CourseSelectPayload;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,7 +23,6 @@ public class PlaneShiftTitleScreen extends Screen {
     /** One colour per action, in the order they are offered. */
     private static final int PLAY = 0xFF_E8484A;
     private static final int MAP = 0xFF_2E8AE0;
-    private static final int COURSES_3D = 0xFF_3FAE4C;
     private static final int CLOSE = 0xFF_6B6F7A;
 
     private static final int BUTTON_WIDTH = 220;
@@ -42,7 +40,7 @@ public class PlaneShiftTitleScreen extends Screen {
         int centreX = this.width / 2 - BUTTON_WIDTH / 2;
         // Anchored from the bottom rather than the middle: the wordmark needs the upper half, and
         // centring the stack put the first button through the middle of it at 16:9.
-        int y = this.height - 40 - (BUTTON_HEIGHT + BUTTON_GAP) * 4;
+        int y = this.height - 40 - (BUTTON_HEIGHT + BUTTON_GAP) * 3;
 
         addRenderableWidget(new MenuButton(centreX, y, BUTTON_WIDTH, BUTTON_HEIGHT,
                 Component.translatable("gui.planeshift.play"), PLAY, () -> {
@@ -54,11 +52,6 @@ public class PlaneShiftTitleScreen extends Screen {
         addRenderableWidget(new MenuButton(centreX, y, BUTTON_WIDTH, BUTTON_HEIGHT,
                 Component.translatable("gui.planeshift.map"), MAP,
                 () -> this.minecraft.setScreen(new CourseMapScreen())));
-        y += BUTTON_HEIGHT + BUTTON_GAP;
-
-        addRenderableWidget(new MenuButton(centreX, y, BUTTON_WIDTH, BUTTON_HEIGHT,
-                Component.translatable("gui.planeshift.title.courses_3d"), COURSES_3D,
-                () -> this.minecraft.setScreen(new ThreeDCourseScreen())));
         y += BUTTON_HEIGHT + BUTTON_GAP;
 
         addRenderableWidget(new MenuButton(centreX, y, BUTTON_WIDTH, BUTTON_HEIGHT,
