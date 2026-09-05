@@ -190,16 +190,18 @@ public class KoopaEntity extends CourseEnemyEntity {
             return;
         }
         if (!inShell()) {
+            // The retreat happens in onStomped, not here. Asking a second time whether that touch
+            // was a stomp is what broke it: this class used a tighter band than the base class and
+            // so disagreed with the decision that had already been made.
             super.playerTouch(player);
-            // A survivable stomp retreats it rather than killing it.
-            if (isAlive() && wasStompedThisTick(serverPlayer)) {
-                enterShell();
-            }
             return;
         }
         if (sliding()) {
             // Running into a moving shell hurts; stomping one stops it.
-            if (serverPlayer.getBoundingBox().minY >= getBoundingBox().maxY - 0.25D) {
+            // Same band as an ordinary stomp. It used its own tighter 0.25 and so had the same
+            // failure the shell retreat did: landing squarely on a sliding shell would miss the
+            // check and fall through to taking damage from it.
+            if (serverPlayer.getBoundingBox().minY >= getBoundingBox().maxY - STOMP_BAND) {
                 stopSlide();
             } else {
                 serverPlayer.hurtServer((ServerLevel) level(), damageSources().mobAttack(this), 2.0F);
@@ -209,9 +211,12 @@ public class KoopaEntity extends CourseEnemyEntity {
         kick(serverPlayer);
     }
 
-    /** True when the player is above us and descending, i.e. this touch was a stomp. */
-    private boolean wasStompedThisTick(ServerPlayer player) {
-        return player.getBoundingBox().minY >= getBoundingBox().maxY - 0.35D;
+    /** A survivable stomp retreats it rather than killing it. */
+    @Override
+    protected void onStomped(ServerPlayer player) {
+        if (!inShell()) {
+            enterShell();
+        }
     }
 
     private void enterShell() {

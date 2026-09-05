@@ -288,11 +288,20 @@ public abstract class CourseEnemyEntity extends Monster {
         }
     }
 
+    /**
+     * How deep the "landed on top of it" band is.
+     *
+     * <p>0.5 rather than 0.25 because the scaled hitboxes (up to 1.35x) mean a tighter band lets a
+     * fast-falling player tunnel straight past the top of the box on the collision tick. Shared
+     * rather than written out at each site: every place that has picked its own number for this
+     * has eventually disagreed with this one, and the disagreement always presents as an enemy
+     * that cannot be stomped.
+     */
+    protected static final double STOMP_BAND = 0.5D;
+
     private boolean isStompContact(ServerPlayer player) {
         // Contact normal check: the player's feet must be in the top band of our box.
-        // We use 0.5D instead of 0.25D because the scaled hitboxes (up to 1.35x) mean 0.25D is too tight
-        // when the player is falling fast, causing them to tunnel past the top band on the collision tick.
-        boolean fromAbove = player.getBoundingBox().minY >= getBoundingBox().maxY - 0.5D;
+        boolean fromAbove = player.getBoundingBox().minY >= getBoundingBox().maxY - STOMP_BAND;
         // Relative velocity check: falling onto us, not brushing past.
         boolean falling = player.getDeltaMovement().y - getDeltaMovement().y < -STOMP_MIN_FALL_SPEED;
         return fromAbove && falling;
@@ -367,6 +376,23 @@ public abstract class CourseEnemyEntity extends Monster {
         }
     }
 
+    /**
+     * Called after a stomp this enemy survived.
+     *
+     * <p>Exists because subclasses were re-deriving "was that a stomp?" for themselves and getting
+     * a different answer. KoopaEntity tested the contact normal against a 0.35 band while
+     * {@link #isStompContact} had been widened to 0.5 — deliberately, because the scaled hitboxes
+     * mean a fast-falling player tunnels past a tighter band. So the base class accepted the stomp,
+     * bounced the player and squished the Koopa, and then the Koopa's stricter re-check said no and
+     * never entered its shell. It read in-game as a Koopa with i-frames and hyper armour: it could
+     * be landed on repeatedly, and nothing ever happened to it.
+     *
+     * <p>The threshold is not the point; having two of them was. A stomp is whatever
+     * {@code isStompContact} says it is, and this hook is how that decision reaches a subclass.
+     */
+    protected void onStomped(ServerPlayer player) {
+    }
+
     private void resolveStomp(ServerPlayer player) {
         long now = level().getGameTime();
         if (now - lastStompGameTime < STOMP_COOLDOWN_TICKS) {
@@ -396,6 +422,9 @@ public abstract class CourseEnemyEntity extends Monster {
                 level().playSound(null, blockPosition(), ModSounds.STOMP.get(), SoundSource.HOSTILE, 1.0F, 1.2F);
                 spawnHitParticles(4);
             }
+            // Survivors get told. See onStomped: this is the single place that decides a stomp
+            // happened, so a subclass must never form its own opinion about it.
+            onStomped(player);
         } else {
             // Armored top: the silhouette warned them.
             if (com.studio.planeshift.server.AirMoveService.isSpinJumping(player)) {
