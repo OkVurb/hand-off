@@ -40,6 +40,7 @@ public class ParatroopaEntity extends KoopaEntity {
     private static final int HOP_INTERVAL = 32;
 
     private int hopTimer;
+    private boolean lostWingsThisTick;
 
     public ParatroopaEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -65,6 +66,7 @@ public class ParatroopaEntity extends KoopaEntity {
     @Override
     public void tick() {
         super.tick();
+        lostWingsThisTick = false;
         if (level().isClientSide() || !winged() || !isAlive()) {
             return;
         }
@@ -89,6 +91,7 @@ public class ParatroopaEntity extends KoopaEntity {
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (winged() && source.getEntity() instanceof Player) {
             entityData.set(WINGED, false);
+            lostWingsThisTick = true;
             hopTimer = 0;
             level.playSound(null, blockPosition(), ModSounds.STOMP.get(),
                     SoundSource.HOSTILE, 1.0F, 1.4F);
@@ -98,6 +101,16 @@ public class ParatroopaEntity extends KoopaEntity {
             return false;
         }
         return super.hurtServer(level, source, amount);
+    }
+
+    @Override
+    protected void onStomped(net.minecraft.server.level.ServerPlayer player) {
+        if (lostWingsThisTick) {
+            // The stomp that took the wings should not also put it in the shell.
+            lostWingsThisTick = false;
+        } else {
+            super.onStomped(player);
+        }
     }
 
     @Override
