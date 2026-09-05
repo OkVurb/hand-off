@@ -129,6 +129,11 @@ public final class CourseReachability {
     private static final Set<Block> ONE_WAY = Set.of(
             ModBlocks.SEMISOLID_PLATFORM.get());
 
+    /** The one-way set, exposed so tests can assert what an upper route may be built from. */
+    static Set<Block> oneWay() {
+        return ONE_WAY;
+    }
+
     /** Whether this cell can be stood on. */
     private boolean isFloor(int x, int y) {
         BlockState state = canvas.get(x, y, laneZ);

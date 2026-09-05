@@ -283,6 +283,9 @@ public final class CourseComposer {
         int checkpointX = placeCheckpoint(canvas, placed, length);
         placeStarCoins(canvas, placed, ctx);
         populate(canvas, ctx, floorAt, SPAWN_RUN, contentEnd, length);
+        // The high road, before scenery: it needs the floor map and it writes real geometry, so it
+        // belongs with the level rather than with the dressing.
+        CourseRoutes.build(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, SPAWN_RUN, contentEnd);
         // Scenery last, so it can see the finished floor and fill in behind everything else.
         CourseDecorator.decorate(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, 0, length + 6);
 
