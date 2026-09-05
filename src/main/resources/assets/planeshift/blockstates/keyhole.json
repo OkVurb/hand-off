@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "unlocked=false": {
+      "model": "planeshift:block/keyhole"
+    },
+    "unlocked=true": {
+      "model": "planeshift:block/keyhole_unlocked"
+    }
+  }
+}

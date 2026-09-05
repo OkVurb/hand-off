@@ -14,6 +14,7 @@ import com.studio.planeshift.common.block.CourseVineBlock;
 import com.studio.planeshift.common.block.DonutBlock;
 import com.studio.planeshift.common.block.SecretVineBlock;
 import com.studio.planeshift.common.block.HiddenQuestionBlock;
+import com.studio.planeshift.common.block.KeyholeBlock;
 import com.studio.planeshift.common.block.LoopTriggerBlock;
 import com.studio.planeshift.common.block.MuncherBlock;
 import com.studio.planeshift.common.block.MusicBlock;
@@ -345,6 +346,18 @@ public final class ModBlocks {
      * <p>noOcclusion because the player is regularly inside one on the way up, and a block that
      * occludes while you are standing in it culls the faces of everything behind it.
      */
+    /**
+     * The ghost house's other exit. noCollission because the player completes the course by
+     * walking into it, and a solid door would stop them doing the one thing it is for.
+     */
+    public static final DeferredBlock<KeyholeBlock> KEYHOLE =
+            BLOCKS.registerBlock("keyhole", KeyholeBlock::new, p -> p
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(2.0F)
+                    .noOcclusion()
+                    .lightLevel(state -> state.getValue(KeyholeBlock.UNLOCKED) ? 12 : 4)
+                    .sound(SoundType.METAL));
+
     public static final DeferredBlock<SemisolidBlock> SEMISOLID_PLATFORM =
             BLOCKS.registerBlock("semisolid_platform", SemisolidBlock::new, p -> p
                     .mapColor(MapColor.WOOD)

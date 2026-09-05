@@ -167,7 +167,13 @@ public final class CourseComposer {
             Segment chosen = null;
 
             // The set piece goes in the last third, once, when the theme has one.
-            if (!setPieceUsed && progress > 0.62D && progress < 0.82D) {
+            // The set piece waits for a breather too.
+            //
+            // It was chosen before the breather rule ran, so a castle bridge could land directly
+            // on top of a hard segment - the one arrangement the rule exists to prevent, taken by
+            // the one segment most likely to kill you. Latent until ON_OFF_CORRIDOR made difficulty
+            // 3 common enough to expose it.
+            if (!setPieceUsed && lastDifficulty < 3 && progress > 0.62D && progress < 0.82D) {
                 for (Segment candidate : SegmentLibrary.setPieces()) {
                     // A set piece is chosen directly rather than through pick(), so the teaching
                     // rule has to be applied here too. A castle bridge is a climax, not a place to

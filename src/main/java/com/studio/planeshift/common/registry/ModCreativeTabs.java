@@ -74,6 +74,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.BULLET_BILL_CANNON_ITEM.get());
                         output.accept(ModItems.COURSE_ICE_BLOCK_ITEM.get());
                         output.accept(ModItems.MUNCHER_ITEM.get());
+                        output.accept(ModItems.KEYHOLE_ITEM.get());
+                        output.accept(ModItems.COURSE_KEY.get());
                         output.accept(ModItems.SEMISOLID_PLATFORM_ITEM.get());
                         output.accept(ModItems.TRAMPOLINE_ITEM.get());
                         output.accept(ModItems.GOOMBA_SPAWN_EGG.get());

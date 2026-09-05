@@ -2,6 +2,7 @@ package com.studio.planeshift.common.registry;
 
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.item.CoinItem;
+import com.studio.planeshift.common.item.CourseKeyItem;
 import com.studio.planeshift.common.item.ExtraPipItem;
 import com.studio.planeshift.common.item.FireFlowerItem;
 import com.studio.planeshift.common.item.FiveUpItem;
@@ -69,6 +70,9 @@ public final class ModItems {
             ITEMS.registerItem("acorn", AcornItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<CloudFlowerItem> CLOUD_FLOWER =
             ITEMS.registerItem("cloud_flower", CloudFlowerItem::new, p -> p.stacksTo(16));
+    public static final DeferredItem<CourseKeyItem> COURSE_KEY =
+            ITEMS.registerItem("course_key", CourseKeyItem::new, p -> p.stacksTo(1));
+
     public static final DeferredItem<StarCoinItem> STAR_COIN =
             ITEMS.registerItem("star_coin", StarCoinItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<HammerItem> HAMMER =
@@ -196,6 +200,8 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_ICE_BLOCK);
     public static final DeferredItem<?> MUNCHER_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.MUNCHER);
+    public static final DeferredItem<?> KEYHOLE_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.KEYHOLE);
     public static final DeferredItem<?> SEMISOLID_PLATFORM_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.SEMISOLID_PLATFORM);
     public static final DeferredItem<?> TRAMPOLINE_ITEM =

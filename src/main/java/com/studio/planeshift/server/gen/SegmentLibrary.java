@@ -1258,6 +1258,39 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * A key hidden off the main route, and the door it opens.
+     *
+     * <p>Both halves in one segment on purpose. Scattering them across a course sounds better and
+     * is worse: the composer cannot guarantee ordering, so a keyhole could be placed before its
+     * key and the player would walk past a locked door with no way of knowing whether the key was
+     * behind them or ahead. Keeping the pair together means the puzzle is always solvable and
+     * always local, which is what a ghost house room actually is.
+     *
+     * <p>The key is above the lane rather than behind a wall. A secret the player cannot see is a
+     * secret they will not look for; one they can see and cannot immediately reach is a question.
+     */
+    static final Segment KEY_HUNT = new Segment() {
+        public SegmentSpec spec() {
+            return def("key_hunt", 20, 0, 2, Tag.SECRET, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 20, y, ctx);
+
+            // The alcove: a shelf with the key on it, visible from the floor and needing two jumps.
+            platform(c, x + 4, 3, y + 4, ctx);
+            platform(c, x + 8, 3, y + 7, ctx);
+            c.item(ModItems.COURSE_KEY.get(), x + 9.5D, y + 8.5D, 0.5D);
+            coinTrail(c, x + 5, 3, y + 6, 1);
+
+            // The door, back at ground level and well past the alcove, so the player has to come
+            // down with the key rather than falling straight into it.
+            c.set(x + 17, y + 1, 0, ModBlocks.KEYHOLE.get().defaultBlockState());
+            c.set(x + 17, y + 2, 0, ModBlocks.COURSE_TRIM.get().defaultBlockState());
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -1310,6 +1343,7 @@ public final class SegmentLibrary {
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);
+        list.add(KEY_HUNT);
         list.add(ZIPLINE_GAP_TRAVERSAL);
         return list;
     }

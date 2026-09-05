@@ -239,6 +239,10 @@ ITEMS = {
     # Health
     "extra_pip": lambda: heart((228, 84, 92)),
 
+    # The only objective item in the game: it does nothing on its own and is worth having entirely
+    # because of somewhere else in the level.
+    "course_key": lambda: key_icon(),
+
     # Block item
     "hidden_question_block": lambda: block_icon((198, 158, 74), (120, 88, 32)),
 }
@@ -261,6 +265,20 @@ EGGS = {
 }
 for name, (base, spot) in EGGS.items():
     ITEMS[name] = (lambda b=base, s=spot: egg(b, s))
+
+
+def key_icon():
+    """A key: bow, shaft, two wards."""
+    img = new()
+    d = ImageDraw.Draw(img)
+    gold = (238, 196, 62)
+    d.ellipse([3, 2, 10, 9], outline=shade(gold, 1.0), width=2)
+    d.ellipse([5, 4, 8, 7], fill=CLEAR)
+    d.rectangle([6, 8, 7, 14], fill=shade(gold, 1.0))
+    d.rectangle([8, 10, 10, 11], fill=shade(gold, 1.0))
+    d.rectangle([8, 13, 10, 14], fill=shade(gold, 1.0))
+    d.line([(3, 3), (5, 2)], fill=shade(gold, 1.45))
+    return img
 
 
 def main():

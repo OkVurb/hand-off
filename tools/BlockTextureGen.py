@@ -651,6 +651,40 @@ def semisolid_top(base, seed):
     return img
 
 
+def keyhole(base, glow, seed):
+    """A heavy plate with a keyhole cut through it.
+
+    The lit state is not a different picture, it is the same plate with the hole blown open and
+    glowing. Making the two states differ only in that one detail is what tells the player the door
+    they just used is the door they were looking for, rather than a new object appearing.
+    """
+    img = plain(base, seed, 0.05)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], outline=shade(base, 0.5))
+    d.rectangle([2, 2, S - 3, S - 3], outline=shade(base, 1.22))
+    for cx, cy in ((4, 4), (11, 4), (4, 11), (11, 11)):
+        d.point((cx, cy), fill=shade(base, 1.5))
+    # The hole: a round socket over a tapering slot, which is the shape everyone reads as a keyhole
+    # even at sixteen pixels.
+    d.ellipse([6, 5, 9, 8], fill=glow)
+    d.polygon([(7, 8), (8, 8), (9, 12), (6, 12)], fill=glow)
+    return lit(img, base)
+
+
+def course_key():
+    """A key: bow, shaft, two wards. Gold, because it is the only objective item in the game."""
+    img = new()
+    d = ImageDraw.Draw(img)
+    gold = (238, 196, 62)
+    d.ellipse([3, 2, 10, 9], outline=shade(gold, 1.0), width=2)
+    d.ellipse([5, 4, 8, 7], fill=CLEAR)
+    d.rectangle([6, 8, 7, 14], fill=gold)
+    d.rectangle([8, 10, 10, 11], fill=gold)
+    d.rectangle([8, 13, 10, 14], fill=gold)
+    d.line([(3, 3), (5, 2)], fill=shade(gold, 1.45))
+    return img
+
+
 def note_block(base):
     """A Mario note block: white face, black quaver, and — unlike the version this replaces — a
     frame and the house lighting.
@@ -734,6 +768,8 @@ def build():
     out["course_dirt"] = dirt((124, 88, 58), 26)
     out["semisolid_platform"] = semisolid((178, 132, 74), 29)
     out["semisolid_platform_top"] = semisolid_top((198, 152, 92), 30)
+    out["keyhole"] = keyhole((126, 126, 138), (26, 24, 30, 255), 41)
+    out["keyhole_unlocked"] = keyhole((126, 126, 138), (255, 226, 120, 255), 41)
     out["note_block"] = note_block((242, 242, 236))
     out["donut_block"] = donut((196, 130, 62), 28)
 
