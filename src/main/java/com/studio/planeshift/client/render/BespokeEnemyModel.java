@@ -101,6 +101,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case KOOPA -> koopa();
             case PARATROOPA -> paratroopa();
             case DRY_BONES -> dryBones();
+            case PODOBOO -> podoboo();
             case THWOMP -> thwomp();
             case BULLET_BILL -> bulletBill();
             case BOO -> boo();
@@ -291,6 +292,35 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         // Eye sockets, dark and deep-set.
         r.addOrReplaceChild("detail_5", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
         r.addOrReplaceChild("detail_6", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
+        return finish(mesh);
+    }
+
+    /**
+     * A teardrop of molten rock.
+     *
+     * <p>Built widest at the bottom and tapering upward, because it is falling material being
+     * thrown up rather than a creature jumping — the mass belongs underneath. The trailing wisps
+     * are separate parts so the animation can lag them behind the body, which is what sells a
+     * blob as liquid rather than as a ball.
+     *
+     * <p>Face contract: the 8x6x7 head box at (64,0), reusing the standard slot so the sheet does
+     * not need a bespoke face size for one creature.
+     */
+    private static LayerDefinition podoboo() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -5, -5, -5, 10, 7, 10), pose(0, 19, 0));
+        r.addOrReplaceChild("head", box(64, 0, -4, -6, -3.5F, 8, 6, 7), pose(0, 15, 0));
+        // Tapering crown, so the top comes to a point.
+        r.addOrReplaceChild("shell", box(64, 40, -3, -4, -3, 6, 4, 6), pose(0, 12, 0));
+        r.addOrReplaceChild("snout", box(0, 80, -1.5F, -3, -1.5F, 3, 3, 3), pose(0, 9, 0));
+        // Trailing wisps, dragged behind on the way up.
+        for (int i = 0; i < 4; i++) {
+            float angle = (float) (i * Math.PI / 2.0);
+            r.addOrReplaceChild("detail_" + (i + 1), box(64, 80, -1, 0, -1, 2, 5, 2),
+                    pose((float) Math.cos(angle) * 3.2F, 22, (float) Math.sin(angle) * 3.2F,
+                            0, 0, 0));
+        }
         return finish(mesh);
     }
 
@@ -535,6 +565,18 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 details[0].zRot += idle * 0.08F;
                 details[1].zRot += idle * 0.06F;
                 details[2].zRot -= idle * 0.06F;
+            }
+            case PODOBOO -> {
+                // Molten: the body pulses and the wisps lag behind it. Nothing here is driven by
+                // walk speed, because this creature never walks.
+                float pulse = Mth.sin(state.ageInTicks * 0.35F) * 0.10F;
+                body.xScale = 1.0F + pulse;
+                body.zScale = 1.0F + pulse;
+                body.yScale = 1.0F - pulse * 0.6F;
+                for (int i = 0; i < 4; i++) {
+                    details[i].xRot = Mth.sin(state.ageInTicks * 0.3F + i) * 0.28F;
+                    details[i].zRot = Mth.cos(state.ageInTicks * 0.3F + i) * 0.28F;
+                }
             }
             case DRY_BONES -> {
                 // A looser, more rattling walk than the Koopa's — the joints are not attached to

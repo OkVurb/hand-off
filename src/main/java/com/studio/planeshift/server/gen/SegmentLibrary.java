@@ -1010,6 +1010,45 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * A lava pit that throws things at you on a clock.
+     *
+     * <p>The LAVA theme has been digging pits since the generator was written and nothing ever came
+     * out of them, which makes a pit a wall lying down. Three Lava Bubbles on staggered cycles turn
+     * the same geometry into a timing problem: the crossing is easy, and the question is when.
+     *
+     * <p>The bubbles are placed only in the LAVA theme. The segment is still a perfectly good gap
+     * everywhere else, and a ball of molten rock leaping out of a grassland is not a thing that
+     * should be possible just because the picker happened to reach for this one.
+     */
+    static final Segment PODOBOO_PIT = new Segment() {
+        public SegmentSpec spec() {
+            return def("podoboo_pit", 18, 0, 3, Tag.GAP, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 5, y, ctx);
+            for (int i = 5; i <= 12; i++) {
+                ctx.pitFloor(c, x + i, y);
+            }
+            floor(c, x + 13, 5, y, ctx);
+
+            // Two stepping stones, so the gap is crossable without waiting for a gap in the cycle
+            // if the player is confident enough to run it.
+            platform(c, x + 7, 2, y + 1, ctx);
+            platform(c, x + 10, 2, y + 1, ctx);
+            coinTrail(c, x + 6, 6, y + 4, 1);
+
+            if (ctx.theme() == com.studio.planeshift.common.course.CourseTheme.LAVA) {
+                // Staggered along the pit rather than stacked, so their cycles read as three
+                // separate clocks instead of one wide wall of fire.
+                for (int i = 0; i < 3; i++) {
+                    mob(c, ModEntities.PODOBOO.get(), x + 6 + i * 3, y - 2, 0.0F);
+                }
+            }
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -1055,6 +1094,7 @@ public final class SegmentLibrary {
         list.add(MUNCHER_PIT_HOP);
         list.add(TRAMPOLINE_SKY_LAUNCH);
         list.add(FROST_ICE_SLIDE);
+        list.add(PODOBOO_PIT);
         list.add(ZIPLINE_GAP_TRAVERSAL);
         return list;
     }

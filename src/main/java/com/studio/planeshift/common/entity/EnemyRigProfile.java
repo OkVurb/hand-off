@@ -27,6 +27,7 @@ public enum EnemyRigProfile {
     KOOPA(1.25F),
     PARATROOPA(1.25F),
     DRY_BONES(1.20F),
+    PODOBOO(1.15F),
     THWOMP(1.05F),
     BULLET_BILL(1.30F),
     BOO(1.25F),

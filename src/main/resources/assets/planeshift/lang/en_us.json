@@ -328,5 +328,6 @@
   "block.planeshift.course_lamp": "Course Lamp",
   "block.planeshift.course_dirt_block": "Course Dirt",
   "entity.planeshift.paratroopa": "Koopa Paratroopa",
-  "entity.planeshift.dry_bones": "Dry Bones"
+  "entity.planeshift.dry_bones": "Dry Bones",
+  "entity.planeshift.podoboo": "Lava Bubble"
 }

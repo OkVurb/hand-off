@@ -35,6 +35,9 @@ class BespokeEnemyModelTest {
             // limbs, a broken shell plate. The player should recognise the species before they
             // recognise that stomping it will not stick.
             Map.entry(EnemyRigProfile.DRY_BONES, 14L),
+            // A teardrop: body, head, tapering crown, tip, and four trailing wisps that the
+            // animation lags behind the mass. Small, because it is a blob and not a creature.
+            Map.entry(EnemyRigProfile.PODOBOO, 8L),
             Map.entry(EnemyRigProfile.THWOMP, 11L),
             Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
             Map.entry(EnemyRigProfile.BOO, 11L),

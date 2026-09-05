@@ -664,8 +664,50 @@ def dry_bones():
     return img
 
 
+def podoboo():
+    """Molten rock: white-hot at the core, cooling to red at the edges.
+
+    The only creature in the set lit from the inside. Everything else has a top-to-bottom ramp
+    because Minecraft shades faces from above; this one inverts it, brightest at the bottom where
+    the mass is, so it reads as glowing rather than as an orange ball with a shadow on it.
+    """
+    img = new_sheet()
+
+    def molten(region, hot, cool, seed):
+        ox, oy = region
+        w, h = REGION_SIZE[region]
+        px = img.load()
+        for y in range(oy, oy + h):
+            t = (y - oy) / max(1, h - 1)
+            # Inverted ramp: hotter toward the bottom.
+            colour = tuple(int(cool[i] + (hot[i] - cool[i]) * t) for i in range(3))
+            for x in range(ox, ox + w):
+                k = _hash(x, y, seed)
+                f = 1.0 + (0.06 if (k >> 16) & 1 else -0.06) if k % 3 == 0 else 1.0
+                px[x, y] = shade(colour, f)
+        # Bright veins, so the surface moves.
+        dr = ImageDraw.Draw(img)
+        for i in range(7):
+            k = _hash(i * 41, seed, 9)
+            x0 = ox + k % w
+            y0 = oy + (k >> 8) % h
+            dr.line([(x0, y0), (x0 + 3 + (k >> 17) % 5, y0 + 2)], fill=shade(hot, 1.35))
+
+    molten(BODY, (255, 210, 90), (214, 62, 26), 131)
+    molten(HEAD, (255, 220, 110), (222, 74, 30), 132)
+    molten(LIMB, (250, 180, 70), (196, 48, 22), 133)
+    molten(HARD, (255, 232, 150), (236, 110, 40), 134)
+    molten(MUZZLE, (255, 246, 200), (250, 170, 60), 135)
+    molten(TRIM, (255, 200, 80), (200, 52, 24), 136)
+
+    # Eyes on the standard head box. Dark against the glow is the only way they read at all.
+    eyes(img, front(HEAD, 8, 6, 7), 8, 6, sclera=(255, 250, 220), pupil=(60, 14, 8))
+    return img
+
+
 CHARACTERS = {
     "goomba": goomba,
+    "podoboo": podoboo,
     "dry_bones": dry_bones,
     "paratroopa": paratroopa,
     "koopa": koopa,
