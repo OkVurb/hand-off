@@ -195,8 +195,10 @@ def goomba():
     base(img, HEAD, cap, 12)
     scales(img, HEAD, cap)
 
-    # Feet: darker than the cap, and flat — they are always in shadow under the body.
-    base(img, LIMB, (86, 52, 28), 13, ramp=0.18)
+    # Feet: tan, and lighter than the cap. Checked against reference art — they are not the dark
+    # brown that seems obvious from the silhouette, and painting them dark loses the feet entirely
+    # against the cap, which is half of what makes a Goomba's waddle readable.
+    base(img, LIMB, (214, 170, 118), 13, ramp=0.20)
 
     # Fangs and the head stalk share this region, so it is bone-cream.
     base(img, HARD, (246, 236, 212), 14, ramp=0.16)
@@ -572,7 +574,7 @@ def bowser():
     to make one face in the roster look like it belongs to something in charge.
     """
     img = new_sheet()
-    hide = (232, 160, 48)
+    hide = (238, 178, 56)
     base(img, BODY, hide, 111)
     scales(img, BODY, hide)
 
@@ -580,17 +582,19 @@ def bowser():
     scales(img, HEAD, hide)
     eyes(img, front(HEAD, 12, 8, 10), 12, 8, sclera=(250, 226, 90), pupil=INK)
 
-    base(img, LIMB, (240, 176, 64), 113)
-    scales(img, LIMB, (240, 176, 64))
+    base(img, LIMB, (244, 192, 72), 113)
+    scales(img, LIMB, (244, 192, 72))
 
     shell = (74, 154, 58)
     base(img, HARD, shell, 114, ramp=0.34)
     scutes(img, HARD, shell, step=12)
     rect(img, HARD, 0, 0, 64, 2, shade(shell, 1.35))
 
-    # Muzzle, a lighter tan than the hide.
-    muzzle = (232, 200, 154)
+    # Muzzle and belly share this region, and the belly is plated in the reference art rather than
+    # smooth — horizontal ribs are what stop the front of him reading as a plain tan slab.
+    muzzle = (236, 206, 158)
     base(img, MUZZLE, muzzle, 115, ramp=0.20)
+    ribs(img, MUZZLE, muzzle, step=5)
 
     # Horns, spikes, brow and cuffs: one bone material with lengthwise striations.
     bone = (245, 234, 208)
