@@ -74,6 +74,17 @@ public class CourseMapScreen extends Screen {
         this.worldIndex = Mth.clamp(worldIndex, 0, WorldRegistry.worldCount() - 1);
     }
 
+    /**
+     * Whether the local player is exempt from progression gates.
+     *
+     * <p>Mirrors ProgressionService.bypassesLocks. The map must ask the same question the server
+     * will, or it greys out courses that would in fact load.
+     */
+    private static boolean bypassesLocks() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.player != null && minecraft.player.getAbilities().instabuild;
+    }
+
     private static CourseProgress progress() {
         Minecraft minecraft = Minecraft.getInstance();
         return minecraft.player == null
@@ -135,7 +146,7 @@ public class CourseMapScreen extends Screen {
         previousWorld.active = worldIndex > 0;
         nextWorld.active = worldIndex < WorldRegistry.worldCount() - 1
                 && WorldRegistry.isWorldUnlocked(progress(),
-                        WorldRegistry.allWorlds().get(worldIndex + 1));
+                        WorldRegistry.allWorlds().get(worldIndex + 1), bypassesLocks());
     }
 
     // ------------------------------------------------------------------ geometry
@@ -169,7 +180,7 @@ public class CourseMapScreen extends Screen {
             // A Toad House or cannon opens once the course it hangs off is reachable.
             return anyNeighbourUnlocked(node);
         }
-        return WorldRegistry.isUnlocked(progress(), node.id());
+        return WorldRegistry.isUnlocked(progress(), node.id(), bypassesLocks());
     }
 
     private boolean anyNeighbourUnlocked(WorldMapLayout.Node node) {
@@ -178,7 +189,8 @@ public class CourseMapScreen extends Screen {
             int other = link.from() == index ? link.to() : (link.to() == index ? link.from() : -1);
             if (other >= 0) {
                 WorldMapLayout.Node neighbour = layout.node(other);
-                if (neighbour.isPlayable() && WorldRegistry.isUnlocked(progress(), neighbour.id())) {
+                if (neighbour.isPlayable()
+                        && WorldRegistry.isUnlocked(progress(), neighbour.id(), bypassesLocks())) {
                     return true;
                 }
             }

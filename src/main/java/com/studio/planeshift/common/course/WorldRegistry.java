@@ -96,6 +96,27 @@ public final class WorldRegistry {
      * </ul>
      */
     public static boolean isUnlocked(CourseProgress progress, String courseId) {
+        return isUnlocked(progress, courseId, false);
+    }
+
+    /**
+     * The same rule, with an explicit override for players who are exempt from progression.
+     *
+     * <p>The override is a parameter rather than something the server checks on its own, and that
+     * is the whole point of it. A creative bypass added inside ProgressionService made the server
+     * permissive while the map screen and MapNodeService went on calling this class directly and
+     * kept greying courses out — so a creative player was shown a locked course the server would
+     * happily have loaded, and the two halves of the game disagreed about the rules.
+     *
+     * <p>Keeping the exemption here means every caller computes the same answer from the same
+     * function. The client passes its local player's creative flag, the server passes the real
+     * one, and the map cannot drift out of step with what loading a course will actually do.
+     */
+    public static boolean isUnlocked(CourseProgress progress, String courseId,
+                                     boolean bypassLocks) {
+        if (bypassLocks) {
+            return true;
+        }
         WorldDefinition world = worldForCourse(courseId);
         if (world == null) {
             return true;
@@ -119,7 +140,13 @@ public final class WorldRegistry {
 
     /** A world is open when its first course is. Used by the map screen to grey out a page. */
     public static boolean isWorldUnlocked(CourseProgress progress, WorldDefinition world) {
-        return isUnlocked(progress, world.courseIds().get(0));
+        return isUnlocked(progress, world.courseIds().get(0), false);
+    }
+
+    /** A world is open when its first course is, honouring the same exemption. */
+    public static boolean isWorldUnlocked(CourseProgress progress, WorldDefinition world,
+                                          boolean bypassLocks) {
+        return isUnlocked(progress, world.courseIds().get(0), bypassLocks);
     }
 
     /** Total number of courses across all worlds. */

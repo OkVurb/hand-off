@@ -76,11 +76,21 @@ public final class ProgressionService {
      * map screen can grey out the same courses this refuses, from the same data.
      */
     public static boolean isUnlocked(ServerPlayer player, String courseId) {
-        return WorldRegistry.isUnlocked(get(player), courseId);
+        return WorldRegistry.isUnlocked(get(player), courseId, bypassesLocks(player));
     }
 
     /** A world is open when its first course is. */
     public static boolean isWorldUnlocked(ServerPlayer player, WorldDefinition world) {
-        return WorldRegistry.isWorldUnlocked(get(player), world);
+        return WorldRegistry.isWorldUnlocked(get(player), world, bypassesLocks(player));
+    }
+
+    /**
+     * Whether this player is exempt from progression gates.
+     *
+     * <p>Creative is the exemption, because creative is how the courses get tested: being made to
+     * clear world one to look at world four makes the mod harder to work on than to play.
+     */
+    public static boolean bypassesLocks(ServerPlayer player) {
+        return player.isCreative();
     }
 }

@@ -1,0 +1,10 @@
+{
+  "dimension": "planeshift:course",
+  "start_pos": [-5120, 64, 0],
+  "start_mode": "side_on",
+  "theme": "grass",
+  "kill_y": 40.0,
+  "length": 64,
+  "time_limit_seconds": 0,
+  "auto_scroll": false
+}

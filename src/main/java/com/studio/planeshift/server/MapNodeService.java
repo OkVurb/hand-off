@@ -61,7 +61,8 @@ public final class MapNodeService {
     private static WorldMapLayout.Node findNode(ServerPlayer player, String nodeId) {
         CourseProgress progress = ProgressionService.get(player);
         for (WorldDefinition world : WorldRegistry.allWorlds()) {
-            if (!WorldRegistry.isWorldUnlocked(progress, world)) {
+            if (!WorldRegistry.isWorldUnlocked(progress, world,
+                    ProgressionService.bypassesLocks(player))) {
                 continue;
             }
             WorldMapLayout layout = WorldMapLayout.forWorld(world);
@@ -82,11 +83,20 @@ public final class MapNodeService {
      * directly into a slot would skip the Form grant, the sound and the particles.
      */
     private static void visitToadHouse(ServerPlayer player, WorldMapLayout.Node node) {
+        // The gift is unconditional, and that ordering is the fix.
+        //
+        // Gating it on the room failing to load meant the happy path gave the player nothing at
+        // all: they were teleported into a small room and sent on their way empty-handed, with the
+        // power-up reachable only when the datapack was broken. A Toad House that pays out only
+        // when it is misconfigured is not a Toad House.
         int roll = player.getRandom().nextInt(GIFTS.size());
         player.drop(new ItemStack(GIFTS.get(roll).get()), false, false);
         player.level().playSound(null, player.blockPosition(), ModSounds.POWER_UP.get(),
                 SoundSource.PLAYERS, 0.9F, 1.0F);
         player.sendSystemMessage(Component.translatable("message.planeshift.toad_house"));
+
+        // The room is the presentation, so its absence costs the flavour and not the reward.
+        CourseService.loadCourse(player, "toad_house");
     }
 
     /**
@@ -104,7 +114,8 @@ public final class MapNodeService {
             return;
         }
         WorldDefinition next = WorldRegistry.allWorlds().get(index + 1);
-        if (!WorldRegistry.isWorldUnlocked(ProgressionService.get(player), next)) {
+        if (!WorldRegistry.isWorldUnlocked(ProgressionService.get(player), next,
+                ProgressionService.bypassesLocks(player))) {
             player.sendSystemMessage(Component.translatable("message.planeshift.cannon_locked"));
             return;
         }
