@@ -150,11 +150,13 @@ public class HammerBroGoal extends Goal {
 
     private void throwHammer(Player target) {
         Vec3 launch = target.position().add(0.0D, 1.0D, 0.0D).subtract(bro.position()).normalize();
-        HammerProjectile hammer = new HammerProjectile(bro.level(), bro);
-        hammer.setPos(bro.getX(), bro.getEyeY() - 0.1D, bro.getZ());
-        // Arcing throw: slight upward bias, then gravity takes over.
-        hammer.shoot((float) launch.x, (float) (launch.y + 0.15D), (float) launch.z, 0.9F, 0.5F);
-        bro.level().addFreshEntity(hammer);
+        net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile thrown = bro.createProjectile();
+        thrown.setPos(bro.getX(), bro.getEyeY() - 0.1D, bro.getZ());
+        // Arc and power come from the Bro, so a Fire Bro throws flat and fast where a Hammer Bro
+        // lobs, without either needing its own copy of this goal.
+        thrown.shoot((float) launch.x, (float) (launch.y + bro.throwArc()), (float) launch.z,
+                bro.throwPower(), 0.5F);
+        bro.level().addFreshEntity(thrown);
     }
 
     /** The axis the perch is measured along, for callers that place one. */

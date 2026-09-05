@@ -144,6 +144,12 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.BOB_OMB.get(),
                 CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/bob_omb.png"),
                         0.22F, EnemyRigProfile.BOB_OMB));
+        event.registerEntityRenderer(ModEntities.FIRE_BRO.get(),
+                CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/fire_bro.png"),
+                        0.22F, EnemyRigProfile.HAMMER_BRO));
+        event.registerEntityRenderer(ModEntities.BOOMERANG_BRO.get(),
+                CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/boomerang_bro.png"),
+                        0.22F, EnemyRigProfile.HAMMER_BRO));
         event.registerEntityRenderer(ModEntities.THWOMP.get(),
                 CourseEnemyRenderer.provider(thwomp, 0.55F, EnemyRigProfile.THWOMP));
         event.registerEntityRenderer(ModEntities.BULLET_BILL.get(),

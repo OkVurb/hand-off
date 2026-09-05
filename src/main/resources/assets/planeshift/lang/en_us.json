@@ -330,5 +330,7 @@
   "entity.planeshift.paratroopa": "Koopa Paratroopa",
   "entity.planeshift.dry_bones": "Dry Bones",
   "entity.planeshift.podoboo": "Lava Bubble",
-  "entity.planeshift.bob_omb": "Bob-omb"
+  "entity.planeshift.bob_omb": "Bob-omb",
+  "entity.planeshift.fire_bro": "Fire Bro",
+  "entity.planeshift.boomerang_bro": "Boomerang Bro"
 }

@@ -114,9 +114,9 @@ public final class SegmentLibrary {
                     ModEntities.PARATROOPA.get());
             case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.GOOMBA.get(), ModEntities.BOB_OMB.get());
             case SNOW -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get());
-            case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get(), ModEntities.DRY_BONES.get());
+            case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get(), ModEntities.DRY_BONES.get(), ModEntities.FIRE_BRO.get());
             case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get());
-            case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get());
+            case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get(), ModEntities.BOOMERANG_BRO.get());
         };
     }
 

@@ -748,8 +748,35 @@ def bob_omb():
     return img
 
 
+def _bro(armour, seed):
+    """The Hammer Bro sheet with a different uniform.
+
+    Shares the body, beak and eyes on purpose - these are the same soldier - and changes only the
+    armour region. At rest the weapon is not visible, so the helmet and shell are the entire cue
+    telling the player which of the three is about to throw something at them, and getting that
+    wrong is a hit they could not have avoided.
+    """
+    img = hammer_bro()
+    base(img, HARD, armour, seed)
+    scutes(img, HARD, armour)
+    rect(img, HARD, 0, 0, 64, 2, shade(armour, 1.45))
+    return img
+
+
+def fire_bro():
+    """Red armour: the one that throws flat and fast."""
+    return _bro((186, 54, 40), 77)
+
+
+def boomerang_bro():
+    """Blue-white armour: the one whose projectile comes back."""
+    return _bro((72, 148, 196), 78)
+
+
 CHARACTERS = {
     "goomba": goomba,
+    "fire_bro": fire_bro,
+    "boomerang_bro": boomerang_bro,
     "bob_omb": bob_omb,
     "podoboo": podoboo,
     "dry_bones": dry_bones,
