@@ -366,6 +366,11 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.CASTLE_BRIDGE) {
             return theme == CourseTheme.LAVA || theme == CourseTheme.UNDERGROUND;
         }
+        // The endless hall is a ghost-house joke. In a grass level it is just a balcony that
+        // inexplicably rejects you, with no fiction to hang the effect on.
+        if (segment == SegmentLibrary.GHOST_LOOP) {
+            return theme == CourseTheme.GHOST_HOUSE;
+        }
         return true;
     }
 

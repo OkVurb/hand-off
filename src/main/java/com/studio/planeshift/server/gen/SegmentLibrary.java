@@ -66,6 +66,24 @@ public final class SegmentLibrary {
         return new Segment.SegmentSpec(id, width, 0, exitRise, difficulty, Set.of(tags));
     }
 
+    /**
+     * Where the loop puts the player back, as an offset into GHOST_LOOP.
+     *
+     * <p>Must be exactly {@code LOOP_TRIGGER_X - LoopTriggerBlock.LOOP_DISTANCE}, and must be a
+     * column the balcony actually covers, or the teleport lands the player in mid-air.
+     */
+    static final int LOOP_RETURN_X = 4;
+
+    /** Where the trigger stands. The right-hand end of the balcony. */
+    static final int LOOP_TRIGGER_X = 29;
+
+    /** Lays one column of a block across the full course width. */
+    private static void lane(CourseCanvas c, GenContext ctx, int x, int y, BlockState state) {
+        for (int z = -ctx.halfWidth(); z <= ctx.halfWidth(); z++) {
+            c.setIfEmpty(x, y, z, state);
+        }
+    }
+
     /** Solid ground for the whole width of a segment. */
     private static void floor(CourseCanvas c, int x0, int width, int y, GenContext ctx) {
         for (int i = 0; i < width; i++) {
@@ -1317,45 +1335,71 @@ public final class SegmentLibrary {
      * secret they will not look for; one they can see and cannot immediately reach is a question.
      */
     /**
-     * A ghost-house looping corridor that teleports the player back on contact.
+     * The ghost house's endless hall.
      *
-     * <p>The main path is perfectly walkable. Above it is a long dead-end corridor
-     * containing a LoopTriggerBlock. The loop contains a COURSE_KEY. Down on the
-     * main path, a KeyholeBlock guards a StarCoin.
+     * <p>Uses {@code LoopTriggerBlock}, which a coverage audit found was the last registered block
+     * the generator never placed. The block teleports whatever touches it 25 blocks backwards, and
+     * that is a soft-lock anywhere on a route the player has to get past — so the loop is built as
+     * a <em>dead-end balcony above</em> the main floor. Running right along the balcony puts you
+     * back at its left end; the floor underneath is untouched and always walkable.
+     *
+     * <p>Three things about the layout are load-bearing, and each of them is a mistake worth not
+     * repeating:
+     *
+     * <ul>
+     *   <li><b>The balcony is semisolid.</b> A solid deck 26 blocks long is a ceiling over the main
+     *       route, which is the exact failure {@code CourseRoutes} exists to avoid. Semisolids are
+     *       floor-from-above and invisible to the body, so the low road is unaffected.</li>
+     *   <li><b>The way up is at the left, and it is also the way out.</b> The trigger returns the
+     *       player to the balcony's left end, right beside the stairs, so the loop is a joke the
+     *       player is in on rather than a trap. A loop with no exit is not a puzzle.</li>
+     *   <li><b>The keyhole is a secret exit, not a locked door.</b> {@code KeyholeBlock} calls
+     *       {@code CourseCompletionService.beginSlide} — it <em>ends the course</em> and pays
+     *       SECRET_EXIT_BONUS. Treating it as a door that guards a prize gets the mechanic exactly
+     *       backwards: the prize is leaving early. So it sits on the main floor near the end of the
+     *       segment, and the key that opens it is out on the balcony.</li>
+     * </ul>
+     *
+     * <p>The distances are not free choices. {@code LoopTriggerBlock.LOOP_DISTANCE} is 25, so the
+     * trigger has to stand exactly 25 columns right of where the balcony can catch the player, or
+     * the teleport drops them into open air or inside the stairs. {@link #LOOP_RETURN_X} and
+     * {@link #LOOP_TRIGGER_X} are held together by an assertion in the test rather than by comment.
      */
     static final Segment GHOST_LOOP = new Segment() {
         public SegmentSpec spec() {
-            return def("ghost_loop", 26, 0, 2, Tag.SECRET, Tag.CLIMB);
+            return def("ghost_loop", 30, 0, 2, Tag.SECRET, Tag.CLIMB);
         }
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
-            floor(c, x, 26, y, ctx);
+            // The main route, untouched and complete on its own. Everything else is optional.
+            floor(c, x, 30, y, ctx);
 
-            // Guarded secret on the main path
-            c.set(x + 20, y + 1, 0, ModBlocks.KEYHOLE.get().defaultBlockState());
-            c.set(x + 20, y + 2, 0, ModBlocks.KEYHOLE.get().defaultBlockState());
-            c.item(ModItems.EXTRA_PIP.get(), x + 23.5D, y + 1.5D, 0.5D);
-            c.set(x + 20, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 21, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 22, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 23, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 24, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 24, y + 2, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 24, y + 1, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
+            BlockState semi = ModBlocks.SEMISOLID_PLATFORM.get().defaultBlockState();
 
-            // The upper looping corridor (y + 5)
-            c.set(x + 5, y + 2, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            c.set(x + 8, y + 3, 0, ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            
-            platform(c, x, 26, y + 5, ctx);
-            platform(c, x, 26, y + 9, ctx);
+            // Stairs up at the left. Also the stairs down, which is the whole reason the loop is
+            // survivable.
+            for (int step = 0; step < 3; step++) {
+                lane(c, ctx, x + 1 + step, y + 2 + step, semi);
+            }
 
-            c.item(ModItems.COURSE_KEY.get(), x + 15.5D, y + 6.5D, 0.5D);
-            
-            BlockState loopTrigger = ModBlocks.LOOP_TRIGGER.get().defaultBlockState();
-            c.set(x + 25, y + 6, 0, loopTrigger);
-            c.set(x + 25, y + 7, 0, loopTrigger);
-            c.set(x + 25, y + 8, 0, loopTrigger);
+            // The balcony itself.
+            for (int i = LOOP_RETURN_X; i <= LOOP_TRIGGER_X; i++) {
+                lane(c, ctx, x + i, y + 5, semi);
+            }
+
+            // The key, out at the far end, so claiming it means committing to the walk that the
+            // trigger is waiting at the end of.
+            c.item(ModItems.COURSE_KEY.get(), x + 20.5D, y + 6.5D, 0.5D);
+            coinTrail(c, x + LOOP_RETURN_X + 2, 6, y + 6, 2);
+
+            // The trigger, at head and foot height so it cannot be jumped over or crawled under.
+            BlockState loop = ModBlocks.LOOP_TRIGGER.get().defaultBlockState();
+            c.set(x + LOOP_TRIGGER_X, y + 6, 0, loop);
+            c.set(x + LOOP_TRIGGER_X, y + 7, 0, loop);
+
+            // The secret exit, down on the floor where a player who never found the key simply
+            // walks past it.
+            c.set(x + 27, y + 1, 0, ModBlocks.KEYHOLE.get().defaultBlockState());
         }
     };
 
