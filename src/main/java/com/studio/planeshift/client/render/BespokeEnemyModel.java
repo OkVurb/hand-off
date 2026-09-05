@@ -33,7 +33,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
 
     static {
         for (EnemyRigProfile profile : EnemyRigProfile.values()) {
-            if (profile != EnemyRigProfile.VILLAGER) {
+            if (profile != EnemyRigProfile.TOAD) {
                 LAYERS.put(profile, new ModelLayerLocation(
                         PlaneShift.id("enemy/" + profile.name().toLowerCase()), "main"));
             }
@@ -97,18 +97,18 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
 
     public static LayerDefinition createLayer(EnemyRigProfile profile) {
         return switch (profile) {
-            case SPROUTLING -> sproutling();
-            case GECKO -> gecko();
-            case CRUSHER -> crusher();
-            case FLYER -> torpedoMoth();
-            case WISP -> moonWisp();
-            case RIDER -> mantaRider();
-            case WARRIOR -> pangolin();
-            case CRAWLER -> pincushionCrab();
-            case BEETLE -> burrowingBeetle();
-            case PLANT -> trumpetVine();
-            case BOSS -> salamanderMonarch();
-            case VILLAGER -> throw new IllegalArgumentException("Villager uses ToadModel");
+            case GOOMBA -> goomba();
+            case KOOPA -> koopa();
+            case THWOMP -> thwomp();
+            case BULLET_BILL -> bulletBill();
+            case BOO -> boo();
+            case LAKITU -> lakitu();
+            case HAMMER_BRO -> hammerBro();
+            case SPINY -> spiny();
+            case BUZZY_BEETLE -> buzzyBeetle();
+            case PIRANHA_PLANT -> piranhaPlant();
+            case BOWSER -> bowser();
+            case TOAD -> throw new IllegalArgumentException("Villager uses ToadModel");
         };
     }
 
@@ -175,7 +175,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
      * what makes it cheap to add the horns, brows, teeth and studs that turn a coloured box into a
      * recognisable creature.
      */
-    private static LayerDefinition sproutling() {
+    private static LayerDefinition goomba() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // Head-body, one mass. A Goomba is almost entirely face, so the face box IS the creature
@@ -199,7 +199,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition gecko() {
+    private static LayerDefinition koopa() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         r.addOrReplaceChild("body", box(0, 0, -4, -9, -3, 8, 9, 6), pose(0, 19, 0));
@@ -223,7 +223,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition crusher() {
+    private static LayerDefinition thwomp() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // One heavy slab, exactly the size the face is painted for.
@@ -246,7 +246,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition torpedoMoth() {
+    private static LayerDefinition bulletBill() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // Barrel: long, smooth, unbroken. This is the whole read, and the previous rig buried it
@@ -270,7 +270,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition moonWisp() {
+    private static LayerDefinition boo() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // 12x10x10 exactly: this is the box the WISP face is painted around.
@@ -280,9 +280,11 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         // Shoulders, narrower and set back. The two-stage taper is what rounds the silhouette and
         // stops it reading as a floating plate.
         r.addOrReplaceChild("shell", box(0, 40, -5, -2, -4, 10, 5, 8), pose(0, 18, 0.5F));
-        r.addOrReplaceChild("left_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+        // Arms on the body material, not the trim region — trim is the pink reserved for the
+        // tongue, and a ghost with pink hands is not the look.
+        r.addOrReplaceChild("left_arm", box(0, 40, -1.5F, -1.5F, -1.5F, 3, 3, 3),
                 pose(6.5F, 14, -2.5F, 0, -0.5F, 0));
-        r.addOrReplaceChild("right_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+        r.addOrReplaceChild("right_arm", box(0, 40, -1.5F, -1.5F, -1.5F, 3, 3, 3),
                 pose(-6.5F, 14, -2.5F, 0, 0.5F, 0));
         // Ragged hem, tallest in the middle. A ghost has no flat bottom.
         for (int i = 0; i < 5; i++) {
@@ -296,7 +298,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition mantaRider() {
+    private static LayerDefinition lakitu() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // The cloud is the character's ground. Built from a slab plus four puffs so its outline is
@@ -318,7 +320,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition pangolin() {
+    private static LayerDefinition hammerBro() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         r.addOrReplaceChild("body", box(0, 0, -4.5F, -10, -3, 9, 10, 6), pose(0, 19, 0));
@@ -338,7 +340,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition pincushionCrab() {
+    private static LayerDefinition spiny() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // 14x7x10: the box the CRAB face is painted around.
@@ -365,7 +367,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition burrowingBeetle() {
+    private static LayerDefinition buzzyBeetle() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         r.addOrReplaceChild("body", box(0, 0, -5, -4, -5, 10, 4, 10), pose(0, 20, 0));
@@ -388,7 +390,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition trumpetVine() {
+    private static LayerDefinition piranhaPlant() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         // 12x7x10: the box the PLANT mouth is painted around. Split into an upper and a lower half
@@ -413,7 +415,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return finish(mesh);
     }
 
-    private static LayerDefinition salamanderMonarch() {
+    private static LayerDefinition bowser() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
         r.addOrReplaceChild("body", box(0, 0, -8, -13, -5, 16, 13, 10), pose(0, 20, 0));
@@ -455,7 +457,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         head.xRot += state.xRot * Mth.DEG_TO_RAD * 0.35F;
 
         switch (profile) {
-            case SPROUTLING -> {
+            case GOOMBA -> {
                 leftLeg.xRot = opposite;
                 rightLeg.xRot = step;
                 body.y += Math.abs(Mth.sin(phase)) * speed * -0.8F + idle * 0.12F;
@@ -463,12 +465,12 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 details[1].zRot += idle * 0.06F;
                 details[2].zRot -= idle * 0.06F;
             }
-            case GECKO -> {
+            case KOOPA -> {
                 walk(step, opposite, 0.75F);
                 tail.yRot = Mth.sin(state.ageInTicks * 0.13F) * 0.22F - step * 0.12F;
                 tailTip.yRot = tail.yRot * 1.35F;
             }
-            case CRUSHER -> {
+            case THWOMP -> {
                 body.y += idle * 0.3F;
                 float slam = Math.max(0, Mth.sin(state.ageInTicks * 0.12F) - 0.68F) * 2.7F;
                 leftArm.y += slam * 4.2F;
@@ -476,7 +478,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 leftLeg.y += slam * 2.5F;
                 rightLeg.y += slam * 2.5F;
             }
-            case FLYER -> {
+            case BULLET_BILL -> {
                 body.y += idle * 0.3F;
                 float flap = Mth.sin(state.ageInTicks * 0.9F) * 0.48F;
                 leftWing.zRot += flap;
@@ -485,7 +487,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 rightArm.zRot += flap * 0.65F;
                 tail.yRot = Mth.sin(state.ageInTicks * 0.18F) * 0.08F;
             }
-            case WISP -> {
+            case BOO -> {
                 body.y += idle * 0.8F;
                 head.y += idle * 0.8F;
                 leftArm.y += -idle * 0.35F;
@@ -494,7 +496,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                     details[i].xRot = Mth.sin(state.ageInTicks * 0.16F + i * 0.7F) * 0.12F;
                 }
             }
-            case RIDER -> {
+            case LAKITU -> {
                 float flap = Mth.sin(state.ageInTicks * 0.32F) * 0.22F;
                 leftWing.zRot += flap;
                 rightWing.zRot -= flap;
@@ -502,14 +504,14 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 rightArm.xRot += flap * 0.7F;
                 details[1].yRot = Mth.sin(state.ageInTicks * 0.18F) * 0.18F;
             }
-            case WARRIOR -> {
+            case HAMMER_BRO -> {
                 walk(step, opposite, 0.82F);
                 tail.yRot = -step * 0.12F;
                 tailTip.yRot = -step * 0.18F;
                 leftArm.zRot -= 0.08F;
                 rightArm.zRot += 0.08F;
             }
-            case CRAWLER, BEETLE -> {
+            case SPINY, BUZZY_BEETLE -> {
                 for (int i = 0; i < details.length; i++) {
                     float cycle = Mth.sin(phase * 1.35F + (i % 3) * 0.85F + (i >= 3 ? Mth.PI : 0));
                     details[i].yRot += cycle * 0.25F * speed;
@@ -518,14 +520,14 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 rightArm.yRot -= step * 0.16F;
                 body.y += Math.abs(Mth.sin(phase * 1.35F)) * speed * -0.18F;
             }
-            case PLANT -> {
+            case PIRANHA_PLANT -> {
                 body.zRot = idle * 0.06F;
                 head.zRot = Mth.sin(state.ageInTicks * 0.11F + 0.6F) * 0.09F;
                 jaw.xRot += 0.12F + (Mth.sin(state.ageInTicks * 0.17F) + 1) * 0.08F;
                 leftArm.zRot += idle * 0.12F;
                 rightArm.zRot -= idle * 0.12F;
             }
-            case BOSS -> {
+            case BOWSER -> {
                 walk(step, opposite, 0.42F);
                 body.y += Math.abs(Mth.sin(phase)) * speed * -0.22F;
                 tail.yRot = Mth.sin(state.ageInTicks * 0.08F) * 0.16F;
@@ -533,7 +535,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 jaw.xRot += (Mth.sin(state.ageInTicks * 0.075F) + 1) * 0.035F;
                 shell.xRot = idle * 0.012F;
             }
-            case VILLAGER -> {
+            case TOAD -> {
                 // Dedicated ToadModel handles the non-hostile shopkeeper.
             }
         }

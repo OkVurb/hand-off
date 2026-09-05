@@ -89,7 +89,7 @@ public final class ClientModEvents {
                 AnimatedCourseEnemyModel::createBodyLayer);
         event.registerLayerDefinition(ToadModel.LAYER_LOCATION, ToadModel::createBodyLayer);
         for (EnemyRigProfile profile : EnemyRigProfile.values()) {
-            if (profile != EnemyRigProfile.VILLAGER) {
+            if (profile != EnemyRigProfile.TOAD) {
                 event.registerLayerDefinition(BespokeEnemyModel.layer(profile),
                         () -> BespokeEnemyModel.createLayer(profile));
             }
@@ -129,28 +129,28 @@ public final class ClientModEvents {
         Identifier bowser = PlaneShift.id("textures/entity/bowser.png");
 
         event.registerEntityRenderer(ModEntities.GOOMBA.get(),
-                CourseEnemyRenderer.provider(goomba, 0.25F, EnemyRigProfile.SPROUTLING));
+                CourseEnemyRenderer.provider(goomba, 0.25F, EnemyRigProfile.GOOMBA));
         event.registerEntityRenderer(ModEntities.KOOPA.get(),
-                CourseEnemyRenderer.provider(koopa, 0.22F, EnemyRigProfile.GECKO));
+                CourseEnemyRenderer.provider(koopa, 0.22F, EnemyRigProfile.KOOPA));
         event.registerEntityRenderer(ModEntities.THWOMP.get(),
-                CourseEnemyRenderer.provider(thwomp, 0.55F, EnemyRigProfile.CRUSHER));
+                CourseEnemyRenderer.provider(thwomp, 0.55F, EnemyRigProfile.THWOMP));
         event.registerEntityRenderer(ModEntities.BULLET_BILL.get(),
-                CourseEnemyRenderer.provider(bulletBill, 0.15F, EnemyRigProfile.FLYER));
+                CourseEnemyRenderer.provider(bulletBill, 0.15F, EnemyRigProfile.BULLET_BILL));
         event.registerEntityRenderer(ModEntities.BOO.get(),
-                CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.WISP));
+                CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.BOO));
         event.registerEntityRenderer(ModEntities.LAKITU.get(),
-                CourseEnemyRenderer.provider(lakitu, 0.22F, EnemyRigProfile.RIDER));
+                CourseEnemyRenderer.provider(lakitu, 0.22F, EnemyRigProfile.LAKITU));
         event.registerEntityRenderer(ModEntities.HAMMER_BRO.get(),
-                CourseEnemyRenderer.provider(hammerBro, 0.22F, EnemyRigProfile.WARRIOR));
+                CourseEnemyRenderer.provider(hammerBro, 0.22F, EnemyRigProfile.HAMMER_BRO));
         event.registerEntityRenderer(ModEntities.SPINY.get(),
-                CourseEnemyRenderer.provider(spiny, 0.22F, EnemyRigProfile.CRAWLER));
+                CourseEnemyRenderer.provider(spiny, 0.22F, EnemyRigProfile.SPINY));
         event.registerEntityRenderer(ModEntities.BUZZY_BEETLE.get(),
-                CourseEnemyRenderer.provider(buzzyBeetle, 0.25F, EnemyRigProfile.BEETLE));
+                CourseEnemyRenderer.provider(buzzyBeetle, 0.25F, EnemyRigProfile.BUZZY_BEETLE));
         event.registerEntityRenderer(ModEntities.PIRANHA_PLANT.get(),
-                CourseEnemyRenderer.provider(piranhaPlant, 0.55F, EnemyRigProfile.PLANT));
+                CourseEnemyRenderer.provider(piranhaPlant, 0.55F, EnemyRigProfile.PIRANHA_PLANT));
         event.registerEntityRenderer(ModEntities.TOAD.get(), ToadRenderer::new);
         event.registerEntityRenderer(ModEntities.BOWSER.get(),
-                CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOSS));
+                CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOWSER));
         event.registerEntityRenderer(ModEntities.EMBER_BOLT.get(),
                 BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/ember_bolt.png"),
                         ProjectileVisualProfile.EMBER_BOLT));

@@ -23,18 +23,18 @@ package com.studio.planeshift.common.entity;
  * actually built at, and what gets registered is what appears on screen.
  */
 public enum EnemyRigProfile {
-    SPROUTLING(1.35F),
-    GECKO(1.25F),
-    CRUSHER(1.05F),
-    FLYER(1.30F),
-    WISP(1.25F),
-    RIDER(1.10F),
-    WARRIOR(1.15F),
-    CRAWLER(1.25F),
-    BEETLE(1.25F),
-    PLANT(1.05F),
-    VILLAGER(1.0F),
-    BOSS(1.0F);
+    GOOMBA(1.35F),
+    KOOPA(1.25F),
+    THWOMP(1.05F),
+    BULLET_BILL(1.30F),
+    BOO(1.25F),
+    LAKITU(1.10F),
+    HAMMER_BRO(1.15F),
+    SPINY(1.25F),
+    BUZZY_BEETLE(1.25F),
+    PIRANHA_PLANT(1.05F),
+    TOAD(1.0F),
+    BOWSER(1.0F);
 
     private final float visualScale;
 

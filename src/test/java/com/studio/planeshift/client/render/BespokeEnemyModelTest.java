@@ -25,20 +25,20 @@ class BespokeEnemyModelTest {
      * one-part Thwomp shipped. See R13.
      */
     private static final Map<EnemyRigProfile, Long> SOLID_PARTS = Map.ofEntries(
-            Map.entry(EnemyRigProfile.SPROUTLING, 11L),
-            Map.entry(EnemyRigProfile.GECKO, 14L),
-            Map.entry(EnemyRigProfile.CRUSHER, 11L),
-            Map.entry(EnemyRigProfile.FLYER, 11L),
-            Map.entry(EnemyRigProfile.WISP, 11L),
-            Map.entry(EnemyRigProfile.RIDER, 12L),
-            Map.entry(EnemyRigProfile.WARRIOR, 13L),
-            Map.entry(EnemyRigProfile.CRAWLER, 15L),
-            Map.entry(EnemyRigProfile.BEETLE, 14L),
-            Map.entry(EnemyRigProfile.PLANT, 15L),
-            Map.entry(EnemyRigProfile.BOSS, 19L));
+            Map.entry(EnemyRigProfile.GOOMBA, 11L),
+            Map.entry(EnemyRigProfile.KOOPA, 14L),
+            Map.entry(EnemyRigProfile.THWOMP, 11L),
+            Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
+            Map.entry(EnemyRigProfile.BOO, 11L),
+            Map.entry(EnemyRigProfile.LAKITU, 12L),
+            Map.entry(EnemyRigProfile.HAMMER_BRO, 13L),
+            Map.entry(EnemyRigProfile.SPINY, 15L),
+            Map.entry(EnemyRigProfile.BUZZY_BEETLE, 14L),
+            Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
+            Map.entry(EnemyRigProfile.BOWSER, 19L));
 
     @ParameterizedTest(name = "{0} bakes as a complete bespoke mesh")
-    @EnumSource(value = EnemyRigProfile.class, names = "VILLAGER", mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = EnemyRigProfile.class, names = "TOAD", mode = EnumSource.Mode.EXCLUDE)
     void everyEnemyLayerBakesAndAnimates(EnemyRigProfile profile) {
         ModelPart root = assertDoesNotThrow(() -> BespokeEnemyModel.createLayer(profile).bakeRoot());
         BespokeEnemyModel model = assertDoesNotThrow(() -> new BespokeEnemyModel(root, profile));

@@ -101,30 +101,30 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
         leftWing.zRot = flap;
 
         switch (profile) {
-            case SPROUTLING -> {
+            case GOOMBA -> {
                 float bounce = Math.abs(Mth.sin(state.ageInTicks * 0.17F));
                 body.yScale *= 0.88F + bounce * 0.12F;
                 head.y -= bounce * 0.6F;
             }
-            case CRUSHER -> {
+            case THWOMP -> {
                 float slam = Math.max(0.0F, Mth.sin(state.ageInTicks * 0.14F) - 0.72F) * 2.8F;
                 rightArm.y += slam * 4.0F;
                 leftArm.y += slam * 4.0F;
                 body.y += slam;
             }
-            case FLYER -> {
+            case BULLET_BILL -> {
                 body.xRot = (float) (Math.PI / 2.0D);
                 body.y += Mth.sin(state.ageInTicks * 0.22F) * 0.5F;
             }
-            case WISP -> {
+            case BOO -> {
                 head.y += Mth.sin(state.ageInTicks * 0.16F) * 0.8F;
                 head.yRot += Mth.sin(state.ageInTicks * 0.08F) * 0.18F;
             }
-            case PLANT -> {
+            case PIRANHA_PLANT -> {
                 body.zRot = Mth.sin(state.ageInTicks * 0.08F) * 0.08F;
                 head.zRot = Mth.sin(state.ageInTicks * 0.08F + 0.7F) * 0.12F;
             }
-            case BOSS -> {
+            case BOWSER -> {
                 rightArm.zRot = -0.14F + Mth.sin(state.ageInTicks * 0.07F) * 0.06F;
                 leftArm.zRot = 0.14F - Mth.sin(state.ageInTicks * 0.07F) * 0.06F;
             }
@@ -145,7 +145,7 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
         leftWing.visible = false;
 
         switch (profile) {
-            case SPROUTLING -> {
+            case GOOMBA -> {
                 rightArm.visible = false;
                 leftArm.visible = false;
                 body.xScale = 1.1F;
@@ -155,8 +155,8 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 rightLeg.yScale = 0.55F;
                 leftLeg.yScale = 0.55F;
             }
-            case GECKO -> body.zScale = 0.82F;
-            case CRUSHER -> {
+            case KOOPA -> body.zScale = 0.82F;
+            case THWOMP -> {
                 head.visible = false;
                 body.xScale = 1.35F;
                 body.yScale = 1.35F;
@@ -168,7 +168,7 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 rightLeg.yScale = 0.5F;
                 leftLeg.yScale = 0.5F;
             }
-            case FLYER -> {
+            case BULLET_BILL -> {
                 head.visible = false;
                 rightArm.visible = false;
                 leftArm.visible = false;
@@ -180,7 +180,7 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 body.yScale = 0.72F;
                 body.zScale = 1.55F;
             }
-            case WISP -> {
+            case BOO -> {
                 rightArm.visible = false;
                 leftArm.visible = false;
                 rightLeg.visible = false;
@@ -190,16 +190,16 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 head.yScale = 1.15F;
                 head.zScale = 1.15F;
             }
-            case RIDER -> {
+            case LAKITU -> {
                 rightWing.visible = true;
                 leftWing.visible = true;
                 rightWing.yScale = 0.55F;
                 leftWing.yScale = 0.55F;
             }
-            case WARRIOR, VILLAGER -> {
+            case HAMMER_BRO, TOAD -> {
                 // Standard articulated biped proportions.
             }
-            case CRAWLER, BEETLE -> {
+            case SPINY, BUZZY_BEETLE -> {
                 body.yScale = 0.62F;
                 body.zScale = 1.35F;
                 head.yScale = 0.72F;
@@ -208,7 +208,7 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 rightLeg.yScale = 0.55F;
                 leftLeg.yScale = 0.55F;
             }
-            case PLANT -> {
+            case PIRANHA_PLANT -> {
                 rightArm.visible = false;
                 leftArm.visible = false;
                 rightLeg.visible = false;
@@ -217,7 +217,7 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 body.yScale = 1.45F;
                 body.zScale = 0.7F;
             }
-            case BOSS -> {
+            case BOWSER -> {
                 head.xScale = 1.2F;
                 head.yScale = 1.1F;
                 body.xScale = 1.25F;
