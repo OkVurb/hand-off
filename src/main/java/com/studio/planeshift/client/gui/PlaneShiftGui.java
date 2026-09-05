@@ -100,4 +100,71 @@ public final class PlaneShiftGui {
                 .size(w, h)
                 .build();
     }
+
+    /** Mixes a packed ARGB colour toward white. Used by the menu buttons for their lit edges. */
+    public static int lighten(int argb, float amount) {
+        return mix(argb, 0xFFFFFF, amount);
+    }
+
+    /** Mixes a packed ARGB colour toward black. */
+    public static int darken(int argb, float amount) {
+        return mix(argb, 0x000000, amount);
+    }
+
+    private static int mix(int argb, int target, float amount) {
+        int a = argb >>> 24;
+        int r = (argb >> 16) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int b = argb & 0xFF;
+        int tr = (target >> 16) & 0xFF;
+        int tg = (target >> 8) & 0xFF;
+        int tb = target & 0xFF;
+        r = Math.round(r + (tr - r) * amount);
+        g = Math.round(g + (tg - g) * amount);
+        b = Math.round(b + (tb - b) * amount);
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    /**
+     * A bright parallax sky: gradient, drifting cloud banks, and rolling hills.
+     *
+     * <p>Replaces a static backdrop. A menu that does not move reads as a paused game, and the
+     * modern Mario front ends all keep something drifting behind the buttons for exactly that
+     * reason - it costs nothing and it is the difference between a screen and a place.
+     *
+     * @param time a monotonically increasing tick count; the drift is derived from it
+     */
+    public static void renderParallaxSky(GuiGraphics graphics, int width, int height, float time) {
+        for (int y = 0; y < height; y++) {
+            float t = y / (float) Math.max(1, height);
+            graphics.fill(0, y, width, y + 1, mix(SKY_TOP, SKY_BOTTOM & 0xFFFFFF, t));
+        }
+
+        // Two cloud banks at different speeds. Parallax is the whole trick: one layer moving is a
+        // slideshow, two at different rates is depth.
+        drawCloudBank(graphics, width, (int) (height * 0.18F), time * 0.25F, 3, 0x50FFFFFF);
+        drawCloudBank(graphics, width, (int) (height * 0.30F), time * 0.55F, 4, 0x90FFFFFF);
+
+        int horizon = height - 64;
+        for (int i = 0; i < 5; i++) {
+            int hx = (int) ((i * 150 - time * 0.15F) % (width + 300)) - 150;
+            int r = 70 + (i % 3) * 26;
+            graphics.fill(hx - r, horizon - r / 3, hx + r, horizon, 0xFF3E8E3A);
+        }
+        graphics.fill(0, horizon, width, horizon + 6, 0xFF6ECB4A);
+        graphics.fill(0, horizon + 6, width, height, 0xFF7A5230);
+    }
+
+    private static void drawCloudBank(GuiGraphics graphics, int width, int y, float drift,
+                                      int scale, int colour) {
+        int span = 220;
+        for (int i = -1; i < width / span + 2; i++) {
+            int x = (int) ((i * span - drift) % (width + span * 2)) - span;
+            int s = 4 * scale;
+            graphics.fill(x, y, x + s * 5, y + s, colour);
+            graphics.fill(x + s, y - s, x + s * 4, y, colour);
+            graphics.fill(x + s * 2, y - s * 2, x + s * 3, y - s, colour);
+        }
+    }
+
 }
