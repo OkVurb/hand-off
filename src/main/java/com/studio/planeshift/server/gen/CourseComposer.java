@@ -68,6 +68,9 @@ public final class CourseComposer {
     /** How far above the design floor a roaming enemy may be placed, in blocks. */
     private static final int ROAM_MAX_CLIMB = 6;
 
+    /** Coins in the arc that leads to a secret. Enough to read as a trail, not as a payout. */
+    private static final int SIGNPOST_COINS = 4;
+
     private CourseComposer() {
     }
 
@@ -79,9 +82,11 @@ public final class CourseComposer {
      * @param spawnY       the floor height at the spawn
      * @param checkpointX  where the checkpoint beacon went
      * @param flagX        where the flagpole went
+     * @param lesson       the mechanic this course was built around, introduced early and paid
+     *                     off late — see {@link CourseLesson}
      */
     public record Composition(CourseCanvas canvas, List<String> segmentIds, int spawnY,
-                              int checkpointX, int flagX) {
+                              int checkpointX, int flagX, Segment.Tag lesson) {
     }
 
     /** One placed segment, kept so star coins and the checkpoint can be sited afterwards. */
@@ -137,6 +142,15 @@ public final class CourseComposer {
 
         List<Placed> placed = new ArrayList<>();
         List<String> ids = new ArrayList<>();
+        // What this course is about. See CourseLesson: the composer implemented introduce, develop
+        // and rest but never *conclude*, so a course was a well-paced sequence of unrelated ideas
+        // that stopped when it ran out of room. One mechanic, set up early and paid off late, is
+        // the whole difference between a level and a corridor.
+        Segment.Tag lesson = CourseLesson.pickLesson(theme, ctx.random());
+        CourseLesson.ThemeRules themeRules = CourseLesson.rules(theme);
+        boolean lessonIntroduced = false;
+        boolean lessonConcluded = false;
+
         Set<Segment.Tag> taught = EnumSet.noneOf(Segment.Tag.class);
         Set<Segment.Tag> recent = EnumSet.noneOf(Segment.Tag.class);
         boolean setPieceUsed = false;
@@ -169,13 +183,38 @@ public final class CourseComposer {
                 }
             }
 
+            // The conclude step, forced rather than hoped for. Once the course is into its last
+            // third, the lesson gets one guaranteed hard appearance — that payoff is the entire
+            // reason the lesson exists, and leaving it to weighted chance meant courses that
+            // taught something and then simply ended.
             // A breather is forced after anything demanding.
             if (chosen == null && lastDifficulty >= 3) {
                 chosen = SegmentLibrary.BREATHER;
             }
 
+            // The two ends of the four-step structure, forced rather than hoped for — but placed
+            // *after* the breather rule and subject to the same teaching rule as everything else.
+            // An earlier version put these first and quietly punched a hole through both: forced
+            // segments skipped the mandatory breather after a hard segment, and introduced
+            // mechanics the player had never been shown. A guarantee that suspends the other
+            // guarantees is not a guarantee, it is a special case.
+            if (chosen == null && !lessonIntroduced && progress > 0.30D) {
+                Segment intro = CourseLesson.carrying(lesson, remaining, Math.max(allowed, 1), false);
+                if (intro != null && teachable(intro, taught)) {
+                    chosen = intro;
+                }
+            }
+            if (chosen == null && !lessonConcluded && progress > 0.72D && lessonIntroduced) {
+                Segment payoff = CourseLesson.carrying(lesson, remaining, Math.max(allowed, 2), true);
+                if (payoff != null && teachable(payoff, taught)) {
+                    chosen = payoff;
+                    lessonConcluded = true;
+                }
+            }
+
             if (chosen == null) {
-                chosen = pick(catalogue, ctx, allowed, remaining, taught, recent, floorY);
+                chosen = pick(catalogue, ctx, allowed, remaining, taught, recent, floorY,
+                        lesson, themeRules, CourseLesson.phase(progress), lessonIntroduced);
             }
             if (chosen == null) {
                 // Nothing fits the remaining space; fill it with ground rather than leaving a hole.
@@ -202,6 +241,13 @@ public final class CourseComposer {
             recordFloor(floorAt, cursor, s.width(), floorY, length);
             placed.add(new Placed(chosen, cursor, floorY));
             ids.add(s.id());
+
+            if (s.tags().contains(lesson)) {
+                lessonIntroduced = true;
+            }
+            if (s.tags().contains(Segment.Tag.SECRET)) {
+                signpostSecret(canvas, ctx, cursor, floorY);
+            }
 
             taught.addAll(s.tags());
             recent.clear();
@@ -235,7 +281,7 @@ public final class CourseComposer {
         // spawnY is a standing position, which is one above the surface block: ground(x, 0)
         // fills y=0 with solid, so the player's feet are at y=1. Reporting the surface height
         // here instead was an off-by-one that made every reachability search start inside rock.
-        return new Composition(canvas, ids, 1, checkpointX, flagX);
+        return new Composition(canvas, ids, 1, checkpointX, flagX, lesson);
     }
 
     /**
@@ -276,7 +322,9 @@ public final class CourseComposer {
      * playing one idea eight times.
      */
     private static Segment pick(List<Segment> catalogue, GenContext ctx, int allowed, int remaining,
-                                Set<Segment.Tag> taught, Set<Segment.Tag> recent, int floorY) {
+                                Set<Segment.Tag> taught, Set<Segment.Tag> recent, int floorY,
+                                Segment.Tag lesson, CourseLesson.ThemeRules themeRules,
+                                int phase, boolean lessonIntroduced) {
         List<Segment> candidates = new ArrayList<>();
         List<Integer> weights = new ArrayList<>();
         int total = 0;
@@ -314,6 +362,10 @@ public final class CourseComposer {
                     weight += 5;
                 }
             }
+            // The course's own lesson, and what this theme is for. Both are deltas so that every
+            // rule steering the choice stays legible together rather than being spread around.
+            weight += CourseLesson.weightFor(s, lesson, themeRules, phase, lessonIntroduced);
+
             weight = Math.max(1, weight);
 
             candidates.add(segment);
@@ -568,6 +620,44 @@ public final class CourseComposer {
                 canvas.setIfEmpty(x, y, z, ctx.palette().surface());
             }
         }
+    }
+
+
+    /**
+     * Lays a short rising arc of coins in front of a secret.
+     *
+     * <p>Generated secrets had no tell. A hidden room the player never looks at is not a secret,
+     * it is wasted geometry — and every segment in the catalogue tagged SECRET was, in practice,
+     * unfindable unless the player happened to jump at the right blank wall.
+     *
+     * <p>Coins are the genre's standard answer and they are honest: they are a reward in
+     * themselves, so following them is never a waste even when the player does not realise they
+     * are being led. An arrow would be clearer and much worse — it tells the player there is a
+     * secret instead of letting them find one.
+     *
+     * <p>Placed with {@code setIfEmpty} semantics via the item list, so it cannot disturb the
+     * segment's own contents.
+     */
+    private static void signpostSecret(CourseCanvas canvas, GenContext ctx, int cursor, int floorY) {
+        for (int i = 0; i < SIGNPOST_COINS; i++) {
+            // Rising as it approaches, so the eye is led upward toward the entrance rather than
+            // along the floor it was already walking down.
+            canvas.item(ModItems.COIN.get(),
+                    cursor - SIGNPOST_COINS + i + 0.5D, floorY + 2.0D + i * 0.6D, 0.5D);
+        }
+    }
+
+
+    /**
+     * Whether a segment may be placed given what the player has been shown.
+     *
+     * <p>The same rule {@code pick} applies inline: nothing demanding may be the first thing to
+     * use a mechanic. Extracted so the forced lesson picks obey it too rather than each caller
+     * re-deriving it — which is exactly how the forced picks came to skip it.
+     */
+    private static boolean teachable(Segment segment, Set<Segment.Tag> taught) {
+        Segment.SegmentSpec spec = segment.spec();
+        return spec.difficulty() < 3 || taught.containsAll(mechanics(spec));
     }
 
 }
