@@ -590,7 +590,7 @@ public final class CourseStructureService {
                         Blocks.PACKED_ICE.defaultBlockState(), Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState(),
                         ModBlocks.COURSE_SNOW_BLOCK.get().defaultBlockState());
                 case LAVA -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.BLACKSTONE.defaultBlockState(), ModBlocks.COURSE_MAGMA_BLOCK.get().defaultBlockState(),
+                        Blocks.BLACKSTONE.defaultBlockState(), ModBlocks.COURSE_EMBER_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
                 case UNDERGROUND -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         Blocks.DEEPSLATE.defaultBlockState(), Blocks.PURPLE_TERRACOTTA.defaultBlockState(),

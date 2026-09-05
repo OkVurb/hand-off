@@ -103,7 +103,23 @@ public final class ModBlocks {
                     .friction(0.85F));
     public static final DeferredBlock<Block> COURSE_CASTLE_BLOCK = courseBlock(
             "course_castle_block", MapColor.DEEPSLATE, SoundType.DEEPSLATE_BRICKS);
-    public static final DeferredBlock<Block> COURSE_MAGMA_BLOCK = courseBlock(
+    /**
+     * The LAVA theme's decorative accent. <b>Not a hazard.</b>
+     *
+     * <p>Renamed from {@code COURSE_MAGMA_BLOCK}, because that name was actively dangerous. It is
+     * registered through {@link #courseBlock} like any other wall: no damage behaviour, no tick, no
+     * special collision. But three separate readers - two review agents and one of the authors -
+     * independently proposed adding it to a "kills whatever stands on it" set purely on the
+     * strength of the word <em>magma</em>, and one of those very nearly shipped. It is also what
+     * {@code CourseStructureService.buildFinish} lays the flagpole steps from, so treating it as
+     * lethal would have killed enemies standing on the goal.
+     *
+     * <p>The registry id is deliberately still {@code course_magma_block}: renaming that would
+     * churn the blockstate, model, item model, lang entry and texture for no gain, and would break
+     * blocks already placed in saved worlds. The trap was the Java identifier, and that is what
+     * moved.
+     */
+    public static final DeferredBlock<Block> COURSE_EMBER_BLOCK = courseBlock(
             "course_magma_block", MapColor.FIRE, SoundType.NETHER_BRICKS);
     public static final DeferredBlock<Block> COURSE_WOOD_BLOCK = courseBlock(
             "course_wood_block", MapColor.WOOD, SoundType.WOOD);

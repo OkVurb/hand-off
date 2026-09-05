@@ -139,8 +139,8 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(ModBlocks.SECRET_VINE);
     public static final DeferredItem<net.minecraft.world.item.BlockItem> COURSE_VINE_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_VINE);
-    public static final DeferredItem<?> COURSE_MAGMA_BLOCK_ITEM =
-            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_MAGMA_BLOCK);
+    public static final DeferredItem<?> COURSE_EMBER_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_EMBER_BLOCK);
     public static final DeferredItem<?> COURSE_WOOD_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.COURSE_WOOD_BLOCK);
     public static final DeferredItem<?> COURSE_HARD_BLOCK_ITEM =

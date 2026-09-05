@@ -127,7 +127,7 @@ public final class GenContext {
                 case LAVA -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         Blocks.BLACKSTONE.defaultBlockState(),
-                        ModBlocks.COURSE_MAGMA_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_EMBER_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         Blocks.LAVA.defaultBlockState());
                 case UNDERGROUND -> new Palette(

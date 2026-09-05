@@ -44,10 +44,10 @@ public final class EnemyHazardService {
      * standable anyway. Keeping the two aligned is the whole discipline here: a block that kills
      * enemies but that the solver happily walks the player over teaches exactly the wrong lesson.
      *
-     * <p>{@code COURSE_MAGMA_BLOCK} is deliberately <em>not</em> here despite the name. It is the
-     * LAVA theme accent - a decorative block registered through {@code courseBlock} with no damage
-     * behaviour of any kind - so it does not hurt the player, and a block that kills enemies but
-     * not the player is the same misalignment in the other direction.
+     * <p>{@code COURSE_EMBER_BLOCK} - once called {@code COURSE_MAGMA_BLOCK}, and renamed because
+     * of exactly this - is deliberately absent. It is the LAVA theme's decorative accent with no
+     * damage behaviour at all, so it does not hurt the player, and a block that kills enemies but
+     * not the player is the same misalignment pointing the other way.
      */
     private static final Set<Block> LETHAL = Set.of(
             ModBlocks.MUNCHER.get(),

@@ -472,3 +472,136 @@ R13: `CourseSafety` never tells `CourseReachability` anything. It asks `isStand`
   **Reality:** With entityInside untouched (step 1's stated intent), beginSlide called directly from the test never runs awardFlagpole, so the test would pass while the real in-world path double-pays. The test as designed cannot catch the duplication it creates.
   **Fix:** Drive the GameTest through the actual block trigger (entityInside / a player moved into the pole) rather than calling beginSlide directly, so the test exercises the path players take.
 
+
+
+---
+
+# Plan checks
+
+Run 2026-09-04 against the code as it stands, after the ground pound, spin and enemy-hazard
+work landed. Both plans below were written before those shipped.
+
+
+## Verdict: `needs-correction`
+
+The design is sound and the feature is genuinely absent, but the plan has two outright compile errors in the GameTest step, a wrong wither count, a per-tick attribute-modifier churn bug, a mis-stated AttributeModifier operation, an unproved CourseReachability claim, and a killY hazard that would make its own GameTest fail — so it needs correction before it is built from.
+
+### Problems
+
+**Claimed:** Step 11: put the test player in a course via `CourseStateAccess.update(p -> p.withState(PlayState.PLAYING_2_5D))`
+
+**Reality:** CourseStateAccess.update takes two arguments: `public static CourseState update(ServerPlayer player, UnaryOperator<CourseState> mutation)` — CourseStateAccess.java:24. The single-argument form in step 11 does not compile. (Step 6 uses the correct two-arg form, so the plan contradicts itself.)
+
+**Fix:** Write `CourseStateAccess.update(player, s -> s.withState(PlayState.PLAYING_2_5D))` in the GameTest too.
+
+**Claimed:** Step 11: 'obtain a server player (… `helper.makeMockPlayer(GameType.SURVIVAL)` is used by `hitBrickFromBelow`; use `makeMockServerPlayerInLevel` if `makeMockPlayer` does not return a `ServerPlayer` here)'
+
+**Reality:** It does not. GameTestHelper.java:320 is `public Player makeMockPlayer(final GameType)`, and PlaneShiftGameTests.java:233 assigns it to a `Player`. MovementRuleService.tick and CourseStateAccess both require ServerPlayer, so the makeMockPlayer path is a compile error. GameTestHelper.java:335 `public ServerPlayer makeMockServerPlayerInLevel()` is the only usable one — and it takes no GameType argument.
+
+**Fix:** State outright: use `helper.makeMockServerPlayerInLevel()` (no arguments). Drop the makeMockPlayer branch.
+
+**Claimed:** Step 2 / Files: 'thread pMeter through … all 14 existing withers'
+
+**Reality:** CourseState.java has 13 withers, not 14: withState:242, withMode:247, withTransition:253, withRole:259, withFormSlot:264, withPips:269, withCheckpoint:275, withCoins:280, withStarCoins:286, withLives:292, withScore:298, withTimeLeft:305, withCourseRules:312.
+
+**Fix:** Say 13 existing withers (14 after withPMeter is added), or an implementer following the count will hunt for a wither that does not exist.
+
+**Claimed:** Step 6: call `applyPSpeed(player, next.atFull())` every tick
+
+**Reality:** applyPSpeed as specified (step 5: 'removeModifier first then addTransientModifier only when full') therefore removes and re-adds the MOVEMENT_SPEED and JUMP_STRENGTH modifiers on every one of the ~1200 ticks the player holds P-speed. CourseMovementService.refresh (CourseMovementService.java:38-58), the pattern being copied, is event-driven, not per-tick; each attribute mutation dirties the AttributeMap and re-broadcasts an attribute update packet to the client.
+
+**Fix:** Track the last applied state (e.g. a WeakHashMap<ServerPlayer,Boolean> or compare `previous.atFull() != next.atFull()`) and call applyPSpeed only on the transition, the same edge the POWER_UP ping uses.
+
+**Claimed:** Step 5: 'copying the shape of CourseMovementService.refresh/clear exactly … AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL'
+
+**Reality:** CourseMovementService uses ADD_MULTIPLIED_BASE for both attributes (CourseMovementService.java:48 and :54), not ADD_MULTIPLIED_TOTAL. The step says 'exactly' and then names a different operation.
+
+**Fix:** Pick one and say why. ADD_MULTIPLIED_TOTAL is defensible (it stacks multiplicatively on top of the course boost rather than adding to the same base term) but the plan must not call that 'copying the shape exactly'.
+
+**Claimed:** Step 7: the small jump value is safe because 'CourseReachability proves courses walkable at a fixed conservative arc and must not be told about this'
+
+**Reality:** This is asserted, not shown. The relevant facts are CourseReachability.java:35-36 (`MAX_RISE = 4`, javadoc 'Real value is higher'), :45 `REACH_BY_RISE = {6,5,5,4,3}` and :48 `FALL_REACH = 6`, with the class javadoc at :26 saying the real boosted player clears about six blocks. The proof is one-sided — it certifies a course reachable under a *pessimistic* arc — so a larger jump cannot invalidate it, which is the argument the plan owes and does not make.
+
+**Fix:** Replace the assertion with that one-sided-bound argument, citing CourseReachability.java:26 and :35-36, so a later reader can check it rather than trust it.
+
+**Claimed:** Step 11: drive the player with setPos and 45 ticks of MovementRuleService.tick, then assert pMeter == SEGMENTS
+
+**Reality:** MovementRuleService.tick:61-64 kills the player and returns early whenever `player.getY() < state.killY()`, and withState leaves killY at CourseState.DEFAULT_KILL_Y = -50.0D (CourseState.java:73). GameTest structures are not guaranteed to sit above y=-50, in which case every tick takes the DamageService.down branch and the meter never fills — the test fails for a reason unrelated to the feature.
+
+**Fix:** Have the test set killY explicitly below the structure floor (or assert the player's Y first). There is no wither for killY on CourseState, so this needs to be resolved in the plan, not at implementation time.
+
+### Verified to exist as described
+
+- MovementRuleService.java:66-82 is exactly the P-Speed block the plan describes (SPRINT_TICKS at :26, ticks==30 edge-triggered ping at :70-72, compounding v.x*1.05D at :74-75)
+- MovementRuleService.java:29 LAST_X exists; :89-91 measures position deltas; :112 SMOOTH_VEL_X write ends the skid block, as the plan says
+- CourseService.java:93 is the only out-of-file `new CourseState(...)` call in src (grep over all of src)
+- CourseState.java:80 DEFAULT, :89 CODEC, :122-168 STREAM_CODEC with matching encode/decode order, :171-202 two sanitize returns (hub branch :180, tail :198)
+- CourseStateAccess.update (CourseStateAccess.java:24-31) does skip setData/syncData when the new state equals the old, so 8-step quantisation does reduce packets as claimed
+- CourseMovementService.java:26-27 named Identifier modifiers, :38 refresh / :59 clear, getAttribute(Attributes.JUMP_STRENGTH/MOVEMENT_SPEED) — the pattern the plan copies exists
+- MovementRuleService.tick is called every server tick for every ServerPlayer (ServerEvents.java:93), so the !inCourse() clear path in step 6 does get reached
+- PlayState.inCourse() (PlayState.java:59-61) is PLAYING_2_5D||PLAYING_3D only, so DOWNED/HUB/RESULTS/TRANSITION all fall through the early return as the plan claims
+- CourseHud.java:89 renderCluster, :100 panelRight, :107 pip-loop clipping idiom, pips end y+12, clock at y+28, :190 clip(Font,Component,int) — the y+16 band is genuinely free and PANEL_HEIGHT (98) needs no change
+- PlaneShiftConfig.java:106 builder.push("movement"), courseJumpBoost :114, courseRunBoost :120 — the insertion point exists
+- PlaneShiftGameTests.java has exactly seven test Identifiers (:36-42) with matching registerFunctions (:46-52) and onRegisterGameTests (:60-66) entries
+- docs/MARIO_FEATURE_GAPS.md:760 is the 'P-meter as a real gauge' entry and it does carry the 'Partly present already.' line
+- ModSounds.POWER_UP is already used at MovementRuleService.java:71, so no new sound registration is needed
+- CourseStateTest.java exists (src/test/java/com/studio/planeshift/common/course/CourseStateTest.java); PMeter/PMeterTest do not exist — this feature is genuinely not implemented (unrelated to GroundPoundResolver.java / SpinAttackService.java / EnemyHazardService.java, which are all present)
+
+## Verdict: `needs-correction`
+
+The plan's factual reading of the generator is accurate and the feature is genuinely unbuilt, but it has one non-compiling line, one hazard-set entry that would make a purely decorative block unstandable, and a specified test that cannot be written against the API it proposes.
+
+### Problems
+
+**Claimed:** Step 2: LETHAL_TO_STAND_ON should include ModBlocks.COURSE_MAGMA_BLOCK, justified as 'the LAVA accent is COURSE_MAGMA_BLOCK'.
+
+**Reality:** COURSE_MAGMA_BLOCK is a plain decorative block with no damage behaviour — ModBlocks.java:106-107 registers it via courseBlock("course_magma_block", MapColor.FIRE, SoundType.NETHER_BRICKS), the same helper as COURSE_WOOD_BLOCK. GenContext.java:127-132 shows it is the LAVA palette's *accent* slot (pillars/frames/steps), while the hazard slot is Blocks.LAVA. Making the accent lethal-to-stand-on would make ordinary LAVA-theme decorative geometry unstandable to CourseReachability — a false positive of exactly the kind the plan's own R4 note warns against, and it would likely be the cause of any UNREACHABLE delta the plan then instructs the reader to 'fix in the course generation'.
+
+**Fix:** Drop COURSE_MAGMA_BLOCK from the set; the shared set is MUNCHER, SPIKE_BLOCK, Blocks.LAVA. If magma is meant to hurt, that is a block-behaviour change, not a solver-set change.
+
+**Claimed:** Step 2: `Set.of(..., Blocks.LAVA.getBlock())` in a Set<Block>.
+
+**Reality:** Blocks.LAVA is already a Block (used as such at GenContext.java:132 via Blocks.LAVA.defaultBlockState()); getBlock() is a BlockState/BlockBehaviour.BlockStateBase method, not a Block method. As written this does not compile.
+
+**Fix:** Write `Blocks.LAVA`.
+
+**Claimed:** Step 11 test (5) `nettingOnlyAddsRoutes` — 'for a fixed sample of seeds, every stand the un-netted canvas had is still a stand'.
+
+**Reality:** There is no way to produce an un-netted canvas. CourseComposer.compose is the only entry point (CourseStructureService.java:103-104) and the plan adds no flag or overload to disable netIntroduction; the netting is unconditional inside the placement loop (CourseComposer.java:181-187 region). The test as specified cannot be written.
+
+**Fix:** Either add an explicit test-visible toggle/overload to compose (and say so in the Files section), or restate the test as a property of netIntroduction alone on a canvas built by a single Segment.build call.
+
+**Claimed:** Step 11 test (3) `anIntroductionIsNeverDemanding` 'makes the invariant that pick's difficulty>=3 gate currently implies into something stated'.
+
+**Reality:** That invariant is already stated and tested: CourseGenerationTest.java has `hardSegmentsNeverIntroduceMechanics` (see the method list at CourseGenerationTest.java, alongside everyCourseIsWalkable/coursesAreInhabited). The plan never mentions it.
+
+**Fix:** Drop test (3) or say explicitly that it is the existing assertion re-expressed over `introductions`.
+
+**Claimed:** Step 9: 'canvas.setLane(cx, floorY - INTRO_NET_DROP, ctx.palette().surface(), ctx.halfWidth()) (a plain `set`, so it deliberately overwrites MUNCHER_PIT_HOP's stone shelf at floorY-3)'.
+
+**Reality:** setLane and set are different methods — CourseCanvas.java:148 setIfEmpty, :155 setLane, plus set. setLane writes the full lane width and is last-write-wins; the parenthetical calling it 'a plain set' is describing overwrite semantics with the name of a different method, and MUNCHER_PIT_HOP's Muncher row is written with `c.set(x + i, y - 2, 0, muncher)` at z=0 only (SegmentLibrary.java:900) while the shelf uses setLane (:899).
+
+**Fix:** Say 'setLane, which is last-write-wins, so it overwrites the shelf' and note the Muncher row is single-column at z=0 so the clear loop only strictly needs z=0.
+
+**Claimed:** Step 7: extending Composition to six components 'compiles everywhere'.
+
+**Reality:** CourseComposer.java:66-72 is a javadoc @param block enumerating all five components; adding a component without a matching @param produces a javadoc warning at minimum, and the record's own doc becomes wrong. The plan's Files section does not mention it.
+
+**Fix:** Add the @param line for introductions.
+
+### Verified to exist as described
+
+- CourseCanvas.java:136-147,172,208-217 — maxX/minY/maxY fields and accessors, get(x,y,z), setIfEmpty, setLane exist; no clear() yet
+- CourseReachability.java:111-113 — private HAZARD = Set.of(MUNCHER, SPIKE_BLOCK), as the plan describes
+- CourseReachability.java:36,45 — MAX_RISE = 4, REACH_BY_RISE = {6,5,5,4,3} (REACH_BY_RISE[4]==3, [3]==4), so the INTRO_NET_DROP=3 arithmetic holds
+- CourseReachability.java:203-220 — search() rebuilds the whole stand set per call, including the movingSurfaces() loop; the extraction in step 4 is accurate
+- GenContext.java:194-198 — pitFloor writes palette.hazard() at floorY-4; LAVA hazard is Blocks.LAVA (GenContext.java:132)
+- CourseComposer.java:73-74 record Composition(canvas, segmentIds, spawnY, checkpointX, flagX); single construction site at :218
+- CourseComposer.java:181-187 — chosen.build(...) then taught.addAll(s.tags()); recent.clear(); exactly the insertion point step 8 names
+- CourseComposer.java:318 mechanics(Segment.SegmentSpec) exists and s at :180 is a SegmentSpec, so mechanics(s) compiles
+- CourseComposer.java:44-45 MAX_FLOOR_DRIFT=12 / MIN_FLOOR_DRIFT=-8; no segment writes below y-4 in SegmentLibrary, so the -13 floor bound is arithmetically right
+- CourseStructureService.java:103-110 reads only composition.canvas()/segmentIds()
+- CourseWriter.java:92 bottom = Math.min(-CLEAR_BELOW, canvas.minY() - 4) — corridor is sized off minY as claimed
+- CourseGenerationTest.java:33-34 LENGTHS {96,144,180,224,240,720}, SEEDS 25, Failure record at :90 and report() at :97; everyCourseIsWalkable, generationIsDeterministic, coursesAreInhabited all present; CourseCompletabilityTest exists at src/test/java/com/studio/planeshift/server/CourseCompletabilityTest.java
+- SegmentLibrary.java:891-900 muncher_pit_hop is difficulty 2, Tag.GAP+Tag.UNSTABLE, stone shelf at y-3 and Munchers at y-2 — as described
+- Nothing named CourseSafety, CourseHazards, landingBelow or Introduction exists anywhere in src/ — the feature is genuinely unbuilt

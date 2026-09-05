@@ -52,6 +52,16 @@ public final class CourseComposer {
     /** Flat ground before the flag, so the finish is never a blind jump. */
     private static final int FINISH_RUN = 12;
 
+    /**
+     * How far below the floor a first-appearance safety net sits.
+     *
+     * <p>Three blocks: deep enough that falling in is unmistakably a mistake, shallow enough that
+     * {@code CourseReachability.MAX_RISE} (4) can climb back out. The player pays for the error
+     * with their run-up, which is the correct price for getting a mechanic wrong the first time
+     * they have ever seen it.
+     */
+    static final int INTRO_NET_DROP = 3;
+
     /** Slack on each end of the per-column floor map, since content starts a little before x=0. */
     private static final int FLOOR_MAP_MARGIN = 16;
 
@@ -178,7 +188,17 @@ public final class CourseComposer {
             }
 
             Segment.SegmentSpec s = chosen.spec();
+
+            // Computed before taught is updated below: this asks whether the player has met this
+            // mechanic before, and after taught.addAll the answer is always no.
+            boolean introducesGaps = s.tags().contains(Segment.Tag.GAP)
+                    && !taught.contains(Segment.Tag.GAP);
+
             chosen.build(canvas, cursor, floorY, ctx);
+            if (introducesGaps) {
+                netIntroduction(canvas, ctx, cursor, s.width(), floorY);
+                canvas.marker("intro_net", cursor, floorY, 0);
+            }
             recordFloor(floorAt, cursor, s.width(), floorY, length);
             placed.add(new Placed(chosen, cursor, floorY));
             ids.add(s.id());
@@ -519,5 +539,35 @@ public final class CourseComposer {
             ModBlocks.SPRING_PAD.get(),
             ModBlocks.FLAG_POLE.get(),
             ModBlocks.COURSE_ICE_BLOCK.get());
+
+
+    /**
+     * Floors the pits in the segment that first teaches the player about pits.
+     *
+     * <p>The first time a course shows a mechanic is where the player is allowed to be wrong. A
+     * gap they have never seen before should cost them their momentum, not their life - they have
+     * to understand the rule before failing it can mean anything, and a course whose opening lesson
+     * is a death teaches only that the course is unfair.
+     *
+     * <p>Written with {@link CourseCanvas#setIfEmpty}, so it can never overwrite anything the
+     * segment itself placed - the net fills the hole and leaves the design alone.
+     *
+     * <p>It is also safe against {@link CourseReachability} for a reason worth stating rather than
+     * assuming. The solver's proof is one-sided: it certifies that a route <em>exists</em> under a
+     * deliberately pessimistic jump arc. This only ever adds standable floor three blocks below an
+     * existing surface, which cannot remove a route or break an arc that was already clear, so any
+     * course that passed before still passes. That is the argument - not "the solver is
+     * conservative so it will be fine", which is the shape of reasoning review R13 was written
+     * about.
+     */
+    private static void netIntroduction(CourseCanvas canvas, GenContext ctx,
+                                        int fromX, int width, int floorY) {
+        int y = floorY - INTRO_NET_DROP;
+        for (int x = fromX; x < fromX + width; x++) {
+            for (int z = -ctx.halfWidth(); z <= ctx.halfWidth(); z++) {
+                canvas.setIfEmpty(x, y, z, ctx.palette().surface());
+            }
+        }
+    }
 
 }

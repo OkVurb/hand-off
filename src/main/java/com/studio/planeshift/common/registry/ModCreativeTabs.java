@@ -48,7 +48,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.COURSE_SAND_BLOCK_ITEM.get());
                         output.accept(ModItems.COURSE_SNOW_BLOCK_ITEM.get());
                         output.accept(ModItems.COURSE_CASTLE_BLOCK_ITEM.get());
-                        output.accept(ModItems.COURSE_MAGMA_BLOCK_ITEM.get());
+                        output.accept(ModItems.COURSE_EMBER_BLOCK_ITEM.get());
                         output.accept(ModItems.COURSE_WOOD_BLOCK_ITEM.get());
                         output.accept(ModItems.COURSE_HARD_BLOCK_ITEM.get());
                         output.accept(ModItems.SHIFT_GATE_ITEM.get());
