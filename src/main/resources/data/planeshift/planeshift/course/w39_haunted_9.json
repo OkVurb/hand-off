@@ -1,12 +1,12 @@
 {
-    "dimension":  "planeshift:course",
-    "start_pos":  [
-                      9728,
-                      64,
-                      0
-                  ],
-    "start_mode":  "side_on",
-    "theme":  "ghost_house",
-    "kill_y":  40,
-    "length":  80
+  "dimension": "planeshift:course",
+  "start_pos": [
+    92160,
+    64,
+    0
+  ],
+  "start_mode": "side_on",
+  "theme": "ghost_house",
+  "kill_y": 40,
+  "length": 80
 }

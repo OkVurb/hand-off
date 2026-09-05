@@ -1291,6 +1291,46 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * A row of pipes that go nowhere.
+     *
+     * <p>Every pipe in the mod so far has been functional, which is backwards. In a Mario level
+     * most pipes are furniture: they make the world look plumbed, they give Piranha Plants a place
+     * to live, and the small number that actually lead somewhere matter precisely because the rest
+     * do not. If every pipe is a door, the player has to test all of them, and finding a real one
+     * stops being a discovery.
+     *
+     * <p>So these are deliberately inert. Some hold a plant and are an obstacle; some are empty and
+     * are scenery you can stand on. Neither leads anywhere, and that is the point.
+     */
+    static final Segment PIPE_ROW = new Segment() {
+        public SegmentSpec spec() {
+            return def("pipe_row", 18, 0, 1, Tag.PIPE, Tag.ENEMY);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 18, y, ctx);
+            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+
+            // Three pipes of different heights. Uneven on purpose - a matched row reads as a fence
+            // rather than as plumbing.
+            int[] heights = {2, 3, 2};
+            int[] offsets = {3, 8, 13};
+            for (int i = 0; i < offsets.length; i++) {
+                int px = x + offsets[i];
+                for (int h = 1; h <= heights[i]; h++) {
+                    c.setLane(px, y + h, pipe, ctx.halfWidth());
+                }
+                // Roughly half get a tenant. The rest are empty, so the player cannot learn "pipe
+                // means plant" and stop reading them.
+                if (ctx.random().nextInt(2) == 0) {
+                    mob(c, ModEntities.PIRANHA_PLANT.get(), px, y + heights[i], 0.0F);
+                }
+            }
+            coinTrail(c, x + 5, 3, y + 5, 1);
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -1344,6 +1384,7 @@ public final class SegmentLibrary {
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);
         list.add(KEY_HUNT);
+        list.add(PIPE_ROW);
         list.add(ZIPLINE_GAP_TRAVERSAL);
         return list;
     }

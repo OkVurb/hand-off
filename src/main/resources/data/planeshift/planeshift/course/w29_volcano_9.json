@@ -1,12 +1,12 @@
 {
-    "dimension":  "planeshift:course",
-    "start_pos":  [
-                      7168,
-                      64,
-                      0
-                  ],
-    "start_mode":  "side_on",
-    "theme":  "lava",
-    "kill_y":  40,
-    "length":  80
+  "dimension": "planeshift:course",
+  "start_pos": [
+    64000,
+    64,
+    0
+  ],
+  "start_mode": "side_on",
+  "theme": "lava",
+  "kill_y": 40,
+  "length": 80
 }
