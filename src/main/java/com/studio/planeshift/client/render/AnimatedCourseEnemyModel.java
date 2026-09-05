@@ -156,7 +156,7 @@ public final class AnimatedCourseEnemyModel extends EntityModel<LivingEntityRend
                 leftLeg.yScale = 0.55F;
             }
             case PODOBOO -> body.y += 0.0F;
-            case KOOPA, PARATROOPA, DRY_BONES -> body.zScale = 0.82F;
+            case KOOPA, PARATROOPA, DRY_BONES, BOB_OMB -> body.zScale = 0.82F;
             case THWOMP -> {
                 head.visible = false;
                 body.xScale = 1.35F;

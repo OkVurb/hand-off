@@ -705,8 +705,52 @@ def podoboo():
     return img
 
 
+def bob_omb():
+    """Black cast iron, a brass key, and one live spark.
+
+    Nearly monochrome like the Bullet Bill, and for the same reason - it is machinery among
+    creatures - but where the Bill spends its contrast on a grin, this spends it on the fuse. The
+    trim region is the spark and is the only saturated colour on the sheet, because the single
+    thing the player needs to read at a glance is whether this one is lit.
+    """
+    img = new_sheet()
+    iron = (38, 40, 50)
+
+    def cast(region, colour, seed):
+        base(img, region, colour, seed, ramp=0.36)
+        ox, oy = region
+        w, h = REGION_SIZE[region]
+        dr = ImageDraw.Draw(img)
+        # A broad specular sweep across the upper left: this is a sphere, and one highlight is
+        # what says so on a flat swatch.
+        for i in range(8):
+            dr.line([(ox + 4 + i, oy + 4), (ox + 12 + i, oy + 12)], fill=shade(colour, 1.55))
+        for i in range(w * h // 50):
+            k = _hash(i, seed, 5)
+            dr.point((ox + k % w, oy + (k >> 9) % h), fill=shade(colour, 1.18))
+
+    cast(BODY, iron, 141)
+    cast(HEAD, (46, 48, 60), 142)
+    eyes(img, front(HEAD, 8, 6, 7), 8, 6, sclera=WHITE, pupil=INK)
+
+    # Feet, in a warmer near-black so they separate from the body.
+    base(img, LIMB, (62, 52, 44), 143, ramp=0.24)
+    # Wind-up key: brass.
+    base(img, HARD, (206, 158, 62), 144, ramp=0.28)
+    # Fuse cord.
+    base(img, MUZZLE, (128, 116, 96), 145, ramp=0.22)
+    # The spark. The only saturated colour here, on purpose.
+    base(img, TRIM, (255, 214, 96), 146, ramp=0.20)
+    dr = ImageDraw.Draw(img)
+    for i in range(20):
+        k = _hash(i * 29, 146, 11)
+        dr.point((TRIM[0] + k % 64, TRIM[1] + (k >> 9) % 40), fill=(255, 255, 235, 255))
+    return img
+
+
 CHARACTERS = {
     "goomba": goomba,
+    "bob_omb": bob_omb,
     "podoboo": podoboo,
     "dry_bones": dry_bones,
     "paratroopa": paratroopa,

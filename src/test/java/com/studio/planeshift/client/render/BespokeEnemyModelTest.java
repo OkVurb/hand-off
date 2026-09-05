@@ -38,6 +38,9 @@ class BespokeEnemyModelTest {
             // A teardrop: body, head, tapering crown, tip, and four trailing wisps that the
             // animation lags behind the mass. Small, because it is a blob and not a creature.
             Map.entry(EnemyRigProfile.PODOBOO, 8L),
+            // Almost all body, which is what makes it read as a bomb rather than a small angry
+            // creature: the feet, the wind-up key and the fuse are appendages on a mass.
+            Map.entry(EnemyRigProfile.BOB_OMB, 8L),
             Map.entry(EnemyRigProfile.THWOMP, 11L),
             Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
             Map.entry(EnemyRigProfile.BOO, 11L),

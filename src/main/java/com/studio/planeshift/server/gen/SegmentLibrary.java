@@ -112,10 +112,10 @@ public final class SegmentLibrary {
         return switch (theme) {
             case GRASS -> List.of(ModEntities.GOOMBA.get(), ModEntities.KOOPA.get(),
                     ModEntities.PARATROOPA.get());
-            case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.GOOMBA.get());
+            case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.GOOMBA.get(), ModEntities.BOB_OMB.get());
             case SNOW -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get(), ModEntities.DRY_BONES.get());
-            case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get());
+            case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get());
         };
     }

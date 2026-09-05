@@ -102,6 +102,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case PARATROOPA -> paratroopa();
             case DRY_BONES -> dryBones();
             case PODOBOO -> podoboo();
+            case BOB_OMB -> bobOmb();
             case THWOMP -> thwomp();
             case BULLET_BILL -> bulletBill();
             case BOO -> boo();
@@ -321,6 +322,33 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                     pose((float) Math.cos(angle) * 3.2F, 22, (float) Math.sin(angle) * 3.2F,
                             0, 0, 0));
         }
+        return finish(mesh);
+    }
+
+    /**
+     * A cast-iron sphere with feet and a fuse.
+     *
+     * <p>Almost all body, because that is what makes the silhouette read as a bomb rather than as
+     * a small angry creature: the feet and the wind-up key are tiny appendages on a mass. The fuse
+     * stands proud on top and is a separate part so the animation can make it whip about once lit.
+     *
+     * <p>Face contract: the 8x6x7 head slot at (64,0), shared with the Koopa family so the sheet
+     * does not need a bespoke face size.
+     */
+    private static LayerDefinition bobOmb() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -5, -10, -5, 10, 10, 10), pose(0, 24, 0));
+        r.addOrReplaceChild("head", box(64, 0, -4, -5, -4.5F, 8, 6, 7), pose(0, 19, -1.5F));
+        // Little feet, set wide.
+        r.addOrReplaceChild("left_leg", box(0, 40, -1.5F, 0, -2, 3, 2, 4), pose(3, 22, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -1.5F, 0, -2, 3, 2, 4), pose(-3, 22, 0));
+        // Wind-up key on the back.
+        r.addOrReplaceChild("shell", box(64, 40, -1, -1, 0, 2, 2, 3), pose(0, 19, 5));
+        r.addOrReplaceChild("detail_1", box(64, 40, -3, -0.5F, -0.5F, 6, 1, 1), pose(0, 19, 7.5F));
+        // The fuse: a short stalk and a spark on top.
+        r.addOrReplaceChild("tail", box(0, 40, -0.5F, -4, -0.5F, 1, 4, 1), pose(0, 14, 0));
+        r.addOrReplaceChild("tail_tip", box(64, 80, -1, -2, -1, 2, 2, 2), pose(0, 10, 0));
         return finish(mesh);
     }
 
@@ -565,6 +593,13 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 details[0].zRot += idle * 0.08F;
                 details[1].zRot += idle * 0.06F;
                 details[2].zRot -= idle * 0.06F;
+            }
+            case BOB_OMB -> {
+                // A short waddle - the legs are tiny, so a wide Koopa stride would look wrong -
+                // and a fuse that whips about on its own clock regardless of walk speed.
+                walk(step, opposite, 0.55F);
+                tail.zRot = Mth.sin(state.ageInTicks * 0.9F) * 0.32F;
+                tailTip.zRot = tail.zRot * 1.6F;
             }
             case PODOBOO -> {
                 // Molten: the body pulses and the wisps lag behind it. Nothing here is driven by
