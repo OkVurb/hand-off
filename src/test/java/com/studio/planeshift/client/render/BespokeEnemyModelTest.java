@@ -11,22 +11,31 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class BespokeEnemyModelTest {
 
+    /**
+     * Visible cuboid groups per silhouette.
+     *
+     * <p>Every number here went up in the pass that rebuilt these rigs, because the complaint was
+     * that the enemies were squashed and hard to recognise — the fix for that is more parts, not
+     * different colours. They are recorded rather than derived so that a rig losing geometry is a
+     * test failure and not a shrug.
+     *
+     * <p>Updating a number here is fine <em>when you meant to</em>, and the commit should say which
+     * part changed and why. It is not fine as a way of making a red test go green: a previous pass
+     * through this file halved every one of these to accommodate a broken rewrite, which is how a
+     * one-part Thwomp shipped. See R13.
+     */
     private static final Map<EnemyRigProfile, Long> SOLID_PARTS = Map.ofEntries(
-            Map.entry(EnemyRigProfile.SPROUTLING, 7L),
-            Map.entry(EnemyRigProfile.GECKO, 12L),
-            Map.entry(EnemyRigProfile.CRUSHER, 8L),
-            // 9, not 10: the Bullet Bill rig lost its separate snout when it was rebuilt from a
-            // moth into a shell. Changed deliberately and recorded here on purpose — the previous
-            // pass through this file halved every number in it to make a broken rewrite pass,
-            // which is the one thing these constants exist to prevent.
-            Map.entry(EnemyRigProfile.FLYER, 9L),
-            Map.entry(EnemyRigProfile.WISP, 10L),
-            Map.entry(EnemyRigProfile.RIDER, 11L),
-            Map.entry(EnemyRigProfile.WARRIOR, 11L),
-            Map.entry(EnemyRigProfile.CRAWLER, 14L),
-            Map.entry(EnemyRigProfile.BEETLE, 12L),
-            Map.entry(EnemyRigProfile.PLANT, 13L),
-            Map.entry(EnemyRigProfile.BOSS, 16L));
+            Map.entry(EnemyRigProfile.SPROUTLING, 11L),
+            Map.entry(EnemyRigProfile.GECKO, 14L),
+            Map.entry(EnemyRigProfile.CRUSHER, 11L),
+            Map.entry(EnemyRigProfile.FLYER, 11L),
+            Map.entry(EnemyRigProfile.WISP, 11L),
+            Map.entry(EnemyRigProfile.RIDER, 12L),
+            Map.entry(EnemyRigProfile.WARRIOR, 13L),
+            Map.entry(EnemyRigProfile.CRAWLER, 15L),
+            Map.entry(EnemyRigProfile.BEETLE, 14L),
+            Map.entry(EnemyRigProfile.PLANT, 15L),
+            Map.entry(EnemyRigProfile.BOSS, 19L));
 
     @ParameterizedTest(name = "{0} bakes as a complete bespoke mesh")
     @EnumSource(value = EnemyRigProfile.class, names = "VILLAGER", mode = EnumSource.Mode.EXCLUDE)

@@ -43,7 +43,8 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
     private static final String[] PARTS = {
         "body", "head", "jaw", "snout", "shell", "left_arm", "right_arm",
         "left_leg", "right_leg", "left_wing", "right_wing", "tail", "tail_tip",
-        "detail_1", "detail_2", "detail_3", "detail_4", "detail_5", "detail_6"
+        "detail_1", "detail_2", "detail_3", "detail_4", "detail_5", "detail_6",
+        "detail_7", "detail_8", "detail_9", "detail_10", "detail_11", "detail_12"
     };
 
     private final EnemyRigProfile profile;
@@ -80,7 +81,9 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         tailTip = root.getChild("tail_tip");
         details = new ModelPart[] {
             root.getChild("detail_1"), root.getChild("detail_2"), root.getChild("detail_3"),
-            root.getChild("detail_4"), root.getChild("detail_5"), root.getChild("detail_6")
+            root.getChild("detail_4"), root.getChild("detail_5"), root.getChild("detail_6"),
+            root.getChild("detail_7"), root.getChild("detail_8"), root.getChild("detail_9"),
+            root.getChild("detail_10"), root.getChild("detail_11"), root.getChild("detail_12")
         };
     }
 
@@ -135,227 +138,278 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return PartPose.offsetAndRotation(x, y, z, xr, yr, zr);
     }
 
+    /**
+     * The face contract.
+     *
+     * <p>Every rig below obeys one rule that is invisible in code and catastrophic to break, so it
+     * is written down here rather than rediscovered.
+     *
+     * <p>{@code EnemyTextureGen} paints these 128x128 sheets as six flat material regions, at
+     * origins (0,0), (64,0), (0,40), (64,40), (0,80) and (64,80). A box does not pick a picture, it
+     * picks a <em>material</em> — which is why every {@code texOffs} in this file is one of those
+     * six and never anything in between. A UV of, say, (32,48) starts partway through one region
+     * and runs into the next, so the box samples two materials with a seam through the middle. An
+     * earlier rewrite of this whole file did exactly that, using vanilla player-model coordinates
+     * from a 64x64 skin, and every enemy in the mod sampled the wrong part of its own texture.
+     *
+     * <p>The second half of the rule is tighter. Two regions are not flat: the generator paints a
+     * <em>face</em> into them, sized for one specific box. {@code sideFace(g, u, v, w, h, depth)}
+     * wraps eyes around a box of exactly those dimensions, so the part carrying the face has to be
+     * that size or the eyes land on its ear. Per profile:
+     *
+     * <pre>
+     *   SPROUTLING  body 12x9x8   @(0,0)    head plate 10x6 @(0,80)
+     *   GECKO       head  8x6x7   @(64,0)   muzzle      6x3 @(0,80)
+     *   CRUSHER     body 16x14x8  @(0,0)    head plate 10x7 @(0,80)
+     *   FLYER       head 10x10x5  @(64,0)
+     *   WISP        body 12x10x10 @(0,0)    head plate  8x5 @(0,80)
+     *   RIDER       head  7x6x6   @(64,0)   muzzle      5x3 @(0,80)
+     *   WARRIOR     head  8x6x7   @(64,0)   muzzle      6x3 @(0,80)
+     *   CRAWLER     body 14x7x10  @(0,0)    head plate  8x4 @(0,80)
+     *   BEETLE      head 10x7x7   @(64,0)
+     *   PLANT       maw  12x7x10  @(64,0)   mouth plate 10x8 @(0,80)
+     *   BOSS        head 12x8x10  @(64,0)   muzzle     10x5 @(0,80)
+     * </pre>
+     *
+     * <p>Everything else is free. Detail parts can be any size at any of the six origins, which is
+     * what makes it cheap to add the horns, brows, teeth and studs that turn a coloured box into a
+     * recognisable creature.
+     */
     private static LayerDefinition sproutling() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
+        // Head-body, one mass. A Goomba is almost entirely face, so the face box IS the creature
+        // and the legs are an afterthought hanging off the bottom.
         r.addOrReplaceChild("body", box(0, 0, -6, -9, -4, 12, 9, 8), pose(0, 21, 0));
-        r.addOrReplaceChild("head", box(0, 80, -5, -3, -0.5F, 10, 6, 1), pose(0, 16, -4));
-        r.addOrReplaceChild("left_leg", box(0, 40, -4.5F, 0, -3.5F, 5, 3, 7), pose(0, 21, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -0.5F, 0, -3.5F, 5, 3, 7), pose(0, 21, 0));
-        r.addOrReplaceChild("detail_1", box(64, 40, -1.5F, -8, -0.5F, 3, 8, 1), pose(0, 13, 0));
-        r.addOrReplaceChild("detail_2", box(64, 40, -1, -7, -0.5F, 2, 7, 1),
-                pose(-3, 14, 0, 0, 0, -0.82F));
-        r.addOrReplaceChild("detail_3", box(64, 40, -1, -7, -0.5F, 2, 7, 1),
-                pose(3, 14, 0, 0, 0, 0.82F));
+        r.addOrReplaceChild("head", box(0, 80, -5, -3, -0.5F, 10, 6, 1), pose(0, 16, -4.2F));
+        // Brow ridge, jutting forward over the eyes. This one part does most of the work of making
+        // it read as cross rather than blank.
+        r.addOrReplaceChild("snout", box(64, 80, -6, -1.5F, -1, 12, 3, 2), pose(0, 13.5F, -4));
+        r.addOrReplaceChild("left_leg", box(0, 40, -3.5F, 0, -3, 7, 3, 6), pose(3.5F, 21, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -3.5F, 0, -3, 7, 3, 6), pose(-3.5F, 21, 0));
+        // Angled brows over each eye.
+        r.addOrReplaceChild("detail_1", box(64, 80, -3, -1, -0.5F, 5, 2, 1), pose(-2.6F, 14.4F, -4.6F, 0, 0, 0.32F));
+        r.addOrReplaceChild("detail_2", box(64, 80, -2, -1, -0.5F, 5, 2, 1), pose(2.6F, 14.4F, -4.6F, 0, 0, -0.32F));
+        // Two fangs at the lower lip.
+        r.addOrReplaceChild("detail_3", box(64, 40, -1, 0, -0.5F, 2, 2, 1), pose(-2, 18.6F, -4.4F));
+        r.addOrReplaceChild("detail_4", box(64, 40, -1, 0, -0.5F, 2, 2, 1), pose(2, 18.6F, -4.4F));
+        // A short stalk on the crown, so the silhouette is not a plain dome from behind.
+        r.addOrReplaceChild("detail_5", box(64, 40, -1.5F, -3, -1.5F, 3, 3, 3), pose(0, 12, 0));
+        r.addOrReplaceChild("detail_6", box(64, 40, -2.5F, -1, -1, 5, 2, 2), pose(0, 10.5F, 0));
         return finish(mesh);
     }
 
     private static LayerDefinition gecko() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -4, -8, -3, 8, 8, 6), pose(0, 18, 0));
-        r.addOrReplaceChild("head", box(64, 0, -4, -6, -4, 8, 6, 7), pose(0, 11, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -3, -2, -4, 6, 3, 4), pose(0, 9, -3));
-        r.addOrReplaceChild("shell", box(64, 40, -4, -5, -1, 8, 10, 3), pose(0, 14, 3));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -1.5F, 3, 7, 3), pose(4, 11, 0, 0, 0, -0.12F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -3, 0, -1.5F, 3, 7, 3), pose(-4, 11, 0, 0, 0, 0.12F));
-        r.addOrReplaceChild("left_leg", box(0, 40, -1.5F, 0, -2, 3, 6, 4), pose(2.5F, 18, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -1.5F, 0, -2, 3, 6, 4), pose(-2.5F, 18, 0));
-        r.addOrReplaceChild("tail", box(64, 40, -2, -2, 0, 4, 4, 8), pose(0, 17, 3, 0.35F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 40, -1.5F, -1.5F, 0, 3, 3, 7), pose(0, 19, 10, 0.62F, 0, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.7F, 8.5F, -3.5F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.7F, 8.5F, -3.5F));
+        r.addOrReplaceChild("body", box(0, 0, -4, -9, -3, 8, 9, 6), pose(0, 19, 0));
+        // The shell is the read. Wide, domed, sitting proud of the back rather than flush with it.
+        r.addOrReplaceChild("shell", box(64, 40, -5.5F, -7, -1, 11, 11, 5), pose(0, 17, 2.5F));
+        r.addOrReplaceChild("head", box(64, 0, -4, -6, -3.5F, 8, 6, 7), pose(0, 11, -1));
+        r.addOrReplaceChild("snout", box(0, 80, -3, -1.5F, -3, 6, 3, 3), pose(0, 9.5F, -4));
+        r.addOrReplaceChild("jaw", box(0, 80, -2.5F, 0, -2.5F, 5, 2, 3), pose(0, 11, -4, 0.12F, 0, 0));
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -1.5F, 3, 7, 3), pose(4, 12, 0, 0, 0, -0.14F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -3, -1, -1.5F, 3, 7, 3), pose(-4, 12, 0, 0, 0, 0.14F));
+        r.addOrReplaceChild("left_leg", box(0, 40, -1.5F, 0, -2, 3, 5, 5), pose(2.5F, 19, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -1.5F, 0, -2, 3, 5, 5), pose(-2.5F, 19, 0));
+        r.addOrReplaceChild("tail", box(64, 40, -2, -2, 0, 4, 4, 5), pose(0, 20, 4, 0.4F, 0, 0));
+        // Shell rim, a lighter band around the dome.
+        r.addOrReplaceChild("detail_1", box(64, 80, -6, -1, -0.5F, 12, 2, 5), pose(0, 17.5F, 2.5F));
+        // Two scutes on the shell so it is not a smooth blob in profile.
+        r.addOrReplaceChild("detail_2", box(64, 80, -2, -2, -0.5F, 4, 4, 1), pose(0, 13.5F, 7.6F));
+        // Eyes, standing off the head.
+        r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
+        r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
         return finish(mesh);
     }
 
     private static LayerDefinition crusher() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
+        // One heavy slab, exactly the size the face is painted for.
         r.addOrReplaceChild("body", box(0, 0, -8, -14, -4, 16, 14, 8), pose(0, 21, 0));
-        r.addOrReplaceChild("head", box(0, 80, -5, -4, -0.5F, 10, 7, 1), pose(0, 12, -4));
-        r.addOrReplaceChild("left_arm", box(64, 0, -1, -4, -3, 6, 8, 6), pose(8, 13, 0));
-        r.addOrReplaceChild("right_arm", box(64, 0, -5, -4, -3, 6, 8, 6), pose(-8, 13, 0));
-        r.addOrReplaceChild("left_leg", box(0, 40, -2, 0, -2.5F, 4, 4, 5), pose(4, 21, 0));
-        r.addOrReplaceChild("right_leg", box(0, 40, -2, 0, -2.5F, 4, 4, 5), pose(-4, 21, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -3, -3, -0.5F, 6, 6, 1), pose(0, 18, -4.1F));
-        r.addOrReplaceChild("detail_2", box(64, 40, -2, -2, -1, 4, 4, 2), pose(0, 8, 0));
+        r.addOrReplaceChild("head", box(0, 80, -5, -4, -0.5F, 10, 7, 1), pose(0, 12, -4.2F));
+        // Heavy brow: the single part that makes a stone block look furious.
+        r.addOrReplaceChild("snout", box(64, 80, -7, -2, -1, 14, 3, 2), pose(0, 9, -3.6F));
+        // Corner studs. A Thwomp is masonry, and masonry has edges.
+        float[][] studs = {{-6.5F, 9.5F}, {6.5F, 9.5F}, {-6.5F, 19.5F}, {6.5F, 19.5F}};
+        for (int i = 0; i < studs.length; i++) {
+            r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+                    pose(studs[i][0], studs[i][1], 0));
+        }
+        // Gritted teeth along the lower edge of the face.
+        r.addOrReplaceChild("detail_5", box(64, 40, -4, 0, -0.5F, 8, 2, 1), pose(0, 16, -4.4F));
+        // A capstone and a base course, so the slab has a top and a bottom.
+        r.addOrReplaceChild("detail_6", box(64, 40, -8.5F, -2, -4.5F, 17, 2, 9), pose(0, 8.5F, 0));
+        r.addOrReplaceChild("detail_7", box(64, 40, -8.5F, -2, -4.5F, 17, 2, 9), pose(0, 22, 0));
+        r.addOrReplaceChild("detail_8", box(64, 80, -2, -1, -0.5F, 4, 2, 1), pose(0, 10.5F, -4.4F));
         return finish(mesh);
     }
 
-    /**
-     * The flying artillery shell.
-     *
-     * <p>Rebuilt because the previous rig was a moth: it had two 10-long wings, a tail fin and a
-     * separate snout, and the silhouette that produced was an insect, not a projectile. A shell
-     * reads from exactly two things — a long smooth barrel and a blunt rounded nose with a face on
-     * it — and everything sticking off the sides was working against both.
-     *
-     * <p>What is left of the wings is a pair of short side fins, kept only because the FLYER
-     * animation flaps {@code leftWing}/{@code rightWing} and a tiny bob at the fin sells "hovering
-     * under power" better than a rigid bar does.
-     *
-     * <p>UV origins are one of the six material regions the 128x128 sheet is divided into —
-     * (0,0), (64,0), (0,40), (64,40), (0,80), (64,80) — and the face is painted into (64,0), so
-     * the nose is the part that samples it. A box whose UV starts anywhere else lands between
-     * regions and samples two materials at once.
-     */
     private static LayerDefinition torpedoMoth() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        // Barrel: long, round-ish, unbroken. This is the whole read.
+        // Barrel: long, smooth, unbroken. This is the whole read, and the previous rig buried it
+        // under two ten-long wings and a tail fin, which made an insect rather than a shell.
         r.addOrReplaceChild("body", box(0, 0, -5, -5, -7, 10, 10, 16), pose(0, 15, 0));
-        // Nose cap, wider than the barrel so the profile blunts instead of tapering, and on the
-        // face material so the eyes land here.
-        r.addOrReplaceChild("head", box(64, 0, -6, -6, -4, 12, 12, 5), pose(0, 15, -8));
-        // Tail flare, shorter and narrower — a shell is fatter at the front.
+        // Nose cap: exactly 10x10x5, because that is the box the face is painted around.
+        r.addOrReplaceChild("head", box(64, 0, -5, -5, -4, 10, 10, 5), pose(0, 15, -8));
         r.addOrReplaceChild("tail", box(64, 40, -4, -4, 0, 8, 8, 3), pose(0, 15, 9));
-        // Side fins where the arms were. Small on purpose.
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -2, 4, 2, 6), pose(5, 15, 1, 0, 0, -0.18F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -4, -1, -2, 4, 2, 6), pose(-5, 15, 1, 0, 0, 0.18F));
-        // Vestigial wings, kept so the FLYER flap animation has something to move.
-        r.addOrReplaceChild("left_wing", box(0, 40, 0, -0.5F, -1.5F, 3, 1, 4), pose(5, 12, 2, 0, 0, -0.42F));
-        r.addOrReplaceChild("right_wing", box(0, 40, -3, -0.5F, -1.5F, 3, 1, 4), pose(-5, 12, 2, 0, 0, 0.42F));
-        // Rivets on the nose ring, so the cap reads as a separate cast piece.
-        r.addOrReplaceChild("detail_1", box(64, 80, -1, -1, -0.5F, 2, 2, 1), pose(-4, 15, -12.2F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1, -1, -0.5F, 2, 2, 1), pose(4, 15, -12.2F));
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -2, 5, 2, 6), pose(5, 15, 1, 0, 0, -0.2F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -5, -1, -2, 5, 2, 6), pose(-5, 15, 1, 0, 0, 0.2F));
+        // Vestigial wings, kept because the FLYER animation flaps them and a little motion at the
+        // fin sells "under power" better than a rigid bar.
+        r.addOrReplaceChild("left_wing", box(0, 40, 0, -0.5F, -1.5F, 4, 1, 4), pose(5, 12, 3, 0, 0, -0.42F));
+        r.addOrReplaceChild("right_wing", box(0, 40, -4, -0.5F, -1.5F, 4, 1, 4), pose(-5, 12, 3, 0, 0, 0.42F));
+        // Nose ring and rivets, so the cap reads as a separate cast piece.
+        r.addOrReplaceChild("detail_1", box(64, 40, -5.5F, -5.5F, -0.5F, 11, 11, 1), pose(0, 15, -3.4F));
+        r.addOrReplaceChild("detail_2", box(64, 80, -1, -1, -0.5F, 2, 2, 1), pose(-4, 15, -12.2F));
+        r.addOrReplaceChild("detail_3", box(64, 80, -1, -1, -0.5F, 2, 2, 1), pose(4, 15, -12.2F));
+        // Exhaust flare at the back.
+        r.addOrReplaceChild("detail_4", box(64, 40, -2.5F, -2.5F, 0, 5, 5, 2), pose(0, 15, 12));
         return finish(mesh);
     }
 
-    /**
-     * The shy ghost.
-     *
-     * <p>The previous rig was a box with six posts hanging off the bottom, and the feedback on it
-     * was that it did not look like a ghost at all. Three things were missing and all three are
-     * cheap.
-     *
-     * <p>A ghost has <em>no flat bottom</em>. The body now narrows in two stages toward the tail
-     * so the silhouette rounds off, and the fringe posts taper from the middle outward instead of
-     * all being the same stub, which is what turns a row of pegs into a ragged hem.
-     *
-     * <p>A ghost is <em>front-heavy</em>: the face is most of the character, so the face plate is
-     * larger and sits proud of the body rather than flush with it, and the little arms are held
-     * forward and inward — the pose that reads as "reaching", which is the only thing this
-     * creature does.
-     *
-     * <p>The bobbing is already in the WISP branch of the animation; what it had to bob was the
-     * problem.
-     */
     private static LayerDefinition moonWisp() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        // Round main mass, taller than the old one so it is not a floating plate.
-        r.addOrReplaceChild("body", box(0, 0, -6, -7, -5, 12, 12, 10), pose(0, 13, 0));
-        // Shoulders, narrower and set back — the two-stage taper is what rounds the silhouette.
+        // 12x10x10 exactly: this is the box the WISP face is painted around.
+        r.addOrReplaceChild("body", box(0, 0, -6, -6, -5, 12, 10, 10), pose(0, 13, 0));
+        // Face plate at (0,80), 8x5 — the flat face the generator paints there, not the side face.
+        r.addOrReplaceChild("head", box(0, 80, -4, -2.5F, -0.5F, 8, 5, 1), pose(0, 12, -5.4F));
+        // Shoulders, narrower and set back. The two-stage taper is what rounds the silhouette and
+        // stops it reading as a floating plate.
         r.addOrReplaceChild("shell", box(0, 40, -5, -2, -4, 10, 5, 8), pose(0, 18, 0.5F));
-        // Face plate: large, and pushed forward so it catches light separately from the body.
-        r.addOrReplaceChild("head", box(64, 0, -5, -4, -0.5F, 10, 8, 1), pose(0, 12, -5.4F));
-        // Ragged hem: tallest in the middle, shortest at the edges.
+        r.addOrReplaceChild("left_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+                pose(6.5F, 14, -2.5F, 0, -0.5F, 0));
+        r.addOrReplaceChild("right_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+                pose(-6.5F, 14, -2.5F, 0, 0.5F, 0));
+        // Ragged hem, tallest in the middle. A ghost has no flat bottom.
         for (int i = 0; i < 5; i++) {
             float x = -4.0F + i * 2.0F;
             int height = 5 - Math.abs(i - 2);
             r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -1, 0, -1, 2, height, 2),
                     pose(x, 21, 0, 0, 0, (i - 2) * 0.09F));
         }
-        // Small arms, forward and turned in.
-        r.addOrReplaceChild("left_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
-                pose(6.5F, 14, -2.5F, 0, -0.5F, 0));
-        r.addOrReplaceChild("right_arm", box(64, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3),
-                pose(-6.5F, 14, -2.5F, 0, 0.5F, 0));
+        // Tongue, just below the face. Cheap, and it is half of what makes a Boo a Boo.
+        r.addOrReplaceChild("detail_6", box(64, 80, -1.5F, 0, -0.5F, 3, 2, 1), pose(0, 15.5F, -5.6F));
         return finish(mesh);
     }
 
     private static LayerDefinition mantaRider() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -7, -2, -5, 14, 4, 10), pose(0, 20, 0));
-        r.addOrReplaceChild("left_wing", box(0, 0, 0, -1, -5, 9, 2, 10), pose(6, 20, 0, 0, 0, -0.08F));
-        r.addOrReplaceChild("right_wing", box(0, 0, -9, -1, -5, 9, 2, 10), pose(-6, 20, 0, 0, 0, 0.08F));
-        r.addOrReplaceChild("tail", box(0, 40, -1.5F, -1.5F, 0, 3, 3, 9), pose(0, 20, 5, 0.16F, 0, 0));
-        r.addOrReplaceChild("shell", box(64, 40, -4, -5, -3, 8, 5, 6), pose(0, 17, 0));
+        // The cloud is the character's ground. Built from a slab plus four puffs so its outline is
+        // lumpy rather than rectangular.
+        r.addOrReplaceChild("shell", box(0, 0, -8, -3, -6, 16, 5, 12), pose(0, 20, 0));
+        float[][] puffs = {{-7, 19, -4}, {7, 19, -4}, {-6, 19, 5}, {6, 19, 5}};
+        for (int i = 0; i < puffs.length; i++) {
+            r.addOrReplaceChild("detail_" + (i + 1), box(0, 0, -3, -3, -3, 6, 6, 6),
+                    pose(puffs[i][0], puffs[i][1], puffs[i][2]));
+        }
+        r.addOrReplaceChild("body", box(0, 40, -3.5F, -6, -2.5F, 7, 6, 5), pose(0, 18, 0));
         r.addOrReplaceChild("head", box(64, 0, -3.5F, -6, -3, 7, 6, 6), pose(0, 12, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -2.5F, -2, -2, 5, 3, 2), pose(0, 10, -3));
+        r.addOrReplaceChild("snout", box(0, 80, -2.5F, -1.5F, -1.5F, 5, 3, 3), pose(0, 10, -3.5F));
         r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -1, 2, 5, 2), pose(3.5F, 13, 0, -0.65F, 0, -0.25F));
         r.addOrReplaceChild("right_arm", box(0, 40, -2, 0, -1, 2, 5, 2), pose(-3.5F, 13, 0, -0.65F, 0, 0.25F));
-        r.addOrReplaceChild("detail_1", box(64, 80, -3, -1, -0.5F, 6, 2, 1), pose(0, 8.5F, -3.1F));
-        r.addOrReplaceChild("detail_2", box(64, 40, 0, -0.5F, -0.5F, 8, 1, 1), pose(2, 13, 2, 0, 0.35F, 0.12F));
+        // Goggles across the eyes, and a shell on the back.
+        r.addOrReplaceChild("detail_5", box(64, 80, -3.5F, -1.5F, -0.5F, 7, 3, 1), pose(0, 8.5F, -3.2F));
+        r.addOrReplaceChild("detail_6", box(64, 40, -3.5F, -4, -1, 7, 6, 3), pose(0, 17, 2.5F));
         return finish(mesh);
     }
 
     private static LayerDefinition pangolin() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -5, -9, -3.5F, 10, 9, 7), pose(0, 19, 0));
-        r.addOrReplaceChild("shell", box(64, 40, -5.5F, -8, -1, 11, 10, 4), pose(0, 17, 2));
-        r.addOrReplaceChild("head", box(64, 0, -4, -6, -4, 8, 6, 7), pose(0, 10, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -3, -2, -4, 6, 3, 4), pose(0, 9, -3));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -2, 4, 8, 4), pose(5, 11, 0, 0, 0, -0.18F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -4, 0, -2, 4, 8, 4), pose(-5, 11, 0, 0, 0, 0.18F));
+        r.addOrReplaceChild("body", box(0, 0, -4.5F, -10, -3, 9, 10, 6), pose(0, 19, 0));
+        r.addOrReplaceChild("shell", box(64, 40, -5.5F, -8, -1, 11, 11, 5), pose(0, 17, 2.5F));
+        r.addOrReplaceChild("head", box(64, 0, -4, -6, -3.5F, 8, 6, 7), pose(0, 10, 0));
+        r.addOrReplaceChild("snout", box(0, 80, -3, -1.5F, -3, 6, 3, 3), pose(0, 8.5F, -3.5F));
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -2, 4, 8, 4), pose(5, 11, 0, 0, 0, -0.2F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -4, -1, -2, 4, 8, 4), pose(-5, 11, 0, 0, 0, 0.2F));
         r.addOrReplaceChild("left_leg", box(0, 40, -2, 0, -2.5F, 4, 5, 5), pose(3, 19, 0));
         r.addOrReplaceChild("right_leg", box(0, 40, -2, 0, -2.5F, 4, 5, 5), pose(-3, 19, 0));
-        r.addOrReplaceChild("tail", box(64, 40, -3, -3, 0, 6, 6, 8), pose(0, 17, 3, 0.42F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 40, -2, -2, 0, 4, 4, 7), pose(0, 20, 10, 0.62F, 0, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -4.5F, -1, -0.5F, 9, 2, 1), pose(0, 6, -3.8F));
+        // The helmet is the whole reason a Hammer Bro is not a Koopa: a hard brim across the brow.
+        r.addOrReplaceChild("detail_1", box(64, 40, -4.5F, -2, -4, 9, 3, 8), pose(0, 5.5F, 0));
+        r.addOrReplaceChild("detail_2", box(64, 40, -5, -1, -1.5F, 10, 2, 3), pose(0, 5.5F, -3.5F));
+        r.addOrReplaceChild("detail_3", box(64, 80, -6, -1, -0.5F, 12, 2, 5), pose(0, 17.5F, 2.5F));
+        r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 7.5F, -3.6F));
+        r.addOrReplaceChild("detail_5", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 7.5F, -3.6F));
         return finish(mesh);
     }
 
     private static LayerDefinition pincushionCrab() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
+        // 14x7x10: the box the CRAB face is painted around.
         r.addOrReplaceChild("body", box(0, 0, -7, -5, -5, 14, 7, 10), pose(0, 18, 0));
-        r.addOrReplaceChild("head", box(0, 80, -4, -2, -0.5F, 8, 4, 1), pose(0, 17, -5));
-        r.addOrReplaceChild("left_arm", box(64, 0, 0, -2, -2, 6, 5, 5), pose(7, 19, -2, 0, 0, -0.18F));
-        r.addOrReplaceChild("right_arm", box(64, 0, -6, -2, -2, 6, 5, 5), pose(-7, 19, -2, 0, 0, 0.18F));
-        for (int i = 0; i < 6; i++) {
-            boolean left = i >= 3;
-            int lane = i % 3;
-            float x = left ? 6 : -6;
-            float z = -3 + lane * 3;
-            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, left ? 0 : -5, -1, -1, 5, 2, 2),
-                    pose(x, 21, z, 0, (lane - 1) * 0.2F, left ? 0.32F : -0.32F));
+        r.addOrReplaceChild("head", box(0, 80, -4, -2, -0.5F, 8, 4, 1), pose(0, 17, -5.2F));
+        // Domed shell over the back — the thing the spikes stand on, and the thing that tells the
+        // player not to jump here.
+        r.addOrReplaceChild("shell", box(64, 40, -6.5F, -4, -4.5F, 13, 4, 9), pose(0, 13.5F, 0));
+        r.addOrReplaceChild("left_leg", box(0, 40, 0, 0, -2, 4, 3, 4), pose(5, 21, -2, 0, 0, -0.15F));
+        r.addOrReplaceChild("right_leg", box(0, 40, -4, 0, -2, 4, 3, 4), pose(-5, 21, -2, 0, 0, 0.15F));
+        // Six spikes, alternating height so the back is jagged rather than a crown of matched pins.
+        float[][] spikes = {{-4.5F, -3}, {0, -4}, {4.5F, -3}, {-4.5F, 3}, {0, 4}, {4.5F, 3}};
+        for (int i = 0; i < spikes.length; i++) {
+            float h = (i % 3 == 1) ? 5 : 4;
+            r.addOrReplaceChild("detail_" + (i + 1), box(64, 80, -1.5F, -h, -1.5F, 3, h, 3),
+                    pose(spikes[i][0], 13.5F, spikes[i][1]));
         }
-        r.addOrReplaceChild("left_leg", box(64, 80, -1, -5, -1, 2, 5, 2), pose(4, 14, -1, -0.3F, 0, 0.35F));
-        r.addOrReplaceChild("right_leg", box(64, 80, -1, -5, -1, 2, 5, 2), pose(-4, 14, -1, -0.3F, 0, -0.35F));
-        r.addOrReplaceChild("tail", box(64, 80, -1, -6, -1, 2, 6, 2), pose(0, 14, 1, 0.25F, 0, 0));
-        r.addOrReplaceChild("tail_tip", box(64, 80, -1, -5, -1, 2, 5, 2), pose(0, 15, -3, -0.35F, 0, 0));
+        // Eyes, set wide and low.
+        r.addOrReplaceChild("detail_7", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-3, 16, -4.8F));
+        r.addOrReplaceChild("detail_8", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(3, 16, -4.8F));
+        // Front feet. It walks on four, and two made it look like it was dragging itself.
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -2, 4, 3, 4), pose(5, 21, 3, 0, 0, -0.15F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -4, 0, -2, 4, 3, 4), pose(-5, 21, 3, 0, 0, 0.15F));
         return finish(mesh);
     }
 
     private static LayerDefinition burrowingBeetle() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("body", box(0, 0, -7, -5, -7, 14, 8, 14), pose(0, 18, 1));
-        r.addOrReplaceChild("shell", box(64, 40, -6, -3, -6, 12, 5, 13), pose(0, 15, 2));
-        r.addOrReplaceChild("head", box(64, 0, -5, -4, -5, 10, 7, 7), pose(0, 19, -6));
-        r.addOrReplaceChild("snout", box(0, 80, -4, -1.5F, -2, 8, 3, 2), pose(0, 20, -11));
-        for (int i = 0; i < 6; i++) {
-            boolean left = i >= 3;
-            int lane = i % 3;
-            float x = left ? 6 : -6;
-            float z = -3 + lane * 4;
-            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, left ? 0 : -5, -1, -1, 5, 2, 2),
-                    pose(x, 21, z, 0, (lane - 1) * 0.18F, left ? 0.38F : -0.38F));
-        }
-        r.addOrReplaceChild("left_arm", box(64, 80, 0, -1, -1, 4, 2, 2), pose(2, 21, -11, 0, -0.32F, 0.18F));
-        r.addOrReplaceChild("right_arm", box(64, 80, -4, -1, -1, 4, 2, 2), pose(-2, 21, -11, 0, 0.32F, -0.18F));
+        r.addOrReplaceChild("body", box(0, 0, -5, -4, -5, 10, 4, 10), pose(0, 20, 0));
+        // Wide, low, glossy carapace: a Buzzy Beetle is a helmet with feet.
+        r.addOrReplaceChild("shell", box(64, 40, -7, -6, -6, 14, 6, 12), pose(0, 20, 0));
+        r.addOrReplaceChild("head", box(64, 0, -5, -7, -3.5F, 10, 7, 7), pose(0, 20, -5));
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -1.5F, 3, 3, 3), pose(5.5F, 21, -3));
+        r.addOrReplaceChild("right_arm", box(0, 40, -3, 0, -1.5F, 3, 3, 3), pose(-5.5F, 21, -3));
+        r.addOrReplaceChild("left_leg", box(0, 40, 0, 0, -1.5F, 3, 3, 3), pose(5.5F, 21, 3));
+        r.addOrReplaceChild("right_leg", box(0, 40, -3, 0, -1.5F, 3, 3, 3), pose(-5.5F, 21, 3));
+        // Rim around the carapace, and a ridge down the middle.
+        r.addOrReplaceChild("detail_1", box(64, 80, -7.5F, -1, -6.5F, 15, 2, 13), pose(0, 20.5F, 0));
+        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -2, -6, 3, 2, 12), pose(0, 14.5F, 0));
+        r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.6F, 16.5F, -8.2F));
+        r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.6F, 16.5F, -8.2F));
+        // Antennae, and a tail nub so the shell is not symmetrical front to back.
+        r.addOrReplaceChild("detail_5", box(64, 40, -0.5F, -3, -0.5F, 1, 3, 1), pose(-2.5F, 14, -6, -0.3F, 0, -0.25F));
+        r.addOrReplaceChild("detail_6", box(64, 40, -0.5F, -3, -0.5F, 1, 3, 1), pose(2.5F, 14, -6, -0.3F, 0, 0.25F));
+        r.addOrReplaceChild("tail", box(64, 40, -2, -1.5F, 0, 4, 3, 3), pose(0, 21, 6));
         return finish(mesh);
     }
 
     private static LayerDefinition trumpetVine() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();
-        r.addOrReplaceChild("shell", box(64, 40, -6, -3, -5, 12, 5, 10), pose(0, 22, 0));
-        r.addOrReplaceChild("body", box(0, 0, -3, -13, -3, 6, 13, 6), pose(0, 21, 0));
-        r.addOrReplaceChild("head", box(64, 0, -6, -6, -5, 12, 7, 10), pose(0, 7, 0, -0.08F, 0, 0));
-        r.addOrReplaceChild("jaw", box(64, 0, -6, -1, -5, 12, 5, 10), pose(0, 8, 0, 0.18F, 0, 0));
-        r.addOrReplaceChild("snout", box(0, 80, -5, -4, -0.5F, 10, 8, 1), pose(0, 7, -5));
-        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -3, 8, 2, 6), pose(2.5F, 16, 0, 0, 0, 0.38F));
-        r.addOrReplaceChild("right_arm", box(0, 40, -8, -1, -3, 8, 2, 6), pose(-2.5F, 16, 0, 0, 0, -0.38F));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1, -3, -1, 2, 3, 2), pose(-3.5F, 5, -4.5F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1, -3, -1, 2, 3, 2), pose(0, 4, -4.5F));
-        r.addOrReplaceChild("detail_3", box(64, 80, -1, -3, -1, 2, 3, 2), pose(3.5F, 5, -4.5F));
-        r.addOrReplaceChild("detail_4", box(64, 80, -1, 0, -1, 2, 3, 2), pose(-3.5F, 10, -4.5F));
-        r.addOrReplaceChild("detail_5", box(64, 80, -1, 0, -1, 2, 3, 2), pose(0, 11, -4.5F));
-        r.addOrReplaceChild("detail_6", box(64, 80, -1, 0, -1, 2, 3, 2), pose(3.5F, 10, -4.5F));
+        // 12x7x10: the box the PLANT mouth is painted around. Split into an upper and a lower half
+        // so the jaw can open, which is the only animation this creature needs.
+        r.addOrReplaceChild("head", box(64, 0, -6, -7, -5, 12, 7, 10), pose(0, 12, 0));
+        r.addOrReplaceChild("jaw", box(64, 0, -6, 0, -5, 12, 7, 10), pose(0, 12, 0, 0.22F, 0, 0));
+        r.addOrReplaceChild("body", box(0, 80, -5, -4, -0.5F, 10, 8, 1), pose(0, 12, -5.2F));
+        // Stem in two tapering segments, so it bends instead of being a pipe.
+        r.addOrReplaceChild("tail", box(0, 40, -2.5F, 0, -2.5F, 5, 7, 5), pose(0, 13, 1));
+        r.addOrReplaceChild("tail_tip", box(0, 40, -2, 0, -2, 4, 6, 4), pose(0, 19, 1));
+        // Teeth: four upper, four lower, so the maw has a bite rather than an outline.
+        for (int i = 0; i < 4; i++) {
+            float x = -4.5F + i * 3;
+            r.addOrReplaceChild("detail_" + (i + 1), box(64, 40, -1, 0, -0.5F, 2, 2, 1),
+                    pose(x, 5.6F, -5.2F));
+            r.addOrReplaceChild("detail_" + (i + 5), box(64, 40, -1, -2, -0.5F, 2, 2, 1),
+                    pose(x, 12, -5.2F, 0.22F, 0, 0));
+        }
+        // Two leaves at the base.
+        r.addOrReplaceChild("detail_9", box(0, 40, 0, -1, -2, 6, 2, 4), pose(2.5F, 20, 1, 0, 0.4F, -0.3F));
+        r.addOrReplaceChild("detail_10", box(0, 40, -6, -1, -2, 6, 2, 4), pose(-2.5F, 20, 1, 0, -0.4F, 0.3F));
         return finish(mesh);
     }
 
@@ -364,6 +418,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         PartDefinition r = mesh.getRoot();
         r.addOrReplaceChild("body", box(0, 0, -8, -13, -5, 16, 13, 10), pose(0, 20, 0));
         r.addOrReplaceChild("shell", box(64, 40, -9, -12, -2, 18, 14, 6), pose(0, 17, 4));
+        // 12x8x10: the box the BOSS face is painted around.
         r.addOrReplaceChild("head", box(64, 0, -6, -8, -6, 12, 8, 10), pose(0, 7, -1));
         r.addOrReplaceChild("snout", box(0, 80, -5, -3, -6, 10, 5, 6), pose(0, 4, -6));
         r.addOrReplaceChild("jaw", box(0, 80, -5, -1, -6, 10, 4, 6), pose(0, 7, -6, 0.1F, 0, 0));
@@ -373,11 +428,17 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         r.addOrReplaceChild("right_leg", box(0, 40, -3, -2, -4, 6, 8, 8), pose(-6, 18, 0));
         r.addOrReplaceChild("tail", box(64, 40, -4, -4, 0, 8, 8, 12), pose(0, 17, 5, 0.35F, 0, 0));
         r.addOrReplaceChild("tail_tip", box(64, 40, -3, -3, 0, 6, 6, 11), pose(0, 20, 15, 0.5F, 0, 0));
-        r.addOrReplaceChild("detail_1", box(64, 80, -1.5F, -7, -1.5F, 3, 7, 3), pose(-4, 0, -2, 0, 0, -0.3F));
-        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -7, -1.5F, 3, 7, 3), pose(4, 0, -2, 0, 0, 0.3F));
-        r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -6, -1.5F, 3, 6, 3), pose(0, 4, 8, -0.4F, 0, 0));
-        r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -6, -1.5F, 3, 6, 3), pose(0, 8, 10, -0.2F, 0, 0));
-        r.addOrReplaceChild("detail_5", box(64, 80, -1.5F, -5, -1.5F, 3, 5, 3), pose(0, 12, 11, 0, 0, 0));
+        // Horns, swept back and out.
+        r.addOrReplaceChild("detail_1", box(64, 80, -1.5F, -7, -1.5F, 3, 7, 3), pose(-4, 0, -2, -0.2F, 0, -0.35F));
+        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -7, -1.5F, 3, 7, 3), pose(4, 0, -2, -0.2F, 0, 0.35F));
+        // Shell spikes, three down the back.
+        r.addOrReplaceChild("detail_3", box(64, 80, -2, -5, -2, 4, 5, 4), pose(0, 6, 8, -0.4F, 0, 0));
+        r.addOrReplaceChild("detail_4", box(64, 80, -2, -5, -2, 4, 5, 4), pose(-5, 10, 9, -0.2F, 0, -0.3F));
+        r.addOrReplaceChild("detail_5", box(64, 80, -2, -5, -2, 4, 5, 4), pose(5, 10, 9, -0.2F, 0, 0.3F));
+        // Brow ridge, and two cuffs on the wrists.
+        r.addOrReplaceChild("detail_6", box(64, 80, -6.5F, -1.5F, -1, 13, 3, 2), pose(0, 2, -6));
+        r.addOrReplaceChild("detail_7", box(64, 40, -3.5F, -1.5F, -3.5F, 7, 3, 7), pose(8, 20, 0));
+        r.addOrReplaceChild("detail_8", box(64, 40, -3.5F, -1.5F, -3.5F, 7, 3, 7), pose(-8, 20, 0));
         return finish(mesh);
     }
 
