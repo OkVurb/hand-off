@@ -1049,6 +1049,176 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * A corridor whose floor is half missing until you hit the switch.
+     *
+     * <p>ON/OFF blocks and their switch have been registered, textured, modelled and fixed twice,
+     * and until now no generated course contained one. This is the segment that makes the mechanic
+     * exist: two staggered rows of blocks in opposite states, so exactly half the route is solid
+     * at any moment and the switch is the only way through.
+     *
+     * <p>The switch sits <em>before</em> the corridor rather than inside it. A switch you have to
+     * reach through the obstacle it controls is a lock with the key behind the door.
+     */
+    static final Segment ON_OFF_CORRIDOR = new Segment() {
+        public SegmentSpec spec() {
+            return def("on_off_corridor", 20, 0, 3, Tag.BLOCKS, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            // A continuous floor underneath, and the puzzle happens above it.
+            //
+            // The first version put the alternating blocks at standing height across the lane and
+            // made 680 of 4500 generated courses unwalkable. CourseReachability cannot model a
+            // block whose solidity depends on world state - to the solver an OFF block is simply
+            // rock - so anything load-bearing built from them is a wall it will refuse to route
+            // through, and rightly. The fix is geometry, not an exemption: the ground route is
+            // always open, and the ON/OFF rows are an upper path worth taking for the coins.
+            floor(c, x, 20, y, ctx);
+
+            BlockState on = ModBlocks.ON_OFF_BLOCK.get().defaultBlockState()
+                    .setValue(com.studio.planeshift.common.block.OnOffBlock.ON, true);
+            BlockState off = ModBlocks.ON_OFF_BLOCK.get().defaultBlockState()
+                    .setValue(com.studio.planeshift.common.block.OnOffBlock.ON, false);
+
+            // Two staggered rows overhead. Whichever state is live, one of them is a path and the
+            // other is not, so the switch moves the route rather than opening it.
+            for (int i = 0; i < 5; i++) {
+                int px = x + 6 + i * 2;
+                c.set(px, y + 4, 0, i % 2 == 0 ? on : off);
+                c.set(px + 1, y + 6, 0, i % 2 == 0 ? off : on);
+            }
+
+            // The switch sits before the corridor. A switch reached through the obstacle it
+            // controls is a lock with the key behind the door.
+            c.set(x + 3, y + 1, 0, ModBlocks.ON_OFF_SWITCH.get().defaultBlockState());
+            coinTrail(c, x + 7, 4, y + 8, 1);
+        }
+    };
+
+    /**
+     * Rings hung over a gap, worth coins for threading rather than clearing.
+     *
+     * <p>The coin ring is the only block in the set that rewards the <em>shape</em> of a jump
+     * rather than its success. Placed at three heights so the greedy line and the safe line are
+     * different lines, which is the cheapest way to give one gap two skill levels.
+     */
+    static final Segment COIN_RING_ARC = new Segment() {
+        public SegmentSpec spec() {
+            return def("coin_ring_arc", 16, 0, 2, Tag.GAP, Tag.SECRET);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            // Four columns of pit, so the jump is five and CourseReachability's flat reach of six
+            // clears it. The first version dug six columns, which needs a seven-block jump and
+            // made this the last segment 330 courses ever got to. The solver was right and the
+            // segment was wrong; widening a gap past the proven arc is not a difficulty knob.
+            floor(c, x, 6, y, ctx);
+            for (int i = 6; i <= 9; i++) {
+                ctx.pitFloor(c, x + i, y);
+            }
+            floor(c, x + 10, 6, y, ctx);
+
+            BlockState ring = ModBlocks.COIN_RING_BLOCK.get().defaultBlockState();
+            // Following the arc of a full-power jump rather than a straight line, so threading all
+            // three is one committed leap instead of three separate decisions.
+            c.set(x + 6, y + 3, 0, ring);
+            c.set(x + 8, y + 5, 0, ring);
+            c.set(x + 10, y + 3, 0, ring);
+        }
+    };
+
+    /**
+     * A vine wall: the vertical route the generator never had.
+     *
+     * <p>Every climb in the catalogue is a staircase or a platform ladder, both of which are just
+     * jumping upward. A vine is the only thing in the block set that makes height a matter of
+     * holding on rather than timing, and it was registered and unused.
+     */
+    static final Segment VINE_WALL = new Segment() {
+        public SegmentSpec spec() {
+            return def("vine_wall", 16, 4, 2, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 7, y, ctx);
+            BlockState vine = ModBlocks.COURSE_VINE.get().defaultBlockState();
+
+            // Stepped ledges up to the exit, with the vines on the face of them. The vine is the
+            // fast way and the steps are the guaranteed way — the solver proves the crossing on
+            // the steps, so the segment is never load-bearing on a climbable the solver treats as
+            // empty air.
+            for (int i = 0; i < 4; i++) {
+                platform(c, x + 7 + i, 2, y + 1 + i, ctx);
+                c.set(x + 6 + i, y + 2 + i, 0, vine);
+            }
+            floor(c, x + 11, 5, y + 4, ctx);
+            coinTrail(c, x + 7, 5, y + 6, 1);
+        }
+    };
+
+    /**
+     * Music blocks as a staircase you have to bounce up.
+     *
+     * <p>The music block bounces and plays a note, and the note rises with height — so a climb
+     * built from them scores itself as the player ascends. Registered, textured, and never placed
+     * until now.
+     */
+    static final Segment MUSIC_STEPS = new Segment() {
+        public SegmentSpec spec() {
+            return def("music_steps", 16, 3, 2, Tag.CLIMB, Tag.BLOCKS);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 5, y, ctx);
+            BlockState note = ModBlocks.MUSIC_BLOCK.get().defaultBlockState();
+            for (int i = 0; i < 4; i++) {
+                c.setLane(x + 5 + i * 2, y + 1 + i, note, ctx.halfWidth());
+            }
+            floor(c, x + 13, 3, y + 3, ctx);
+            coinTrail(c, x + 6, 6, y + 4, 1);
+        }
+    };
+
+    /**
+     * A dressed hall: tiled floor, banners, a shift gate at the end.
+     *
+     * <p>Pure decoration apart from the gate, and that is the point. Every segment in the catalogue
+     * earns its place by being an obstacle, which is why generated courses feel like assault
+     * courses rather than places — nothing is ever just built. Tiles and banners cost nothing and
+     * are the only thing here that says somebody lives in this castle.
+     */
+    static final Segment DRESSED_HALL = new Segment() {
+        public SegmentSpec spec() {
+            return def("dressed_hall", 16, 0, 0, Tag.REST);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            // Proper ground first. The first version laid tiles at floor level with nothing under
+            // them and put a shift gate at standing height in the middle of the lane, which is a
+            // wall as far as the reachability solver is concerned - and it was right.
+            floor(c, x, 16, y, ctx);
+            BlockState tile = ModBlocks.COURSE_TILE.get().defaultBlockState();
+            for (int i = 0; i < 16; i++) {
+                c.setLane(x + i, y, tile, ctx.halfWidth());
+            }
+
+            // Banners high on the walls, well clear of head height, and a trim course above them.
+            BlockState banner = ModBlocks.COURSE_BANNER.get().defaultBlockState();
+            BlockState trim = ModBlocks.COURSE_TRIM.get().defaultBlockState();
+            for (int i = 2; i < 15; i += 5) {
+                for (int h = 6; h <= 8; h++) {
+                    c.set(i + x, y + h, 0, h == 8 ? trim : banner);
+                }
+            }
+            // The gate at the end of a corridor the player has been allowed to walk down without
+            // being attacked. Safe to stand in the lane now that CourseReachability knows a shift
+            // gate is a doorway rather than rock.
+            c.set(x + 14, y + 1, 0, ModBlocks.SHIFT_GATE.get().defaultBlockState());
+            coinTrail(c, x + 4, 6, y + 2, 1);
+        }
+    };
+
     // ------------------------------------------------------------------ catalogue
 
     /** Every segment the composer may choose from, in a stable order. */
@@ -1095,6 +1265,11 @@ public final class SegmentLibrary {
         list.add(TRAMPOLINE_SKY_LAUNCH);
         list.add(FROST_ICE_SLIDE);
         list.add(PODOBOO_PIT);
+        list.add(ON_OFF_CORRIDOR);
+        list.add(COIN_RING_ARC);
+        list.add(VINE_WALL);
+        list.add(MUSIC_STEPS);
+        list.add(DRESSED_HALL);
         list.add(ZIPLINE_GAP_TRAVERSAL);
         return list;
     }

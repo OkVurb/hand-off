@@ -93,7 +93,11 @@ public final class CourseReachability {
             ModBlocks.COIN_RING_BLOCK.get(),
             // The axe is touched, not climbed: it sits in the player's path on purpose and must
             // not read as a wall standing between them and the end of the bridge.
-            ModBlocks.AXE_BLOCK.get());
+            ModBlocks.AXE_BLOCK.get(),
+            // A shift gate is a doorway the player walks through to change plane. Its VoxelShape
+            // is a 2/16 panel and passing through it is the entire point, so treating it as rock
+            // makes the solver refuse routes that are not merely possible but intended.
+            ModBlocks.SHIFT_GATE.get());
 
     /**
      * Solid blocks the solver refuses to stand on.
