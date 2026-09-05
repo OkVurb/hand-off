@@ -277,6 +277,8 @@ public final class CourseComposer {
         int checkpointX = placeCheckpoint(canvas, placed, length);
         placeStarCoins(canvas, placed, ctx);
         populate(canvas, ctx, floorAt, SPAWN_RUN, contentEnd, length);
+        // Scenery last, so it can see the finished floor and fill in behind everything else.
+        CourseDecorator.decorate(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, 0, length + 6);
 
         // spawnY is a standing position, which is one above the surface block: ground(x, 0)
         // fills y=0 with solid, so the player's feet are at y=1. Reporting the surface height
