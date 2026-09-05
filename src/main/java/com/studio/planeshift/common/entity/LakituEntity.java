@@ -23,10 +23,6 @@ public class LakituEntity extends CourseEnemyEntity {
                 .add(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
-    @Override
-    public boolean isStompable() {
-        return false;
-    }
 
     @Override
     protected void registerGoals() {
@@ -37,6 +33,17 @@ public class LakituEntity extends CourseEnemyEntity {
     @Override
     public boolean canBeStaggered() {
         return false;
+    }
+
+
+    /**
+     * Out of reach of a stomp on its cloud, but not of anything thrown. The spin is the answer a
+     * player always has, which is what keeps it an enemy rather than a weather condition.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.of(DefeatVector.SPIN, DefeatVector.SHELL,
+                DefeatVector.FIRE, DefeatVector.ICE, DefeatVector.STAR);
     }
 
 }

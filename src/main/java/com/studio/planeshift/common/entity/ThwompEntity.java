@@ -39,10 +39,6 @@ public class ThwompEntity extends CourseEnemyEntity {
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
-    @Override
-    public boolean isStompable() {
-        return false;
-    }
 
     @Override
     public boolean isNoGravity() {
@@ -70,6 +66,20 @@ public class ThwompEntity extends CourseEnemyEntity {
     @Override
     public boolean canBeStaggered() {
         return false;
+    }
+
+
+    /**
+     * A falling block cannot be defeated, only survived. Not even star power - it is masonry.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.noneOf(DefeatVector.class);
+    }
+
+    @Override
+    public boolean isHazard() {
+        return true;
     }
 
 }

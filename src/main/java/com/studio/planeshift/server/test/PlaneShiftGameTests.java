@@ -27,6 +27,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import com.studio.planeshift.common.entity.DefeatVector;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import java.lang.reflect.Method;
 import net.minecraft.world.level.Level;
@@ -40,6 +46,7 @@ public class PlaneShiftGameTests {
     public static final Identifier COIN_BRICK_TEST = PlaneShift.id("coin_brick_test");
     public static final Identifier HAMMER_BRO_PERCH_TEST = PlaneShift.id("hammer_bro_perch_test");
     public static final Identifier COURSE_GENERATION_TEST = PlaneShift.id("course_generation_test");
+    public static final Identifier DEFEAT_MATRIX_TEST = PlaneShift.id("defeat_matrix_test");
 
     public static void registerFunctions(RegisterEvent event) {
         event.register(Registries.TEST_FUNCTION, helper -> {
@@ -50,6 +57,7 @@ public class PlaneShiftGameTests {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), PlaneShiftGameTests::testCoinBrick);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), PlaneShiftGameTests::testHammerBroPerch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), PlaneShiftGameTests::testCourseGeneration);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, DEFEAT_MATRIX_TEST), PlaneShiftGameTests::testDefeatMatrix);
         });
     }
 
@@ -64,6 +72,7 @@ public class PlaneShiftGameTests {
         event.registerTest(COIN_BRICK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), data));
         event.registerTest(HAMMER_BRO_PERCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), data));
         event.registerTest(COURSE_GENERATION_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), data));
+        event.registerTest(DEFEAT_MATRIX_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, DEFEAT_MATRIX_TEST), data));
     }
 
     /**
@@ -264,4 +273,50 @@ public class PlaneShiftGameTests {
             helper.assertTrue(Math.abs(bro.getZ() - expectedZ) < 0.01D, "Hammer Bro Z not clamped to perch");
         });
     }
+
+    /**
+     * Every enemy the generator can place must be beatable with what the player always has.
+     *
+     * <p>A GameTest rather than a unit test, and the reason is the one review R6 was written
+     * about: this needs live {@code EntityType}s, and an {@code EntityType} cannot be constructed
+     * outside registration. In a plain JUnit classloader the registry is empty, so a unit test
+     * here would pass by checking nothing.
+     *
+     * <p>What it enforces is a design rule, not a crash: an enemy whose only answers are FIRE or
+     * STAR is not an enemy, it is a wall, because the generator will cheerfully drop it in a
+     * corridor in front of a player who is carrying neither. Hazards - Thwomps, Boos - are exempt
+     * by declaring {@code isHazard()}, which is the whole point of that flag existing.
+     */
+    private static void testDefeatMatrix(GameTestHelper helper) {
+        List<String> unbeatable = new ArrayList<>();
+
+        for (EntityType<?> type : List.of(
+                ModEntities.GOOMBA.get(), ModEntities.KOOPA.get(), ModEntities.THWOMP.get(),
+                ModEntities.BULLET_BILL.get(), ModEntities.BOO.get(), ModEntities.LAKITU.get(),
+                ModEntities.HAMMER_BRO.get(), ModEntities.SPINY.get(),
+                ModEntities.BUZZY_BEETLE.get(), ModEntities.PIRANHA_PLANT.get(),
+                ModEntities.BOWSER.get())) {
+            Entity spawned = type.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
+            if (!(spawned instanceof CourseEnemyEntity enemy)) {
+                continue;
+            }
+            boolean answered = enemy.answers().stream()
+                    .anyMatch(DefeatVector.ALWAYS_AVAILABLE::contains);
+            if (!enemy.isHazard() && !answered) {
+                unbeatable.add(type.getDescriptionId() + " answers only " + enemy.answers());
+            }
+            if (enemy.isHazard() && answered) {
+                unbeatable.add(type.getDescriptionId()
+                        + " is flagged a hazard but can be beaten with " + enemy.answers());
+            }
+            spawned.discard();
+        }
+
+        if (!unbeatable.isEmpty()) {
+            helper.fail(String.join("; ", unbeatable));
+            return;
+        }
+        helper.succeed();
+    }
+
 }

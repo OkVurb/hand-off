@@ -23,10 +23,6 @@ public class SpinyEntity extends CourseEnemyEntity {
                 .add(Attributes.ATTACK_DAMAGE, 3.0D);
     }
 
-    @Override
-    public boolean isStompable() {
-        return false;
-    }
 
     @Override
     protected void registerGoals() {
@@ -45,6 +41,18 @@ public class SpinyEntity extends CourseEnemyEntity {
     @Override
     public boolean canBeFlipped() {
         return true;
+    }
+
+
+    /**
+     * The spikes are the point: landing on it is the one thing that does not work. Everything else
+     * does, and the ground pound is the specific answer - it flips the Spiny onto its back, after
+     * which an ordinary stomp finishes it.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.of(DefeatVector.GROUND_POUND, DefeatVector.SHELL,
+                DefeatVector.FIRE, DefeatVector.ICE, DefeatVector.STAR);
     }
 
 }

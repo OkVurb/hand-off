@@ -69,5 +69,17 @@ public class BuzzyBeetleEntity extends CourseEnemyEntity {
         return true;
     }
 
+
+    /**
+     * Immune to fire and nothing else. That immunity is the Buzzy Beetle's entire reason to exist
+     * - it is the enemy that makes a fire flower stop being the answer to everything.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        java.util.EnumSet<DefeatVector> set = java.util.EnumSet.allOf(DefeatVector.class);
+        set.remove(DefeatVector.FIRE);
+        return set;
+    }
+
 }
 

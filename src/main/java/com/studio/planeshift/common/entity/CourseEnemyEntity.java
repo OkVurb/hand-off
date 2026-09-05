@@ -219,9 +219,40 @@ public abstract class CourseEnemyEntity extends Monster {
         super(type, level);
     }
 
-    /** Whether landing on this enemy defeats it. Armored silhouettes return false. */
+    /**
+     * Every way this enemy can be defeated.
+     *
+     * <p>The single declaration of what an enemy <em>is</em>, in the only terms that matter to a
+     * platformer. Previously the roster stated only the negative - six subclasses overrode
+     * {@code isStompable()} to return false and nothing said what did work - so the answer to any
+     * given enemy could only be recovered by reading every damage path in the mod.
+     *
+     * <p>Default is everything: an ordinary enemy should die to whatever the player brings.
+     * Subclasses narrow it, and each narrowing is a design statement rather than a special case.
+     */
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.allOf(DefeatVector.class);
+    }
+
+    /** Whether this vector defeats this enemy. */
+    public final boolean answersTo(DefeatVector vector) {
+        return answers().contains(vector);
+    }
+
+    /**
+     * Whether this is a hazard to be avoided rather than an enemy to be beaten.
+     *
+     * <p>Thwomps and Boos are not weak enemies, they are terrain with opinions. The distinction
+     * has to be explicit because the invariant "every enemy answers to something the player always
+     * has" is true and important for enemies and meaningless for hazards.
+     */
+    public boolean isHazard() {
+        return false;
+    }
+
+    /** Whether landing on this enemy defeats it. Now derived from {@link #answers()}. */
     public boolean isStompable() {
-        return true;
+        return answersTo(DefeatVector.STOMP);
     }
 
     /** Damage dealt to the enemy by a valid stomp. */

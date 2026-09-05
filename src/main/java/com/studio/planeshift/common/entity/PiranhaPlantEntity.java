@@ -73,10 +73,6 @@ public class PiranhaPlantEntity extends CourseEnemyEntity {
         return entityData.get(EXTENSION);
     }
 
-    @Override
-    public boolean isStompable() {
-        return false;
-    }
 
     /** A retracted plant is inside its pipe and cannot be touched. */
     @Override
@@ -181,6 +177,17 @@ public class PiranhaPlantEntity extends CourseEnemyEntity {
     @Override
     public boolean canBeStaggered() {
         return false;
+    }
+
+
+    /**
+     * Anchored in its pipe and biting upward, so it cannot be landed on. A spin reaches it at
+     * ground level, which is the answer the player always has; fire is the satisfying one.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.of(DefeatVector.SPIN, DefeatVector.SHELL,
+                DefeatVector.FIRE, DefeatVector.ICE, DefeatVector.STAR);
     }
 
 }

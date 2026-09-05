@@ -34,10 +34,6 @@ public class BowserEntity extends CourseEnemyEntity {
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
-    @Override
-    public boolean isStompable() {
-        return false;
-    }
 
     @Override
     public void tick() {
@@ -69,6 +65,17 @@ public class BowserEntity extends CourseEnemyEntity {
     @Override
     protected float groundPoundDamage() {
         return 20.0F;
+    }
+
+
+    /**
+     * A boss: too big to stomp, and not to be deleted by a thrown fireball either. The ground
+     * pound is the required finisher, which is why it is in this set and STOMP is not.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.of(DefeatVector.GROUND_POUND, DefeatVector.SHELL,
+                DefeatVector.FIRE, DefeatVector.STAR);
     }
 
 }

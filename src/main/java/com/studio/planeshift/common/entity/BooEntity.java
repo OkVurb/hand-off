@@ -23,10 +23,6 @@ public class BooEntity extends CourseEnemyEntity {
                 .add(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
-    @Override
-    public boolean isStompable() {
-        return false;
-    }
 
     @Override
     protected void registerGoals() {
@@ -37,6 +33,21 @@ public class BooEntity extends CourseEnemyEntity {
     @Override
     public boolean canBeStaggered() {
         return false;
+    }
+
+
+    /**
+     * A Boo is terrain, not an opponent. Nothing in the player's ordinary kit touches it: the
+     * answer to a Boo is to look at it, and the answer to a room of them is to keep moving.
+     */
+    @Override
+    public java.util.Set<DefeatVector> answers() {
+        return java.util.EnumSet.of(DefeatVector.STAR);
+    }
+
+    @Override
+    public boolean isHazard() {
+        return true;
     }
 
 }
