@@ -26,3 +26,9 @@ tmp
 
 # MCP decompiled sources cache
 .mcsources
+
+# Personal audio dropped into the sounds folder for local play. Never committed:
+# these are the user's own files, and the repo is pushed to a remote.
+/src/main/resources/assets/planeshift/sounds/*.local.ogg
+/personal-audio/
+yt-dlp.exe

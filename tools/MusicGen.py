@@ -3,9 +3,8 @@
 
 Why this exists
 ---------------
-The existing tracks were written for the wrong era. This mod imitates the New Super Mario Bros.
-line — Wii, Wii U — and that music has a very specific and very copyable set of habits, none of
-which are the 8-bit ones:
+This mod imitates the New Super Mario Bros. line -- Wii, Wii U -- and that music has a specific,
+copyable set of habits, none of which are the 8-bit ones:
 
 * **Swing.** Straight sixteenths sound like the NES. NSMB is shuffled, and it is the single change
   that moves a track forty years forward.
@@ -14,15 +13,34 @@ which are the 8-bit ones:
 * **Major sixths and ninths.** Plain triads sound like a fanfare. Adding the sixth is what makes a
   chord sound like a holiday.
 * **A marimba or steel-drum lead**, not a square wave.
-* **Percussion that is felt rather than heard** — soft kick, brushed snare, busy closed hats.
+* **Percussion that is felt rather than heard** -- soft kick, brushed snare, busy closed hats.
 
-Everything here is synthesised from oscillators and envelopes, so it is original work, and it is
-generated rather than performed so a track can be re-tuned by changing a number instead of being
-re-recorded.
+Everything here is synthesised from oscillators and envelopes, so it is original work in a genre
+rather than a copy of any particular piece, and it is generated rather than performed so a track
+can be re-tuned by changing a number instead of being re-recorded.
+
+What changed in this pass
+-------------------------
+1. **The loop gap is gone.** Every track was rendered into a buffer one second longer than the
+   music (``Track(total + 1.0)``), so each loop ended with a full second of silence and audibly
+   stopped before restarting. The buffer is now exactly the length of the music and voices near the
+   end wrap around into the beginning, so a note or cymbal that rings past the final bar rings over
+   bar one -- which is what makes a loop seamless rather than merely gapless.
+2. **The brass filter was not a filter.** It fed the previous *output* sample -- already multiplied
+   by its envelope and an output gain -- back in as filter state, and divided it by that gain to
+   compensate. The brightness therefore tracked the envelope twice and collapsed on quiet notes.
+   It keeps proper filter state now.
+3. **Songs have sections.** Every track used to be one four-chord loop with two lead phrases
+   alternating, which is fine for eight bars and wearing by the third minute. Tracks are now built
+   from an A section and a B section with their own progressions and melodies.
+4. **Stereo.** The buffer was mono, written twice. Voices are placed across the field now, which is
+   most of the difference between "chiptune" and "produced".
+5. **A pad**, under everything, so the arrangement has a floor.
 
 Requires ffmpeg on PATH for the WAV to OGG step (Minecraft will not load WAV).
 
 Run:  python tools/MusicGen.py src/main/resources/assets/planeshift/sounds
+      python tools/MusicGen.py <dir> music_hub      # one track only
 """
 
 import math
@@ -44,28 +62,42 @@ def freq(name, octave=4):
 
 
 class Track:
-    """A mono buffer you mix voices into."""
+    """A stereo buffer you mix voices into, exactly one loop long."""
 
     def __init__(self, seconds):
         self.n = int(RATE * seconds)
-        self.buf = [0.0] * self.n
+        self.left = [0.0] * self.n
+        self.right = [0.0] * self.n
 
-    def add(self, start, samples, gain=1.0):
+    def add(self, start, samples, gain=1.0, pan=0.0):
+        """Mix a voice in at ``start`` seconds, wrapping past the end back to the beginning.
+
+        The wrap is the whole point. A marimba note struck on the last sixteenth still has most of
+        its decay left when the loop ends; without wrapping, that decay is simply cut off and the
+        seam is audible every time the track repeats. Wrapping lets the tail ring over the top of
+        bar one, which is how the loop stops sounding like a loop.
+        """
+        # Equal-power panning, so a voice does not get louder as it moves to the centre.
+        gl = gain * math.sqrt((1.0 - pan) * 0.5)
+        gr = gain * math.sqrt((1.0 + pan) * 0.5)
         i = int(start * RATE)
+        n = self.n
         for k, v in enumerate(samples):
-            j = i + k
-            if 0 <= j < self.n:
-                self.buf[j] += v * gain
+            j = (i + k) % n
+            self.left[j] += v * gl
+            self.right[j] += v * gr
 
     def save(self, path):
-        peak = max(1e-6, max(abs(v) for v in self.buf))
-        # Leave headroom rather than normalising to full scale: these loop under sound effects,
-        # and a track mastered to 0 dBFS buries every stomp and coin in the game.
+        peak = max(1e-6, max(max(abs(v) for v in self.left),
+                             max(abs(v) for v in self.right)))
+        # Leave headroom rather than normalising to full scale: these loop under sound effects, and
+        # a track mastered to 0 dBFS buries every stomp and coin in the game.
         scale = 0.72 / peak
         frames = bytearray()
-        for v in self.buf:
-            s = int(max(-1.0, min(1.0, v * scale)) * 32767)
-            frames += struct.pack("<hh", s, s)
+        for a, b in zip(self.left, self.right):
+            l = int(max(-1.0, min(1.0, a * scale)) * 32767)
+            r = int(max(-1.0, min(1.0, b * scale)) * 32767)
+            frames += struct.pack("<hh", l, r)
         with wave.open(path, "wb") as w:
             w.setnchannels(2)
             w.setsampwidth(2)
@@ -90,6 +122,19 @@ def env(n, attack, decay, sustain, release):
     return (out + [0.0] * n)[:n]
 
 
+# Rendering the same note twice is common enough that caching it roughly halves the run time.
+_CACHE = {}
+
+
+def cached(fn, *args):
+    key = (fn.__name__,) + tuple(round(a, 4) if isinstance(a, float) else a for a in args)
+    hit = _CACHE.get(key)
+    if hit is None:
+        hit = fn(*args)
+        _CACHE[key] = hit
+    return hit
+
+
 def marimba(f, dur):
     """Struck wooden bar: a fast attack, a hard decay, and a strong second partial."""
     n = int(RATE * dur)
@@ -105,20 +150,40 @@ def marimba(f, dur):
 
 
 def brass(f, dur):
-    """A short stab. Saw-ish, with the brightness falling away as the note decays."""
+    """A short stab: a saw whose brightness falls away as the note decays.
+
+    The lowpass keeps its own state. The previous version filtered the *output* -- already scaled
+    by the envelope and the output gain -- and divided by that gain to undo it, which meant the
+    cutoff tracked the envelope a second time and the tone collapsed on anything quiet.
+    """
     n = int(RATE * dur)
     e = env(n, 0.02, 0.20, 0.55, 0.45)
     out = []
     phase = 0.0
+    low = 0.0
     for i in range(n):
-        t = i / RATE
         phase += f / RATE
         saw = 2.0 * (phase % 1.0) - 1.0
-        # One-pole lowpass that closes as the envelope falls: the cheapest convincing brass cue.
         cutoff = 0.25 + 0.55 * e[i]
-        if out:
-            saw = out[-1] / 0.3 * (1 - cutoff) + saw * cutoff
-        out.append(saw * e[i] * 0.30)
+        low += cutoff * (saw - low)
+        out.append(low * e[i] * 0.30)
+    return out
+
+
+def pad(f, dur):
+    """Two detuned saws, soft and slow. The floor the rest of the arrangement stands on."""
+    n = int(RATE * dur)
+    e = env(n, 0.25, 0.2, 0.75, 0.35)
+    out = []
+    p1 = 0.0
+    p2 = 0.0
+    low = 0.0
+    for i in range(n):
+        p1 += f / RATE
+        p2 += (f * 1.004) / RATE
+        saw = (2.0 * (p1 % 1.0) - 1.0) + (2.0 * (p2 % 1.0) - 1.0)
+        low += 0.06 * (saw * 0.5 - low)
+        out.append(low * e[i] * 0.16)
     return out
 
 
@@ -173,8 +238,8 @@ def swing(step, amount=0.62):
     return (step // 2) * 2 + (amount * 2 if step % 2 else 0)
 
 
-def chord(root, kind):
-    """Chord tones in semitones. The sixth is deliberate — it is the 'holiday' interval."""
+def chord(kind):
+    """Chord tones in semitones. The sixth is deliberate -- it is the 'holiday' interval."""
     if kind == "maj6":
         return [0, 4, 7, 9]
     if kind == "min7":
@@ -186,56 +251,81 @@ def chord(root, kind):
     return [0, 4, 7]
 
 
-def render(name, bpm, bars, progression, lead_notes, seed, minor=False, busy=True):
-    """Assemble one track from a chord loop and a lead line."""
+def render_section(tr, offset, bars, bpm, progression, lead_notes, seed, busy, bar0):
+    """Lay one section of the arrangement into the track, starting at ``offset`` seconds."""
     beat = 60.0 / bpm
     sixteenth = beat / 4.0
-    total = bars * 4 * beat
-    tr = Track(total + 1.0)
 
     for bar in range(bars):
         root_name, root_oct, kind = progression[bar % len(progression)]
         root = freq(root_name, root_oct)
-        bar_t = bar * 4 * beat
+        bar_t = offset + bar * 4 * beat
+
+        # A pad holding the chord for the whole bar, wide, quiet, underneath everything.
+        for idx, semi in enumerate(chord(kind)):
+            spread = -0.6 + 0.4 * idx
+            tr.add(bar_t, cached(pad, root * (2 ** (semi / 12.0)), beat * 4.0), 0.5, spread)
 
         # Bass on the beat, an octave answer on the and-of-two: the NSMB walking feel.
         for b in range(4):
-            tr.add(bar_t + b * beat, bass(root / 2, beat * 0.55), 1.0)
+            tr.add(bar_t + b * beat, cached(bass, root / 2, beat * 0.55), 1.0, 0.0)
             if b % 2 == 1:
-                tr.add(bar_t + b * beat + beat * 0.5, bass(root, beat * 0.3), 0.6)
+                tr.add(bar_t + b * beat + beat * 0.5,
+                       cached(bass, root, beat * 0.3), 0.6, 0.0)
 
-        # Brass stabs answering off the beat.
+        # Brass stabs answering off the beat, spread across the field.
         for b in (0, 2):
             at = bar_t + b * beat + beat * 0.5
-            for semi in chord(root, kind):
-                tr.add(at, brass(root * (2 ** (semi / 12.0)), beat * 0.42), 0.5)
+            tones = chord(kind)
+            for idx, semi in enumerate(tones):
+                pan = -0.5 + idx * (1.0 / max(1, len(tones) - 1))
+                tr.add(at, cached(brass, root * (2 ** (semi / 12.0)), beat * 0.42), 0.5, pan)
 
         # Percussion.
         for b in range(4):
             at = bar_t + b * beat
             if b in (0, 2):
-                tr.add(at, kick(), 0.9)
+                tr.add(at, cached(kick), 0.9, 0.0)
             if b in (1, 3):
-                tr.add(at, snare(seed=seed + b), 0.7)
+                tr.add(at, cached(snare, 0.14, seed + b), 0.7, 0.0)
             if busy:
                 for s in range(4):
-                    tr.add(at + swing(s) * sixteenth, hat(seed=seed + s + b * 4), 0.8)
+                    # Alternating narrow placement, so the hats shimmer instead of sitting in a
+                    # single point in the middle of the mix.
+                    pan = 0.22 if (s % 2) else -0.22
+                    tr.add(at + swing(s) * sixteenth,
+                           cached(hat, 0.05, seed + s + b * 4, 0.20), 0.8, pan)
 
         # Lead: marimba, one phrase per bar, swung.
-        phrase = lead_notes[bar % len(lead_notes)]
+        phrase = lead_notes[(bar0 + bar) % len(lead_notes)]
         for step, semi in enumerate(phrase):
             if semi is None:
                 continue
             at = bar_t + swing(step) * sixteenth
-            tr.add(at, marimba(root * (2 ** (semi / 12.0)), sixteenth * 3.2), 0.85)
+            tr.add(at, cached(marimba, root * (2 ** (semi / 12.0)), sixteenth * 3.2), 0.85, 0.18)
+
+
+def render(name, bpm, sections, seed):
+    """Assemble one track from a list of (bars, progression, lead, busy) sections."""
+    beat = 60.0 / bpm
+    total = sum(s[0] for s in sections) * 4 * beat
+    # Exactly one loop long. Voices that ring past the end wrap into the start; see Track.add.
+    tr = Track(total)
+
+    offset = 0.0
+    bar0 = 0
+    for bars, progression, lead, busy in sections:
+        render_section(tr, offset, bars, bpm, progression, lead, seed, busy, bar0)
+        offset += bars * 4 * beat
+        bar0 += bars
 
     out_wav = os.path.join(TARGET, name + ".wav")
     tr.save(out_wav)
     out_ogg = os.path.join(TARGET, name + ".ogg")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", out_wav,
-                    "-c:a", "libvorbis", "-qscale:a", "4", out_ogg], check=True)
+                    "-c:a", "libvorbis", "-qscale:a", "5", out_ogg], check=True)
     os.remove(out_wav)
-    print("  %s  (%d bars @ %d bpm)" % (name, bars, bpm))
+    print("  %-22s %5.1fs  %2d bars @ %d bpm" % (name, total, bar0, bpm))
 
 
 # ---------------------------------------------------------------- the tracks
@@ -243,26 +333,49 @@ def render(name, bpm, bars, progression, lead_notes, seed, minor=False, busy=Tru
 # Progressions are (root, octave, chord kind). I-vi-IV-V with sixths is the backbone of the whole
 # NSMB overworld sound; the minor variants below are the same trick with the thirds flattened.
 OVERWORLD = [("C", 3, "maj6"), ("A", 2, "min7"), ("F", 3, "maj6"), ("G", 3, "dom9")]
+# The B section moves to the subdominant, which is the ordinary way a bright loop finds somewhere
+# else to be for eight bars without changing key.
+OVERWORLD_B = [("F", 3, "maj6"), ("D", 3, "min7"), ("G", 3, "maj6"), ("G", 3, "dom9")]
 ATHLETIC = [("D", 3, "maj6"), ("B", 2, "min7"), ("G", 3, "maj6"), ("A", 3, "dom9")]
+ATHLETIC_B = [("G", 3, "maj6"), ("E", 3, "min7"), ("A", 3, "maj6"), ("A", 3, "dom9")]
 UNDER = [("A", 2, "min7"), ("F", 2, "maj6"), ("C", 3, "maj6"), ("E", 3, "dom9")]
+UNDER_B = [("D", 3, "min7"), ("A#", 2, "maj6"), ("F", 3, "maj6"), ("E", 3, "dom9")]
 BOSS = [("D", 2, "min7"), ("D", 2, "dim"), ("A#", 2, "maj6"), ("A", 2, "dom9")]
+BOSS_B = [("G", 2, "min7"), ("G", 2, "dim"), ("D#", 2, "maj6"), ("A", 2, "dom9")]
 
 # Lead phrases, in semitones above the chord root. None is a rest.
 BOUNCE = [[0, None, 4, 7, None, 4, 0, None, 7, None, 9, 7, None, 4, None, None],
           [7, None, 4, 0, None, 4, 7, None, 9, None, 7, 4, None, 0, None, None]]
+# The answering phrase: same shape, higher, and it resolves downward so the A section can come
+# back in without the join sounding abrupt.
+BOUNCE_B = [[12, None, 9, 7, None, 9, 12, None, 16, None, 14, 12, None, 9, None, None],
+            [9, None, 7, 4, None, 7, 9, None, 12, None, 9, 7, None, 4, None, None]]
 CLIMB = [[0, 4, 7, 12, None, 9, 7, 4, 0, None, 4, 7, None, 12, None, None],
          [12, 9, 7, 4, None, 7, 9, 12, None, 9, 7, None, 4, None, 0, None]]
+CLIMB_B = [[7, 12, 16, 19, None, 16, 12, 7, None, 12, 16, None, 19, None, None, None],
+           [19, 16, 12, 9, None, 12, 16, 19, None, 16, 12, None, 7, None, None, None]]
 STOMP = [[0, 0, None, 3, 3, None, 7, None, 0, 0, None, 3, None, 10, None, None]]
+STOMP_B = [[0, 0, None, 5, 5, None, 10, None, 0, 0, None, 5, None, 12, None, None]]
 RUSH = [[0, 7, 12, 7, 0, 7, 12, 7, 0, 7, 12, 7, 0, 7, 12, 7]]
 
 TRACKS = [
-    # name, bpm, bars, progression, lead, seed, busy
-    ("music_hub", 116, 16, OVERWORLD, BOUNCE, 3, True),
-    ("music_course_2_5d", 148, 16, OVERWORLD, BOUNCE, 5, True),
-    ("music_course_3d", 138, 16, ATHLETIC, CLIMB, 9, True),
-    ("music_combat", 164, 12, UNDER, STOMP, 13, True),
-    ("music_boss", 172, 12, BOSS, STOMP, 17, True),
-    ("music_star_power", 200, 8, ATHLETIC, RUSH, 23, True),
+    # name, bpm, [(bars, progression, lead, busy), ...], seed
+    ("music_hub", 116, [(8, OVERWORLD, BOUNCE, True),
+                        (8, OVERWORLD_B, BOUNCE_B, True),
+                        (8, OVERWORLD, BOUNCE, True)], 3),
+    ("music_course_2_5d", 148, [(8, OVERWORLD, BOUNCE, True),
+                                (8, OVERWORLD_B, BOUNCE_B, True),
+                                (8, OVERWORLD, BOUNCE, True)], 5),
+    ("music_course_3d", 138, [(8, ATHLETIC, CLIMB, True),
+                              (8, ATHLETIC_B, CLIMB_B, True),
+                              (8, ATHLETIC, CLIMB, True)], 9),
+    ("music_combat", 164, [(8, UNDER, STOMP, True),
+                           (8, UNDER_B, STOMP_B, True)], 13),
+    ("music_boss", 172, [(8, BOSS, STOMP, True),
+                         (8, BOSS_B, STOMP_B, True)], 17),
+    # Star power stays a single short loop on purpose: it plays for a few seconds at a time, so a
+    # B section would never be heard.
+    ("music_star_power", 200, [(8, ATHLETIC, RUSH, True)], 23),
 ]
 
 TARGET = "."
@@ -277,10 +390,11 @@ def main():
     os.makedirs(TARGET, exist_ok=True)
     only = sys.argv[2] if len(sys.argv) > 2 else None
     print("rendering:")
-    for name, bpm, bars, prog, lead, seed, busy in TRACKS:
+    for name, bpm, sections, seed in TRACKS:
         if only and name != only:
             continue
-        render(name, bpm, bars, prog, lead, seed, busy=busy)
+        _CACHE.clear()
+        render(name, bpm, sections, seed)
     return 0
 
 
