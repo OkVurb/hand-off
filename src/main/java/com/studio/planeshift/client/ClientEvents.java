@@ -156,4 +156,43 @@ public final class ClientEvents {
             PlaneMovementAssists.reset();
         }
     }
+
+    /**
+     * The mouse does not turn the player inside a 2.5D course.
+     *
+     * <p>A side-on platformer has no use for free look, and having it is actively harmful: mouse
+     * movement pitched the character up and down, which both tilts the model and drags the block
+     * highlight across everything in front of and behind them. The camera is authored, the lane is
+     * fixed, and the only thing the player should be steering is which way they are walking.
+     *
+     * <p>Setting sensitivity to zero rather than cancelling the event, because this is the hook
+     * NeoForge provides for exactly this and it composes: a mod that also wants a say still gets
+     * one, and nothing downstream has to know the turn was suppressed.
+     */
+    @SubscribeEvent
+    public static void onCalculatePlayerTurn(
+            net.neoforged.neoforge.client.event.CalculatePlayerTurnEvent event) {
+        if (ClientCourseState.get().in2_5D()) {
+            event.setMouseSensitivity(0.0D);
+        }
+    }
+
+    /**
+     * Keeps the head level while a course is being played.
+     *
+     * <p>Belt and braces alongside the turn suppression above. Pitch can be changed by things
+     * other than the mouse — a teleport, another mod, a resize — and a character permanently
+     * looking at the floor is the kind of thing a player notices immediately and cannot fix,
+     * because their mouse no longer does anything.
+     */
+    @SubscribeEvent
+    public static void levelHeadInCourse(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof net.minecraft.client.player.LocalPlayer player)) {
+            return;
+        }
+        if (ClientCourseState.get().in2_5D() && player.getXRot() != 0.0F) {
+            player.setXRot(0.0F);
+        }
+    }
+
 }
