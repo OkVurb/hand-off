@@ -967,6 +967,11 @@ public final class SegmentLibrary {
             c.set(x + 8, y + 1, 0, ModBlocks.PRIZE_CACHE.get().defaultBlockState());
             c.set(x + 10, y + 4, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
             c.item(ModItems.EXTRA_PIP.get(), x + 8.5D, y + 2.5D, 0.5D);
+            // A charm, which is the only place in the game a player can get one. Behind a secret
+            // rather than in the question block above it, because a charm is a deterministic grant
+            // and putting it on a random roll would defeat the reason it exists.
+            c.item(com.studio.planeshift.common.course.CharmPool.pick(ctx.random()),
+                    x + 11.5D, y + 2.5D, 0.5D);
             coinTrail(c, x + 7, 3, y + 2, 1);
         }
     };

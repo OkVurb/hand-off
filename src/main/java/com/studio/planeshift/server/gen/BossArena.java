@@ -3,6 +3,7 @@ package com.studio.planeshift.server.gen;
 import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModEntities;
+import com.studio.planeshift.common.registry.ModItems;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -132,6 +133,14 @@ public final class BossArena {
             }
             lane(c, x, 0, castle);
         }
+
+        // A Barrier Block charm on the approach, before the bridge.
+        //
+        // Barrier Block is the only Form in the defense category and it was creative-only, so no
+        // player had ever held a defensive Form. The run-up to the one fight in the game is the
+        // place it means the most, and it is a charm rather than a pickup so taking it is the
+        // player deciding to spend it here.
+        c.item(ModItems.BARRIER_CHARM.get(), 8.5D, 1.5D, 0.5D);
 
         // Bowser, on the bridge, facing back down it at the approaching player.
         c.spawn(ModEntities.BOWSER.get(), 23.5D, 1.0D, 0.5D, 90.0F, SegmentLibrary.GENERATED_TAG);
