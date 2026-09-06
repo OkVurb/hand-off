@@ -70,7 +70,8 @@ public final class CourseStructureService {
         // and earns a send-off no other course gets. It was an ordinary generated level, and
         // Bowser was spawned by nothing anywhere in the game.
         if (BossArena.isBossCourse(courseId)) {
-            CourseWriter.write(level, course.startPos(), BossArena.build(), course.length());
+            CourseWriter.write(level, course.startPos(),
+                    BossArena.build(BossArena.worldIndexOf(courseId)), course.length());
             PlaneShift.LOGGER.info("Placed boss arena for {} at {}", courseId, course.startPos());
             return;
         }

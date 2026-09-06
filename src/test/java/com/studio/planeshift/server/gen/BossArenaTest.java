@@ -108,6 +108,63 @@ class BossArenaTest {
         assertEquals(7, highest, "no staircase reaching jumping range of the top of the pole");
     }
 
+    @Test
+    void theBridgeIsUnbrokenAtEveryDifficulty() {
+        // The one rule the escalation must never break. AxeBlock walks its collapse westward and
+        // stops at the first tile that is not bridge, so a gap anywhere in the span would leave
+        // everything beyond it standing -- the castle would end with half a bridge hanging in the
+        // air over the lava. Tempting to add gaps as a difficulty knob; this is why not.
+        for (int world = 0; world < 8; world++) {
+            CourseCanvas c = BossArena.build(world);
+            int axeX = axeColumn(c);
+            for (int x = 15; x < axeX; x++) {
+                assertTrue(c.blocks().containsKey(CourseCanvas.key(x, 0, 0)),
+                        "world " + world + ": gap in the bridge at x=" + x);
+            }
+        }
+    }
+
+    @Test
+    void laterCastlesAskMoreThanEarlierOnes() {
+        // Five worlds all building the same room makes the fifth castle the first castle with a
+        // longer walk in front of it.
+        int first = BossArena.build(0).entities().size();
+        int last = BossArena.build(4).entities().size();
+        assertTrue(last > first,
+                "the last castle has no more in it than the first (" + first + " vs " + last + ")");
+    }
+
+    @Test
+    void theFirstCastleIsJustTheEncounter() {
+        // Whatever else escalates, the first boss a player ever meets should be the fight and
+        // nothing else, so the fight itself is what they learn.
+        assertEquals(1, BossArena.build(0).entities().size(),
+                "the first castle has hazards in it as well as Bowser");
+    }
+
+    @Test
+    void anExtraWorldWouldGetTheHardestArenaRatherThanAnEmptyOne() {
+        // The table is indexed by world and clamped. A sixth world added later must not fall off
+        // the end into a castle containing nothing.
+        assertTrue(BossArena.build(99).entities().size() > 1,
+                "a world past the end of the escalation table builds an empty castle");
+    }
+
+    @Test
+    void everythingInTheArenaCanBeCleanedUp() {
+        List<String> problems = new ArrayList<>();
+        for (int world = 0; world < 6; world++) {
+            for (CourseCanvas.EntitySpawn spawn : BossArena.build(world).entities()) {
+                if (!SegmentLibrary.GENERATED_TAG.equals(spawn.tag())) {
+                    problems.add("world " + world + ": " + spawn.type().getDescriptionId()
+                            + " tagged " + spawn.tag());
+                }
+            }
+        }
+        assertEquals(List.of(), problems,
+                "these would survive a rebuild and accumulate on every attempt");
+    }
+
     private static int axeColumn(CourseCanvas c) {
         for (var e : c.blocks().entrySet()) {
             if (e.getValue().is(ModBlocks.AXE_BLOCK.get())) {

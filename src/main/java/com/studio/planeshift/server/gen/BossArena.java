@@ -65,8 +65,51 @@ public final class BossArena {
         return world != null && courseId.equals(world.bossCourseId());
     }
 
+    /** Which world this boss course ends, or 0 if it cannot be placed. */
+    public static int worldIndexOf(String courseId) {
+        com.studio.planeshift.common.course.WorldDefinition world =
+                com.studio.planeshift.common.course.WorldRegistry.worldForCourse(courseId);
+        if (world == null) {
+            return 0;
+        }
+        return Math.max(0, com.studio.planeshift.common.course.WorldRegistry
+                .worldIndex(world.worldId()));
+    }
+
+    /**
+     * How much is in the arena, by world.
+     *
+     * <p>There are five boss courses and they were all the same room, which makes the fifth castle
+     * the first castle again with a longer walk in front of it. The escalation is deliberately in
+     * the furniture rather than in Bowser: the player has spent a world learning to read firebars
+     * and Podoboos, and the castle is the place those get asked about together.
+     *
+     * <p>Indexed by world, clamped, so adding a sixth world degrades to the hardest arena rather
+     * than to an empty one.
+     */
+    private record Escalation(int firebars, int podoboos, int boos) {
+
+        private static final Escalation[] BY_WORLD = {
+            new Escalation(0, 0, 0),   // grassland: the encounter alone, so it can be learned
+            new Escalation(1, 0, 0),   // frozen
+            new Escalation(2, 2, 0),   // volcano: the pit starts fighting back
+            new Escalation(2, 2, 2),   // haunted
+            new Escalation(3, 3, 3),   // sky: everything at once
+        };
+
+        static Escalation forWorld(int worldIndex) {
+            return BY_WORLD[Math.clamp(worldIndex, 0, BY_WORLD.length - 1)];
+        }
+    }
+
     /** Builds the arena into a canvas, ready for {@link CourseWriter}. */
     public static CourseCanvas build() {
+        return build(0);
+    }
+
+    /** Builds the arena for a given world, which decides how much is in it. */
+    public static CourseCanvas build(int worldIndex) {
+        Escalation escalation = Escalation.forWorld(worldIndex);
         CourseCanvas c = new CourseCanvas();
         BlockState castle = ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState();
         BlockState lava = Blocks.LAVA.defaultBlockState();
@@ -92,6 +135,35 @@ public final class BossArena {
 
         // Bowser, on the bridge, facing back down it at the approaching player.
         c.spawn(ModEntities.BOWSER.get(), 23.5D, 1.0D, 0.5D, 90.0F, SegmentLibrary.GENERATED_TAG);
+
+        // Firebars over the bridge, spread across the span rather than stacked, so they read as
+        // separate clocks instead of one wall of fire.
+        for (int i = 0; i < escalation.firebars(); i++) {
+            int at = BRIDGE_FROM + 3 + i * (BRIDGE_TO - BRIDGE_FROM - 5)
+                    / Math.max(1, escalation.firebars());
+            c.spawn(ModEntities.FIREBAR.get(), at + 0.5D, 6.0D, 0.5D, 0.0F,
+                    SegmentLibrary.GENERATED_TAG);
+        }
+
+        // Podoboos in the lava under the bridge. They are the reason the pit is worth looking at
+        // rather than merely worth not falling into.
+        for (int i = 0; i < escalation.podoboos(); i++) {
+            int at = BRIDGE_FROM + 4 + i * 6;
+            if (at <= BRIDGE_TO) {
+                c.spawn(ModEntities.PODOBOO.get(), at + 0.5D, -2.0D, 0.5D, 0.0F,
+                        SegmentLibrary.GENERATED_TAG);
+            }
+        }
+
+        // Boos along the approach, so the walk in is no longer free.
+        for (int i = 0; i < escalation.boos(); i++) {
+            c.spawn(ModEntities.BOO.get(), 5.5D + i * 4, 3.0D, 0.5D, 0.0F,
+                    SegmentLibrary.GENERATED_TAG);
+        }
+
+        // No gaps in the bridge, at any difficulty, however tempting. AxeBlock walks its collapse
+        // westward and stops at the first tile that is not bridge, so a gap would leave everything
+        // beyond it standing and the castle would end with half a bridge in mid-air.
 
         // The axe. Taking it drops the bridge; it does not end the course, because AxeBlock is
         // also ordinary mid-course furniture in CASTLE_BRIDGE and making it a finish line would
