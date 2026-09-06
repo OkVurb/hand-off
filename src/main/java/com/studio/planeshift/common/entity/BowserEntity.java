@@ -1,5 +1,6 @@
 package com.studio.planeshift.common.entity;
 
+import com.studio.planeshift.common.registry.ModSounds;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -10,7 +11,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
- * Bowser placeholder boss. Big, fire-breathing, not stompable.
+ * The boss at the end of every world.
+ *
+ * <p>Was described here as a placeholder for as long as nothing spawned him. {@code BossArena}
+ * now puts him on a bridge over lava at the end of all five worlds, so this is the real thing and
+ * the comment should stop apologising for it.
+ *
+ * <p>The classic defeat is not in this class and does not need to be. The arena drops the bridge
+ * out from under him when the player takes the axe, and the lava check in {@link #tick} does the
+ * rest -- so the oldest boss mechanic in the genre falls out of two pieces that were each written
+ * for their own reasons.
  */
 public class BowserEntity extends CourseEnemyEntity {
 
@@ -76,6 +86,54 @@ public class BowserEntity extends CourseEnemyEntity {
     public java.util.Set<DefeatVector> answers() {
         return java.util.EnumSet.of(DefeatVector.GROUND_POUND, DefeatVector.SHELL,
                 DefeatVector.FIRE, DefeatVector.STAR);
+    }
+
+    /**
+     * The roar.
+     *
+     * <p>ModSounds.BOWSER_ROAR was the one registered sound in the mod that nothing ever played --
+     * recorded, packaged, and silent, because until the arena existed there was nothing to roar
+     * at. Bowser had no sound hooks of any kind and neither does the base enemy class, so he fought
+     * the player in complete silence.
+     */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getAmbientSound() {
+        return ModSounds.BOWSER_ROAR.get();
+    }
+
+    /**
+     * How often the idle roar comes round.
+     *
+     * <p>Vanilla picks roughly every four seconds, which for a single loud roar in a sealed stone
+     * room is not atmosphere, it is a metronome. This is the interval that decides whether the
+     * fight sounds tense or ridiculous, so it is set here rather than inherited.
+     */
+    @Override
+    public int getAmbientSoundInterval() {
+        return 160;
+    }
+
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(
+            net.minecraft.world.damagesource.DamageSource source) {
+        return ModSounds.BOWSER_ROAR.get();
+    }
+
+    @Override
+    protected net.minecraft.sounds.SoundEvent getDeathSound() {
+        return ModSounds.BOWSER_ROAR.get();
+    }
+
+    /**
+     * Pitched down, so the same recording reads as three different things.
+     *
+     * <p>There is one roar and three occasions for it. Playing it identically each time would make
+     * the death sound indistinguishable from an idle grumble, which is the moment in the whole
+     * game that most needs to land.
+     */
+    @Override
+    public float getVoicePitch() {
+        return isDeadOrDying() ? 0.65F : (hurtTime > 0 ? 0.8F : 1.0F);
     }
 
 }
