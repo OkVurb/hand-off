@@ -366,6 +366,20 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.CASTLE_BRIDGE) {
             return theme == CourseTheme.LAVA || theme == CourseTheme.UNDERGROUND;
         }
+        // One climax per theme. Before these existed CASTLE_BRIDGE was the only set piece in the
+        // library, so four of the six themes reserved the slot at 62-82% and never filled it.
+        if (segment == SegmentLibrary.GREAT_OAK) {
+            return theme == CourseTheme.GRASS;
+        }
+        if (segment == SegmentLibrary.SAND_CAUSEWAY) {
+            return theme == CourseTheme.DESERT;
+        }
+        if (segment == SegmentLibrary.FROZEN_GAUNTLET) {
+            return theme == CourseTheme.SNOW;
+        }
+        if (segment == SegmentLibrary.HAUNTED_ASCENT) {
+            return theme == CourseTheme.GHOST_HOUSE;
+        }
         // The endless hall is a ghost-house joke. In a grass level it is just a balcony that
         // inexplicably rejects you, with no fiction to hang the effect on.
         if (segment == SegmentLibrary.GHOST_LOOP) {

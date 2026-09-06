@@ -650,6 +650,167 @@ public final class SegmentLibrary {
     // ------------------------------------------------------------------ set pieces
 
     /** The castle bridge and axe. One per course, only where the theme earns it. */
+    /**
+     * Grassland climax: the great oak.
+     *
+     * <p>Four of the six themes reserved a set-piece slot and never filled it, because
+     * CASTLE_BRIDGE was the only one in the library and it is restricted to lava and underground.
+     * A grass course built up to a climax at 62-82% through and then simply carried on with
+     * ordinary segments. These four exist to close that.
+     *
+     * <p>Vertical rather than long, deliberately. Every other grassland segment is something the
+     * player runs across; the one moment meant to feel different should ask them to go up instead,
+     * and the canopy is the only place in a grass course with a view back down.
+     */
+    static final Segment GREAT_OAK = new Segment() {
+        public SegmentSpec spec() {
+            return def("great_oak", 24, 0, 3, Tag.SETPIECE, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 24, y, ctx);
+            BlockState wood = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
+            BlockState semi = ModBlocks.SEMISOLID_PLATFORM.get().defaultBlockState();
+
+            // The trunk, behind the lane rather than in it.
+            //
+            // Built at z=0 first, which put a solid two-by-twelve wall across the middle of the
+            // walking lane: CourseReachability rejected 626 grass courses, every one of them
+            // stopping dead at the tree. The lane is z=-1..1 and CourseDecorator already
+            // establishes z=2..3 as the depth scenery lives at, so that is where anything the
+            // player is meant to walk past belongs. From a side-on camera it reads as the trunk
+            // holding the canopy up either way, which is the only thing it was ever doing.
+            for (int h = 1; h <= 12; h++) {
+                for (int z = CourseDecorator.NEAR_Z; z <= CourseDecorator.FAR_Z; z++) {
+                    c.set(x + 11, y + h, z, wood);
+                    c.set(x + 12, y + h, z, wood);
+                }
+            }
+
+            // Canopy tiers, alternating sides so the climb switchbacks up the trunk instead of
+            // being a straight ladder. Three blocks of rise each, the same step SEMISOLID_TIERS
+            // already teaches.
+            for (int tier = 0; tier < 3; tier++) {
+                int ty = y + 4 + tier * 3;
+                int from = (tier % 2 == 0) ? x + 5 : x + 13;
+                for (int i = 0; i < 6; i++) {
+                    lane(c, ctx, from + i, ty, semi);
+                }
+                coinTrail(c, from + 1, 4, ty + 1, 1);
+            }
+
+            // The reward is at the top, which is the only reason to make the climb.
+            c.set(x + 17, y + 11, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+        }
+    };
+
+    /**
+     * Desert climax: the causeway.
+     *
+     * <p>A bridge in pieces over a pit, raked from both banks by cannon fire. The desert segments
+     * are mostly about footing; this is the one about timing, and the gaps are sized so the jump
+     * itself is never the difficulty -- being airborne at the wrong moment is.
+     */
+    static final Segment SAND_CAUSEWAY = new Segment() {
+        public SegmentSpec spec() {
+            return def("sand_causeway", 26, 0, 3, Tag.SETPIECE, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 5, y, ctx);
+            floor(c, x + 21, 5, y, ctx);
+            for (int i = 5; i < 21; i++) {
+                ctx.pitFloor(c, x + i, y);
+            }
+
+            // Four spans, two wide, three apart. Three is the gap the rest of the library uses for
+            // a jump that is read rather than measured.
+            for (int span = 0; span < 4; span++) {
+                int from = x + 5 + span * 4;
+                for (int i = 0; i < 2; i++) {
+                    lane(c, ctx, from + i, y,
+                            ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState());
+                }
+                coinTrail(c, from, 2, y + 3, 1);
+            }
+
+            // Cannons on both banks, above head height so they clear the causeway itself.
+            BlockState east = ModBlocks.BULLET_BILL_CANNON.get().defaultBlockState()
+                    .setValue(HorizontalDirectionalBlock.FACING, Direction.EAST);
+            BlockState west = ModBlocks.BULLET_BILL_CANNON.get().defaultBlockState()
+                    .setValue(HorizontalDirectionalBlock.FACING, Direction.WEST);
+            c.set(x + 3, y + 2, 0, east);
+            c.set(x + 3, y + 4, 0, east);
+            c.set(x + 22, y + 3, 0, west);
+        }
+    };
+
+    /**
+     * Snow climax: the gauntlet.
+     *
+     * <p>Thwomps over ice. Neither half is new -- the player has met both by now -- and putting
+     * them together is the point: ice takes away the ability to stop, and a Thwomp is the one
+     * hazard that punishes not stopping. The alcoves between them are wide enough to slide to a
+     * halt in, so the segment is difficult rather than unfair.
+     */
+    static final Segment FROZEN_GAUNTLET = new Segment() {
+        public SegmentSpec spec() {
+            return def("frozen_gauntlet", 24, 0, 3, Tag.SETPIECE, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 24, y, ctx);
+            BlockState ice = ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState();
+            for (int i = 3; i < 21; i++) {
+                c.setLane(x + i, y, ice, ctx.halfWidth());
+            }
+
+            // Three, spaced five apart. Closer together and there is nowhere to stop between them,
+            // which on ice means the segment is decided by luck.
+            for (int i = 0; i < 3; i++) {
+                mob(c, ModEntities.THWOMP.get(), x + 5 + i * 5, y + 7, 0.0F);
+            }
+            coinTrail(c, x + 8, 6, y + 2, 2);
+        }
+    };
+
+    /**
+     * Ghost house climax: the ascent.
+     *
+     * <p>The one ghost-house segment that goes anywhere. GHOST_LOOP is a joke about not making
+     * progress, and that only works if the theme has something real to climb somewhere else.
+     *
+     * <p>No keyhole here, deliberately. KeyholeBlock ends the course, and a set piece is placed
+     * two thirds of the way through, so one here would cut every ghost house short at exactly the
+     * moment it was supposed to peak.
+     */
+    static final Segment HAUNTED_ASCENT = new Segment() {
+        public SegmentSpec spec() {
+            return def("haunted_ascent", 24, 0, 3, Tag.SETPIECE, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 24, y, ctx);
+            BlockState semi = ModBlocks.SEMISOLID_PLATFORM.get().defaultBlockState();
+
+            // Landings climbing away to the right, four across and three up, so every step of the
+            // ascent is the same jump.
+            for (int step = 0; step < 4; step++) {
+                int sx = x + 4 + step * 4;
+                int sy = y + 3 + step * 3;
+                for (int i = 0; i < 3; i++) {
+                    lane(c, ctx, sx + i, sy, semi);
+                }
+                // One Boo per landing, so the pressure builds with the height rather than all of
+                // it arriving at once.
+                mob(c, ModEntities.BOO.get(), sx + 1, sy + 2, 0.0F);
+            }
+
+            coinTrail(c, x + 5, 8, y + 5, 2);
+            c.set(x + 20, y + 13, 0, ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
+        }
+    };
+
     static final Segment CASTLE_BRIDGE = new Segment() {
         public SegmentSpec spec() {
             return def("castle_bridge", 24, 0, 4, Tag.SETPIECE, Tag.OVERHEAD);
@@ -1526,6 +1687,7 @@ public final class SegmentLibrary {
 
     /** Set pieces, which the composer places at most one of. */
     public static List<Segment> setPieces() {
-        return List.of(CASTLE_BRIDGE);
+        return List.of(CASTLE_BRIDGE, GREAT_OAK, SAND_CAUSEWAY, FROZEN_GAUNTLET,
+                HAUNTED_ASCENT);
     }
 }
