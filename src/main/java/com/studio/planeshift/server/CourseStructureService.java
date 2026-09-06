@@ -3,6 +3,7 @@ package com.studio.planeshift.server;
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.course.CourseDefinition;
+import com.studio.planeshift.server.gen.BossArena;
 import com.studio.planeshift.server.gen.CourseCanvas;
 import com.studio.planeshift.server.gen.CourseComposer;
 import com.studio.planeshift.server.gen.CourseWriter;
@@ -63,6 +64,14 @@ public final class CourseStructureService {
         if (ToadHouseRoom.ID.equals(courseId)) {
             CourseWriter.write(level, course.startPos(), ToadHouseRoom.build(), course.length());
             PlaneShift.LOGGER.info("Placed Toad House room at {}", course.startPos());
+            return;
+        }
+        // The last course of every world is its boss course: clearing it unlocks the next world
+        // and earns a send-off no other course gets. It was an ordinary generated level, and
+        // Bowser was spawned by nothing anywhere in the game.
+        if (BossArena.isBossCourse(courseId)) {
+            CourseWriter.write(level, course.startPos(), BossArena.build(), course.length());
+            PlaneShift.LOGGER.info("Placed boss arena for {} at {}", courseId, course.startPos());
             return;
         }
         placeGenerated(level, course, courseId);
