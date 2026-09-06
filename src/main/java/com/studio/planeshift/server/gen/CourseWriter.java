@@ -65,6 +65,12 @@ public final class CourseWriter {
             if (spawn.tag() != null) {
                 entity.addTag(spawn.tag());
             }
+            if (spawn.configure() != null) {
+                // Before addFreshEntity, so synced data is set when the entity is first sent to
+                // clients. Setting it afterwards would show every boss as the default sibling for
+                // a tick and then pop to the right one.
+                spawn.configure().accept(entity);
+            }
             level.addFreshEntity(entity);
         }
 

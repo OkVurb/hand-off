@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
@@ -74,8 +75,15 @@ public final class CourseCanvas {
      * @param facing  yaw in degrees
      * @param tag     an optional tag applied to the entity, for cleanup on course reload
      */
+    /**
+     * @param configure applied to the entity after it is placed and before it enters the world,
+     *                  or null. Exists because some spawns are not fully described by their type:
+     *                  all eight tower bosses share one entity type and differ by a synced
+     *                  variant, so without this the generator could place a boss but not say
+     *                  which one, and every tower in the game would hold the same sibling.
+     */
     public record EntitySpawn(EntityType<?> type, double x, double y, double z, float facing,
-                              String tag) {
+                              String tag, java.util.function.Consumer<Entity> configure) {
     }
 
     /** An item pickup placed in the world. */
@@ -178,7 +186,13 @@ public final class CourseCanvas {
     }
 
     public void spawn(EntityType<?> type, double x, double y, double z, float facing, String tag) {
-        entities.add(new EntitySpawn(type, x, y, z, facing, tag));
+        spawn(type, x, y, z, facing, tag, null);
+    }
+
+    /** As above, with a hook to set up the entity before it enters the world. */
+    public void spawn(EntityType<?> type, double x, double y, double z, float facing, String tag,
+                      java.util.function.Consumer<Entity> configure) {
+        entities.add(new EntitySpawn(type, x, y, z, facing, tag, configure));
     }
 
     public void item(Item item, double x, double y, double z) {

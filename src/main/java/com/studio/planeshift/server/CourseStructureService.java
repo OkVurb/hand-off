@@ -7,6 +7,7 @@ import com.studio.planeshift.server.gen.BossArena;
 import com.studio.planeshift.server.gen.CourseCanvas;
 import com.studio.planeshift.server.gen.CourseComposer;
 import com.studio.planeshift.server.gen.CourseWriter;
+import com.studio.planeshift.server.gen.KoopalingTower;
 import com.studio.planeshift.server.gen.ToadHouseRoom;
 import com.studio.planeshift.common.course.CourseLayout;
 import com.studio.planeshift.common.course.CourseTheme;
@@ -69,6 +70,14 @@ public final class CourseStructureService {
         // The last course of every world is its boss course: clearing it unlocks the next world
         // and earns a send-off no other course gets. It was an ordinary generated level, and
         // Bowser was spawned by nothing anywhere in the game.
+        // The tower halfway through a world. Checked before the castle only because the two can
+        // never be the same course -- towerCourseIdOf refuses to return the last one.
+        if (KoopalingTower.isTowerCourse(courseId)) {
+            CourseWriter.write(level, course.startPos(),
+                    KoopalingTower.build(KoopalingTower.worldIndexOf(courseId)), course.length());
+            PlaneShift.LOGGER.info("Placed tower for {} at {}", courseId, course.startPos());
+            return;
+        }
         if (BossArena.isBossCourse(courseId)) {
             CourseWriter.write(level, course.startPos(),
                     BossArena.build(BossArena.worldIndexOf(courseId)), course.length());
