@@ -21,8 +21,10 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
  * angles blend between bases with smoothstep easing; the collision basis is untouched
  * (that is the server's commit).
  *
- * <p>Comfort: reduced-motion shortens the perceived blend by snapping at 50%, and smoothing
- * scales the blend easing from client config.
+ * <p>Comfort: reduced-motion shortens the perceived blend by snapping at 50%, and the blend
+ * easing is the profile's authored {@link CameraProfile#damping} scaled by the client's comfort
+ * multiplier -- capped at the authored value, so a player can calm the camera and never make it
+ * floatier than the profile designed it.
  *
  * <p><b>Look-ahead is not implemented.</b> {@link CameraProfile#lookAhead} is authored per profile
  * and documented as "horizontal look-ahead toward velocity, in blocks", and nothing in this class
@@ -59,12 +61,22 @@ public final class CameraDirector {
                 // Identical transaction timing, shorter perceived motion.
                 progress = progress < 0.5F ? 0.0F : 1.0F;
             }
-            // Smoothing blends between a straight ramp and full smoothstep, which is exactly
-            // what the config option says it does: 0 is rigid, 1 is floaty. It had nothing
-            // reading it, so the blend was always fully smoothed however the slider was set.
-            float smoothing = (float) (double) PlaneShiftConfig.CLIENT.cameraSmoothing.get();
+            // How much of the blend is eased rather than linear.
+            //
+            // Two controls were specified for this and neither was applied. CameraProfile.damping
+            // is authored per profile and described as "0 = rigid, 1 = floaty"; the config option
+            // cameraSmoothing carried word-for-word the same description. Two rival knobs for one
+            // quantity, both dead, is how they stayed consistent with each other.
+            //
+            // Resolved as authored-value-times-comfort-multiplier rather than by picking a winner,
+            // which is what the class contract above has always claimed: the profile decides the
+            // camera, and the player may calm it but never exceed it. Capped at the authored
+            // damping so "never past authored profile bounds" is actually true.
+            float authored = ClientCourseState.profileFor(sync.toMode()).damping();
+            float comfort = Mth.clamp(
+                    (float) (double) PlaneShiftConfig.CLIENT.cameraSmoothing.get(), 0.0F, 1.0F);
             float smoothstep = progress * progress * (3.0F - 2.0F * progress);
-            float eased = Mth.lerp(Mth.clamp(smoothing, 0.0F, 1.0F), progress, smoothstep);
+            float eased = Mth.lerp(Mth.clamp(authored * comfort, 0.0F, 1.0F), progress, smoothstep);
 
             float fromYaw = angleFor(sync.fromMode(), state, event.getYaw());
             float fromPitch = pitchFor(sync.fromMode(), state, event.getPitch());

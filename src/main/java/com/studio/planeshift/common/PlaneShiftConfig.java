@@ -40,8 +40,11 @@ public final class PlaneShiftConfig {
         Client(ModConfigSpec.Builder builder) {
             builder.push("camera");
             cameraSmoothing = builder
-                    .comment("Camera smoothing strength in 2.5D mode (0 = rigid, 1 = floaty).")
-                    .defineInRange("cameraSmoothing", 0.35D, 0.0D, 1.0D);
+                    .comment("Comfort multiplier on the authored per-profile camera damping.",
+                            "1.0 leaves the camera exactly as the profile authored it;",
+                            "0 is rigid. The result is capped at the authored value, so this",
+                            "can calm the camera but never make it floatier than designed.")
+                    .defineInRange("cameraSmoothing", 1.0D, 0.0D, 1.0D);
             reducedMotion = builder
                     .comment("Reduced motion: shorter camera blends, no shake, low parallax.",
                             "Transaction timing is identical; only presentation changes.")
