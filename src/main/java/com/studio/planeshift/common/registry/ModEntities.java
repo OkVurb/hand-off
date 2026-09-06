@@ -2,6 +2,7 @@ package com.studio.planeshift.common.registry;
 
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.entity.EnemyRigProfile;
+import com.studio.planeshift.common.entity.KoopalingEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.BoomerangProjectile;
 import com.studio.planeshift.common.entity.BowserEntity;
@@ -211,6 +212,15 @@ public final class ModEntities {
                     .updateInterval(3)
                     .build(key("toad")));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<KoopalingEntity>> KOOPALING =
+            ENTITY_TYPES.register("koopaling", () -> EntityType.Builder
+                    .<KoopalingEntity>of(KoopalingEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.KOOPALING.scaled(0.8F),
+                            EnemyRigProfile.KOOPALING.scaled(1.4F))
+                    .clientTrackingRange(12)
+                    .updateInterval(3)
+                    .build(key("koopaling")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<BowserEntity>> BOWSER =
             ENTITY_TYPES.register("bowser", () -> EntityType.Builder
                     .<BowserEntity>of(BowserEntity::new, MobCategory.MONSTER)
@@ -258,6 +268,7 @@ public final class ModEntities {
         event.put(FIRE_BRO.get(), FireBroEntity.createAttributes().build());
         event.put(KOOPA.get(), KoopaEntity.createAttributes().build());
         event.put(TOAD.get(), ToadEntity.createMobAttributes().build());
+        event.put(KOOPALING.get(), KoopalingEntity.createAttributes().build());
         event.put(THWOMP.get(), ThwompEntity.createAttributes().build());
         event.put(BULLET_BILL.get(), BulletBillEntity.createAttributes().build());
         event.put(BOO.get(), BooEntity.createAttributes().build());

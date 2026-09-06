@@ -38,6 +38,12 @@ public enum EnemyRigProfile {
     BUZZY_BEETLE(1.25F),
     PIRANHA_PLANT(1.05F),
     TOAD(1.0F),
+    /**
+     * All eight tower bosses share this one. See {@link Koopaling}: the scale here is tied to the
+     * registered hitbox, so per-sibling sizes would mean per-sibling registrations and eight
+     * chances to let the art and the hitbox disagree.
+     */
+    KOOPALING(1.15F),
     BOWSER(1.0F);
 
     private final float visualScale;

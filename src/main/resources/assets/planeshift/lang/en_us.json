@@ -337,5 +337,7 @@
   "block.planeshift.keyhole": "Keyhole",
   "item.planeshift.course_key": "Key",
   "message.planeshift.keyhole_locked": "It is locked. There is a key somewhere in this course.",
-  "block.planeshift.toad_box": "Toad House Box"
+  "block.planeshift.toad_box": "Toad House Box",
+  "entity.planeshift.koopaling": "Koopaling",
+  "item.planeshift.koopaling_spawn_egg": "Koopaling Spawn Egg"
 }

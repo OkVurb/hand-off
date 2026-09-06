@@ -29,8 +29,25 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
         this.visualScale = profile.visualScale();
     }
 
+    /**
+     * Per-sibling sheets for the tower bosses, indexed by {@code Koopaling} ordinal.
+     *
+     * <p>Built once. A renderer is constructed per entity type and asked for a texture every frame
+     * for every visible entity, so resolving an Identifier from a string in there would allocate
+     * on the render thread for no reason.
+     */
+    private static final Identifier[] KOOPALING_TEXTURES =
+            java.util.Arrays.stream(com.studio.planeshift.common.entity.Koopaling.values())
+                    .map(k -> com.studio.planeshift.PlaneShift.id(
+                            "textures/entity/koopaling_" + k.id() + ".png"))
+                    .toArray(Identifier[]::new);
+
     @Override
     public Identifier getTextureLocation(CourseEnemyRenderState state) {
+        // One entity type, eight looks. Everything else has a fixed sheet chosen at registration.
+        if (state.koopalingVariant >= 0) {
+            return KOOPALING_TEXTURES[state.koopalingVariant % KOOPALING_TEXTURES.length];
+        }
         return texture;
     }
 
@@ -45,6 +62,9 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
         state.squishY = entity.squishScaleY(partialTick);
         state.squishXZ = entity.squishScaleXZ(partialTick);
         state.inShell = (entity instanceof com.studio.planeshift.common.entity.KoopaEntity k) && k.inShell();
+        state.koopalingVariant =
+                entity instanceof com.studio.planeshift.common.entity.KoopalingEntity boss
+                        ? boss.variant().ordinal() : -1;
     }
 
     @Override

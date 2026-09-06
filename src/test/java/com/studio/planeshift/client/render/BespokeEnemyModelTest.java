@@ -49,6 +49,11 @@ class BespokeEnemyModelTest {
             Map.entry(EnemyRigProfile.SPINY, 15L),
             Map.entry(EnemyRigProfile.BUZZY_BEETLE, 14L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
+            // Body, shell, head, snout, jaw, two arms, two legs, a three-piece crest and a
+            // two-piece wand. No separate eye boxes, unlike the Koopa it is built from: the crest
+            // needs the trim region for its colour, and a box picks a material, so the eyes are
+            // painted onto the head's front face instead.
+            Map.entry(EnemyRigProfile.KOOPALING, 14L),
             Map.entry(EnemyRigProfile.BOWSER, 19L));
 
     @ParameterizedTest(name = "{0} bakes as a complete bespoke mesh")

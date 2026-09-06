@@ -251,6 +251,67 @@ def koopa():
     return img
 
 
+# The eight tower bosses. Kept as a table because what separates them is entirely colour: the
+# geometry is one shared rig, so the sheet is the only thing that says which sibling this is.
+#
+# Hair is the primary read and no two may share it -- at 20-30 blocks a boss is a silhouette and
+# two colours, and the crest is the part that differs in shape as well as hue. Shell is the
+# secondary read, the mass of the thing from behind.
+# Two pairs had to be pulled apart from the reference rather than copied from it.
+#
+# Larry and Ludwig both have blue hair, and Morton's head and Bowser Jr's bandana are both white.
+# Faithful, and useless: the first render put Larry at (79,134,217) and Ludwig at (83,117,218),
+# which are the same colour to anyone standing 25 blocks away. A boss the player cannot name on
+# sight is a boss with no identity, so Larry keeps a bright sky blue, Ludwig goes deep indigo, and
+# Bowser Jr is read by his bandana red instead of by white. Roy went violet for the
+# same reason a third time: his pink sat 32 units from Wendy's, and pink is hers.
+#
+# KoopalingPaletteTest measures the shipped PNGs rather than this table, because the table is not
+# what the player looks at.
+KOOPALINGS = {
+    # name        hair              shell             head
+    "larry":     ((72, 168, 240),  (102, 183, 232),  (232, 208, 122)),
+    "morton":    ((242, 242, 242), (58, 58, 66),     (138, 106, 82)),
+    "wendy":     ((240, 106, 168), (210, 64, 94),    (232, 208, 122)),
+    "iggy":      ((102, 194, 74),  (168, 204, 74),   (232, 208, 122)),
+    "roy":       ((166, 92, 210),   (154, 90, 200),   (232, 122, 154)),
+    "lemmy":     ((232, 160, 48),  (232, 200, 74),   (232, 208, 122)),
+    "ludwig":    ((92, 70, 190),   (46, 74, 158),    (232, 208, 122)),
+    "bowser_jr": ((214, 62, 54),   (76, 168, 60),    (232, 200, 106)),
+}
+
+
+def koopaling(hair, shell, head, seed):
+    """One tower boss.
+
+    Same construction as the Koopa it is built from, with two differences that matter. The trim
+    region carries the hair rather than eye white, because the crest is what tells the siblings
+    apart and it needs the sibling's colour. And the shell gets a heavier rim than a Koopa's, since
+    a boss read at distance needs its outline to survive being small.
+    """
+    img = new_sheet()
+    base(img, BODY, head, seed)
+    ribs(img, BODY, head)
+
+    base(img, HEAD, head, seed + 1, ramp=0.22)
+    # Angry, unlike a Koopa. These ones came looking for you.
+    eyes(img, front(HEAD, 8, 6, 7), 8, 6, angry=True)
+
+    base(img, LIMB, shade(head, 0.88), seed + 2, ramp=0.20)
+
+    base(img, HARD, shell, seed + 3)
+    scutes(img, HARD, shell)
+    rect(img, HARD, 0, 0, 64, 3, shade(shell, 1.4))
+    rect(img, HARD, 0, 33, 64, 3, shade(shell, 0.58))
+
+    # Beak, and the wand tip, which share the muzzle region.
+    base(img, MUZZLE, (247, 231, 168), seed + 4, ramp=0.16)
+
+    # The crest.
+    base(img, TRIM, hair, seed + 5, ramp=0.26)
+    return img
+
+
 def thwomp():
     """Cut blue-grey stone with a furious face.
 
@@ -792,6 +853,13 @@ CHARACTERS = {
     "piranha_plant": piranha_plant,
     "bowser": bowser,
 }
+
+
+for _i, (_name, (_hair, _shell, _head)) in enumerate(KOOPALINGS.items()):
+    # Default arguments bind the loop variables now rather than at call time; without them every
+    # entry would close over the last sibling and all eight sheets would come out identical.
+    CHARACTERS["koopaling_" + _name] = (
+        lambda h=_hair, s=_shell, d=_head, i=_i: koopaling(h, s, d, 60 + i * 7))
 
 
 def main():

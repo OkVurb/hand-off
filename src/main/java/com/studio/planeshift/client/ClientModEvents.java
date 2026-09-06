@@ -167,6 +167,12 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.PIRANHA_PLANT.get(),
                 CourseEnemyRenderer.provider(piranhaPlant, 0.55F, EnemyRigProfile.PIRANHA_PLANT));
         event.registerEntityRenderer(ModEntities.TOAD.get(), ToadRenderer::new);
+        // The texture passed here is only a fallback: CourseEnemyRenderer picks the real sheet
+        // from the synced variant, because all eight siblings share this one entity type.
+        event.registerEntityRenderer(ModEntities.KOOPALING.get(),
+                CourseEnemyRenderer.provider(
+                        PlaneShift.id("textures/entity/koopaling_larry.png"),
+                        0.7F, EnemyRigProfile.KOOPALING));
         event.registerEntityRenderer(ModEntities.BOWSER.get(),
                 CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOWSER));
         event.registerEntityRenderer(ModEntities.EMBER_BOLT.get(),

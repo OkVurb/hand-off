@@ -111,6 +111,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         return switch (profile) {
             case GOOMBA -> goomba();
             case KOOPA -> koopa();
+            case KOOPALING -> koopaling();
             case PARATROOPA -> paratroopa();
             case DRY_BONES -> dryBones();
             case PODOBOO -> podoboo();
@@ -257,6 +258,57 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         // Eyes, standing off the head.
         r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(-2.4F, 8, -3.6F));
         r.addOrReplaceChild("detail_4", box(64, 80, -1.5F, -1.5F, -1, 3, 3, 2), pose(2.4F, 8, -3.6F));
+        return finish(mesh);
+    }
+
+    /**
+     * A tower boss: the Koopa build, bulked up, with a crest.
+     *
+     * <p>All eight siblings share this one rig; {@code Koopaling} explains why, and the short of it
+     * is that the scale here is tied to the registered hitbox. What separates them is paint, so the
+     * geometry's job is to give the paint somewhere to read from at 20-30 blocks.
+     *
+     * <p>Hence the crest. At that distance a boss is a silhouette and two colours, and hair is the
+     * only part of these characters that differs in <em>shape</em> as well as hue — so it is built
+     * tall and stepped rather than as a flat cap, and it lives in the first three detail slots
+     * where the texture generator can paint each sibling's colour onto it.
+     *
+     * <p>Same face contract as the Koopa: the 8x6x7 head at (64,0) and the 6x3 muzzle at (0,80).
+     * The face regions are shared across every rig on purpose — a box that picks a material has to
+     * be exactly the size the sheet was painted for, and inventing a new head size here would mean
+     * inventing a new face region for it too.
+     */
+    private static LayerDefinition koopaling() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -4.5F, -9, -3, 9, 9, 6), pose(0, 19, 0));
+        // Wider and rounder than a Koopa's, so the boss reads as heavier from the side.
+        r.addOrReplaceChild("shell", box(64, 40, -6.5F, -8, -1, 13, 13, 6), pose(0, 17, 2.5F));
+        r.addOrReplaceChild("head", box(64, 0, -4, -6, -3.5F, 8, 6, 7), pose(0, 11, -1));
+        r.addOrReplaceChild("snout", box(0, 80, -3, -1.5F, -3, 6, 3, 3), pose(0, 9.5F, -4));
+        r.addOrReplaceChild("jaw", box(0, 80, -2.5F, 0, -2.5F, 5, 2, 3), pose(0, 11, -4, 0.12F, 0, 0));
+        r.addOrReplaceChild("left_arm", box(0, 40, 0, -1, -1.5F, 3, 7, 3), pose(4.5F, 12, 0, 0, 0, -0.16F));
+        r.addOrReplaceChild("right_arm", box(0, 40, -3, -1, -1.5F, 3, 7, 3), pose(-4.5F, 12, 0, 0, 0, 0.16F));
+        r.addOrReplaceChild("left_leg", box(0, 40, -1.5F, 0, -2, 3, 5, 5), pose(2.5F, 19, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -1.5F, 0, -2, 3, 5, 5), pose(-2.5F, 19, 0));
+
+        // The crest, in three stepped tufts. Stepped rather than one slab because a single block
+        // of hair reads as a hat, and the shape is half of what tells the siblings apart.
+        r.addOrReplaceChild("detail_1", box(64, 80, -1.5F, -4, -1, 3, 4, 2), pose(0, 7, -1));
+        r.addOrReplaceChild("detail_2", box(64, 80, -1.5F, -3, -1, 3, 3, 2), pose(0, 8.5F, 1.5F));
+        r.addOrReplaceChild("detail_3", box(64, 80, -1.5F, -2, -1, 3, 2, 2), pose(0, 10, 3.5F));
+
+        // No separate eye boxes here, unlike the Koopa rig.
+        //
+        // The crest above uses the trim region, and trim is where the Koopa puts its eye whites --
+        // a box picks a material, so hair colour and eye white cannot share one. The head's front
+        // face already has eyes painted into it by the texture generator, which is the same place
+        // every other rig gets them, so the standalone boxes were only ever a highlight. Dropping
+        // them costs a little relief and buys eight readable hair colours.
+
+        // The wand. Every one of them casts, so it is rig rather than paint.
+        r.addOrReplaceChild("detail_4", box(0, 40, -0.5F, -6, -0.5F, 1, 7, 1), pose(5.5F, 13, -1));
+        r.addOrReplaceChild("detail_5", box(0, 80, -1.5F, -1.5F, -1.5F, 3, 3, 3), pose(5.5F, 7, -1));
         return finish(mesh);
     }
 

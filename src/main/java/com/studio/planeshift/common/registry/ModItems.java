@@ -104,6 +104,8 @@ public final class ModItems {
             registerSpawnEgg("piranha_plant_spawn_egg", ModEntities.PIRANHA_PLANT);
     public static final DeferredItem<SpawnEggItem> TOAD_SPAWN_EGG =
             registerSpawnEgg("toad_spawn_egg", ModEntities.TOAD);
+    public static final DeferredItem<SpawnEggItem> KOOPALING_SPAWN_EGG =
+            registerSpawnEgg("koopaling_spawn_egg", ModEntities.KOOPALING);
     public static final DeferredItem<SpawnEggItem> BOWSER_SPAWN_EGG =
             registerSpawnEgg("bowser_spawn_egg", ModEntities.BOWSER);
     public static final DeferredItem<SpawnEggItem> MOVING_PLATFORM_SPAWN_EGG =

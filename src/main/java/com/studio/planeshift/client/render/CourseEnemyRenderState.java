@@ -17,4 +17,12 @@ public class CourseEnemyRenderState extends LivingEntityRenderState {
     public float squishXZ = 1.0F;
     /** True if this is a Koopa inside its shell. */
     public boolean inShell;
+
+    /**
+     * Which tower boss this is, or -1 for anything that is not one.
+     *
+     * <p>All eight siblings are one entity type with one rig, so the sheet is the only thing that
+     * says which of them the player is looking at. See {@code Koopaling}.
+     */
+    public int koopalingVariant = -1;
 }
