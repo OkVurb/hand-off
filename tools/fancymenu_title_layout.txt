@@ -1,0 +1,49 @@
+type = fancymenu_layout
+
+layout-meta {
+  identifier = %menu:net.minecraft.client.gui.screens.TitleScreen%
+  is_enabled = true
+  layout_index = 0
+  randommode = false
+  randomgroup = 1
+  randomonlyfirsttime = false
+  render_custom_elements_behind_vanilla = false
+  last_edited_time = 0
+}
+
+menu_background {
+  background_type = image
+  image_path = config/fancymenu/assets/menu_background.png
+  repeat_texture = false
+  restart_animated_on_menu_load = true
+  parallax = false
+  parallax_intensity_x = 1.0
+  parallax_intensity_y = 1.0
+  invert_parallax = false
+  slide = false
+  opacity = 1.0
+}
+
+element {
+  element_type = vanilla_button
+  instance_identifier = title_screen_logo
+  button_identifier = title_screen_logo
+  is_hidden = true
+  anchor_point = top_centered
+}
+
+element {
+  element_type = image
+  instance_identifier = planeshift_wordmark
+  source = config/fancymenu/assets/menu_wordmark.png
+  anchor_point = top_centered
+  x = -206
+  y = 26
+  width = 413
+  height = 77
+  base_opacity = 1.0
+  repeat_texture = false
+  restart_animated_on_menu_load = false
+  sticky_anchor = false
+  stay_on_screen = true
+}
