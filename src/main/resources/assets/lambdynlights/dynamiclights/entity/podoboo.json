@@ -1,0 +1,10 @@
+{
+  "match": {
+    "type": "planeshift:podoboo"
+  },
+  "luminance": {
+    "type": "lambdynlights:wet_sensitive",
+    "dry": 14,
+    "wet": 10
+  }
+}

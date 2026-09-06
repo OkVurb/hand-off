@@ -1,0 +1,9 @@
+{
+  "match": {
+    "type": "planeshift:ember_bolt"
+  },
+  "luminance": {
+    "type": "lambdynlights:water_sensitive",
+    "out_of_water": 12
+  }
+}

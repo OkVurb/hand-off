@@ -1,0 +1,9 @@
+{
+  "match": {
+    "type": "planeshift:bowser_fire"
+  },
+  "luminance": {
+    "type": "lambdynlights:water_sensitive",
+    "out_of_water": 14
+  }
+}

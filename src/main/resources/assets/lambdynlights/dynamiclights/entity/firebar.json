@@ -1,0 +1,10 @@
+{
+  "match": {
+    "type": "planeshift:firebar"
+  },
+  "luminance": {
+    "type": "lambdynlights:wet_sensitive",
+    "dry": 13,
+    "wet": 7
+  }
+}

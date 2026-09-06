@@ -1,0 +1,9 @@
+{
+  "match": {
+    "type": "planeshift:fireball"
+  },
+  "luminance": {
+    "type": "lambdynlights:water_sensitive",
+    "out_of_water": 12
+  }
+}
