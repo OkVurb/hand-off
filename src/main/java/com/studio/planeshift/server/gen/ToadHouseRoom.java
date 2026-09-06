@@ -93,7 +93,12 @@ public final class ToadHouseRoom {
         }
 
         // Toad, at the far end, facing back down the room toward the player.
-        c.spawn(ModEntities.TOAD.get(), TO - 3 + 0.5D, 1.0D, 0.5D, 90.0F, "toad_house_host");
+        //
+        // GENERATED_TAG, not a tag of its own. CourseWriter.clear() discards entities by that tag
+        // before it rebuilds, so anything spawned under a different one survives the rebuild and
+        // is joined by a fresh copy: a Toad House would gain another Toad on every single visit.
+        c.spawn(ModEntities.TOAD.get(), TO - 3 + 0.5D, 1.0D, 0.5D, 90.0F,
+                SegmentLibrary.GENERATED_TAG);
         c.marker("toad_house", BOX_X[1], BOX_Y, 0);
         return c;
     }
