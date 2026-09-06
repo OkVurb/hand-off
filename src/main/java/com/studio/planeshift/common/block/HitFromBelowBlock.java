@@ -65,9 +65,29 @@ public interface HitFromBelowBlock {
             rotating.triggerSpin(state, level, pos);
             return true;
         }
+        if (state.getBlock() instanceof PrizeCacheBlock cache) {
+            cache.triggerFromImpact(state, level, pos);
+            return true;
+        }
+        if (state.getBlock() instanceof ToadBoxBlock box) {
+            box.triggerFromImpact(state, level, pos);
+            return true;
+        }
         if (state.getBlock() instanceof BrickBlock) {
             return BrickBlock.impact(state, level, pos);
         }
+        // Deliberately not dispatched, so the omissions are on the record rather than looking
+        // like more blocks nobody got round to:
+        //
+        //   HiddenQuestionBlock and SecretVineBlock are found by hitting them from underneath.
+        //   Revealing one by landing on top of it would give away a secret the player has not
+        //   actually looked for.
+        //
+        //   CoinRingBlock is passed through rather than struck.
+        //
+        //   PSwitchBlock, OnOffSwitchBlock, MusicBlock and PlaneshiftNoteBlock all implement
+        //   stepOn, so landing on one already triggers it by a different route. Dispatching here
+        //   too would fire them twice on the same pound.
         return false;
     }
 

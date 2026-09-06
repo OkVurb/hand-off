@@ -75,6 +75,21 @@ public class ToadBoxBlock extends Block implements HitFromBelowBlock {
     }
 
     /**
+     * Opens from a ground pound.
+     *
+     * <p>A box that can be head-butted but not pounded is a box that rejects one of the two moves
+     * the whole game is built on, for no reason the player can see. Added late because this block
+     * was written after {@link HitFromBelowBlock#impact} and simply never joined the dispatcher —
+     * which is how a rule stops holding: not by being argued with, but by the next thing not
+     * being told about it.
+     */
+    public void triggerFromImpact(BlockState state, Level level, BlockPos pos) {
+        if (!level.isClientSide() && !state.getValue(USED)) {
+            open(level, pos);
+        }
+    }
+
+    /**
      * Pays out, then closes every other box in the room.
      *
      * <p>The sweep runs before the payout is popped so the player cannot open a second box in the

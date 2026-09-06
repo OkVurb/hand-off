@@ -66,10 +66,30 @@ public class PrizeCacheBlock extends Block implements HitFromBelowBlock {
     protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
         if (!state.getValue(OPENED) && !level.isClientSide()
                 && HitFromBelowBlock.isHeadContact(player, pos)) {
-            level.setBlock(pos, state.setValue(OPENED, true), Block.UPDATE_ALL);
-            popCoins(level, pos);
-            level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.8F, 1.3F);
+            open(state, level, pos);
         }
+    }
+
+    /**
+     * Opens from a ground pound or a kicked shell.
+     *
+     * <p>{@link #attack} cannot serve those: it needs a Player, which a shell has not got, and it
+     * gates on {@code isHeadContact}, which a pound fails by definition because the player is
+     * above the block rather than under it. Without this the cache was the one deterministic
+     * reward in the game whose payout depended on which side you hit it from — the exact thing
+     * {@link HitFromBelowBlock#impact} exists to prevent, and it said so in its own javadoc while
+     * this block sat outside the dispatcher.
+     */
+    public void triggerFromImpact(BlockState state, Level level, BlockPos pos) {
+        if (!state.getValue(OPENED) && !level.isClientSide()) {
+            open(state, level, pos);
+        }
+    }
+
+    private void open(BlockState state, Level level, BlockPos pos) {
+        level.setBlock(pos, state.setValue(OPENED, true), Block.UPDATE_ALL);
+        popCoins(level, pos);
+        level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.8F, 1.3F);
     }
 
     @Override
