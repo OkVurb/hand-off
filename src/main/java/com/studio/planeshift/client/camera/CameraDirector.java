@@ -21,8 +21,17 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
  * angles blend between bases with smoothstep easing; the collision basis is untouched
  * (that is the server's commit).
  *
- * <p>Comfort: reduced-motion shortens the perceived blend by snapping at 50%; smoothing
- * and look-ahead scale from client config, never past authored profile bounds.
+ * <p>Comfort: reduced-motion shortens the perceived blend by snapping at 50%, and smoothing
+ * scales the blend easing from client config.
+ *
+ * <p><b>Look-ahead is not implemented.</b> {@link CameraProfile#lookAhead} is authored per profile
+ * and documented as "horizontal look-ahead toward velocity, in blocks", and nothing in this class
+ * or anywhere else ever reads it -- the 2.5D branch below sets yaw, pitch and roll and never
+ * touches the camera position. This comment used to claim look-ahead scaled from config, which
+ * was the only description of the feature anywhere and was describing something that did not
+ * exist. The authored field is left alone rather than deleted, because it is the specification
+ * for the feature whenever someone builds it; the config slider that pretended to scale it has
+ * been removed, because a comfort setting that silently does nothing is worse than no setting.
  */
 public final class CameraDirector {
 
@@ -50,7 +59,12 @@ public final class CameraDirector {
                 // Identical transaction timing, shorter perceived motion.
                 progress = progress < 0.5F ? 0.0F : 1.0F;
             }
-            float eased = progress * progress * (3.0F - 2.0F * progress);
+            // Smoothing blends between a straight ramp and full smoothstep, which is exactly
+            // what the config option says it does: 0 is rigid, 1 is floaty. It had nothing
+            // reading it, so the blend was always fully smoothed however the slider was set.
+            float smoothing = (float) (double) PlaneShiftConfig.CLIENT.cameraSmoothing.get();
+            float smoothstep = progress * progress * (3.0F - 2.0F * progress);
+            float eased = Mth.lerp(Mth.clamp(smoothing, 0.0F, 1.0F), progress, smoothstep);
 
             float fromYaw = angleFor(sync.fromMode(), state, event.getYaw());
             float fromPitch = pitchFor(sync.fromMode(), state, event.getPitch());

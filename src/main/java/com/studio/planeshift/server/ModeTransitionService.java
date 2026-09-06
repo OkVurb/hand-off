@@ -1,5 +1,6 @@
 package com.studio.planeshift.server;
 
+import com.studio.planeshift.common.PlaneShiftConfig;
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.course.CourseState;
 import com.studio.planeshift.common.mode.ModeTransaction;
@@ -96,7 +97,7 @@ public final class ModeTransitionService {
                 txId, state.mode(), target, rail,
                 player.position(), destination,
                 player.level().dimension(),
-                now, now + ModeTransaction.DEFAULT_DURATION_TICKS);
+                now, now + PlaneShiftConfig.SERVER.transitionDurationTicks.get());
         ACTIVE.put(id, tx);
 
         CourseStateAccess.update(player, s -> s.withTransition(

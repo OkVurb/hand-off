@@ -39,6 +39,14 @@ public record ModeTransaction(
         long commitTick
 ) {
     /** Default presentation blend: 14 ticks = 0.7 s, inside the bible's 0.6-0.9 s window. */
+    /**
+     * The blend length when nothing overrides it.
+     *
+     * <p>Still the default, but no longer the value actually used: ModeTransitionService reads
+     * {@code PlaneShiftConfig.SERVER.transitionDurationTicks}, which defaults to this same 14. The
+     * config option existed for a long time with nothing reading it at all, so a player could set
+     * it to anything and every transition still took exactly this long.
+     */
     public static final int DEFAULT_DURATION_TICKS = 14;
     /** Watchdog: a transaction older than this is aborted and rolled back. */
     public static final int TIMEOUT_TICKS = 60;

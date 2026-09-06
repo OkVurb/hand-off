@@ -30,7 +30,6 @@ public final class PlaneShiftConfig {
     /** Camera comfort, HUD and accessibility (Design Bible, "Accessibility and input"). */
     public static final class Client {
         public final ModConfigSpec.DoubleValue cameraSmoothing;
-        public final ModConfigSpec.DoubleValue lookAheadScale;
         public final ModConfigSpec.BooleanValue reducedMotion;
         public final ModConfigSpec.BooleanValue showModeBadge;
         public final ModConfigSpec.BooleanValue showDebugHud;
@@ -43,9 +42,6 @@ public final class PlaneShiftConfig {
             cameraSmoothing = builder
                     .comment("Camera smoothing strength in 2.5D mode (0 = rigid, 1 = floaty).")
                     .defineInRange("cameraSmoothing", 0.35D, 0.0D, 1.0D);
-            lookAheadScale = builder
-                    .comment("Scale applied to the authored camera look-ahead (comfort slider).")
-                    .defineInRange("lookAheadScale", 1.0D, 0.0D, 2.0D);
             reducedMotion = builder
                     .comment("Reduced motion: shorter camera blends, no shake, low parallax.",
                             "Transaction timing is identical; only presentation changes.")
@@ -84,7 +80,6 @@ public final class PlaneShiftConfig {
     /** Server-authoritative gameplay rules. */
     public static final class Server {
         public final ModConfigSpec.IntValue transitionDurationTicks;
-        public final ModConfigSpec.BooleanValue allowManualShift;
         public final ModConfigSpec.DoubleValue courseJumpBoost;
         public final ModConfigSpec.DoubleValue courseRunBoost;
         public final ModConfigSpec.BooleanValue wallJump;
@@ -97,10 +92,6 @@ public final class PlaneShiftConfig {
             transitionDurationTicks = builder
                     .comment("Perspective blend duration in ticks (bible window: 12-18 = 0.6-0.9 s).")
                     .defineInRange("transitionDurationTicks", 14, 8, 40);
-            allowManualShift = builder
-                    .comment("Allow non-operator players to shift modes by command (courses",
-                            "normally authorize shifts only through gates).")
-                    .define("allowManualShift", false);
             builder.pop();
 
             builder.push("movement");
