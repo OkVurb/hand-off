@@ -27,8 +27,10 @@ import net.minecraft.world.phys.Vec3;
  * corridor the player has to cross, which is why the telegraph matters more here than anywhere
  * else -- without it the only way to learn the route is to be standing on it.
  *
- * <p>Draws nothing of its own. Like {@link FirebarEntity} the visual is particles emitted on the
- * client, which costs no model and cannot drift out of step with the position.
+ * <p>Drawn as a real toothed disc. An earlier version emitted a ring of sparks instead and drew no
+ * model at all, which is the right call for a fire bar -- whose flames genuinely are the thing --
+ * and the wrong one here. A grinder is a solid object, and a scatter of particles where one should
+ * be does not read as a hazard so much as an effect.
  */
 public class SawEntity extends Entity {
 
@@ -108,7 +110,6 @@ public class SawEntity extends Entity {
         }
 
         if (level().isClientSide()) {
-            spawnTeeth();
             return;
         }
         hurtTouching();
@@ -122,17 +123,6 @@ public class SawEntity extends Entity {
                               new Vec3(originX, originY + r, getZ())}
                 : new Vec3[] {new Vec3(originX - r, originY, getZ()),
                               new Vec3(originX + r, originY, getZ())};
-    }
-
-    private void spawnTeeth() {
-        // A ring of short-lived sparks around the hub, which reads as a spinning blade without a
-        // model and without any rotation state to keep synced.
-        for (int i = 0; i < 4; i++) {
-            double a = (tickCount * 0.6D) + i * Math.PI / 2.0D;
-            level().addParticle(net.minecraft.core.particles.ParticleTypes.CRIT,
-                    getX() + Math.cos(a) * 0.7D, getY() + Math.sin(a) * 0.7D, getZ(),
-                    0.0D, 0.0D, 0.0D);
-        }
     }
 
     private void hurtTouching() {

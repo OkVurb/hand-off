@@ -7,5 +7,11 @@ public enum ProjectileVisualProfile {
     FIREBALL,
     ICEBALL,
     BOOMERANG,
-    BOWSER_FIRE
+    BOWSER_FIRE,
+    /** The grinder blade: a toothed disc on a hub. */
+    GRINDER,
+    /** The spiked ball on the end of a chain. */
+    SPIKED_BALL,
+    /** A lump of rock thrown out of an eruption. */
+    FIRE_ROCK
 }

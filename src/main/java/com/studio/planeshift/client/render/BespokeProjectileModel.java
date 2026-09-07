@@ -42,8 +42,59 @@ public final class BespokeProjectileModel extends EntityModel<ProjectileRenderSt
             case ICEBALL -> iceball(root);
             case BOOMERANG -> boomerang(root);
             case BOWSER_FIRE -> bowserFire(root);
+            case GRINDER -> grinder(root);
+            case SPIKED_BALL -> spikedBall(root);
+            case FIRE_ROCK -> fireRock(root);
         }
         return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    /**
+     * A saw blade: a flat disc with teeth around the rim.
+     *
+     * <p>Built thin and wide on purpose. It is seen edge-on from the side camera, so depth is the
+     * one dimension that buys nothing, and every block spent on thickness is a block not spent on
+     * the silhouette the player actually reads.
+     */
+    private static void grinder(PartDefinition root) {
+        add(root, "disc", 0, 0, -7, -7, -1, 14, 14, 2, PartPose.ZERO);
+        add(root, "hub", 32, 0, -3, -3, -1.5F, 6, 6, 3, PartPose.ZERO);
+        // Four teeth at the compass points. Four rather than sixteen because at this size more
+        // teeth stop reading as teeth and start reading as a fuzzy edge.
+        add(root, "tooth_n", 32, 32, -1.5F, -9.5F, -1, 3, 3, 2, PartPose.ZERO);
+        add(root, "tooth_s", 32, 32, -1.5F, 6.5F, -1, 3, 3, 2, PartPose.ZERO);
+        add(root, "tooth_e", 32, 32, 6.5F, -1.5F, -1, 3, 3, 2, PartPose.ZERO);
+        add(root, "tooth_w", 32, 32, -9.5F, -1.5F, -1, 3, 3, 2, PartPose.ZERO);
+    }
+
+    /**
+     * A spiked ball: a cube core with spikes on every side.
+     *
+     * <p>The core is deliberately chunky. This hangs on a chain and swings through a wide arc, and
+     * the player is judging when to cross under it -- a small ball is harder to time not because
+     * the timing is tighter but because the thing being timed is harder to see.
+     */
+    private static void spikedBall(PartDefinition root) {
+        add(root, "core", 0, 0, -5, -5, -5, 10, 10, 10, PartPose.ZERO);
+        add(root, "spike_up", 32, 0, -2, -8, -2, 4, 3, 4, PartPose.ZERO);
+        add(root, "spike_down", 32, 0, -2, 5, -2, 4, 3, 4, PartPose.ZERO);
+        add(root, "spike_e", 32, 0, 5, -2, -2, 3, 4, 4, PartPose.ZERO);
+        add(root, "spike_w", 32, 0, -8, -2, -2, 3, 4, 4, PartPose.ZERO);
+        add(root, "spike_n", 32, 32, -2, -2, -8, 4, 4, 3, PartPose.ZERO);
+        add(root, "spike_s", 32, 32, -2, -2, 5, 4, 4, 3, PartPose.ZERO);
+    }
+
+    /**
+     * A thrown rock: one lump, with two smaller ones stuck to it.
+     *
+     * <p>Irregular rather than a neat cube, because it has to read as debris rather than as a
+     * block that happens to be falling -- and a block falling out of the sky in this game means
+     * something quite different.
+     */
+    private static void fireRock(PartDefinition root) {
+        add(root, "mass", 0, 0, -4, -4, -4, 8, 8, 8, PartPose.ZERO);
+        add(root, "chip_a", 32, 0, 3, -2, -3, 4, 4, 4, PartPose.ZERO);
+        add(root, "chip_b", 32, 32, -6, 1, 0, 3, 3, 3, PartPose.ZERO);
     }
 
     private static void emberBolt(PartDefinition root) {

@@ -13,6 +13,24 @@ Done so far: item 1 (background-plane boss), item 2 (per-face blocks), item 3 (t
 corrections), item 4 (trajectory telegraph, firebar wired). Next is item 5, per-world interior
 tinting, then item 6 (water), item 7 (sub-environments), item 8 (progression links).
 
+## The genre rule, added after a correction
+
+The owner reviewed a night of this work and said, in effect: make it feel like the game it is
+imitating. Two things were wrong in the same way, so the rule is written here rather than learned
+again.
+
+**Telegraphs are physical objects, never overlays.** A grinder's route is visible because the track
+is really there. A spiked ball's arc is visible because the chain is really there. A fire bar's
+warning is its own fireballs. Nothing is painted on top of the world. Particle rings and glowing
+dotted lines say the right thing in a language this genre does not speak.
+
+**Hazards are solid, chunky and readable.** Do not represent an object with a cloud of particles and
+no model. That shortcut is correct for a fire bar, whose flames genuinely are the thing, and wrong
+for anything that is meant to be an object.
+
+**Names come from the vocabulary already in the mod.** It has Goombas, Koopas, Thwomps and Boos. A
+new hazard called "Saw" or "Chain Ball" is a stranger in that list.
+
 ## Rules
 
 **Commit early and often.** Every finished piece gets its own commit and push. Git is the safety

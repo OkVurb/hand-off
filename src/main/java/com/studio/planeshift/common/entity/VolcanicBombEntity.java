@@ -94,20 +94,12 @@ public class VolcanicBombEntity extends Entity {
         setPos(getX(), y, getZ());
 
         if (level().isClientSide()) {
-            if (falling()) {
-                spawnTrail();
-            }
             return;
         }
 
         if (falling()) {
             hurtTouching();
         }
-    }
-
-    private void spawnTrail() {
-        level().addParticle(net.minecraft.core.particles.ParticleTypes.LAVA,
-                getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
     }
 
     private void hurtTouching() {

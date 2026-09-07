@@ -5,9 +5,6 @@ import com.studio.planeshift.client.camera.CameraDirector;
 import com.studio.planeshift.client.hud.CourseHud;
 import com.studio.planeshift.client.input.PlaneConstrainedInput;
 import com.studio.planeshift.client.music.CourseMusicManager;
-import com.studio.planeshift.client.render.ChainBallRenderer;
-import com.studio.planeshift.client.render.VolcanicBombRenderer;
-import com.studio.planeshift.client.render.SawRenderer;
 import com.studio.planeshift.client.render.CourseEnemyRenderer;
 import com.studio.planeshift.client.render.CourseSkyboxRenderer;
 import com.studio.planeshift.client.render.AnimatedCourseEnemyModel;
@@ -187,6 +184,18 @@ public final class ClientModEvents {
                         0.7F, EnemyRigProfile.KOOPALING));
         event.registerEntityRenderer(ModEntities.BOWSER.get(),
                 CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOWSER));
+        // The three hazards built last night as invisible entities with particle clouds for
+        // visuals. They are solid objects in this genre -- a disc, a ball, a rock -- and a scatter
+        // of sparks where one should be is most of what made them feel wrong.
+        event.registerEntityRenderer(ModEntities.SAW.get(),
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/grinder.png"),
+                        ProjectileVisualProfile.GRINDER));
+        event.registerEntityRenderer(ModEntities.CHAIN_BALL.get(),
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/spiked_ball.png"),
+                        ProjectileVisualProfile.SPIKED_BALL));
+        event.registerEntityRenderer(ModEntities.VOLCANIC_BOMB.get(),
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/fire_rock.png"),
+                        ProjectileVisualProfile.FIRE_ROCK));
         event.registerEntityRenderer(ModEntities.EMBER_BOLT.get(),
                 BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/ember_bolt.png"),
                         ProjectileVisualProfile.EMBER_BOLT));
@@ -209,9 +218,6 @@ public final class ClientModEvents {
         // ghost under it is particles the entity emits rather than anything the renderer draws.
         event.registerEntityRenderer(ModEntities.GHOST_PLATFORM.get(), MovingPlatformRenderer::new);
         event.registerEntityRenderer(ModEntities.MOVING_PLATFORM.get(), MovingPlatformRenderer::new);
-        event.registerEntityRenderer(ModEntities.VOLCANIC_BOMB.get(), VolcanicBombRenderer::new);
-        event.registerEntityRenderer(ModEntities.CHAIN_BALL.get(), ChainBallRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAW.get(), SawRenderer::new);
         event.registerEntityRenderer(ModEntities.FIREBAR.get(), FirebarRenderer::new);
     }
 

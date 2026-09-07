@@ -10,13 +10,22 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class BespokeProjectileModelTest {
 
-    private static final Map<ProjectileVisualProfile, Long> SOLID_PARTS = Map.of(
-            ProjectileVisualProfile.EMBER_BOLT, 5L,
-            ProjectileVisualProfile.HAMMER, 4L,
-            ProjectileVisualProfile.FIREBALL, 4L,
-            ProjectileVisualProfile.ICEBALL, 7L,
-            ProjectileVisualProfile.BOOMERANG, 5L,
-            ProjectileVisualProfile.BOWSER_FIRE, 7L);
+    private static final Map<ProjectileVisualProfile, Long> SOLID_PARTS = Map.ofEntries(
+            Map.entry(ProjectileVisualProfile.EMBER_BOLT, 5L),
+            Map.entry(ProjectileVisualProfile.HAMMER, 4L),
+            Map.entry(ProjectileVisualProfile.FIREBALL, 4L),
+            Map.entry(ProjectileVisualProfile.ICEBALL, 7L),
+            Map.entry(ProjectileVisualProfile.BOOMERANG, 5L),
+            Map.entry(ProjectileVisualProfile.BOWSER_FIRE, 7L),
+            // Disc, hub and four teeth. Four rather than a full rim because at this size more
+            // teeth stop reading as teeth and become a fuzzy edge.
+            Map.entry(ProjectileVisualProfile.GRINDER, 6L),
+            // Core plus a spike on each of the six faces.
+            Map.entry(ProjectileVisualProfile.SPIKED_BALL, 7L),
+            // One mass and two chips. Deliberately the smallest mesh here: it is debris, and
+            // debris that is too regular reads as a falling block, which means something else
+            // entirely in this game.
+            Map.entry(ProjectileVisualProfile.FIRE_ROCK, 3L));
 
     @ParameterizedTest(name = "{0} bakes as a complete projectile mesh")
     @EnumSource(ProjectileVisualProfile.class)

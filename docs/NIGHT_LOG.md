@@ -619,3 +619,27 @@ reference does and wrong about *how*. The lesson is the same one as the sheets -
 observation is not the same as knowing how it is built.
 
 323 tests, no failures, counted from XML.
+
+## Iteration 26
+
+Second half of the genre correction, and it found the same mistake made a second way.
+
+Three hazards built last night -- grinder, spiked ball, fire rock -- had no models at all. Each was
+an invisible entity with a renderer that drew nothing, represented by a cloud of particles. I had
+copied that from FirebarRenderer, where it is exactly right, because a fire bar's flames genuinely
+are the thing. It is wrong everywhere else: these are solid objects in this genre, big and readable,
+and a scatter of sparks where one should be reads as an effect rather than a hazard.
+
+BespokeProjectileRenderer already draws baked geometry for plain non-mob entities. It was here the
+whole time and I did not look. Three profiles, three meshes, three 64x64 sheets in the existing
+layout, and the three empty renderer classes are deleted.
+
+The meshes are deliberately coarse. A spinning disc, a swinging ball and a falling rock are all seen
+in motion at distance, and detail that cannot resolve while the thing moves is texture memory spent
+on a smear. Silhouette and value contrast are what read -- hence pale spikes on a dark ball, because
+a uniformly dark ball swinging through a dark castle is a shape nobody can track.
+
+Wrote the rule into AUTONOMOUS_BRIEF.md rather than only into this log, so it survives a context
+reset: telegraphs are physical, hazards are solid, names come from the vocabulary already here.
+
+326 tests, no failures, counted from XML.
