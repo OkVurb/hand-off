@@ -905,8 +905,44 @@ def big_cheep():
     return img
 
 
+def bone_cheep():
+    """The fish as bones: pale ribs, hollow eye, no flesh.
+
+    A reskin rather than a new creature -- it swims exactly like the living one, and that is the
+    point. The reference reuses behaviour and repaints it, which is why a flooded tower feels like
+    a drowned version of somewhere rather than a different game.
+
+    Bone-cream everywhere, with the body ribbed rather than scaled. Ribs are the whole read: a pale
+    fish is a pale fish, but a pale fish with gaps in it is a skeleton.
+    """
+    img = new_sheet()
+    bone = (232, 226, 206)
+    base(img, BODY, bone, 61)
+    ribs(img, BODY, shade(bone, 0.62))
+    # A hollow socket instead of an eye. Drawn as a dark square rather than through eyes(), since
+    # eyes() paints a sclera and a skull has nothing to put one in.
+    at = front(BODY, 12, 9, 8)
+    rect(img, BODY, at[0] + 3, at[1] + 2, 5, 5, (58, 54, 48))
+
+    base(img, HEAD, bone, 62)
+    ribs(img, HEAD, shade(bone, 0.62))
+
+    # Fin rays with nothing between them.
+    base(img, LIMB, shade(bone, 0.90), 63, ramp=0.24)
+    base(img, HARD, (250, 246, 232), 64, ramp=0.14)
+
+    plate = (214, 206, 186)
+    base(img, MUZZLE, plate, 65, ramp=0.12)
+    jaw = front(MUZZLE, 10, 6, 1)
+    fangs(img, jaw, 10, 3, 4, WHITE, upper=True)
+
+    base(img, TRIM, shade(bone, 0.52), 66, ramp=0.18)
+    return img
+
+
 CHARACTERS = {
     "cheep_cheep": cheep_cheep,
+    "bone_cheep": bone_cheep,
     "big_cheep": big_cheep,
     "goomba": goomba,
     "fire_bro": fire_bro,

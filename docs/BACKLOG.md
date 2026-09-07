@@ -201,3 +201,19 @@ wants a display name, and course display names currently live in the lang file k
 which the client would then look up. Syncing the id and translating client-side is the cheap route;
 syncing a `Component` is the flexible one. Worth ten seconds of thought from someone who knows which
 way the rest of the UI is going.
+
+## Enemy reskins want a mechanism, not more entity types
+
+`BoneCheepEntity` is the third fish registered as its own entity type for what is, behaviourally,
+one enemy. That is fine at three and wrong at ten.
+
+Two things would fix it, and both are deliberate non-decisions rather than oversights:
+
+- **A general skin variant.** `CourseEnemyRenderer` already selects a texture from a synced variant,
+  but only for Koopalings, via a `koopalingVariant` field on the render state. Generalising that to
+  any enemy is the right answer and touches render code no test can check, which is why it was not
+  done unattended.
+- **Casts that know their world.** `SegmentLibrary.cast()` is keyed on theme, so the bone fish swims
+  beside the living one everywhere rather than replacing it in the darker worlds, which is what the
+  reference actually does. `GenContext` carries `worldTheme` already; `cast()` simply is not given
+  it. Small change, but it alters what appears in every course, so it wants a waking eye.

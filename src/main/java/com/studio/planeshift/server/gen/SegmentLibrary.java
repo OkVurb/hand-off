@@ -136,8 +136,12 @@ public final class SegmentLibrary {
             case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get());
             // Spiny stays alongside the fish: it is the seafloor half of the cast, a spiked
             // thing sitting on the bottom that the player has to swim over rather than through.
+            // The bone fish swims beside the living one rather than replacing it in a darker
+            // world, which is the shape the reference actually uses -- but only because cast() is
+            // keyed on theme and cannot see which world the course sits in. GenContext knows;
+            // this does not. See BACKLOG.
             case WATER -> List.of(ModEntities.CHEEP_CHEEP.get(), ModEntities.BIG_CHEEP.get(),
-                    ModEntities.SPINY.get());
+                    ModEntities.BONE_CHEEP.get(), ModEntities.SPINY.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get(), ModEntities.BOOMERANG_BRO.get());
         };
     }

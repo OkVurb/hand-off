@@ -435,3 +435,30 @@ That was latent rather than mine: it was harmless only for as long as set pieces
 theme-specific segments, which stopped being true tonight.
 
 319 tests, no failures, counted from XML.
+
+## Iteration 19
+
+Bone Cheep, plan 6.5 -- the same fish repainted as a skeleton. Behaviour inherited untouched,
+because a reskin that also changed how the thing moved would not be a reskin. It is a little faster,
+which is the one deliberate difference: an enemy the player already knows how to read should ask
+slightly more of them the second time, or the repaint is only a repaint.
+
+Two things here were compromises rather than the right answer, and both are in BACKLOG rather than
+buried.
+
+CourseEnemyRenderer already picks a texture from a synced variant, but only for Koopalings, through
+a koopalingVariant field on the render state. Generalising that to any enemy is clearly correct and
+touches render code the suite cannot check, so it was not something to do unattended at seven in the
+morning. Registering a third fish type costs one entry and is provably safe. That is fine at three
+types and wrong at ten, which is exactly why it is written down.
+
+And the reskin swims beside the living fish rather than replacing it in the darker worlds, which is
+what the reference does. SegmentLibrary.cast() is keyed on theme and cannot see which world a course
+belongs to -- GenContext has carried worldTheme since iteration 1, cast() is simply never given it.
+Small change, but it alters what appears in every course in the game, so it wants a waking eye
+rather than mine.
+
+Needed no rig profile: the bone fish reuses CHEEP_CHEEP, so the model test's part-count table is
+untouched. Reusing the rig is the whole point of a reskin.
+
+319 tests, no failures, counted from XML.
