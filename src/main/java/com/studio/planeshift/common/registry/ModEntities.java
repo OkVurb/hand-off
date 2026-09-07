@@ -4,6 +4,7 @@ import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.common.entity.KoopalingEntity;
 import com.studio.planeshift.common.entity.BooEntity;
+import com.studio.planeshift.common.entity.ClownCarEntity;
 import com.studio.planeshift.common.entity.BoomerangProjectile;
 import com.studio.planeshift.common.entity.BowserEntity;
 import com.studio.planeshift.common.entity.BowserFire;
@@ -292,6 +293,14 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .updateInterval(1)
                     .build(key("saw")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ClownCarEntity>> CLOWN_CAR =
+            ENTITY_TYPES.register("clown_car", () -> EntityType.Builder
+                    .<ClownCarEntity>of(ClownCarEntity::new, MobCategory.MISC)
+                    .sized(1.6F, 1.4F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .build(key("clown_car")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<FirebarEntity>> FIREBAR =
             ENTITY_TYPES.register("firebar", () -> EntityType.Builder

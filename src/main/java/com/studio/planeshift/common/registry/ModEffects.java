@@ -35,6 +35,25 @@ public final class ModEffects {
                 return effect;
             });
 
+    /**
+     * Turned to stone: cannot walk, cannot jump.
+     *
+     * <p>Built on {@link #FROZEN}'s mechanism rather than a new one, taken all the way. Frozen
+     * slows and shortens the jump; stone removes both outright, which is the difference between a
+     * penalty and a state. It is deliberately not damage: the clown car's flash is something to be
+     * caught by, and being caught should cost the player the ground they were about to cross rather
+     * than the run they were in the middle of.
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> STONE =
+            EFFECTS.register("stone", () -> {
+                MobEffect effect = new MobEffect(MobEffectCategory.HARMFUL, 0x9A9A93) {};
+                effect.addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                        PlaneShift.id("stone_move"), -1.0D, AttributeModifier.Operation.ADD_VALUE);
+                effect.addAttributeModifier(Attributes.JUMP_STRENGTH,
+                        PlaneShift.id("stone_jump"), -1.0D, AttributeModifier.Operation.ADD_VALUE);
+                return effect;
+            });
+
     public static final DeferredHolder<MobEffect, MobEffect> LEAF_AURA =
             EFFECTS.register("leaf_aura", () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0x55AA00) {});
 

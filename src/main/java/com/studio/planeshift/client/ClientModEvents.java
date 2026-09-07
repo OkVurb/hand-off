@@ -193,6 +193,9 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.CHAIN_BALL.get(),
                 BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/spiked_ball.png"),
                         ProjectileVisualProfile.SPIKED_BALL));
+        event.registerEntityRenderer(ModEntities.CLOWN_CAR.get(),
+                BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/clown_car.png"),
+                        ProjectileVisualProfile.CLOWN_CAR));
         event.registerEntityRenderer(ModEntities.VOLCANIC_BOMB.get(),
                 BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/fire_rock.png"),
                         ProjectileVisualProfile.FIRE_ROCK));

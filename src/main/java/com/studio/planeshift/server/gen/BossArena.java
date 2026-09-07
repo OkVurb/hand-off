@@ -65,6 +65,25 @@ public final class BossArena {
      */
     private static final int[] PILLARS = {17, 21, 25, 29};
 
+    /**
+     * Pillars on the walk-in, which is where the clown car is.
+     *
+     * <p>The bridge pillars are cover during the Bowser fight; these are cover on the approach,
+     * and the approach is the only place the flash can reach anyone. Without them the set-piece
+     * would be a hazard with no answer, which is the mod's own characteristic bug wearing a
+     * different hat: correct, tested, and impossible to get past.
+     */
+    private static final int[] APPROACH_PILLARS = {1, 5, 9, 13};
+
+    /**
+     * Which world gets the clown car.
+     *
+     * <p>One castle, not five. The wiki is specific that this happens in the final castle, and the
+     * reason it works there is that it happens once -- a hazard with no defeat condition is a
+     * set-piece the first time and a tax every time after.
+     */
+    private static final int CLOWN_CAR_WORLD = 4;
+
     private BossArena() {
     }
 
@@ -216,6 +235,11 @@ public final class BossArena {
         //
         // They are furniture now and load-bearing later: the seven-in-a-clown-car set-piece turns
         // the player to stone unless they are behind something, and this is the something.
+        for (int at : APPROACH_PILLARS) {
+            for (int y = 1; y <= 12; y++) {
+                c.set(at, y, HALF, castle);
+            }
+        }
         for (int at : PILLARS) {
             for (int y = 1; y <= 12; y++) {
                 c.set(at, y, HALF, castle);
@@ -229,6 +253,17 @@ public final class BossArena {
                 c.set(x, y, HALF + 1, castle);
             }
             lane(c, x, 13, castle);
+        }
+
+        // The clown car, over the final castle's approach.
+        //
+        // It cannot be beaten and does not try to fight: it flashes, and a player with a column
+        // between themselves and it is not hit. That is the whole encounter, and it is a different
+        // verb -- get past -- from everything else in the game, which is what earns it a place at
+        // the last castle rather than a place in the rotation.
+        if (worldIndex >= CLOWN_CAR_WORLD) {
+            c.spawn(ModEntities.CLOWN_CAR.get(), 7.5D, 9.0D, 0.5D, 90.0F,
+                    SegmentLibrary.GENERATED_TAG);
         }
 
         c.marker("flag", FLAG_X, 1, 0);

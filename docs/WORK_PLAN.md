@@ -100,16 +100,19 @@ times.
 reads `inShell()` for it. A Koopaling spin-dash is that mechanic at boss scale and speed, not a new
 one. The staging was never the gap and neither, it turns out, is the hard part of the moveset.
 
-**3.3 The Koopalings appear as a group in one clown car — but only once, and not as the usual
-fight.** Corrected against the wiki. Five Koopalings are the castle bosses of the main worlds and
-two more of the special worlds, each fought alone in their own castle. The seven-in-one-car
-appearance is a *single set-piece* in World 6-Castle, where the five required ride inside and the
-two optional hang off the outside, and their only attack turns the player to stone — avoided by
-hiding behind pillars.
+**3.3 The clown car is a hazard on the walk-in, not a fight.** ~~Corrected against the wiki~~ —
+corrected twice. The first version read a contact sheet as "this is how the Koopalings fight". The
+second called it a set-piece boss encounter in World 6-Castle. The wiki says neither: World
+6-Castle's boss is Bowser, twice over, and the clown car appears *during* that castle and the Star
+castle, where the Koopalings ride it together and **flash its eyes to turn the player to stone,
+avoided by passing between the castle's pillars**. It has no health and no defeat. The player gets
+past it; they do not beat it.
 
-So this is one specific encounter to build, not a change to how bosses work. Reading it off a
-contact sheet as "how the Koopalings fight" was exactly the mistake of treating one frame as a
-pattern.
+That is a smaller thing to build than either wrong reading, and a better one: it is the only place
+in the game whose verb is *get past* rather than *stomp* or *outrun*, which is exactly what earns
+the last castle a shape of its own. *Built:* `ClownCarEntity` over the approach of the last world's
+arena, resolving its flash with a single raycast so the rule the player learns is the rule the code
+runs, with pillars on the walk-in as the cover.
 
 **3.4 Bosses have phases, and the phase change is visible.** Ordinary, then skeletal, then giant,
 with the fire changing colour. Legible without a health bar.

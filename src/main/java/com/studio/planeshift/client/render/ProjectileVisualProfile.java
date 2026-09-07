@@ -13,5 +13,7 @@ public enum ProjectileVisualProfile {
     /** The spiked ball on the end of a chain. */
     SPIKED_BALL,
     /** A lump of rock thrown out of an eruption. */
-    FIRE_ROCK
+    FIRE_ROCK,
+    /** The Koopalings' clown car, hanging over the final castle's approach. */
+    CLOWN_CAR
 }

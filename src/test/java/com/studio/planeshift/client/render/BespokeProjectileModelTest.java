@@ -25,7 +25,10 @@ class BespokeProjectileModelTest {
             // One mass and two chips. Deliberately the smallest mesh here: it is debris, and
             // debris that is too regular reads as a falling block, which means something else
             // entirely in this game.
-            Map.entry(ProjectileVisualProfile.FIRE_ROCK, 3L));
+            Map.entry(ProjectileVisualProfile.FIRE_ROCK, 3L),
+            // Hull, brim, two eyes, propeller and shaft. The eyes are separate boxes rather than
+            // paint because the flash comes out of them and has to be locatable before it fires.
+            Map.entry(ProjectileVisualProfile.CLOWN_CAR, 6L));
 
     @ParameterizedTest(name = "{0} bakes as a complete projectile mesh")
     @EnumSource(ProjectileVisualProfile.class)

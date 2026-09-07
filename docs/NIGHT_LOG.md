@@ -815,3 +815,16 @@ Four castle-stone columns in the back row of the bridge lane. Back row, not the
 centre: a pillar in a three-wide lane is a wall, and the gaps are what makes cover
 cover. Spaced four apart -- wider than a jump -- so moving between them costs
 something. They are also the shelter the 3.3 stone attack will need. 340 tests, 0 failures.
+
+## The clown car (plan 3.3)
+Read the wiki before building, and it contradicted my own plan entry twice over.
+World 6-Castle's boss is Bowser, not the Koopalings, and the clown car is a hazard
+*during* the castle: it flashes its eyes to turn the player to stone, and you evade
+by passing between the pillars. No health, no defeat. So this is a set-piece with a
+verb -- get past -- that nothing else in the mod has.
+
+Built: STONE effect (FROZEN's mechanism taken to -1.0, so it is a state not a
+penalty), ClownCarEntity hovering over the approach of the last world's arena,
+flash resolved with one raycast so the rule the player learns is the rule that
+runs, eyes lit during the wind-up, approach pillars as the cover, baked mesh and
+texture. 341 tests, 0 failures. Not yet seen in-game.

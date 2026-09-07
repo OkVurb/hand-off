@@ -32,6 +32,10 @@ public final class BespokeProjectileRenderer<T extends Entity>
     protected int getBlockLightLevel(T entity, BlockPos pos) {
         return switch (profile) {
             case EMBER_BOLT, FIREBALL, BOWSER_FIRE -> 15;
+            // The car is a dark shape against a dark ceiling. Lighting it is what makes the
+            // wind-up visible at all, and the wind-up is the only warning the flash gets.
+            case CLOWN_CAR -> entity instanceof com.studio.planeshift.common.entity.ClownCarEntity car
+                    && car.charging() ? 15 : super.getBlockLightLevel(entity, pos);
             default -> super.getBlockLightLevel(entity, pos);
         };
     }
@@ -47,9 +51,14 @@ public final class BespokeProjectileRenderer<T extends Entity>
             case HAMMER, BOOMERANG -> poseStack.mulPose(Axis.XP.rotationDegrees(state.ageInTicks * 28.0F));
             case FIREBALL, ICEBALL -> poseStack.mulPose(Axis.ZP.rotationDegrees(state.ageInTicks * 12.0F));
             case BOWSER_FIRE -> poseStack.mulPose(Axis.XP.rotationDegrees(state.ageInTicks * 8.0F));
-            case EMBER_BOLT -> { }
+            case EMBER_BOLT, CLOWN_CAR -> { }
         }
-        float scale = profile == ProjectileVisualProfile.BOWSER_FIRE ? 0.72F : 0.58F;
+        float scale = switch (profile) {
+            // Big enough to hang over the approach and be unmistakable from the far end of it.
+            case CLOWN_CAR -> 2.0F;
+            case BOWSER_FIRE -> 0.72F;
+            default -> 0.58F;
+        };
         poseStack.scale(scale, scale, scale);
         collector.submitModel(model, state, poseStack, RenderTypes.entityCutout(texture),
                 state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor, null);
@@ -65,6 +74,8 @@ public final class BespokeProjectileRenderer<T extends Entity>
     @Override
     public void extractRenderState(T entity, ProjectileRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
+        state.glowing = entity instanceof com.studio.planeshift.common.entity.ClownCarEntity car
+                && car.charging();
         state.xRot = entity.getXRot(partialTick);
         state.yRot = entity.getYRot(partialTick);
     }

@@ -45,6 +45,7 @@ public final class BespokeProjectileModel extends EntityModel<ProjectileRenderSt
             case GRINDER -> grinder(root);
             case SPIKED_BALL -> spikedBall(root);
             case FIRE_ROCK -> fireRock(root);
+            case CLOWN_CAR -> clownCar(root);
         }
         return LayerDefinition.create(mesh, 64, 64);
     }
@@ -82,6 +83,28 @@ public final class BespokeProjectileModel extends EntityModel<ProjectileRenderSt
         add(root, "spike_w", 32, 0, -8, -2, -2, 3, 4, 4, PartPose.ZERO);
         add(root, "spike_n", 32, 32, -2, -2, -8, 4, 4, 3, PartPose.ZERO);
         add(root, "spike_s", 32, 32, -2, -2, 5, 4, 4, 3, PartPose.ZERO);
+    }
+
+    /**
+     * The clown car: a round hull with a face on it and a propeller underneath.
+     *
+     * <p>The face is the point. This thing's only attack comes out of its eyes, so the eyes are
+     * built as separate boxes standing proud of the hull rather than painted on -- at this camera
+     * distance a flat detail on a curved surface disappears, and the player has to be able to see
+     * where the flash is going to come from before it comes.
+     *
+     * <p>Wide and shallow, because it is seen from the side and hangs above the walk-in. Depth
+     * beyond what stops it looking like a signboard buys nothing.
+     */
+    private static void clownCar(PartDefinition root) {
+        add(root, "hull", 0, 0, -8, -2, -6, 16, 10, 12, PartPose.ZERO);
+        add(root, "brim", 0, 22, -9, -3, -7, 18, 2, 14, PartPose.ZERO);
+        add(root, "eye_l", 0, 38, -6, -6, -6.5F, 5, 5, 1, PartPose.ZERO);
+        add(root, "eye_r", 0, 38, 1, -6, -6.5F, 5, 5, 1, PartPose.ZERO);
+        // The propeller hangs below rather than sticking out sideways: it reads as the thing
+        // holding the car up, which is what tells the player the car is not going to land.
+        add(root, "prop", 24, 38, -7, 8, -1, 14, 1, 2, PartPose.ZERO);
+        add(root, "shaft", 24, 44, -1, 7, -1, 2, 2, 2, PartPose.ZERO);
     }
 
     /**
