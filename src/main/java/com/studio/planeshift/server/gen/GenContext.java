@@ -2,6 +2,7 @@ package com.studio.planeshift.server.gen;
 
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.registry.ModFluids;
 import java.util.random.RandomGenerator;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,6 +34,16 @@ public final class GenContext {
     public static final int WIDE_HALF_WIDTH = 4;
 
     private final CourseTheme theme;
+
+    /**
+     * The theme of the world this course sits in, which is not always the theme of the course.
+     *
+     * <p>An underground stretch inside the desert is still desert: the reference tints its cave
+     * interiors with the world around them -- ochre under the sand, brown-grey under the volcano,
+     * blue-green under the flooded tower -- so that dropping into a cave reads as going below
+     * <em>this</em> place rather than teleporting into the one grey cave every world shares.
+     */
+    private final CourseTheme worldTheme;
     private final Palette palette;
     private final int difficulty;
     private final RandomGenerator random;
@@ -43,8 +54,15 @@ public final class GenContext {
     }
 
     public GenContext(CourseTheme theme, int difficulty, RandomGenerator random, int halfWidth) {
+        this(theme, theme, difficulty, random, halfWidth);
+    }
+
+    /** As above, but for a course whose interior should be tinted by the world it sits in. */
+    public GenContext(CourseTheme theme, CourseTheme worldTheme, int difficulty,
+                      RandomGenerator random, int halfWidth) {
         this.theme = theme;
-        this.palette = Palette.forTheme(theme);
+        this.worldTheme = worldTheme;
+        this.palette = Palette.forTheme(theme, worldTheme);
         this.difficulty = Math.clamp(difficulty, 0, 4);
         this.random = random;
         this.halfWidth = halfWidth;
@@ -58,6 +76,11 @@ public final class GenContext {
     /** Whether this course is being built wide enough to move around in. */
     public boolean isWide() {
         return halfWidth > LANE_HALF_WIDTH;
+    }
+
+    /** The world this course sits in. Equal to {@link #theme()} unless set apart deliberately. */
+    public CourseTheme worldTheme() {
+        return worldTheme;
     }
 
     public CourseTheme theme() {
@@ -104,7 +127,49 @@ public final class GenContext {
     public record Palette(BlockState surface, BlockState fill, BlockState accent,
                           BlockState platform, BlockState hazard) {
 
+        /** What a cave floor is cut from, in each world. */
+        private static BlockState undergroundSurface(CourseTheme world) {
+            return switch (world) {
+                case DESERT -> ModBlocks.COURSE_SANDSTONE.get().defaultBlockState();
+                case SNOW -> ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState();
+                case LAVA -> ModBlocks.COURSE_BASALT.get().defaultBlockState();
+                case GHOST_HOUSE -> ModBlocks.COURSE_GHOST_BEAM.get().defaultBlockState();
+                default -> ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState();
+            };
+        }
+
+        /** The mass behind that floor. Deepstone stays the default: an unmarked world is rock. */
+        private static BlockState undergroundFill(CourseTheme world) {
+            return switch (world) {
+                case DESERT -> ModBlocks.COURSE_SAND_BLOCK.get().defaultBlockState();
+                case SNOW -> ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState();
+                case LAVA -> ModBlocks.COURSE_BASALT.get().defaultBlockState();
+                default -> ModBlocks.COURSE_DEEPSTONE.get().defaultBlockState();
+            };
+        }
+
         static Palette forTheme(CourseTheme theme) {
+            return forTheme(theme, theme);
+        }
+
+        /**
+         * The palette for a course, with interiors tinted by the world around them.
+         *
+         * <p>{@code UNDERGROUND} was one grey cave used by every world, which collapsed six
+         * distinct interiors into one and made the most common transition in the game -- surface
+         * to cave and back -- feel like leaving the world rather than going under it. The rock a
+         * cave is cut through is the rock the world is made of, so the fill comes from the world
+         * and only the structure stays shared.
+         */
+        static Palette forTheme(CourseTheme theme, CourseTheme world) {
+            if (theme == CourseTheme.UNDERGROUND) {
+                return new Palette(
+                        undergroundSurface(world),
+                        undergroundFill(world),
+                        ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        null);
+            }
             return switch (theme) {
                 case GRASS -> new Palette(
                         ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
@@ -129,7 +194,7 @@ public final class GenContext {
                         ModBlocks.COURSE_BASALT.get().defaultBlockState(),
                         ModBlocks.COURSE_EMBER_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.LAVA.defaultBlockState());
+                        ModFluids.LAVA_BLOCK.get().defaultBlockState());
                 case UNDERGROUND -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_DEEPSTONE.get().defaultBlockState(),

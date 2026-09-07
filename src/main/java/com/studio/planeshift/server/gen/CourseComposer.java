@@ -120,6 +120,19 @@ public final class CourseComposer {
      */
     public static Composition compose(CourseTheme theme, int length, int difficulty, long seed,
                                       int halfWidth) {
+        return compose(theme, theme, length, difficulty, seed, halfWidth);
+    }
+
+    /**
+     * As above, but told which world the course sits in.
+     *
+     * <p>Only matters for interiors. An underground course inside the desert is still desert, and
+     * the rock a cave is cut through should be the rock the world is made of -- otherwise the most
+     * common transition in the game, surface to cave and back, reads as leaving the world rather
+     * than going under it.
+     */
+    public static Composition compose(CourseTheme theme, CourseTheme worldTheme, int length,
+                                      int difficulty, long seed, int halfWidth) {
         // java.util.Random, not RandomGeneratorFactory.
         //
         // RandomGeneratorFactory resolves algorithms through ServiceLoader, and ServiceLoader does
@@ -129,7 +142,7 @@ public final class CourseComposer {
         // teleported. Nothing here needs a better generator than a seeded LCG — the requirement is
         // that the same seed gives the same course, and Random satisfies that exactly.
         RandomGenerator random = new java.util.Random(seed);
-        GenContext ctx = new GenContext(theme, difficulty, random, halfWidth);
+        GenContext ctx = new GenContext(theme, worldTheme, difficulty, random, halfWidth);
         CourseCanvas canvas = new CourseCanvas();
 
         int floorY = 0;

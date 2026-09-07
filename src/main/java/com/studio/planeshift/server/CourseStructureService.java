@@ -3,6 +3,8 @@ package com.studio.planeshift.server;
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.course.CourseDefinition;
+import com.studio.planeshift.common.course.WorldRegistry;
+import com.studio.planeshift.common.course.WorldDefinition;
 import com.studio.planeshift.server.gen.BossArena;
 import com.studio.planeshift.server.gen.CourseCanvas;
 import com.studio.planeshift.server.gen.CourseComposer;
@@ -51,6 +53,18 @@ public final class CourseStructureService {
     private static final int CLEAR_ABOVE = 12;
     private static final int UPDATE_FLAGS = Block.UPDATE_CLIENTS
             | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
+
+    /**
+     * The theme of the world a course belongs to, for tinting its interior.
+     *
+     * <p>Falls back to the course's own theme when the course belongs to no world -- a test
+     * fixture, or a course reached directly -- so the untinted result is the old behaviour rather
+     * than a crash.
+     */
+    private static CourseTheme worldThemeOf(String courseId, CourseDefinition course) {
+        WorldDefinition world = WorldRegistry.worldForCourse(courseId);
+        return world == null ? course.theme() : world.primaryTheme();
+    }
 
     private CourseStructureService() {
     }
@@ -129,7 +143,8 @@ public final class CourseStructureService {
                 : com.studio.planeshift.server.gen.GenContext.LANE_HALF_WIDTH;
 
         CourseComposer.Composition composition =
-                CourseComposer.compose(course.theme(), course.length(), difficulty, seed, halfWidth);
+                CourseComposer.compose(course.theme(), worldThemeOf(courseId, course),
+                        course.length(), difficulty, seed, halfWidth);
 
         CourseWriter.write(level, start, composition.canvas(), course.length());
 
