@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Eighteen of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Twenty of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -79,6 +79,14 @@ cannot do it.
 beams, assembled as scaffolding in open air rather than stacked up from the ground. Platforms come
 from a parts kit, not only extruded from terrain.
 
+**A13. An interior uses several wall motifs, not one.** A single ghost house runs tall pointed
+gothic windows, a diamond-check wallpaper, and plain wooden boarding in different rooms.
+`backWall()` draws one arch motif for the whole course, so every indoor stretch looks like the same
+room repeated.
+
+**A14. Platforms tilt.** Several are drawn at an angle and pivot under the player. Everything the
+mod places is grid-aligned and level.
+
 **A4. Terrain is built from mixed block sizes.** Ground reads as masonry of varying rectangles, not
 a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
 
@@ -118,6 +126,9 @@ sliding along a line.
 flooded tower; ground enemies appear winged in sky levels. Same behaviour, different world,
 different sprite — cheap cast expansion off entities that already exist.
 
+**B12. Some platforms are enemies.** Ghost-house platforms are carried by Boos: the thing you
+stand on is a mob, and it behaves like one. A moving platform does not have to be a block.
+
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
 
@@ -156,6 +167,16 @@ framing is what makes a bonus world read as outside the game rather than as anot
 
 **C10. Interiors are lit by embedded sources.** Small glowing crystals and lamps set into the wall,
 so the light in a dark room visibly comes from somewhere. Ours are uniformly dim.
+
+**C11. The ghost theme has an exterior, and it is purple twilight.** The course leaves the house
+and finishes outdoors under a violet sky with bare dead trees as silhouettes and pale ground. Ours
+treats ghost house as indoor-only, so this palette does not exist anywhere in the mod.
+
+**C12. The volcano look is columns behind, arches in front.** Background is a wall of vertical
+basalt columns with lava seams glowing between them; the playfield is grey stone arch viaducts
+crossing above the lava. Two very specific layers, and neither is what the lava theme draws now.
+
+**C13. Flame colour is themed.** Ghost-house sconces burn green, not orange.
 
 **C4. Snow and the two lit themes still draw the same prop at both depths.** They use different
 decorator builders and never got the aerial-perspective treatment.
