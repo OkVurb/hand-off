@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Thirty-four of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Thirty-six of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -54,15 +54,15 @@ treatment, not a different block.
 **A7. Pipes are structural.** A whole level is built as a lattice of pipes forming the walkable
 geometry. The mod's pipes are decorative or fake by design decision.
 
-**A8. Blocks are a body plus a contrasting cap row.** Green tower platforms carry an orange top
-band; rock ledges carry a grass-and-tuft top band; ice carries a snow band. A6 recorded this as a
-snow behaviour, but it is general: the top face of a platform is drawn differently from its body in
-every theme. Cliff terrain goes further and gives the *side* a third treatment again: green top,
-horizontally striated pale rock face, white surf band where it meets the sea. Tower ice goes further again and hangs an icicle
-fringe off the *underside*, so all three exposed faces get their own treatment. A block face is
-drawn by which way it points — top, side, buried — not by which block it is.
-This is `ConnectedBlock` work — the cap is exactly the up-neighbour case the property
-set already models, and it would land across every theme at once.
+**A8. A block face is drawn by which way it points.** Green tower platforms carry an orange top
+band; rock ledges carry a grass-and-tuft band; ice carries snow. A6 recorded this as a snow
+behaviour, but it is general. Cliff terrain gives the *side* its own treatment too — green top,
+horizontally striated pale rock, white surf where it meets the sea — and tower ice hangs an
+icicle fringe off the *underside*. The clearest single instance is the sky-world ground block: green
+grass cap, pale brick body, teal crystalline fringe below. Three faces, three treatments, one block.
+Top, side and buried are different, and which block it is matters less than which way the face
+looks. This is `ConnectedBlock` work — the cap is exactly the up-neighbour case the property set
+already models — and it would land across every theme at once.
 
 **A9. Every theme carries an ambient particle.** Castles drift embers, snow levels drift flakes,
 underwater drifts bubbles. Static geometry plus one moving particle is most of what makes these
@@ -141,8 +141,12 @@ varying rectangles, not a uniform 1×1 grid. `ConnectedBlock` already exists and
 had zero callers for the life of the codebase; the footage settles that question. The fluid now
 exists (`43678fd`), so this is theme + generation + cast, not plumbing. What the footage adds:
 underwater has **light shafts** raking down from the surface, coral and weed on the floor, drifting
-bubbles, and -- where a level is half-submerged -- a **visible surface line** with open air above
-it. Swimming is a movement mode, not a slower walk.
+bubbles, and — where a level is half-submerged — a **visible surface line** with open
+air above it. Swimming is a movement mode, not a slower walk. *And it is cheaper than it looks:* the
+underwater levels reuse the ordinary green capped terrain block rather than a bespoke tileset. What
+makes them read as underwater is the light shafts, the fluid, the coral props and the cast — not
+new terrain art. A course also **descends into** the water from a dry ledge, so the entry is part of
+the level rather than a mode switch.
 
 **B2. Sky.** Cloud platforms, pale palette, height as the subject.
 
@@ -158,8 +162,9 @@ walked into. Ours fight wherever the course happens to end.
 **B7. Bosses fly.** The Koopaling rides a hovering vehicle and attacks from above, dropping hazards.
 `Koopaling` is written entirely as a ground-walking entity with eight ground attacks.
 
-**B8. Moving platforms rotate.** Platforms are mounted on spinning arms around a hub, not only
-sliding along a line.
+**B8. Moving platforms rotate.** *Confirmed with a specific form:* large radial assemblies of
+crossed wooden planks turning about a hub, ridden by the player, alongside smaller platforms hung
+from chains. Not only sliding along a line.
 
 **B9. Vertical climbables.** Vines and stalks that are climbed rather than jumped.
 
@@ -290,6 +295,9 @@ Ours cuts.
 
 **D7. Clearing a castle plays a scene.** A lit room, the rescued character, an ending beat before
 the map returns. The castle is the only course that resolves anything.
+
+**D8. Levels carry signposts.** Arrow boards planted in the terrain pointing the way on, used
+where a route is ambiguous. Navigation as set dressing rather than as UI.
 
 **D5. A level is introduced by a title card.** A plain black screen naming the world and level,
 between the map and the course. Ours cuts straight in.
