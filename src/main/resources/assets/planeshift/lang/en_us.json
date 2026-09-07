@@ -347,5 +347,7 @@
   "block.planeshift.course_desert_brick": "Desert Brick",
   "block.planeshift.course_basalt": "Course Basalt",
   "block.planeshift.course_deepstone": "Deep Stone",
-  "block.planeshift.course_ghost_beam": "Ghost House Beam"
+  "block.planeshift.course_ghost_beam": "Ghost House Beam",
+  "block.planeshift.course_hedge_distant": "Distant Foliage",
+  "block.planeshift.course_wood_distant": "Distant Timber"
 }

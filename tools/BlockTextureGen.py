@@ -1025,6 +1025,11 @@ def build():
     out["course_pillar_far"] = distant(out["course_pillar"])
     out["course_cloud_block_far"] = distant(out["course_cloud_block"])
 
+    # The third layer. Pushed back harder than the "far" set, because it sits a block further
+    # away again and the whole point of a third band is that the eye can tell it from the second.
+    out["course_hedge_distant"] = distant(out["course_hedge"], amount=0.68)
+    out["course_wood_distant"] = distant(out["course_wood_block"], amount=0.68)
+
     # Native replacements for the vanilla blocks five of the six themes were built out of.
     #
     # A theme's fill sits under every surface block, three deep, so it is on screen constantly --

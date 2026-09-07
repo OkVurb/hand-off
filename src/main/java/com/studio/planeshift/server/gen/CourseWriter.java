@@ -29,7 +29,15 @@ public final class CourseWriter {
     private static final int CLEAR_MARGIN = 6;
     private static final int CLEAR_BELOW = 8;
     private static final int CLEAR_ABOVE = 26;
-    private static final int CLEAR_HALF_WIDTH = 3;
+    /**
+     * How wide a slice is wiped before a course is written.
+     *
+     * <p>Four, not three. It has to cover the deepest z the decorator writes to, or scenery from
+     * the previous course survives behind the new one -- and since a course is rebuilt every time
+     * it is entered, that debris would accumulate. Widened when the third background band was
+     * added at z=4.
+     */
+    private static final int CLEAR_HALF_WIDTH = 4;
 
     private CourseWriter() {
     }

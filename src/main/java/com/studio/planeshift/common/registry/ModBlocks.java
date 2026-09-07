@@ -112,6 +112,18 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> COURSE_GHOST_BEAM = courseBlock(
             "course_ghost_beam", MapColor.WOOD, SoundType.WOOD);
 
+    /**
+     * The third depth band, for the big background silhouettes.
+     *
+     * <p>Hazed harder than the FAR set. Reference backgrounds run three layers, not two, and they
+     * are told apart by how washed out they are rather than by how far back they sit -- so a third
+     * band is only a third band if it is visibly paler than the second.
+     */
+    public static final DeferredBlock<Block> COURSE_HEDGE_DISTANT = courseBlock(
+            "course_hedge_distant", MapColor.PLANT, SoundType.GRASS);
+    public static final DeferredBlock<Block> COURSE_WOOD_DISTANT = courseBlock(
+            "course_wood_distant", MapColor.WOOD, SoundType.WOOD);
+
     public static final DeferredBlock<Block> COURSE_HEDGE_FAR = courseBlock(
             "course_hedge_far", MapColor.PLANT, SoundType.GRASS);
     public static final DeferredBlock<Block> COURSE_PILLAR_FAR = courseBlock(
