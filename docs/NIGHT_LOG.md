@@ -540,3 +540,30 @@ Genuine remaining gap confirmed by this pass: pipes are one colour. The sheets s
 reading as different objects.
 
 320 tests, no failures, counted from XML.
+
+## Iteration 23
+
+Pipe colours, plan 4.7 -- the one gap last iteration's audit confirmed was real rather than assumed.
+Green, yellow, blue, red, magenta, as a blockstate property rather than five registered blocks.
+
+That choice is the codebase's own rule rather than my preference. Size is tied to the registered
+hitbox and needs its own type, which is why BigCheep is a separate entity; anything purely visual
+does not, which is why this is a property. A pipe is a pipe whatever colour it is.
+
+The side texture predates BlockTextureGen and is not generated, so redrawing it would have meant
+inventing a second pipe style and hoping it matched. Recoloured the existing art instead: each
+pixel's brightness is mapped onto a ramp built from the new hue, which keeps the rim, the highlight
+arc and the dark mouth exactly as they are and changes only the colour. Green is untouched, so
+nothing that already looked right moved.
+
+Colour is assigned per theme rather than per placement. Deterministic, so a course looks the same
+every time it generates, and stable within a course, so two pipes in one level match. The reference
+uses colour to tell destinations apart, and that only works if the colour means something --
+recolouring every pipe independently would make it mean nothing.
+
+PipeColourTest checks the blockstate and art against the enum rather than a hardcoded list. The
+failure mode here is quiet: a property value with no variant renders as the missing-model
+placeholder and the build says nothing, so it is found by walking into a pipe that looks like a bug
+report. Adding a sixth colour and forgetting its art now fails here instead.
+
+323 tests, no failures, counted from XML.

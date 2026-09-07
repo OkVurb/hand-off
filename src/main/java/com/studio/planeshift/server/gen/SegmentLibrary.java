@@ -4,6 +4,7 @@ import static com.studio.planeshift.server.gen.Segment.Tag;
 
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
+import com.studio.planeshift.common.block.WarpPipeBlock;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModEntities;
 import com.studio.planeshift.common.registry.ModItems;
@@ -112,6 +113,30 @@ public final class SegmentLibrary {
             double lift = Math.sin(t * Math.PI) * 3.0D;
             c.item(ModItems.COIN.get(), x0 + i + 0.5D, y + 1.5D + lift, 0.5D);
         }
+    }
+
+    /**
+     * A pipe in a colour chosen from the course seed.
+     *
+     * <p>Deterministic rather than random per placement, so a course looks the same every time it
+     * is generated -- and stable within a course, so two pipes in one level are the same colour
+     * unless a segment deliberately asks otherwise. The reference uses colour to tell destinations
+     * apart, which only works if the colour means something; recolouring every pipe independently
+     * would make it mean nothing.
+     */
+    private static BlockState pipe(GenContext ctx) {
+        WarpPipeBlock.Colour[] all = WarpPipeBlock.Colour.values();
+        WarpPipeBlock.Colour colour = switch (ctx.theme()) {
+            // Each theme leans on one colour, so a pipe reads as belonging to the world it is in.
+            case DESERT -> WarpPipeBlock.Colour.YELLOW;
+            case SNOW -> WarpPipeBlock.Colour.BLUE;
+            case LAVA -> WarpPipeBlock.Colour.RED;
+            case GHOST_HOUSE -> WarpPipeBlock.Colour.MAGENTA;
+            case WATER -> WarpPipeBlock.Colour.MAGENTA;
+            default -> WarpPipeBlock.Colour.GREEN;
+        };
+        return ModBlocks.WARP_PIPE.get().defaultBlockState()
+                .setValue(WarpPipeBlock.COLOUR, colour);
     }
 
     private static void mob(CourseCanvas c, EntityType<?> type, int x, int y, float facing) {
@@ -451,7 +476,7 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 16, y, ctx);
-            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+            BlockState pipe = pipe(ctx);
             for (int i = 0; i < 3; i++) {
                 int px = x + 3 + i * 5;
                 int height = 2 + (i % 2);
@@ -1055,7 +1080,7 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 12, y, ctx);
-            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+            BlockState pipe = pipe(ctx);
             // A solitary pipe the player can crouch into to find the generated underground room.
             c.setLane(x + 5, y + 1, pipe, ctx.halfWidth());
             c.setLane(x + 5, y + 2, pipe, ctx.halfWidth());
@@ -1072,7 +1097,7 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 15, y, ctx);
-            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+            BlockState pipe = pipe(ctx);
             BlockState fake = ModBlocks.SECRET_PASSAGE.get().defaultBlockState();
             BlockState stone = ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState();
             c.setLane(x + 3, y + 1, pipe, ctx.halfWidth());
@@ -1777,7 +1802,7 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 18, y, ctx);
-            BlockState pipe = ModBlocks.WARP_PIPE.get().defaultBlockState();
+            BlockState pipe = pipe(ctx);
 
             // Three pipes of different heights. Uneven on purpose - a matched row reads as a fence
             // rather than as plumbing.

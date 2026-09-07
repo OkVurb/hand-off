@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "particle": "planeshift:block/warp_pipe_red",
+    "side": "planeshift:block/warp_pipe_red",
+    "top": "planeshift:block/warp_pipe_red_top",
+    "bottom": "planeshift:block/warp_pipe_red"
+  }
+}

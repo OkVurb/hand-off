@@ -1,5 +1,19 @@
 {
   "variants": {
-    "": { "model": "planeshift:block/warp_pipe" }
+    "colour=green": {
+      "model": "planeshift:block/warp_pipe"
+    },
+    "colour=yellow": {
+      "model": "planeshift:block/warp_pipe_yellow"
+    },
+    "colour=blue": {
+      "model": "planeshift:block/warp_pipe_blue"
+    },
+    "colour=red": {
+      "model": "planeshift:block/warp_pipe_red"
+    },
+    "colour=magenta": {
+      "model": "planeshift:block/warp_pipe_magenta"
+    }
   }
 }

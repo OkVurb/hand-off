@@ -19,10 +19,51 @@ import net.minecraft.world.phys.BlockHitResult;
  */
 public class WarpPipeBlock extends Block {
 
+    /**
+     * Pipe colours.
+     *
+     * <p>A blockstate property rather than five registered blocks, and that is this codebase's own
+     * rule rather than a preference: size is tied to the registered hitbox and so needs its own
+     * type, while anything purely visual does not. A pipe is a pipe whatever colour it is.
+     *
+     * <p>The sheets show green, yellow, blue, red and magenta appearing together and reading as
+     * <em>different objects</em> -- which is the point. Colour is how the reference tells one
+     * destination from another without a label, and a game with one pipe colour has thrown that
+     * away and has to explain itself some other way.
+     */
+    public enum Colour implements net.minecraft.util.StringRepresentable {
+        GREEN("green"),
+        YELLOW("yellow"),
+        BLUE("blue"),
+        RED("red"),
+        MAGENTA("magenta");
+
+        private final String name;
+
+        Colour(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
+    public static final net.minecraft.world.level.block.state.properties.EnumProperty<Colour> COLOUR =
+            net.minecraft.world.level.block.state.properties.EnumProperty.create("colour", Colour.class);
+
     public static final MapCodec<WarpPipeBlock> CODEC = simpleCodec(WarpPipeBlock::new);
 
     public WarpPipeBlock(Properties properties) {
         super(properties);
+        registerDefaultState(stateDefinition.any().setValue(COLOUR, Colour.GREEN));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(
+            net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOUR);
     }
 
     @Override
