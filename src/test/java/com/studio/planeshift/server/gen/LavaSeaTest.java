@@ -87,6 +87,34 @@ class LavaSeaTest {
         }
     }
 
+    /**
+     * The sea emits, and only where it can be seen doing it.
+     *
+     * <p>A hazard that never fires is scenery the player learns to ignore, which is worse than not
+     * having one. A Podoboo under a solid floor is exactly that: it rises, hits the underside of
+     * the level and falls back, having cost nothing and taught nothing.
+     */
+    @Test
+    @DisplayName("the sea throws fireballs")
+    void theSeaEmits() {
+        int coursesWithPodoboos = 0;
+        for (long seed = 0; seed < 8; seed++) {
+            CourseCanvas canvas = lavaCourse(seed);
+            int seaY = deepestLava(canvas);
+            long fromTheSea = canvas.entities().stream()
+                    .filter(e -> e.type() == com.studio.planeshift.common.registry.ModEntities
+                            .PODOBOO.get())
+                    .filter(e -> Math.abs(e.y() - (seaY + 1.0D)) < 0.001D)
+                    .count();
+            if (fromTheSea > 0) {
+                coursesWithPodoboos++;
+            }
+        }
+        assertTrue(coursesWithPodoboos >= 6,
+                "only " + coursesWithPodoboos + " of 8 volcano courses had fireballs rising out of "
+                        + "the sea; the surface is decoration in the rest");
+    }
+
     private static net.minecraft.world.level.block.Block blockAt(CourseCanvas canvas, int x, int y) {
         var state = canvas.get(x, y, 0);
         return state == null ? null : state.getBlock();

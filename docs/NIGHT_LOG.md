@@ -1082,3 +1082,11 @@ correctly. Set-piece segments build raised lava channels, and so does the refere
 The finding was never "one lava height", it was "the bottom of the level is one
 surface", so the test now asserts continuity of the deepest lava instead. Kept the
 weaker claim rather than the tidier one. 360 tests, 0 failures.
+
+## The sea emits
+Podoboos now belong to the lava sea rather than to whichever segment happened to
+include one, so a volcano course is played above a surface that does something
+instead of one that just sits there. About one per screen -- punctuation, not a wall
+of fire -- and only where six blocks of clear air mean the player can actually see
+it happen. A fireball under a solid floor rises, hits the underside of the level and
+falls back, having cost nothing and taught nothing. 361 tests, 0 failures.

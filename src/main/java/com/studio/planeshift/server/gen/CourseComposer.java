@@ -86,6 +86,9 @@ public final class CourseComposer {
 
     private static final int FLOOR_MAP_MARGIN = 16;
 
+    /** Columns between Podoboos in the lava sea. Roughly one per screen. */
+    private static final int PODOBOO_SPACING = 18;
+
     /** How far above the design floor a roaming enemy may be placed, in blocks. */
     private static final int ROAM_MAX_CLIMB = 6;
 
@@ -782,6 +785,22 @@ public final class CourseComposer {
             return;
         }
         int seaY = lowest - 4;
+        // Podoboos, spaced along the sea and only where it can actually be seen.
+        //
+        // The plan's other half: the sea emits. Until now a fireball out of the lava was something
+        // a segment happened to include, which means most of a volcano course was played above a
+        // surface that never did anything -- and a hazard that never fires is scenery the player
+        // learns to ignore, which is worse than not having it.
+        //
+        // Placed by the sea rather than by the segments because it belongs to the sea. The spacing
+        // is wide: one every eighteen columns is roughly one per screen, so the player meets them
+        // as punctuation rather than as a wall of fire.
+        for (int x = SPAWN_RUN; x < length - 8; x += PODOBOO_SPACING) {
+            if (openAbove(canvas, x, seaY)) {
+                canvas.spawn(com.studio.planeshift.common.registry.ModEntities.PODOBOO.get(), x + 0.5D, seaY + 1.0D, 0.5D, 0.0F,
+                        SegmentLibrary.GENERATED_TAG);
+            }
+        }
         for (int x = -FLOOR_MAP_MARGIN; x < length + FLOOR_MAP_MARGIN; x++) {
             for (int z = -ctx.halfWidth(); z <= ctx.halfWidth(); z++) {
                 if (canvas.isEmpty(x, seaY, z)) {
@@ -794,6 +813,23 @@ public final class CourseComposer {
                 }
             }
         }
+    }
+
+    /**
+     * Whether the sea is visible from the lane at this column.
+     *
+     * <p>A Podoboo under a solid floor is a hazard the player is never shown and never threatened
+     * by: it rises, hits the underside of the level, and falls back, having cost nothing and taught
+     * nothing. Six blocks of clear air is enough that the column is a genuine gap or shaft rather
+     * than a one-block crack.
+     */
+    private static boolean openAbove(CourseCanvas canvas, int x, int seaY) {
+        for (int y = seaY + 1; y <= seaY + 6; y++) {
+            if (!canvas.isEmpty(x, y, 0)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void recordFloor(int[] floorAt, int from, int width, int floorY, int length) {

@@ -196,9 +196,11 @@ uniformity: set-piece segments build raised lava channels of their own, the refe
 too, and the finding was always about the bottom of the level rather than about every drop of lava
 in it.
 
-*Still missing:* the emission. Fireballs out of the surface, geysers and wall jets are all
-unbuilt — `PodobooEntity` is the closest thing and it is placed by segments rather than by the
-sea itself.
+*The surface emits too.* Podoboos are now placed by the sea rather than by whichever segment
+happened to include one, spaced about a screen apart, and only in columns with six blocks of clear
+air above the lava — a fireball under a solid floor rises, hits the underside of the level and
+falls back, having cost nothing and taught nothing. *Still missing:* vertical geysers and
+horizontal jets from wall nozzles, which are new hazards rather than a placement change.
 
 **4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
 *moves* during the level. The strongest vindication of having built the fluid as a fluid.
