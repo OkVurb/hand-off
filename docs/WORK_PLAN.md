@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Thirty of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Thirty-two of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -173,8 +173,11 @@ The mod has static spikes, which threaten a place; these threaten a moment.
 **B15. Firebars, and hazards that telegraph.** A whole fortress is built around bars of flame
 rotating on a hub block — singly, in pairs, and as four-armed crosses — and the game
 *draws the sweep circle* so the player can read the danger before entering it. The telegraph is the
-finding, not the firebar: a moving hazard is only fair if its reach is visible while it is out of
-the way. Nothing in the mod draws its own threat range.
+finding, not the firebar. *Confirmed in a second form:* buzzsaws travel the castle interiors along
+white rails drawn right through the level, so the saw's whole route — loops, corners, long
+runs — is readable before it arrives. A sweep circle shows reach; a rail shows path. Together
+they are one rule: **every moving hazard renders its own trajectory.** Nothing in the mod draws its
+own threat range, and the mod has more moving hazards planned than the reference has.
 
 **B16. Platforms hang from lines and swing.** A plank slung under a diagonal cable with a
 counterweight, swinging as a pendulum. Distinct from the rotating arms of B8: that turns about a
@@ -210,11 +213,13 @@ walkable surface, not only behind it. Every decorator prop is placed behind the 
 Recorded first as "the sky world is pastel" off a snow-sky level — pink, lavender and mint
 over a heavily blurred far layer. The airship world is the other case: bright cyan with large white
 cumulus and a very pale low-contrast horizon. The high desert is a third: cream and gold with soft
-banked cloud. All are strongly aerial; none is the day sky with the brightness pushed up. Treat sky
+banked cloud. A fourth is a full sunset — saturated orange with magenta cloud bands over tan
+cones. All are strongly aerial; none is the day sky with the brightness pushed up. Treat sky
 colour as per-world data, not as one gradient with a brightness knob.
 
-**C7. Pipes are a colour set.** Green, yellow, blue and red pipes appear in one level and read as
-different objects. Ours are green.
+**C7. Pipes are a colour set.** *Confirmed repeatedly; magenta appears underwater, so the set is
+at least five.* Green, yellow, blue, red and pink pipes appear together and read as different
+objects. Ours are green.
 
 **C8. A cloud bank sits between terrain and far hills.** On mountain levels the peaks are rooted in
 a white haze band rather than meeting the ground plane. Cheap, and it is most of why the far layer
