@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Thirty-two of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Thirty-four of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -31,8 +31,9 @@ course wants an *ordered sequence* of environments, not one.
 
 **A2. A lava sea, not lava pits.** *Confirmed on a second world.* Castle levels run a continuous
 lava band across the entire bottom of the screen with a bright crust line, crossed on narrow
-bridges, and it **throws fireballs upward out of its own surface**. The hazard is not only the
-floor, it is an emitter. World 6 levels sit above a continuous lava band spanning the
+bridges, and it **throws fireballs upward out of its own surface**. The final castle adds vertical
+flame geysers rising straight out of the lava and horizontal jets fired from nozzles in the wall.
+The hazard is not only the floor, it is an emitter, and the room emits too. World 6 levels sit above a continuous lava band spanning the
 whole level with a bright crust line along its top edge. The mod places lava in discrete pits. A
 floor of hazard under the entire course is a different tension and a different failure state.
 
@@ -120,6 +121,13 @@ rounded lobes along its top edge, like something too thick to level off. Two flu
 this is a third, and it is the one that argues hardest that a fluid surface is art rather than a
 plane — lava has a bright crust line, water has a clean rippling line, tar drips.
 
+**A22. Rope is walkable terrain, and it sags.** A whole sky world is built on cables strung
+between anchor posts that hang in a catenary and **deform under the player's weight**. This is the
+one finding in the plan that does not fit a block grid at all: it is soft geometry with its own
+collision, not a row of blocks, and the sag is the mechanic rather than decoration. Recording it
+honestly as expensive and probably out of scope — the cheap dishonest version is a flat line of
+blocks that looks like a rope and behaves like a floor, which is worse than not having it.
+
 **A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
 visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
 two alternating tones, and the eye reads the wall rather than the grid. Ground reads as masonry of
@@ -186,6 +194,11 @@ hub, this hangs and sways.
 **B17. Striped poles are climbed.** Barber-pole spirals running floor to ceiling, used vertically.
 A second climbable after the vines of B9, and the spiral is doing real work — it animates the
 climb without animating the player.
+
+**B18. The Koopalings fight as a group, in one shared vehicle.** The final encounter puts all
+seven in a single large hovering car rather than running them sequentially. `Koopaling` is built as
+eight independent ground mobs with one attack each, so both the staging and the arithmetic are
+different: this is one fight with seven riders, not seven fights.
 
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
