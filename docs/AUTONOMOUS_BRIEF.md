@@ -37,6 +37,17 @@ new hazard called "Saw" or "Chain Ball" is a stranger in that list.
 net that makes unattended work reversible, and a large uncommitted working tree is the one state
 that is genuinely hard to undo.
 
+**Run the game, not just the tests.** `./gradlew runGameTestServer` loads real Minecraft, runs the
+in-world GameTests and exits -- about two minutes, headless, no window. It catches an entire class
+of bug the unit suite structurally cannot: asset wiring is resolved at load, so a block with no
+blockstate, a model pointing at a texture that does not exist, or an item with no model all pass 326
+unit tests and then render as the missing-model placeholder.
+
+This is not hypothetical. Thirty commits went in over one night with unit tests only, and the first
+launch immediately found that both custom fluids had no blockstate at all -- the water and lava the
+entire water theme was built on were rendering as placeholders. Grep the log for `Missing model`,
+`No model loaded`, `Unable to load`, and `Failed to`.
+
 **Never commit without a real test run.** `./gradlew test --rerun-tasks`, then count the XML in
 `build/test-results/test/`. An up-to-date build prints BUILD SUCCESSFUL having run nothing, and
 that exact trap has already produced one broken commit in this project.

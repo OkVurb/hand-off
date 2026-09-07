@@ -666,3 +666,27 @@ An absence that is written down is a decision; an absence that is not is a bug w
 helpfully fixed by whoever notices the omission next.
 
 326 tests, no failures, counted from XML.
+
+## Iteration 28
+
+Ran the client, fixed what it found, and made the finding permanent.
+
+The remaining warning after the first pass was the Koopaling spawn egg, and my fix for it had gone
+to the wrong place: I wrote models/item/koopaling_spawn_egg.json, but 1.21.11 reads item definitions
+from assets/planeshift/items/. Every other spawn egg in the mod already used that directory. I
+guessed the format instead of looking at the fourteen working examples sitting next to it.
+
+The client now loads with zero asset warnings, verified by launching it rather than inferring it.
+
+AssetWiringTest is the standing guard: every registered block has a blockstate, every registered
+item has a definition in the directory the loader actually reads, no model points at a texture that
+does not exist, every renderer names a texture that is on disk, every entity has a renderer. Five
+checks, two seconds, and they fail in CI where nobody is watching a client boot.
+
+The brief now requires running the game, not just the tests, with the reason spelled out --
+runGameTestServer is headless and takes two minutes. Worth noting for whoever reads this next: the
+headless server does not load client models, so a clean run there says nothing about assets. The
+client is the oracle for that; the server is the oracle for world behaviour. I confused the two
+briefly this iteration and nearly reported a false all-clear.
+
+331 tests, no failures, counted from XML.
