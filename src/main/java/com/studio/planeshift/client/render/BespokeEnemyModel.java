@@ -131,6 +131,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             // a second, larger set of boxes would put the difference in two places and let them
             // disagree.
             case BIG_CHEEP -> cheepCheep();
+            case DEEP_CHEEP -> cheepCheep();
             case PIRANHA_PLANT -> piranhaPlant();
             // Same mesh, larger rig. See BIG_CHEEP above.
             case MEGA_PIRANHA_PLANT -> piranhaPlant();

@@ -269,7 +269,12 @@ cast. Multiple palettes observed (green-teal, pale blue-grey), and it combines w
 **6.3 Airships.** The playfield is a *vehicle* — a golden ribbed hull with upturned prow and stern
 over a cloud sea, under a skull flag. Standard staging for a boss.
 
-**6.4 Water cast.** Fish of several sizes, urchins, squid, plus skeletal reskins.
+**6.4 Water cast.** *Mostly built already:* three fish and a skeletal reskin. The gap was not a
+size or a species, it was a **behaviour** — every one of them patrolled, and a threat that never
+approaches is one the player can wait out, which in water is fatal to the pacing because swimming
+is slow. *Built:* `DeepCheepEntity`, the fish that follows. Same silhouette as the red one on
+purpose, with the difference carried by palette and by the one detail the red sheet is emphatic
+about not having — a scowl. Urchins and squid remain.
 
 **6.5 Enemies reskin per world over identical behaviour.** Skeletal fish, Dry Bones, winged
 variants. Cheap cast expansion off entities that already exist.

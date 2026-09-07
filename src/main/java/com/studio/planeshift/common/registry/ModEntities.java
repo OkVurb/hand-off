@@ -5,6 +5,7 @@ import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.common.entity.KoopalingEntity;
 import com.studio.planeshift.common.entity.BigBooEntity;
 import com.studio.planeshift.common.entity.ChainChompEntity;
+import com.studio.planeshift.common.entity.DeepCheepEntity;
 import com.studio.planeshift.common.entity.MegaPiranhaPlantEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.ClownCarEntity;
@@ -200,6 +201,14 @@ public final class ModEntities {
                     .clientTrackingRange(8)
                     .build(key("bone_cheep")));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<DeepCheepEntity>> DEEP_CHEEP =
+            ENTITY_TYPES.register("deep_cheep", () -> EntityType.Builder
+                    .of(DeepCheepEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.DEEP_CHEEP.scaled(0.6F),
+                            EnemyRigProfile.DEEP_CHEEP.scaled(0.4F))
+                    .clientTrackingRange(8)
+                    .build(key("deep_cheep")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<BigCheepEntity>> BIG_CHEEP =
             ENTITY_TYPES.register("big_cheep", () -> EntityType.Builder
                     .of(BigCheepEntity::new, MobCategory.WATER_AMBIENT)
@@ -391,6 +400,7 @@ public final class ModEntities {
         event.put(CHEEP_CHEEP.get(), CheepCheepEntity.createAttributes().build());
         event.put(BONE_CHEEP.get(), CheepCheepEntity.createAttributes().build());
         event.put(BIG_CHEEP.get(), BigCheepEntity.createAttributes().build());
+        event.put(DEEP_CHEEP.get(), DeepCheepEntity.createAttributes().build());
         event.put(BIG_BOO.get(), BigBooEntity.createAttributes().build());
         event.put(CHAIN_CHOMP.get(), ChainChompEntity.createAttributes().build());
         event.put(PIRANHA_PLANT.get(), PiranhaPlantEntity.createAttributes().build());

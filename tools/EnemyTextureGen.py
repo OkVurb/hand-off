@@ -920,6 +920,36 @@ def cheep_cheep():
     return img
 
 
+def deep_cheep():
+    """The fish that follows you: dark blue, and its eye is not blank.
+
+    Deliberately the same silhouette as the red one, because the difference between these two is
+    behaviour and the player has to learn to read it before it matters. Colour carries it -- deep
+    blue instead of red -- and so does the one detail the red sheet is emphatic about *not* having.
+    A Cheep Cheep's eye is round and blank because it is dangerous by being in the way; this one
+    hunts, so it gets the scowl every other enemy in the cast has, and that is the tell.
+    """
+    img = new_sheet()
+    body = (44, 74, 148)
+    base(img, BODY, body, 61)
+    scales(img, BODY, body)
+    rect(img, BODY, 0, 26, 64, 14, (150, 186, 226))
+    eyes(img, front(BODY, 12, 9, 8), 12, 9, angry=True)
+
+    base(img, HEAD, body, 62)
+    scales(img, HEAD, body)
+    base(img, LIMB, shade(body, 1.25), 63, ramp=0.22)
+    base(img, HARD, (196, 216, 240), 64, ramp=0.16)
+
+    plate = (150, 170, 206)
+    base(img, MUZZLE, plate, 65, ramp=0.14)
+    at = front(MUZZLE, 10, 6, 1)
+    rect(img, MUZZLE, at[0] + 3, at[1] + 1, 4, 4, shade(plate, 0.5))
+
+    base(img, TRIM, shade(body, 0.6), 66, ramp=0.20)
+    return img
+
+
 def big_cheep():
     """The large fish: green-grey instead of red, and blunter.
 
@@ -992,6 +1022,7 @@ CHARACTERS = {
     "cheep_cheep": cheep_cheep,
     "bone_cheep": bone_cheep,
     "big_cheep": big_cheep,
+    "deep_cheep": deep_cheep,
     "goomba": goomba,
     "fire_bro": fire_bro,
     "boomerang_bro": boomerang_bro,

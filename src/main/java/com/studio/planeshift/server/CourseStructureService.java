@@ -457,7 +457,7 @@ public final class CourseStructureService {
             case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.LAKITU.get());
             case SNOW -> List.of(ModEntities.GOOMBA.get(), ModEntities.BUZZY_BEETLE.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.THWOMP.get());
-            case WATER -> List.of(ModEntities.CHEEP_CHEEP.get());
+            case WATER -> List.of(ModEntities.CHEEP_CHEEP.get(), ModEntities.DEEP_CHEEP.get());
             // Winged enemies for a world with no ground. Paratroopa is the whole point of the
             // theme's cast: an enemy that ignores the platforms is only interesting where the
             // platforms are the scarce thing.

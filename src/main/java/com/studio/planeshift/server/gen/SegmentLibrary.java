@@ -166,6 +166,11 @@ public final class SegmentLibrary {
             // keyed on theme and cannot see which world the course sits in. GenContext knows;
             // this does not. See BACKLOG.
             case WATER -> List.of(ModEntities.CHEEP_CHEEP.get(), ModEntities.BIG_CHEEP.get(),
+                    // The one fish that comes after you. Water was three patrol patterns and a
+                    // Spiny, which makes an underwater level a timing puzzle with no pressure in
+                    // it -- the swimming is slow enough that a threat which never approaches is a
+                    // threat the player can simply wait out.
+                    ModEntities.DEEP_CHEEP.get(),
                     ModEntities.BONE_CHEEP.get(), ModEntities.SPINY.get());
             // A cast that does not need the floor. Paratroopa and Lakitu both fly, and Bullet
             // Bill crosses open air in a straight line -- all three are at their best in a world

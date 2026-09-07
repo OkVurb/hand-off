@@ -63,6 +63,9 @@ class BespokeEnemyModelTest {
             // comes from the registered hitbox and the rig scale, so a second set of boxes would
             // put the difference in two places and let them drift apart.
             Map.entry(EnemyRigProfile.BIG_CHEEP, 7L),
+            // The same fish again. Three profiles now share this mesh -- red, big and deep -- and
+            // that they all report the same count is the assertion.
+            Map.entry(EnemyRigProfile.DEEP_CHEEP, 7L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
             // Same count as PIRANHA_PLANT, and the equality is the assertion. Third profile in
             // this table whose whole content is "the small one, registered bigger".

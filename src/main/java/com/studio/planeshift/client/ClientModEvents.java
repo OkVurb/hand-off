@@ -176,6 +176,9 @@ public final class ClientModEvents {
                 CourseEnemyRenderer.provider(cheepCheep, 0.25F, EnemyRigProfile.CHEEP_CHEEP));
         event.registerEntityRenderer(ModEntities.BONE_CHEEP.get(),
                 CourseEnemyRenderer.provider(boneCheep, 0.25F, EnemyRigProfile.CHEEP_CHEEP));
+        event.registerEntityRenderer(ModEntities.DEEP_CHEEP.get(),
+                CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/deep_cheep.png"),
+                        0.25F, EnemyRigProfile.DEEP_CHEEP));
         event.registerEntityRenderer(ModEntities.BIG_CHEEP.get(),
                 CourseEnemyRenderer.provider(bigCheep, 0.25F, EnemyRigProfile.BIG_CHEEP));
         event.registerEntityRenderer(ModEntities.PIRANHA_PLANT.get(),

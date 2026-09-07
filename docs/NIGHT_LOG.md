@@ -982,3 +982,16 @@ course unbeatable, it makes every gap free and every secret trivial, which is th
 same as deleting the level design and keeping the scenery. SereneSeasons turned out
 to be harmless and that was checked rather than assumed -- it tints biome foliage,
 and no block model in this mod carries a tintindex at all. 351 tests, 0 failures.
+
+## Two missing skyboxes and a fish that follows
+CourseSkyboxRenderer builds its path from the theme name, so water and sky courses
+had been asking for files nobody drew. Eight themes, six pictures, no error --
+a missing texture is a purple chequerboard, not a crash. Drawn both, and a test now
+reads the files for every theme.
+
+Water's cast was three patrol patterns and a Spiny. Swimming is slow, so a threat
+that never approaches is one you wait out. DeepCheepEntity follows instead --
+slower than the player swims, on purpose: it exists to keep them moving, not to
+catch them. Same mesh and silhouette as the red one; the difference is the palette
+and a scowl, which the red sheet's own comment says it deliberately does not have.
+353 tests, 0 failures.
