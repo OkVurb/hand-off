@@ -54,6 +54,10 @@ public enum EnemyRigProfile {
     DEEP_CHEEP(1.20F),
     /** The spine ball. Read as a silhouette of points, so it carries a little extra scale. */
     URCHIN(1.30F),
+    /** The squid. Pale and read from a distance, so it carries scale for legibility. */
+    BLOOPER(1.35F),
+    /** The fuzz ball. Same size as the urchin it is deliberately not. */
+    FUZZY(1.30F),
     /** The big pursuing fish, for the same reason {@link #BIG_CHEEP} is its own entry. */
     MEGA_DEEP_CHEEP(1.90F),
     TOAD(1.0F),

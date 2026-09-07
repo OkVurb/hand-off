@@ -1020,3 +1020,16 @@ four black triangles. The closing half is not built and the plan says why.
 Castle windows finish the visible-light-sources entry. Set high in the back wall:
 a window at head height reads as a doorway, and the player must never spend a jump
 finding out it is not one. 355 tests, 0 failures.
+
+## Blooper and Fuzzy
+Blooper is the water's third movement idea after patrol and pursuit: gather, dart,
+then sink helplessly while recovering. The sinking is the encounter -- the player is
+not dodging the squid, they are waiting for the beat where it cannot steer. A
+two-state clock rather than pathfinding, because a navigator would smooth exactly
+the thing worth having.
+
+Fuzzy shares the urchin's brief and differs in travelling. It has eyes and the
+urchin deliberately does not: eyes say the thing is going somewhere. The two are the
+same size and nearly the same colour, so at a glance the difference is that one is
+regular and one is not -- regular reads as mineral, irregular as alive. Put in the
+cave roster, which was four things you could stomp, shell or wait out. 357 tests, 0 failures.

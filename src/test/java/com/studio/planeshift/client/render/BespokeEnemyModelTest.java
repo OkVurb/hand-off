@@ -70,6 +70,12 @@ class BespokeEnemyModelTest {
             // Body plus ten spines, and no face plate -- the only rig here without one. Eyes
             // would invite the player to look for the front, and an urchin has no front.
             Map.entry(EnemyRigProfile.URCHIN, 11L),
+            // Mantle, face and five tentacles. The tentacles are separate so the silhouette has
+            // gaps in it: a solid trailing shape at this distance reads as a Boo.
+            Map.entry(EnemyRigProfile.BLOOPER, 7L),
+            // Body, face and eight tufts. Same size and colour as the urchin, and the only thing
+            // separating them at a glance is that this one is irregular and has eyes.
+            Map.entry(EnemyRigProfile.FUZZY, 10L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
             // Same count as PIRANHA_PLANT, and the equality is the assertion. Third profile in
             // this table whose whole content is "the small one, registered bigger".

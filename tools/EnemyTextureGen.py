@@ -974,6 +974,53 @@ def urchin():
     return img
 
 
+def blooper():
+    """Pale squid: white body, dark eyes, nothing else.
+
+    The most legible thing in dark water is a white silhouette, which is exactly why the reference
+    makes this one white and everything else in the depths blue or grey. It reads at the top of the
+    screen long before it is a threat, and that lead time is the whole encounter -- a squid that
+    surprised you would be unfair, because you cannot dodge quickly while swimming.
+    """
+    img = new_sheet()
+    body = (238, 238, 244)
+    base(img, BODY, body, 81, ramp=0.16)
+    base(img, HEAD, body, 82, ramp=0.16)
+    eyes(img, front(HEAD, 10, 7, 8), 10, 7, sclera=WHITE, pupil=INK)
+    # Tentacles, faintly warmer so they separate from the mantle without becoming a second colour.
+    base(img, LIMB, (222, 218, 226), 83, ramp=0.20)
+    base(img, HARD, (206, 202, 214), 84, ramp=0.18)
+    base(img, MUZZLE, (246, 246, 250), 85, ramp=0.12)
+    base(img, TRIM, (188, 186, 200), 86, ramp=0.20)
+    return img
+
+
+def fuzzy():
+    """A black ball of fuzz with two eyes and no other features.
+
+    Nearly the urchin's brief and deliberately not its sheet. An urchin has no face because it has
+    no intentions; a Fuzzy has eyes because it does -- it follows a rail, it is going somewhere, and
+    the player is meant to read it as an animal that will arrive rather than as scenery. The fuzz
+    is drawn as an irregular fringe rather than as clean spikes for the same reason.
+    """
+    img = new_sheet()
+    fur = (30, 28, 40)
+    base(img, BODY, fur, 91, ramp=0.34)
+    dr = ImageDraw.Draw(img)
+    ox, oy = BODY
+    w, h = REGION_SIZE[BODY]
+    for i in range(w * h // 18):
+        k = _hash(i, 91, 7)
+        dr.point((ox + k % w, oy + (k >> 9) % h), fill=shade(fur, 1.45))
+    base(img, HEAD, shade(fur, 1.12), 92, ramp=0.30)
+    eyes(img, front(HEAD, 9, 6, 7), 9, 6, sclera=WHITE, pupil=INK)
+    base(img, LIMB, fur, 93, ramp=0.24)
+    base(img, HARD, shade(fur, 0.9), 94, ramp=0.22)
+    base(img, MUZZLE, shade(fur, 1.2), 95, ramp=0.20)
+    base(img, TRIM, shade(fur, 1.3), 96, ramp=0.22)
+    return img
+
+
 def big_cheep():
     """The large fish: green-grey instead of red, and blunter.
 
@@ -1048,6 +1095,8 @@ CHARACTERS = {
     "big_cheep": big_cheep,
     "deep_cheep": deep_cheep,
     "urchin": urchin,
+    "blooper": blooper,
+    "fuzzy": fuzzy,
     "goomba": goomba,
     "fire_bro": fire_bro,
     "boomerang_bro": boomerang_bro,

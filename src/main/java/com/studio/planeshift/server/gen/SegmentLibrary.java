@@ -158,7 +158,12 @@ public final class SegmentLibrary {
             case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.GOOMBA.get(), ModEntities.BOB_OMB.get());
             case SNOW -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get(), ModEntities.DRY_BONES.get(), ModEntities.FIRE_BRO.get());
-            case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get());
+            // Fuzzy joins the caves rather than the ghost house: the underground roster is four
+            // things the player can stomp, shell or wait out, and it needed one that answers none
+            // of those and simply keeps coming.
+            case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(),
+                    ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get(),
+                    ModEntities.FUZZY.get());
             // Spiny stays alongside the fish: it is the seafloor half of the cast, a spiked
             // thing sitting on the bottom that the player has to swim over rather than through.
             // The bone fish swims beside the living one rather than replacing it in a darker
@@ -171,6 +176,7 @@ public final class SegmentLibrary {
                     // it -- the swimming is slow enough that a threat which never approaches is a
                     // threat the player can simply wait out.
                     ModEntities.DEEP_CHEEP.get(), ModEntities.URCHIN.get(),
+                    ModEntities.BLOOPER.get(),
                     ModEntities.MEGA_DEEP_CHEEP.get(),
                     ModEntities.BONE_CHEEP.get(), ModEntities.SPINY.get());
             // A cast that does not need the floor. Paratroopa and Lakitu both fly, and Bullet

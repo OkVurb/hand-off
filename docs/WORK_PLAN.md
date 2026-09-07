@@ -162,8 +162,11 @@ it. Timings untouched: a plant is a metronome the player learns, and changing th
 this a different enemy rather than a bigger one. Its rise had to be overridden, though, or its head
 would have stayed inside its own pipe at full extension.
 
-*Not built:* the Mega Fuzzy. The Fuzzy does not exist in the mod at any size, so it belongs to §6
-rather than here. The other three of the reference's four oversized enemies are done — Big Boo,
+*The Fuzzy now exists* (§6.6's territory, built here): a ball of fuzz that shares the urchin's
+brief — nothing you have works on it — and differs in the one way that matters, which is that it
+travels. It has eyes for exactly the reason the urchin has none: eyes say the thing is going
+somewhere, and the player must read a Fuzzy as an animal that will arrive and an urchin as terrain
+in the way. A Mega Fuzzy would now be two lines, and is not built because nothing asks for one. The other three of the reference's four oversized enemies are done — Big Boo,
 Mega Piranha Plant, Mega Deep Cheep — alongside the Mega Cheep-Cheep that shipped before the entry
 was written.
 
@@ -280,7 +283,11 @@ about not having — a scowl. Also `UrchinEntity`, which is the cast's first thi
 answered at all: fish are dodged by timing and the pursuing one by moving, and an urchin is
 geometry that hurts. It drifts vertically rather than along the corridor, so what it closes is the
 gap between floor and ceiling — a different shape of threat from anything else in the water. And
-`MegaDeepCheepEntity`, which completes the reference's oversized four. Squid remain.
+`MegaDeepCheepEntity`, which completes the reference's oversized four. Squid are built too: `BlooperEntity`, which is the water's third
+movement idea after patrol and pursuit — it gathers, darts, then sinks helplessly while it
+recovers, and that sinking is the beat the player swims through. Written as a two-state clock
+rather than pathfinding, because a navigator would close the distance smoothly and produce a squid
+with no timing in it. The cast is complete.
 
 **6.5 Enemies reskin per world over identical behaviour.** Skeletal fish, Dry Bones, winged
 variants. Cheap cast expansion off entities that already exist.

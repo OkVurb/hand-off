@@ -7,6 +7,8 @@ import com.studio.planeshift.common.entity.BigBooEntity;
 import com.studio.planeshift.common.entity.ChainChompEntity;
 import com.studio.planeshift.common.entity.DeepCheepEntity;
 import com.studio.planeshift.common.entity.MegaDeepCheepEntity;
+import com.studio.planeshift.common.entity.BlooperEntity;
+import com.studio.planeshift.common.entity.FuzzyEntity;
 import com.studio.planeshift.common.entity.UrchinEntity;
 import com.studio.planeshift.common.entity.MegaPiranhaPlantEntity;
 import com.studio.planeshift.common.entity.BooEntity;
@@ -202,6 +204,20 @@ public final class ModEntities {
                             EnemyRigProfile.CHEEP_CHEEP.scaled(0.4F))
                     .clientTrackingRange(8)
                     .build(key("bone_cheep")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BlooperEntity>> BLOOPER =
+            ENTITY_TYPES.register("blooper", () -> EntityType.Builder
+                    .of(BlooperEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.BLOOPER.scaled(0.6F), EnemyRigProfile.BLOOPER.scaled(0.9F))
+                    .clientTrackingRange(10)
+                    .build(key("blooper")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<FuzzyEntity>> FUZZY =
+            ENTITY_TYPES.register("fuzzy", () -> EntityType.Builder
+                    .of(FuzzyEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.FUZZY.scaled(0.7F), EnemyRigProfile.FUZZY.scaled(0.7F))
+                    .clientTrackingRange(8)
+                    .build(key("fuzzy")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<UrchinEntity>> URCHIN =
             ENTITY_TYPES.register("urchin", () -> EntityType.Builder
@@ -420,6 +436,8 @@ public final class ModEntities {
         event.put(DEEP_CHEEP.get(), DeepCheepEntity.createAttributes().build());
         event.put(MEGA_DEEP_CHEEP.get(), MegaDeepCheepEntity.createAttributes().build());
         event.put(URCHIN.get(), UrchinEntity.createAttributes().build());
+        event.put(BLOOPER.get(), BlooperEntity.createAttributes().build());
+        event.put(FUZZY.get(), FuzzyEntity.createAttributes().build());
         event.put(BIG_BOO.get(), BigBooEntity.createAttributes().build());
         event.put(CHAIN_CHOMP.get(), ChainChompEntity.createAttributes().build());
         event.put(PIRANHA_PLANT.get(), PiranhaPlantEntity.createAttributes().build());

@@ -134,6 +134,8 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case DEEP_CHEEP -> cheepCheep();
             case MEGA_DEEP_CHEEP -> cheepCheep();
             case URCHIN -> urchin();
+            case BLOOPER -> blooper();
+            case FUZZY -> fuzzy();
             case PIRANHA_PLANT -> piranhaPlant();
             // Same mesh, larger rig. See BIG_CHEEP above.
             case MEGA_PIRANHA_PLANT -> piranhaPlant();
@@ -457,6 +459,50 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             float[] at = spines[i];
             r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, -1, -1, -1, 2, 2, 2),
                     pose(at[0] * 0.55F, 13 + at[1] * 0.55F, at[2] * 0.55F));
+        }
+        return finish(mesh);
+    }
+
+    /**
+     * The squid: a mantle, a face on the front of it, and tentacles hanging under.
+     *
+     * <p>The tentacles are separate parts rather than one skirt so the silhouette has gaps in it.
+     * A solid trailing shape at this distance reads as a cape, and the thing it must not look like
+     * is a Boo.
+     */
+    private static LayerDefinition blooper() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -5, -7, -4, 10, 12, 8), pose(0, 15, 0));
+        r.addOrReplaceChild("head", box(64, 0, -4, -3, -1, 8, 6, 1), pose(0, 14, -4.2F));
+        for (int i = 0; i < 5; i++) {
+            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, -1, 0, -1, 2, 6, 2),
+                    pose(-4.0F + i * 2.0F, 8, 0));
+        }
+        return finish(mesh);
+    }
+
+    /**
+     * The fuzz ball: a body, a face, and an irregular fringe.
+     *
+     * <p>Eight tufts at uneven radii rather than the urchin's even spines. The two are the same
+     * size and roughly the same colour, so the only thing separating them at a glance is that one
+     * is regular and one is not -- and regular reads as mineral, irregular as alive.
+     */
+    private static LayerDefinition fuzzy() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -5, -5, -5, 10, 10, 10), pose(0, 13, 0));
+        r.addOrReplaceChild("head", box(64, 0, -4, -3, -1, 8, 6, 1), pose(0, 14, -5.2F));
+        float[][] tufts = {
+            {0, 7, 0}, {5, 5, 0}, {7, 0, 0}, {5, -5, 0},
+            {0, -7, 0}, {-5, -5, 0}, {-7, 0, 0}, {-5, 5, 0},
+        };
+        for (int i = 0; i < tufts.length; i++) {
+            float[] at = tufts[i];
+            float jitter = i % 3 == 0 ? 0.75F : 0.55F;
+            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, -1.5F, -1.5F, -1.5F, 3, 3, 3),
+                    pose(at[0] * jitter, 13 + at[1] * jitter, at[2]));
         }
         return finish(mesh);
     }
