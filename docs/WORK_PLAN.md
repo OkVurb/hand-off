@@ -1,346 +1,259 @@
 # Work plan, from the reference footage
 
 Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 108 contact
-sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
-own words, and feed original generated art and original code.
+sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our own
+words, and feed original generated art and original code.
 
-**Method note.** Forty of the 108 sheets read so far, spread to cover every world and level
-type; more being worked through. An earlier draft of this plan was written off five sheets and
-called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
-later sheet independently repeated an earlier read.
+**Method note.** All 108 sheets have now been read. An earlier draft of this plan was written off
+five of them and called complete, which was too thin a base for the word. Findings marked
+*confirmed* recurred across worlds; those that did not are single sightings, and a few of those are
+the most interesting entries here.
+
+**What the full pass changed.** Reading everything did two things sampling had not. It turned five
+scattered observations into one rule (§1), and it caught five pieces of *already-shipped* code doing
+the wrong thing (§2). The second is the real argument for having read the sheets before writing more
+entity and generation code rather than after.
 
 ---
 
-## Already done from this reference
+## 1. The one rule worth reading first
 
-| Finding | Commit |
+**Every moving thing renders its own trajectory.**
+
+It showed up five separate ways before it was obvious:
+
+| Form | Where |
 |---|---|
-| Far layer is paler and flatter — aerial perspective | `338a9dd` |
-| Themes were built from vanilla blocks | `cad390c` |
-| Interiors get a wall, exteriors get silhouettes; third depth band | `6dd16bc` |
-| Lava composition from a generated pixel tile | `e5f1ce1` |
+| Sweep circle | Firebars rotating on a hub |
+| Rail line drawn through the level | Buzzsaws travelling a castle |
+| Tether with a visible anchor dot | Enemies hanging from a ceiling |
+| Swing arc | Pendulum platforms on cables |
+| Wire with anchor dot | Platforms hung from above |
+
+A hazard shows its reach *before* it reaches you; a platform shows its path *before* you commit to
+the jump. Nothing in the mod draws anything of the kind, and the mod has more moving hazards planned
+than the reference actually has — drop-crushers, rotating arms, pendulum platforms, and a boss that
+reaches out of the background plane. This is one shared rendering concern, not five features.
 
 ---
 
-## A. Structural — how a level is put together
+## 2. Corrections to code already committed
 
-**A1. One level passes through several sub-environments.** World 2-1 runs outdoor desert, then a
-dark interior section, then back outdoors to the flagpole. `CourseComposer` builds a single theme
-for a whole course. This is the largest structural gap found and it changes what a "theme" is: a
-course wants an *ordered sequence* of environments, not one.
+Bugs in shipped work, not gaps.
 
-**A2. A lava sea, not lava pits.** *Confirmed on a second world.* Castle levels run a continuous
-lava band across the entire bottom of the screen with a bright crust line, crossed on narrow
-bridges, and it **throws fireballs upward out of its own surface**. The final castle adds vertical
-flame geysers rising straight out of the lava and horizontal jets fired from nozzles in the wall.
-The hazard is not only the floor, it is an emitter, and the room emits too. World 6 levels sit above a continuous lava band spanning the
-whole level with a bright crust line along its top edge. The mod places lava in discrete pits. A
-floor of hazard under the entire course is a different tension and a different failure state.
+**2.1 `backWall()` draws one room over and over.** A single ghost house runs three distinct wall
+motifs — tall pointed gothic windows, diamond-check wallpaper, plain wooden boarding. Castles run
+arcades, stained glass, brick and grate. One arch motif per course makes every indoor stretch look
+like the same room repeated.
 
-**A3. Interiors are tinted by their world.** Desert caves are dark ochre; volcano interiors are
-brown-grey. `UNDERGROUND` is one grey theme used everywhere, collapsing six distinct interiors into
-one.
+**2.2 `backdrop()` always draws something.** The ice caves draw *no background at all* — black with
+faint mist — and the translucent cyan ice reads precisely because the void behind it is empty.
+Drawing nothing is a third case alongside wall and skyline.
 
-**A5. Silhouette shape is per theme, and this contradicts what was built.** Grass uses rounded
-hills; ice and snow use angular crystalline cliff shapes; volcano uses steep cones. `CourseDecorator
-.hill()` currently draws a sine profile for every exterior theme, which is right for grass and wrong
-for the other two. The rounded-vs-angular distinction is one of the clearest per-world reads there
-is.
+**2.3 `hill()` draws a sine profile for every exterior theme.** Grass is rounded; ice and snow are
+angular crystalline cliffs; volcano is steep cones; desert is flat-topped pyramids. Rounded versus
+angular is one of the clearest per-world reads in the reference.
 
-**A6. Snow sits on top of blocks as a separate cap.** Ice levels show a white cap band on the upper
-face of otherwise blue-grey blocks, independent of the block itself. This is a per-block top
-treatment, not a different block.
+**2.4 Aerial perspective desaturates toward grey.** The volcano tints the *whole scene* warm orange,
+foreground included — the air itself is hot. The current implementation cannot express a warm key
+over the whole frame.
 
-**A7. Pipes are structural.** A whole level is built as a lattice of pipes forming the walkable
-geometry. The mod's pipes are decorative or fake by design decision.
-
-**A8. A block face is drawn by which way it points.** Green tower platforms carry an orange top
-band; rock ledges carry a grass-and-tuft band; ice carries snow. A6 recorded this as a snow
-behaviour, but it is general. Cliff terrain gives the *side* its own treatment too — green top,
-horizontally striated pale rock, white surf where it meets the sea — and tower ice hangs an
-icicle fringe off the *underside*. The clearest single instance is the sky-world ground block: green
-grass cap, pale brick body, teal crystalline fringe below. Three faces, three treatments, one block.
-Top, side and buried are different, and which block it is matters less than which way the face
-looks. This is `ConnectedBlock` work — the cap is exactly the up-neighbour case the property set
-already models — and it would land across every theme at once.
-
-**A9. Every theme carries an ambient particle.** Castles drift embers, snow levels drift flakes,
-underwater drifts bubbles. Static geometry plus one moving particle is most of what makes these
-rooms feel alive; the mod's rooms are entirely still.
-
-**A10. A course passes through a cave and back out.** *Confirmed again.* The mountain level drops
-into an unlit cave mid-course and returns to the sky before the flagpole. This is A1 seen a second
-time in a different world, which promotes it from an observation to a pattern.
-
-**A11. Water level is a variable, not scenery.** A flooded tower has a visible surface line
-partway up the room, dry stone above and submerged rock below, and the line *moves* during the
-level. This is the strongest argument yet for having built the fluid as a fluid: a hazard block
-cannot do it.
-
-**A12. There is a post-and-beam construction kit.** Spotted vertical posts carrying horizontal
-beams, assembled as scaffolding in open air rather than stacked up from the ground. Platforms come
-from a parts kit, not only extruded from terrain.
-
-**A13. An interior uses several wall motifs, not one.** A single ghost house runs tall pointed
-gothic windows, a diamond-check wallpaper, and plain wooden boarding in different rooms.
-`backWall()` draws one arch motif for the whole course, so every indoor stretch looks like the same
-room repeated.
-
-**A14. Platforms tilt.** *Confirmed, and they are a specific object:* brown wooden planks hung at
-an angle that seesaw under the player's weight. They are the dominant platform of the later ghost
-houses, not an occasional flourish. Everything the mod places is grid-aligned and level.
-
-**A15. Airship levels: the playfield is a vehicle.** Golden ribbed hulls with upturned prow and
-stern, floating over a cloud sea, with a skull flag flying. The ground is a shaped object with its
-own silhouette rather than terrain, and it is the classic staging for a boss. Nothing in the mod is
-shaped like this.
-
-**A16. There is a pre-boss corridor.** A long uniform arcade of repeated arches and pillars leads
-into the boss room — rhythmic, empty, and visibly not the level you were just in. It is
-pacing, and it is what makes the arena land.
-
-**A17. The final boss is background-scale and attacks through depth.** It fills most of the
-screen, stands behind the play lane, and reaches forward into it with fire, punches and grabs while
-the player fights on small platforms over lava. This is the most 2.5D-native idea in the whole
-reference and the one the mod is best placed to steal: the Z axis it already has is the axis the
-fight is built on. Every boss here is lane-sized and lane-bound.
-
-**A18. Bosses have phases, and a phase change is visible.** The final fight turns from ordinary to
-giant and skeletal, with the fire changing colour. The transformation is the tell that the fight
-moved on.
-
-**A19. Shops are architecture, not menus.** The item house is a warm gold room with wide rounded
-arches, columns, and open sky behind the openings — bright and welcoming, and built nothing
-like the level interiors it sits between. A shop reads as somewhere you have arrived.
-
-**A20. Platforms are not all cubes.** Thin ledges with a dark inset centre, and grey metal pole
-assemblies carrying switch blocks. Two shapes that are clearly furniture rather than terrain.
-
-**A21. There are four liquids, and each has its own surface treatment.** Lava carries a bright
-crust line, water a clean rippling one, tar hangs in rounded drip lobes, and a purple poison swamp
-meets the terrain in a fringe of pink crystalline spikes. Four fluids, four different edges, no
-shared flat plane between them — whatever draws the top of a fluid has to be per-fluid art. Two are registered; two are not.
-
-**A22. Rope is walkable terrain, and it sags.** A whole sky world is built on cables strung
-between anchor posts that hang in a catenary and **deform under the player's weight**. This is the
-one finding in the plan that does not fit a block grid at all: it is soft geometry with its own
-collision, not a row of blocks, and the sag is the mechanic rather than decoration. Recording it
-honestly as expensive and probably out of scope — the cheap dishonest version is a flat line of
-blocks that looks like a rope and behaves like a floor, which is worse than not having it.
-
-**A23. Lava falls, and that argues with how the fluid was built.** Vertical lava pours down cliff
-faces into the sea below. `ModFluids` sets `levelDecreasePerBlock` to 8 so the custom fluids cannot
-spread at all — deliberately, to keep a placed pool where the generator put it — and a
-non-spreading fluid cannot fall. A column of source blocks would look right and cost nothing, but it
-is worth being clear that this is a workaround for a property chosen for other reasons, not the
-fluid doing what fluids do.
-
-**A24. Forest ground is stacked cut logs.** The terrain is felled timber seen end-on, with
-concentric growth rings on every cut face and moss capping the top. A theme identity carried
-entirely by one block's face art, which is the cheapest kind there is.
-
-**A25. Ice is translucent, and its backdrop is nothing at all.** Cyan ice blocks let the dark
-behind them show through, and the ice caves draw **no background** — black with faint mist. The
-ice reads precisely because the void behind it is empty. `backdrop()` currently switches between a
-decorated wall and a silhouette skyline for every theme; drawing nothing is a third case, and here
-it is the right one.
-
-**A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
-visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
-two alternating tones, and the eye reads the wall rather than the grid. Ground reads as masonry of
-varying rectangles, not a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
+**2.5 The custom fluids cannot fall.** `ModFluids` sets `levelDecreasePerBlock` to 8 so pools stay
+where the generator puts them, and lava visibly pours down cliff faces into the sea below. A column
+of source blocks looks right and costs nothing, but it is a workaround for a property chosen for
+other reasons, not the fluid behaving like a fluid.
 
 ---
 
-## B. Missing content
+## 3. Bosses
 
-**B1. Water.** A whole level type with its own palette, cast and movement. `hasUnderwaterStage` has
-had zero callers for the life of the codebase; the footage settles that question. The fluid now
-exists (`43678fd`), so this is theme + generation + cast, not plumbing. What the footage adds:
-underwater has **light shafts** raking down from the surface, coral and weed on the floor, drifting
-bubbles, and — where a level is half-submerged — a **visible surface line** with open
-air above it. Swimming is a movement mode, not a slower walk. *And it is cheaper than it looks:* the
-underwater levels reuse the ordinary green capped terrain block rather than a bespoke tileset. What
-makes them read as underwater is the light shafts, the fluid, the coral props and the cast — not
-new terrain art. A course also **descends into** the water from a dry ledge, so the entry is part of
-the level rather than a mode switch.
+`Koopaling.java` was written before this reading and essentially none of its assumptions survived.
 
-**B2. Sky.** Cloud platforms, pale palette, height as the subject.
+**3.1 The final boss is background-scale and attacks through depth.** It fills most of the screen,
+stands behind the play lane, and reaches forward into it with fire, punches and grabs while the
+player works across small platforms over lava. **The most 2.5D-native idea in the reference, and the
+one this project is best placed to take** — the Z axis already exists and the fight is built on it.
+Every boss in the mod is lane-sized and lane-bound.
 
-**B3. Water cast.** Fish enemies of at least two sizes. Blocked on B1.
+**3.2 Bosses fly.** Koopalings ride a hovering vehicle and attack downward. `Koopaling` is eight
+ground-walking mobs.
 
-**B5. Giant enemy variants.** A scaled-up version of an ordinary enemy used as a set-piece
-threat. The mod has one size per enemy.
+**3.3 The Koopalings fight as a group, in one shared vehicle.** The final encounter puts all seven
+in a single car. One fight with seven riders, not seven fights — different arithmetic, not just
+different staging.
 
-**B6. Bosses fight in their own arena.** The Koopaling room is a separate space with its own
-wall treatment, its own platform set and a lit window as its back marker -- entered by door, not
-walked into. Ours fight wherever the course happens to end.
+**3.4 Bosses have phases, and the phase change is visible.** Ordinary, then skeletal, then giant,
+with the fire changing colour. Legible without a health bar.
 
-**B7. Bosses fly.** The Koopaling rides a hovering vehicle and attacks from above, dropping hazards.
-`Koopaling` is written entirely as a ground-walking entity with eight ground attacks.
+**3.5 The arena is its own room, and it is approached.** A long uniform arcade of repeated arches
+runs in front of it — rhythmic, empty, visibly not the level you were just in. That corridor is
+pacing, and it is most of what makes the arena land.
 
-**B8. Moving platforms rotate.** *Confirmed with a specific form:* large radial assemblies of
-crossed wooden planks turning about a hub, ridden by the player, alongside smaller platforms hung
-from chains. Not only sliding along a line.
-
-**B9. Vertical climbables.** Vines and stalks that are climbed rather than jumped.
-
-**B10. Enemies emerge from pipes.** A pipe is a spawner as well as a passage.
-
-**B11. Enemies have per-world reskins.** The underwater fish appears as a skeleton variant in the
-flooded tower; ground enemies appear winged in sky levels. Same behaviour, different world,
-different sprite — cheap cast expansion off entities that already exist.
-
-**B12. Some platforms are enemies.** Ghost-house platforms are carried by Boos: the thing you
-stand on is a mob, and it behaves like one. A moving platform does not have to be a block.
-
-**B13. Swingable ropes.** A hanging rope the player grabs and swings on, drawn as an arc.
-Traversal that is neither walking nor jumping.
-
-**B14. Drop-crushers.** Heavy stone faces that hang above the lane and slam down when passed under.
-The mod has static spikes, which threaten a place; these threaten a moment.
-
-**B15. Firebars, and hazards that telegraph.** A whole fortress is built around bars of flame
-rotating on a hub block — singly, in pairs, and as four-armed crosses — and the game
-*draws the sweep circle* so the player can read the danger before entering it. The telegraph is the
-finding, not the firebar. *Confirmed in a second form:* buzzsaws travel the castle interiors along
-white rails drawn right through the level, so the saw's whole route — loops, corners, long
-runs — is readable before it arrives. A sweep circle shows reach; a rail shows path. Together
-they are one rule: **every moving hazard renders its own trajectory.** Nothing in the mod draws its
-own threat range, and the mod has more moving hazards planned than the reference has.
-
-**B16. Platforms hang from lines and swing.** A plank slung under a diagonal cable with a
-counterweight, swinging as a pendulum. Distinct from the rotating arms of B8: that turns about a
-hub, this hangs and sways.
-
-**B17. Striped poles are climbed.** Barber-pole spirals running floor to ceiling, used vertically.
-A second climbable after the vines of B9, and the spiral is doing real work — it animates the
-climb without animating the player.
-
-**B18. The Koopalings fight as a group, in one shared vehicle.** The final encounter puts all
-seven in a single large hovering car rather than running them sequentially. `Koopaling` is built as
-eight independent ground mobs with one attack each, so both the staging and the arithmetic are
-different: this is one fight with seven riders, not seven fights.
-
-**B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
-static blocks.
+**3.6 Giant variants of ordinary enemies serve as set-piece threats.** An oversized Boo fills half
+the screen and pursues along the level — the same background-scale idea as 3.1, at lower cost.
 
 ---
 
-## C. Art direction
+## 4. Structure
 
-**C1. A world is one hue family plus one or two rare accents.** The desert set is almost entirely
-warm ochres — ground, dunes, distant structures, cave interiors — with a green pipe and blue sky as
-deliberate exceptions. *Confirmed hard by the gold underground level*, which is almost entirely one
-olive-and-gold family across walls, ledges, pipes and terrain. Audit each theme for hue discipline.
+**4.1 One course passes through several sub-environments.** *Confirmed four times across different
+worlds.* Outdoor to cave to outdoor; or dry ledge, then a descent into water. `CourseComposer`
+builds one theme per course. The largest structural gap, and it changes what a theme is: a course
+wants an *ordered sequence* of environments.
 
-**C2. Remaining skyboxes.** Five themes still carry the old generated art. Blocked on the ChatGPT
-composer refusing long prompts reliably; procedural fallback is viable since skies are mostly
-gradient.
+**4.2 Themes crossbreed.** Ghost house with ice-block platforms inside. Castle interiors flooded,
+god rays raking down between the arches. Volcano levels set against sky. The theme list is not a
+partition.
 
-**C3. Connected textures beyond castle stone.** Terrain, brick and ice all want edge treatment.
-The machinery is built and proven.
+**4.3 A lava sea, not lava pits.** *Confirmed across worlds.* A continuous band across the whole
+bottom with a bright crust line, crossed on narrow bridges — and it emits: fireballs out of its own
+surface, vertical geysers, horizontal jets from wall nozzles. Floor, fluid and room all emit.
 
-**C5. Foreground detail sits on the playfield itself.** Flowers and tufts are scattered on the
-walkable surface, not only behind it. Every decorator prop is placed behind the lane.
+**4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
+*moves* during the level. The strongest vindication of having built the fluid as a fluid.
 
-**C6. Sky levels come in more than one palette, and none of them is the grass sky lightened.**
-Recorded first as "the sky world is pastel" off a snow-sky level — pink, lavender and mint
-over a heavily blurred far layer. The airship world is the other case: bright cyan with large white
-cumulus and a very pale low-contrast horizon. The high desert is a third: cream and gold with soft
-banked cloud. A fourth is a full sunset — saturated orange with magenta cloud bands over tan
-cones. All are strongly aerial; none is the day sky with the brightness pushed up. Treat sky
-colour as per-world data, not as one gradient with a brightness knob.
+**4.5 Interiors are tinted by world.** *At least five distinct tints* — green towers, ochre desert
+caves, blue-green flooded towers, brown-grey volcano, purple ghost house. `UNDERGROUND` is one grey
+theme collapsing all of them.
 
-**C7. Pipes are a colour set.** *Confirmed repeatedly; magenta appears underwater, so the set is
-at least five.* Green, yellow, blue, red and pink pipes appear together and read as different
-objects. Ours are green.
+**4.6 Terrain is masonry of mixed block sizes.** *The single most visible thing in the reference.*
+Big slabs, half-slabs and squares in two alternating tones; the eye reads the wall, not the grid.
 
-**C8. A cloud bank sits between terrain and far hills.** On mountain levels the peaks are rooted in
-a white haze band rather than meeting the ground plane. Cheap, and it is most of why the far layer
-reads as far.
+**4.7 Pipes are structural, and a colour set of at least five.** Whole levels are built as pipe
+lattices. Green, yellow, blue, red and magenta read as different objects. They also spawn enemies.
 
-**C9. Bonus worlds have their own visual language, levels included.** Not only the checkered map
-of D4: the playfield itself is framed by a chunky primary-coloured border, and the blocks are flat
-untextured plates with bolts, in pastel pink, blue and yellow. Nothing is a rock or a brick. That
-framing is what makes a bonus world read as outside the game rather than as another world in it.
+**4.8 Platforms come from a parts kit.** Post-and-beam scaffolding in open air, thin ledges with
+dark inset centres, capsule beams, mushroom capsules on stalks, metal grate panels, pole-mounted
+switch blocks. Not all cubes, and not all extruded from terrain.
 
-**C10. Interiors are lit by embedded sources.** Small glowing crystals and lamps set into the wall,
-so the light in a dark room visibly comes from somewhere. Ours are uniformly dim.
-
-**C11. The ghost theme has an exterior, and it is purple twilight.** *Confirmed on a second
-world.* The course leaves the house
-and finishes outdoors under a violet sky with bare dead trees as silhouettes and pale ground. Ours
-treats ghost house as indoor-only, so this palette does not exist anywhere in the mod.
-
-**C12. The volcano look is columns behind, arches in front.** *Confirmed in detail.* Background is a wall of vertical
-basalt columns with lava seams glowing between them; the playfield is grey stone arch viaducts
-crossing above the lava. Two very specific layers, and neither is what the lava theme draws now.
-
-**C13. Flame colour is themed.** Ghost-house sconces burn green, not orange.
-
-**C14. Castle back walls carry stained glass.** Coloured lit windows between the pillars, which
-is where the colour in an otherwise brown room comes from.
-
-**C15. The volcano tints the whole scene, not just the distance.** An orange haze sits over
-foreground and background alike, so the air itself is hot. The aerial-perspective work already
-shipped desaturates toward grey; this theme wants a warm key instead, which the current
-implementation has no way to express.
-
-**C4. Snow and the two lit themes still draw the same prop at both depths.** They use different
-decorator builders and never got the aerial-perspective treatment.
+**4.9 Rope is walkable terrain, and it sags.** Cables strung between anchor posts, hanging in a
+catenary and deforming under the player's weight. **The one finding that does not fit a block grid
+at all** — soft geometry with its own collision, where the sag is the mechanic. Recorded as
+expensive and probably out of scope, deliberately: the cheap version is a flat row of blocks that
+looks like a rope and behaves like a floor, which is worse than not having it.
 
 ---
 
-## D. Interface
+## 5. Art direction
 
-**D1. Star coins gate nothing.** The reference gates its final world behind a star-coin count. The
-mod tracks them and gates nothing.
+**5.1 A block face is drawn by which way it points.** Green grass cap, pale brick body, teal
+crystalline fringe below — three faces, three treatments, one block. Cliffs add a striated side face
+and a surf band at the waterline; tower ice hangs icicles off the underside. **This is exactly the
+up/down/east/west property set `ConnectedBlock` already declares**, currently used only to hide
+seams on castle stone. Applying it lands across every theme at once.
 
-**D2. Secret exits and cannons do not know about each other.** Both exist here as separate
-features; in the reference a secret exit is precisely what unlocks a cannon between worlds.
+**5.2 Sky is per-world data, not one gradient with a brightness knob.** At least six palettes:
+pastel pink-lavender over snow; bright cyan with cumulus over airships; cream and gold over high
+desert; saturated sunset orange with magenta bands; toxic green over volcanoes; night with a glowing
+moon over teal terrain.
 
-**D3. World-map decoration.** Map screens carry scenery — trees, buildings, terrain — around the
-node graph. Ours draws nodes and paths on a flat field.
+**5.3 A world is one hue family plus one or two rare accents.** *Confirmed hard by the gold
+underground*, one olive-and-gold family across walls, ledges, pipes and terrain.
+
+**5.4 Each fluid has its own surface treatment.** Four liquids, four different edges: lava has a
+bright crust, water a clean ripple, tar hangs in drip lobes, poison grows pink crystalline spikes.
+Whatever draws the top of a fluid has to be per-fluid art.
+
+**5.5 Every theme carries one ambient particle.** Embers in castles, snowfall in ice, bubbles
+underwater, drifting motes in caves. Static geometry plus one moving particle is most of what makes
+a room feel alive.
+
+**5.6 Interiors are lit by visible sources.** Sconces, lanterns, glowing crystals set into walls,
+stained glass. Flame colour is themed — ghost houses and towers burn green.
+
+**5.7 Background hills carry pattern.** Rounded mounds with chevron and zigzag striping, not flat
+silhouettes. A cloud bank often sits between terrain and far hills.
+
+**5.8 Foreground detail sits on the playfield itself.** Flowers, tufts, fences and coral on the
+walkable surface, not only behind it. Every decorator prop is currently placed behind the lane.
+
+**5.9 Theme identity can ride on one block's face art.** Forest ground is stacked cut logs seen
+end-on, with concentric growth rings and moss on top. The cheapest kind of identity there is.
+
+**5.10 Bonus worlds have their own visual language, levels included.** The playfield is framed by a
+chunky primary-coloured border and built from flat untextured plates with bolts, in pastel pink and
+blue — nothing is a rock or a brick. Their maps are abstract checkered fields, each world taking its
+own checker colour. That framing is what marks a bonus world as outside the game rather than as
+another world in it.
 
 ---
 
-**D4. World maps are themed terrain, and special worlds break the pattern deliberately.** Each
-world's map is built from that world's own materials with scenery around the node graph; the bonus
-worlds use an abstract checkered field instead, which is what marks them as outside the sequence
-— and each bonus world takes its own checker colour, hot pink for one and iridescent purple
-for another, so they are distinct from each other as well as from the main run.
+## 6. Missing content
 
-**D6. Level and map are joined by an iris wipe.** A circular iris closes on the course and opens
-on the map at the node you just cleared, which is what ties the two screens together as one place.
-Ours cuts.
+**6.1 Water — and it is cheaper than it looks.** The underwater levels reuse the *ordinary green
+capped terrain block*, not a bespoke tileset. What makes them read as underwater is light shafts,
+the fluid, coral props and the cast. The fluid exists; the block exists. This is theme, props and
+cast. Multiple palettes observed (green-teal, pale blue-grey), and it combines with castle.
 
-**D7. Clearing a castle plays a scene.** A lit room, the rescued character, an ending beat before
-the map returns. The castle is the only course that resolves anything.
+**6.2 Sky.** Cloud as solid walkable terrain, mushroom capsules on stalks, height as the subject.
 
-**D8. Levels carry signposts.** Arrow boards planted in the terrain pointing the way on, used
-where a route is ambiguous. Navigation as set dressing rather than as UI.
+**6.3 Airships.** The playfield is a *vehicle* — a golden ribbed hull with upturned prow and stern
+over a cloud sea, under a skull flag. Standard staging for a boss.
 
-**D5. A level is introduced by a title card.** A plain black screen naming the world and level,
-between the map and the course. Ours cuts straight in.
+**6.4 Water cast.** Fish of several sizes, urchins, squid, plus skeletal reskins.
 
-## E. Ordering
+**6.5 Enemies reskin per world over identical behaviour.** Skeletal fish, Dry Bones, winged
+variants. Cheap cast expansion off entities that already exist.
 
-Grouped by what unblocks what, not by size.
+**6.6 Hazards the mod lacks.** Drop-crushers that slam when passed under (threatening a *moment*,
+not a place); firebars; buzzsaws; spike balls on chains; volcanic bombs raining from erupting
+background volcanoes *into the lane*; Chain Chomps tethered to posts.
 
-0. **A17 — the boss in the background plane.** Promoted to the top on reading the final
-   fight. It needs no new terrain, no new theme and no new art pipeline; it needs the boss moved off
-   the lane and given reach, which is the one thing this project has that a 2D reference does not.
+**6.7 Traversal the mod lacks.** Swingable ropes, climbable vines, barber-pole spirals (the stripe
+animates the climb without animating the player), spider-web mesh, beanstalks.
 
-1. **A3 — tint interiors by world.** Cheapest real win. One theme becomes six without new art.
-2. **C4 — finish aerial perspective** for snow, lava, ghost house. Completes work already started.
-3. **A8/C3 — connected terrain and cap rows.** Machinery exists; this is application, and the
-   cap row is the single change that touches every theme at once.
-4. **A1 — sub-environments within a course.** The big structural one. Needs composer work and a
+**6.8 Platforms that are enemies.** Ghost-house platforms are carried by Boos. A moving platform
+does not have to be a block.
+
+**6.9 Animated background that reaches in.** Volcanoes erupt and drop hazards onto the playfield.
+Background and lane interact.
+
+---
+
+## 7. Interface
+
+**7.1 Star coins gate nothing.** The reference gates its final world behind a count.
+
+**7.2 Secret exits and cannons do not know about each other.** A secret exit is precisely what
+unlocks a cannon between worlds.
+
+**7.3 World maps are themed terrain.** Built from each world's own materials with dense scenery —
+trees, houses, ponds, volcano cones, ice floes — around the node graph. Ours draws nodes and paths
+on a flat field.
+
+**7.4 Course and map are joined by an iris wipe** at the node just cleared.
+
+**7.5 Levels open on a title card** naming world and level.
+
+**7.6 Levels carry signposts** — arrow boards planted in terrain where a route is ambiguous.
+Navigation as set dressing rather than UI.
+
+**7.7 Progress is announced.** "Star World has appeared!", "You've cleared all of the courses in the
+game!" — banner moments marking structural change.
+
+**7.8 Clearing a castle plays a scene**, and the credits roll over a *playable* level.
+
+**7.9 Shops are architecture, not menus.** A warm gold room with wide arches and open sky behind the
+openings — bright and welcoming, built nothing like the level interiors on either side.
+
+---
+
+## 8. Ordering
+
+Grouped by what unblocks what, and by cost against payoff.
+
+1. **3.1 — the boss in the background plane.** No new terrain, no new theme, no new art pipeline.
+   Move the boss off the lane and give it reach. The one thing this project has that a 2D reference
+   does not.
+2. **5.1 — per-face block treatment.** The machinery exists and is unused. One change, every theme.
+3. **2.1 to 2.5 — fix the shipped code** while the findings are fresh.
+4. **1 — trajectory rendering.** One shared concern; do it before adding the hazards in 6.6, not
+   after.
+5. **4.5 — tint interiors by world.** One theme becomes six without new art.
+6. **6.1 — water.** Much cheaper than previously scoped.
+7. **4.1 — sub-environments within a course.** The big structural one. Needs composer work and a
    reachability re-proof across environment joins.
-5. **B1/B2 — water and sky themes.** Largest content addition; water is now unblocked.
-6. **A2 — lava sea** as a course variant.
-7. **D1/D2 — progression links.** Small, self-contained, high payoff for how the game reads.
+8. **7.1 and 7.2 — progression links.** Small, self-contained, high payoff for how the game reads.
 
 ---
 
