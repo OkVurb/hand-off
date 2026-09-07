@@ -934,3 +934,15 @@ collision, no text, no state. Placed at the start rather than at secrets -- the
 composer already leads the eye to a secret with a rising coin trail and has a
 comment explaining why an arrow there would be worse, so this only fills the gap
 that comment does not cover. 351 tests, 0 failures.
+
+## One signpost, not two
+I built a signpost block without checking, and COURSE_SIGNPOST already existed --
+with a texture, and already placed at the foot of the climbing pole, under a comment
+making the same argument about secrets I put in my own commit message. Exactly the
+failure this project keeps producing, this time by me and in the other direction:
+not unreachable work, but a second copy of reachable work.
+
+Kept the newer one on the owner's call. It is also the better block: a real post and
+board rather than a painted cube. The two segment placements were repointed to it and
+the old block, its texture entry, the now-dead signboard() generator helper and its
+three asset files are gone. 351 tests, 0 failures.

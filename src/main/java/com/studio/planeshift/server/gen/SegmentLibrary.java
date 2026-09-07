@@ -1488,7 +1488,7 @@ public final class SegmentLibrary {
             floor(c, x + 11, 5, y + 4, ctx);
             coinTrail(c, x + 7, 5, y + 6, 1);
             // Same reasoning as the climbing pole: vine or steps, both open, neither obvious.
-            c.set(x + 2, y + 2, 0, ModBlocks.COURSE_SIGNPOST.get().defaultBlockState());
+            c.set(x + 2, y + 2, 0, ModBlocks.SIGNPOST.get().defaultBlockState());
         }
     };
 
@@ -1625,7 +1625,7 @@ public final class SegmentLibrary {
             // that an arrow near a *secret* is worse than nothing because it announces the secret
             // instead of letting the player find it. A sign over an ambiguous but open route says
             // only "there is a way through here", which is what the reference uses them for.
-            c.set(x + 2, y + 2, 0, ModBlocks.COURSE_SIGNPOST.get().defaultBlockState());
+            c.set(x + 2, y + 2, 0, ModBlocks.SIGNPOST.get().defaultBlockState());
 
             // Someone patrolling the ledge at the top. Without this the segment was sixteen blocks
             // of nobody, and the inhabited-density check failed on short snow courses where one

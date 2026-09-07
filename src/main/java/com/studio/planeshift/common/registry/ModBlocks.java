@@ -195,9 +195,6 @@ public final class ModBlocks {
                     .noCollision()
                     .sound(SoundType.CHAIN));
 
-    public static final DeferredBlock<Block> COURSE_SIGNPOST = courseBlock(
-            "course_signpost", MapColor.WOOD, SoundType.WOOD);
-
     public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
             "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
 
