@@ -333,6 +333,24 @@ def signboard(wood, paint):
     return lit(img, wood)
 
 
+def rail(metal, rivet):
+    """A length of track: a dark bar with a bright rivet line through it.
+
+    Horizontal rather than tiled in both directions, because a rail is read along its length. The
+    rivets sit on the centre line so consecutive blocks join into one continuous run instead of
+    reading as a repeated stamp.
+    """
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 5, S - 1, 10], fill=metal[:3] + (255,))
+    d.line([(0, 5), (S - 1, 5)], fill=shade(metal, 1.30))
+    d.line([(0, 10), (S - 1, 10)], fill=shade(metal, 0.66))
+    for x in range(2, S, 5):
+        d.point((x, 7), fill=rivet[:3] + (255,))
+        d.point((x, 8), fill=shade(rivet, 0.80))
+    return img
+
+
 def distant(img, haze=(186, 214, 236), amount=0.46):
     """Push a texture back into the distance.
 
@@ -1186,6 +1204,11 @@ def build():
     # say "onward". Where one has to point back the block is placed rotated, which costs a
     # blockstate property rather than a second texture.
     out["course_signpost"] = signboard((156, 112, 66), (248, 240, 214))
+
+    # Grinder track. Dark metal with bright rivets, so a run of it reads as one rail rather than as
+    # a row of blocks -- which is the whole job: the player should see the route as a thing that is
+    # there, the way they see a wall.
+    out["course_rail"] = rail((72, 76, 88), (198, 206, 220))
 
     # Hazards.
     out["muncher"] = muncher()

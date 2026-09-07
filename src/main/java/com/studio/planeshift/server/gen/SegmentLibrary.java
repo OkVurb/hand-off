@@ -1524,6 +1524,13 @@ public final class SegmentLibrary {
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 14, y, ctx);
 
+            // The track the saw runs on, laid as blocks. The route is visible because it is
+            // really there, which is how this genre shows a moving hazard's path -- an earlier
+            // version drew it in particles and looked like a different game.
+            BlockState rail = ModBlocks.COURSE_RAIL.get().defaultBlockState();
+            for (int i = 2; i <= 12; i++) {
+                c.setIfEmpty(x + i, y + 2, 0, rail);
+            }
             // Head height, so it is crossed by waiting rather than by ducking -- there is no duck.
             c.spawn(ModEntities.SAW.get(), x + 7.5D, y + 2, 0.5D, 0.0F, GENERATED_TAG);
             coinTrail(c, x + 2, 10, y + 1, 1);

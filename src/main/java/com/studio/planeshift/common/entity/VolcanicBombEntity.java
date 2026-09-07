@@ -100,25 +100,9 @@ public class VolcanicBombEntity extends Entity {
             return;
         }
 
-        // Mark the ground for the whole warning window, not just once. A single flash is missed by
-        // a player looking somewhere else, and the point is that this can be planned around.
-        if (!falling() && Telegraph.due(tickCount)) {
-            markLanding();
-        }
         if (falling()) {
             hurtTouching();
         }
-    }
-
-    /**
-     * Draws the impact point on the ground.
-     *
-     * <p>A small ring rather than a dot, because a dot under a rock is hidden by the rock. The ring
-     * is drawn at the anchor, which is where the rock will come to rest.
-     */
-    private void markLanding() {
-        Telegraph.ring(level(), new Vec3(getX(), anchorY + 0.1D, getZ()), 0.9D,
-                net.minecraft.core.particles.ParticleTypes.SMOKE);
     }
 
     private void spawnTrail() {

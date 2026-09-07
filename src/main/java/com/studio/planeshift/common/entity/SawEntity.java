@@ -17,10 +17,10 @@ import net.minecraft.world.phys.Vec3;
 /**
  * A buzzsaw that runs a straight track and shows the track before it gets there.
  *
- * <p>The reference draws these travelling castle interiors along a white rail painted right through
- * the level, so the whole route -- where it goes and how far -- is readable before the saw arrives.
- * That is the same rule the firebar's sweep circle follows, in its other form: a circle shows reach,
- * a rail shows path.
+ * <p>The route is readable because the track is really there: the segment lays a line of rail
+ * blocks the saw runs along, so the player sees where it goes for the same reason they can see a
+ * wall. An earlier version drew the path in particles instead, which said the same thing in a
+ * visual language nothing else in the game uses -- the fix was to build the track, not to draw it.
  *
  * <p>It is the third hazard here and the first that threatens a <em>line</em> rather than a point or
  * a radius. A Thwomp owns the column under it and a firebar owns a disc around it; a saw owns a
@@ -111,9 +111,6 @@ public class SawEntity extends Entity {
             spawnTeeth();
             return;
         }
-        if (Telegraph.due(tickCount)) {
-            telegraphTrack();
-        }
         hurtTouching();
     }
 
@@ -125,12 +122,6 @@ public class SawEntity extends Entity {
                               new Vec3(originX, originY + r, getZ())}
                 : new Vec3[] {new Vec3(originX - r, originY, getZ()),
                               new Vec3(originX + r, originY, getZ())};
-    }
-
-    private void telegraphTrack() {
-        Vec3[] ends = trackEnds();
-        Telegraph.line(level(), ends[0], ends[1],
-                net.minecraft.core.particles.ParticleTypes.END_ROD);
     }
 
     private void spawnTeeth() {

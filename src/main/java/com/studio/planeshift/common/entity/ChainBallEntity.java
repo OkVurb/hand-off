@@ -132,22 +132,7 @@ public class ChainBallEntity extends Entity {
             spawnChain();
             return;
         }
-        if (Telegraph.due(tickCount)) {
-            telegraphSwing();
-        }
         hurtTouching();
-    }
-
-    /**
-     * Draws the arc the ball travels, not the circle it belongs to.
-     *
-     * <p>Standard position measures anticlockwise from east, and the chain measures from straight
-     * down, so the sweep maps onto 270 degrees plus or minus the half-sweep.
-     */
-    private void telegraphSwing() {
-        Telegraph.arc(level(), position(), chainLength(),
-                standardAngle(-sweep()), standardAngle(sweep()),
-                net.minecraft.core.particles.ParticleTypes.SMOKE);
     }
 
     /** The chain itself, drawn as beads from pivot to ball. */

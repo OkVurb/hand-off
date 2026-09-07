@@ -31,9 +31,15 @@ It showed up five separate ways before it was obvious:
 | Wire with anchor dot | Platforms hung from above |
 
 A hazard shows its reach *before* it reaches you; a platform shows its path *before* you commit to
-the jump. Nothing in the mod draws anything of the kind, and the mod has more moving hazards planned
-than the reference actually has — drop-crushers, rotating arms, pendulum platforms, and a boss that
-reaches out of the background plane. This is one shared rendering concern, not five features.
+the jump.
+
+**But the telegraph is always a physical object, never an overlay.** This is the part the first
+implementation got wrong. A grinder's route is visible because the *track is really there*; a spiked
+ball's arc is visible because the *chain is really there*; a fire bar's reach is the fireballs
+themselves; a Thwomp is readable because it is an enormous face on a slab that pauses before it
+drops. None of it is drawn on top of the world. The first pass built this rule out of particle
+rings and glowing dotted lines, which said the right thing in the wrong language and looked like a
+different game entirely. Corrected: physical telegraphs strengthened, drawn ones deleted.
 
 ---
 

@@ -178,6 +178,23 @@ public final class ModBlocks {
      * player where to go, a sign in the world tells them somebody built this place with a way
      * through it.
      */
+    /**
+     * Grinder track.
+     *
+     * <p>The saw's route, built rather than drawn. An earlier version showed the path in particles;
+     * this is the same information as a thing that is actually there, which is how the genre does
+     * it and how everything else in this mod already worked.
+     *
+     * <p>Not solid: the player passes through it, so a rail across a corridor never becomes a wall.
+     */
+    public static final DeferredBlock<Block> COURSE_RAIL =
+            BLOCKS.registerBlock("course_rail", Block::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(0.8F)
+                    .noOcclusion()
+                    .noCollision()
+                    .sound(SoundType.CHAIN));
+
     public static final DeferredBlock<Block> COURSE_SIGNPOST = courseBlock(
             "course_signpost", MapColor.WOOD, SoundType.WOOD);
 

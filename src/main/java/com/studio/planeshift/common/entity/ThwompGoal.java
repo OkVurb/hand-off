@@ -76,22 +76,6 @@ public class ThwompGoal extends Goal {
 
         boolean playerBelow = hasPlayerBelow();
 
-        // Draw the column it will fall down, while it is still up.
-        //
-        // A Thwomp is the clearest case of the rule the reference applies to everything that
-        // moves: a hazard that threatens a *moment* rather than a place is only fair if the moment
-        // can be seen coming. At this camera distance a block hanging above the lane is easy to
-        // miss until it is already falling, and by then the decision it was asking for has been
-        // made for you. Marked only while it is raised and idle -- once it commits there is
-        // nothing left to warn about, and a telegraph that keeps drawing during the fall reads as
-        // part of the hazard rather than as notice of it.
-        if (!playerBelow && Telegraph.due(thwomp.tickCount)) {
-            Telegraph.line(thwomp.level(),
-                    thwomp.position(),
-                    thwomp.position().subtract(0.0D, DETECT_RANGE_Y_DOWN, 0.0D),
-                    net.minecraft.core.particles.ParticleTypes.SMOKE);
-        }
-
         if (playerBelow && thwomp.getY() > homeY - DETECT_RANGE_Y_DOWN) {
             thwomp.setDeltaMovement(new Vec3(0.0D, FALL_SPEED, 0.0D));
             thwomp.hurtMarked = true;

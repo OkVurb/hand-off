@@ -590,3 +590,32 @@ reference uses signs for ambiguous *open* routes, not hidden ones -- so they wen
 segments with genuinely two ways up, the climbing pole and the vine wall, and nowhere near a secret.
 
 323 tests, no failures, counted from XML.
+
+## Iteration 25 — corrected to the genre
+
+The owner looked at the night's work and said, in effect, make it feel like Mario. They were right,
+and the biggest offender was the rule I had been most pleased with.
+
+"Every moving hazard renders its own trajectory" is a correct observation. My implementation of it
+was not: sweep circles in smoke, glowing dotted rails, a ground marker under falling rock. That is
+a modern indie-game idiom -- diegetic UI painted over the world -- and this genre never does it.
+The genre telegraphs constantly and always with objects that are actually there. A grinder runs on
+visible track. A spiked ball hangs from a real chain. A fire bar's warning is the fireballs. A
+Thwomp is readable because it is a huge face that pauses before dropping.
+
+So the drawn telegraphs are gone and Telegraph.java is deleted. What replaces them is physical: the
+saw corridor now lays a line of grinder track blocks the saw runs along, which carries the same
+information as a thing the player can see for the same reason they can see a wall. The chain ball
+keeps its chain, which was always the right answer and was doing the job before I added an arc on
+top of it. The firebar, the moving platform, the Thwomp and the fire rock simply lost their
+overlays; each was already readable without one.
+
+Also renamed the new cast into the vocabulary the mod already speaks -- it has had Goombas, Koopas,
+Thwomps and Boos since long before tonight, and then I added a "Saw" and a "Chain Ball". They are
+now Grinder, Spiked Ball, Fish Bone, Big Cheep Cheep, Fire Rock and Boo Platform.
+
+Worth recording plainly: this is the second time tonight the plan was right about *what* the
+reference does and wrong about *how*. The lesson is the same one as the sheets -- describing an
+observation is not the same as knowing how it is built.
+
+323 tests, no failures, counted from XML.
