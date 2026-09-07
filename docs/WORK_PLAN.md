@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Twenty of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Twenty-two of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -87,6 +87,15 @@ room repeated.
 **A14. Platforms tilt.** Several are drawn at an angle and pivot under the player. Everything the
 mod places is grid-aligned and level.
 
+**A15. Airship levels: the playfield is a vehicle.** Golden ribbed hulls with upturned prow and
+stern, floating over a cloud sea, with a skull flag flying. The ground is a shaped object with its
+own silhouette rather than terrain, and it is the classic staging for a boss. Nothing in the mod is
+shaped like this.
+
+**A16. There is a pre-boss corridor.** A long uniform arcade of repeated arches and pillars leads
+into the boss room — rhythmic, empty, and visibly not the level you were just in. It is
+pacing, and it is what makes the arena land.
+
 **A4. Terrain is built from mixed block sizes.** Ground reads as masonry of varying rectangles, not
 a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
 
@@ -129,6 +138,12 @@ different sprite — cheap cast expansion off entities that already exist.
 **B12. Some platforms are enemies.** Ghost-house platforms are carried by Boos: the thing you
 stand on is a mob, and it behaves like one. A moving platform does not have to be a block.
 
+**B13. Swingable ropes.** A hanging rope the player grabs and swings on, drawn as an arc.
+Traversal that is neither walking nor jumping.
+
+**B14. Drop-crushers.** Heavy stone faces that hang above the lane and slam down when passed under.
+The mod has static spikes, which threaten a place; these threaten a moment.
+
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
 
@@ -150,8 +165,11 @@ The machinery is built and proven.
 **C5. Foreground detail sits on the playfield itself.** Flowers and tufts are scattered on the
 walkable surface, not only behind it. Every decorator prop is placed behind the lane.
 
-**C6. The sky world is pastel, not blue.** Pink, lavender and mint rather than a brighter day sky,
-with a very soft low-contrast far layer. A sky theme cannot be the grass sky lightened.
+**C6. Sky levels come in more than one palette, and none of them is the grass sky lightened.**
+Recorded first as "the sky world is pastel" off a snow-sky level — pink, lavender and mint
+over a heavily blurred far layer. The airship world is the other case: bright cyan with large white
+cumulus and a very pale low-contrast horizon. Both are strongly aerial; neither is the day sky with
+the brightness pushed up.
 
 **C7. Pipes are a colour set.** Green, yellow, blue and red pipes appear in one level and read as
 different objects. Ours are green.
@@ -199,6 +217,13 @@ node graph. Ours draws nodes and paths on a flat field.
 **D4. World maps are themed terrain, and special worlds break the pattern deliberately.** Each
 world's map is built from that world's own materials with scenery around the node graph; the bonus
 worlds use an abstract checkered field instead, which is what marks them as outside the sequence.
+
+**D6. Level and map are joined by an iris wipe.** A circular iris closes on the course and opens
+on the map at the node you just cleared, which is what ties the two screens together as one place.
+Ours cuts.
+
+**D7. Clearing a castle plays a scene.** A lit room, the rescued character, an ending beat before
+the map returns. The castle is the only course that resolves anything.
 
 **D5. A level is introduced by a title card.** A plain black screen naming the world and level,
 between the map and the course. Ours cuts straight in.
