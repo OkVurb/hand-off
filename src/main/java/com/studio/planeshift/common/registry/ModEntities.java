@@ -29,6 +29,7 @@ import com.studio.planeshift.common.entity.LakituEntity;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
 import com.studio.planeshift.common.entity.PiranhaPlantEntity;
 import com.studio.planeshift.common.entity.ChainBallEntity;
+import com.studio.planeshift.common.entity.VolcanicBombEntity;
 import com.studio.planeshift.common.entity.SawEntity;
 import com.studio.planeshift.common.entity.SpinyEntity;
 import com.studio.planeshift.common.entity.ThwompEntity;
@@ -258,6 +259,14 @@ public final class ModEntities {
                     .build(key("bowser_fire")));
 
     /** Rotating castle hazard. MISC because it is a moving obstacle, not an AI mob. */
+    public static final DeferredHolder<EntityType<?>, EntityType<VolcanicBombEntity>> VOLCANIC_BOMB =
+            ENTITY_TYPES.register("volcanic_bomb", () -> EntityType.Builder
+                    .<VolcanicBombEntity>of(VolcanicBombEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .build(key("volcanic_bomb")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<ChainBallEntity>> CHAIN_BALL =
             ENTITY_TYPES.register("chain_ball", () -> EntityType.Builder
                     .<ChainBallEntity>of(ChainBallEntity::new, MobCategory.MISC)

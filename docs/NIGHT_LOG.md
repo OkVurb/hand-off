@@ -410,3 +410,28 @@ Floor unbroken again, same as the saw corridor, so the reachability proof is nev
 hazard it cannot see. Passed first time, second iteration running.
 
 317 tests, no failures, counted from XML.
+
+## Iteration 18
+
+Volcanic bombs, plan 6.9 -- the one case in the whole reference where the background is not just
+scenery. Volcanoes erupt behind the playfield and drop debris into it.
+
+That created a problem none of the other hazards have. A firebar, saw and chain ball are visible for
+their entire cycle, so drawing their path is a courtesy; a rock arriving from off-screen is
+invisible until it is already falling, and drawing its path does not help because the path starts
+where the player cannot see. Left alone it would have been the only genuinely unfair hazard in the
+game.
+
+So the telegraph moved to the other end: the landing spot is marked on the ground before the rock is
+released. That is a fifth form of the same rule -- reach as a circle, path as a line, swing as an
+arc, and here the destination, because the destination is the only part of this hazard the player
+can act on. Marked for the whole warning window rather than flashed once, since a single flash is
+missed by a player looking elsewhere.
+
+Found a real bug while gating it to the volcano. suitsTheme was only consulted for set pieces, so my
+theme gate would have done nothing and rocks would have fallen in grass levels -- and it would have
+compiled, tested and shipped perfectly happily. Ordinary segments now go through the same filter.
+That was latent rather than mine: it was harmless only for as long as set pieces were the only
+theme-specific segments, which stopped being true tonight.
+
+319 tests, no failures, counted from XML.

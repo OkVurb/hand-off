@@ -492,6 +492,11 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.FROZEN_GAUNTLET) {
             return theme == CourseTheme.SNOW;
         }
+        // Volcano only: the hazard is justified by the erupting background that theme draws, and
+        // a rock falling out of a clear grass sky is a non sequitur.
+        if (segment == SegmentLibrary.ERUPTION_FIELD) {
+            return theme == CourseTheme.LAVA;
+        }
         if (segment == SegmentLibrary.REEF_ARCH) {
             return theme == CourseTheme.WATER;
         }
@@ -535,6 +540,12 @@ public final class CourseComposer {
             }
             // Teaching rule: nothing demanding may use a mechanic the player has not met.
             if (s.difficulty() >= 3 && !taught.containsAll(mechanics(s))) {
+                continue;
+            }
+            // Theme fit. This used to be asked only of set pieces, which was fine while set pieces
+            // were the only theme-specific segments -- the moment an ordinary segment needed a
+            // theme, the gate silently did nothing and it appeared everywhere.
+            if (!suitsTheme(segment, ctx.theme())) {
                 continue;
             }
 

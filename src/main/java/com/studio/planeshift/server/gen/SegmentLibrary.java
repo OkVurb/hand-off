@@ -1392,6 +1392,33 @@ public final class SegmentLibrary {
     };
 
     /**
+     * Open ground under an erupting sky.
+     *
+     * <p>Three bombs falling on a flat run. Deliberately the emptiest segment in the library apart
+     * from the breather: the hazard here is timing across open ground, and putting geometry under
+     * it as well would mean solving a jump and a clock at once for no reason.
+     *
+     * <p>Volcano only. A rock out of the sky in a grass level is a non sequitur -- the whole
+     * justification for this hazard is the erupting background the theme already draws, and without
+     * that it is just an unexplained thing landing on you.
+     */
+    static final Segment ERUPTION_FIELD = new Segment() {
+        public SegmentSpec spec() {
+            return def("eruption_field", 16, 3, 2, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            // Spread across the run so the player is never past all of them at once, and each
+            // sits on its own cycle offset so they do not land in unison.
+            c.spawn(ModEntities.VOLCANIC_BOMB.get(), x + 4.5D, y + 1, 0.5D, 0.0F, GENERATED_TAG);
+            c.spawn(ModEntities.VOLCANIC_BOMB.get(), x + 9.5D, y + 1, 0.5D, 0.0F, GENERATED_TAG);
+            c.spawn(ModEntities.VOLCANIC_BOMB.get(), x + 13.5D, y + 1, 0.5D, 0.0F, GENERATED_TAG);
+            coinTrail(c, x + 2, 12, y + 1, 1);
+        }
+    };
+
+    /**
      * Two chain balls swinging over a continuous floor.
      *
      * <p>Spaced so their arcs do not overlap. Overlapping pendulums produce a window that opens and
@@ -1793,6 +1820,7 @@ public final class SegmentLibrary {
         list.add(CLIMB_POLE);
         list.add(SAW_CORRIDOR);
         list.add(CHAIN_BALL_HALL);
+        list.add(ERUPTION_FIELD);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);
