@@ -74,27 +74,32 @@ public final class CourseDecorator {
     private static void place(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                               int x, int floorY, int side) {
         int z = side * (random.nextInt(2) == 0 ? NEAR_Z : FAR_Z);
+        // Whether this prop is on the back plane, so it can be drawn as distance rather than
+        // merely placed at a distance. Two depths existed in the geometry and none in the image.
+        boolean far = Math.abs(z) == FAR_Z;
         switch (ctx.theme()) {
-            case GRASS -> hedgerow(canvas, random, x, floorY, z);
-            case DESERT -> column(canvas, random, x, floorY, z, 4);
+            case GRASS -> hedgerow(canvas, random, x, floorY, z, far);
+            case DESERT -> column(canvas, random, x, floorY, z, 4, far);
             case SNOW -> drift(canvas, random, x, floorY, z);
             case LAVA -> lit(canvas, random, x, floorY, z, true);
             case GHOST_HOUSE -> lit(canvas, random, x, floorY, z, false);
-            case UNDERGROUND -> column(canvas, random, x, floorY, z, 6);
+            case UNDERGROUND -> column(canvas, random, x, floorY, z, 6, far);
         }
     }
 
     /** Grass: bushes, and the occasional tall one so the skyline is not flat. */
     private static void hedgerow(CourseCanvas canvas, RandomGenerator random,
-                                 int x, int floorY, int z) {
-        BlockState hedge = ModBlocks.COURSE_HEDGE.get().defaultBlockState();
+                                 int x, int floorY, int z, boolean far) {
+        BlockState hedge = (far ? ModBlocks.COURSE_HEDGE_FAR : ModBlocks.COURSE_HEDGE)
+                .get().defaultBlockState();
         int height = 1 + random.nextInt(3);
         for (int h = 1; h <= height; h++) {
             canvas.setIfEmpty(x, floorY + h, z, hedge);
         }
         if (random.nextInt(4) == 0) {
             // A cloud well above the skyline. Depth cue, and the only thing up there.
-            BlockState cloud = ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState();
+            BlockState cloud = (far ? ModBlocks.COURSE_CLOUD_BLOCK_FAR : ModBlocks.COURSE_CLOUD_BLOCK)
+                    .get().defaultBlockState();
             int cy = floorY + 9 + random.nextInt(4);
             for (int i = 0; i < 3; i++) {
                 canvas.setIfEmpty(x + i, cy, z, cloud);
@@ -104,8 +109,9 @@ public final class CourseDecorator {
 
     /** Desert and underground: a standing column with a capital, and sometimes a crate at its foot. */
     private static void column(CourseCanvas canvas, RandomGenerator random,
-                               int x, int floorY, int z, int maxHeight) {
-        BlockState pillar = ModBlocks.COURSE_PILLAR.get().defaultBlockState();
+                               int x, int floorY, int z, int maxHeight, boolean far) {
+        BlockState pillar = (far ? ModBlocks.COURSE_PILLAR_FAR : ModBlocks.COURSE_PILLAR)
+                .get().defaultBlockState();
         BlockState trim = ModBlocks.COURSE_TRIM.get().defaultBlockState();
         int height = 2 + random.nextInt(maxHeight);
         for (int h = 1; h <= height; h++) {

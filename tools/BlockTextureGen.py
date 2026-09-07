@@ -235,6 +235,41 @@ CONNECTED = {
 }
 
 
+def distant(img, haze=(186, 214, 236), amount=0.46):
+    """Push a texture back into the distance.
+
+    Aerial perspective: air between the viewer and a thing washes out its colour and lowers its
+    contrast, and the eye reads that as distance far more strongly than it reads position or size.
+    Reference footage for this genre leans on it hard -- the far layer of a background is visibly
+    paler and flatter than the mid layer, and the playfield is the most saturated thing on screen.
+
+    The mod was not using it at all. CourseDecorator chooses a depth of 2 or 3 for every prop and
+    then places the same block at either one, so a bush "behind" another bush is pixel-identical to
+    it. Two depths existed in the geometry and none in the image.
+
+    Two operations, both toward the haze colour: desaturate toward the pixel's own grey, then blend
+    the whole thing toward the horizon tint. Contrast falls out of the second one for free, since
+    everything converges on a single value.
+    """
+    out = img.copy()
+    px = out.load()
+    w, h = out.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            grey = (r * 30 + g * 59 + b * 11) // 100
+            r = r + (grey - r) * 0.45
+            g = g + (grey - g) * 0.45
+            b = b + (grey - b) * 0.45
+            r = int(r + (haze[0] - r) * amount)
+            g = int(g + (haze[1] - g) * amount)
+            b = int(b + (haze[2] - b) * amount)
+            px[x, y] = (r, g, b, a)
+    return out
+
+
 def tiles(a, b, seed):
     img = new()
     d = ImageDraw.Draw(img)
@@ -945,6 +980,13 @@ def build():
     out["course_sand_block"] = drift((228, 196, 118), 73)
     out["course_snow_block"] = drift((238, 244, 250), 74, flecks=(0.96, 1.04))
     out["course_magma_block"] = embers((62, 48, 52), (232, 120, 48), 75)
+
+    # Distant copies of the props the decorator puts at the far depth. Same silhouette, pushed
+    # back by air -- see distant(). Registered as their own blocks because a texture is chosen by
+    # block, and the decorator picks which one by how far back it is placing the prop.
+    out["course_hedge_far"] = distant(out["course_hedge"])
+    out["course_pillar_far"] = distant(out["course_pillar"])
+    out["course_cloud_block_far"] = distant(out["course_cloud_block"])
 
     out["hidden_question_block"] = hidden_block()
     out["toad_box"] = toad_box((238, 232, 222), (214, 62, 58), 61)

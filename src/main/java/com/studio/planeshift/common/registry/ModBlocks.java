@@ -81,6 +81,23 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> COURSE_BANNER = courseBlock(
             "course_banner", MapColor.COLOR_RED, SoundType.WOOL);
     /** Clipped hedge. */
+    /**
+     * Distant copies of the scenery the decorator places at the far depth.
+     *
+     * <p>Separate blocks rather than a property, because a texture is chosen by block and this is
+     * purely a texture difference. They exist because depth was carried entirely by geometry: the
+     * decorator picked z=2 or z=3 and then placed the identical block at either, so a prop
+     * "behind" another prop was pixel-identical to it. These are the same silhouettes washed out
+     * by air -- see {@code distant()} in BlockTextureGen -- which is the cue the eye actually
+     * reads distance from.
+     */
+    public static final DeferredBlock<Block> COURSE_HEDGE_FAR = courseBlock(
+            "course_hedge_far", MapColor.PLANT, SoundType.GRASS);
+    public static final DeferredBlock<Block> COURSE_PILLAR_FAR = courseBlock(
+            "course_pillar_far", MapColor.STONE, SoundType.STONE);
+    public static final DeferredBlock<Block> COURSE_CLOUD_BLOCK_FAR = courseBlock(
+            "course_cloud_block_far", MapColor.SNOW, SoundType.WOOL);
+
     public static final DeferredBlock<Block> COURSE_HEDGE = courseBlock(
             "course_hedge", MapColor.PLANT, SoundType.GRASS);
     /** Carved trim, for the top of a wall. */
