@@ -177,6 +177,18 @@ public final class CourseComposer {
         for (int i = cursor; i < SPAWN_RUN; i++) {
             ctx.ground(canvas, i, floorY);
         }
+        // A signpost in the apron, pointing the way on.
+        //
+        // The one place in a generated course where guidance is unambiguously wanted: the player
+        // has just arrived, the camera has not moved yet, and nothing on screen yet says which way
+        // this level runs. The reference plants arrow boards for exactly this and the mod had no
+        // in-world navigation at all.
+        //
+        // Deliberately not used for secrets -- see signpostSecret, which leads the eye with coins
+        // instead. An arrow at a secret entrance tells the player there is a secret; an arrow at
+        // the start tells them where the level is, which is a different job.
+        canvas.set(SPAWN_RUN - 3, floorY + 1, 0, ModBlocks.SIGNPOST.get().defaultBlockState());
+
         cursor = SPAWN_RUN;
 
         // The floor height each column was *designed* around.

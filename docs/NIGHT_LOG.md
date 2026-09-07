@@ -927,3 +927,10 @@ Tether is clamped rather than repelled, so the reach measured by eye is the reac
 you get. No goals at all -- a navigator that did not know about the chain would drag
 it off its post. Placed in its own segment, wider than the reach, with the coins
 inside it. 351 tests, 0 failures.
+
+## Signposts (7.6)
+An arrow board in the spawn apron of every generated course. Scenery, not UI: no
+collision, no text, no state. Placed at the start rather than at secrets -- the
+composer already leads the eye to a secret with a rising coin trail and has a
+comment explaining why an arrow there would be worse, so this only fills the gap
+that comment does not cover. 351 tests, 0 failures.

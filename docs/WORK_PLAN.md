@@ -314,7 +314,11 @@ settles the question the backlog was holding open: the client would otherwise ne
 the world table, and the failure mode of two tables disagreeing is a blank card nobody notices.
 
 **7.6 Levels carry signposts** — arrow boards planted in terrain where a route is ambiguous.
-Navigation as set dressing rather than UI.
+Navigation as set dressing rather than UI. *Built*, in the spawn apron: the one place in a
+generated course where guidance is unambiguously wanted, since the player has just arrived and
+nothing on screen yet says which way the level runs. Deliberately **not** used at secret entrances
+— `signpostSecret` leads the eye there with a rising coin trail instead, and an arrow at a secret
+tells the player there is a secret, which is a different and worse job.
 
 **7.7 Progress is announced.** *Half was already built:* the final-world banner draws on the
 results screen. The other string, `banner.all_cleared`, had been sitting in the language file with

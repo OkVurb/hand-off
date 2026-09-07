@@ -379,6 +379,24 @@ public final class ModBlocks {
                     .noOcclusion()
                     .sound(SoundType.STONE));
 
+    /**
+     * An arrow board planted in the terrain, pointing the way on.
+     *
+     * <p>Navigation as set dressing rather than as UI. The reference plants these where a route is
+     * ambiguous, and it is worth copying for a reason beyond fidelity: this game generates its
+     * courses, so it cannot rely on a level designer having made the intended path obvious. A sign
+     * is the one piece of guidance that is part of the world instead of drawn over it.
+     *
+     * <p>No collision, no interaction, no stored text. It is scenery that means something.
+     */
+    public static final DeferredBlock<Block> SIGNPOST =
+            BLOCKS.registerBlock("signpost", Block::new, p -> p
+                    .mapColor(MapColor.WOOD)
+                    .strength(0.5F)
+                    .noCollision()
+                    .noOcclusion()
+                    .sound(SoundType.WOOD));
+
     public static final DeferredBlock<SpikeBlock> SPIKE_BLOCK =
             BLOCKS.registerBlock("spike_block", SpikeBlock::new, p -> p
                     .mapColor(MapColor.COLOR_RED)

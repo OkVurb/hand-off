@@ -235,6 +235,20 @@ def banner():
     ], "minecraft:cutout")
 
 
+def signpost():
+    """An arrow board on a post.
+
+    Built as scenery rather than as a sign: it carries no text and stores nothing. The board is
+    thin and faces the camera, because it is read from the side like everything else in this game,
+    and the post is offset back so the board is not standing in the lane the player runs down.
+    """
+    tex = {"particle": t("signpost"), "all": t("signpost")}
+    return model(tex, [
+        box((7, 0, 7), (9, 9, 9), {"*": "#all"}),
+        box((1, 8, 7), (15, 16, 8), {"*": "#all"}, shade=False),
+    ], "minecraft:cutout")
+
+
 def p_switch(pressed):
     """A button. Pressed is genuinely lower, so its state is visible from across the room."""
     name = "p_switch_pressed" if pressed else "p_switch"
@@ -333,6 +347,7 @@ BUILDERS = {
     "course_pillar": pillar,
     "course_lattice": lattice,
     "course_banner": banner,
+    "signpost": signpost,
     "p_switch": lambda: p_switch(False),
     "p_switch_pressed": lambda: p_switch(True),
     "on_off_switch": lambda: on_off_switch(False),
