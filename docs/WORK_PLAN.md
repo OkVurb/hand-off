@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Twenty-two of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Twenty-four of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -96,8 +96,20 @@ shaped like this.
 into the boss room — rhythmic, empty, and visibly not the level you were just in. It is
 pacing, and it is what makes the arena land.
 
-**A4. Terrain is built from mixed block sizes.** Ground reads as masonry of varying rectangles, not
-a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
+**A17. The final boss is background-scale and attacks through depth.** It fills most of the
+screen, stands behind the play lane, and reaches forward into it with fire, punches and grabs while
+the player fights on small platforms over lava. This is the most 2.5D-native idea in the whole
+reference and the one the mod is best placed to steal: the Z axis it already has is the axis the
+fight is built on. Every boss here is lane-sized and lane-bound.
+
+**A18. Bosses have phases, and a phase change is visible.** The final fight turns from ordinary to
+giant and skeletal, with the fire changing colour. The transformation is the tell that the fight
+moved on.
+
+**A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
+visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
+two alternating tones, and the eye reads the wall rather than the grid. Ground reads as masonry of
+varying rectangles, not a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
 
 ---
 
@@ -196,6 +208,9 @@ crossing above the lava. Two very specific layers, and neither is what the lava 
 
 **C13. Flame colour is themed.** Ghost-house sconces burn green, not orange.
 
+**C14. Castle back walls carry stained glass.** Coloured lit windows between the pillars, which
+is where the colour in an otherwise brown room comes from.
+
 **C4. Snow and the two lit themes still draw the same prop at both depths.** They use different
 decorator builders and never got the aerial-perspective treatment.
 
@@ -231,6 +246,10 @@ between the map and the course. Ours cuts straight in.
 ## E. Ordering
 
 Grouped by what unblocks what, not by size.
+
+0. **A17 — the boss in the background plane.** Promoted to the top on reading the final
+   fight. It needs no new terrain, no new theme and no new art pipeline; it needs the boss moved off
+   the lane and given reach, which is the one thing this project has that a 2D reference does not.
 
 1. **A3 — tint interiors by world.** Cheapest real win. One theme becomes six without new art.
 2. **C4 — finish aerial perspective** for snow, lava, ghost house. Completes work already started.
