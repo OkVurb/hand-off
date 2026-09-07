@@ -9,6 +9,7 @@ import com.studio.planeshift.common.entity.BowserEntity;
 import com.studio.planeshift.common.entity.BowserFire;
 import com.studio.planeshift.common.entity.BulletBillEntity;
 import com.studio.planeshift.common.entity.BuzzyBeetleEntity;
+import com.studio.planeshift.common.entity.BigCheepEntity;
 import com.studio.planeshift.common.entity.CheepCheepEntity;
 import com.studio.planeshift.common.entity.EmberBoltEntity;
 import com.studio.planeshift.common.entity.FireballProjectile;
@@ -166,6 +167,14 @@ public final class ModEntities {
                     .clientTrackingRange(8)
                     .build(key("cheep_cheep")));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<BigCheepEntity>> BIG_CHEEP =
+            ENTITY_TYPES.register("big_cheep", () -> EntityType.Builder
+                    .of(BigCheepEntity::new, MobCategory.WATER_AMBIENT)
+                    .sized(EnemyRigProfile.BIG_CHEEP.scaled(0.6F),
+                            EnemyRigProfile.BIG_CHEEP.scaled(0.4F))
+                    .clientTrackingRange(8)
+                    .build(key("big_cheep")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<PiranhaPlantEntity>> PIRANHA_PLANT =
             ENTITY_TYPES.register("piranha_plant", () -> EntityType.Builder
                     .of(PiranhaPlantEntity::new, MobCategory.MONSTER)
@@ -288,6 +297,7 @@ public final class ModEntities {
         event.put(SPINY.get(), SpinyEntity.createAttributes().build());
         event.put(BUZZY_BEETLE.get(), BuzzyBeetleEntity.createAttributes().build());
         event.put(CHEEP_CHEEP.get(), CheepCheepEntity.createAttributes().build());
+        event.put(BIG_CHEEP.get(), BigCheepEntity.createAttributes().build());
         event.put(PIRANHA_PLANT.get(), PiranhaPlantEntity.createAttributes().build());
     }
 

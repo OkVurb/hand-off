@@ -39,6 +39,8 @@ public enum EnemyRigProfile {
     PIRANHA_PLANT(1.05F),
     /** Read side-on and never head-on, so it carries a little more visual scale than it needs. */
     CHEEP_CHEEP(1.20F),
+    /** The large fish. Its size comes from the registered hitbox; this only matches the art. */
+    BIG_CHEEP(1.90F),
     TOAD(1.0F),
     /**
      * All eight tower bosses share this one. See {@link Koopaling}: the scale here is tied to the

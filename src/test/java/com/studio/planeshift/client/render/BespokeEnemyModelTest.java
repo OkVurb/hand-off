@@ -53,6 +53,10 @@ class BespokeEnemyModelTest {
             // because it never turns to face the player, so parts that would only be visible from
             // the front or back would cost geometry nobody ever sees.
             Map.entry(EnemyRigProfile.CHEEP_CHEEP, 7L),
+            // The same seven. BIG_CHEEP shares the small fish's mesh deliberately -- its size
+            // comes from the registered hitbox and the rig scale, so a second set of boxes would
+            // put the difference in two places and let them drift apart.
+            Map.entry(EnemyRigProfile.BIG_CHEEP, 7L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
             // Body, shell, head, snout, jaw, two arms, two legs, a three-piece crest and a
             // two-piece wand. No separate eye boxes, unlike the Koopa it is built from: the crest

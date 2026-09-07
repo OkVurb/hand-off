@@ -126,6 +126,7 @@ public final class ClientModEvents {
         Identifier spiny = PlaneShift.id("textures/entity/spiny.png");
         Identifier buzzyBeetle = PlaneShift.id("textures/entity/buzzy_beetle.png");
         Identifier cheepCheep = PlaneShift.id("textures/entity/cheep_cheep.png");
+        Identifier bigCheep = PlaneShift.id("textures/entity/big_cheep.png");
         Identifier piranhaPlant = PlaneShift.id("textures/entity/piranha_plant.png");
         Identifier bowser = PlaneShift.id("textures/entity/bowser.png");
 
@@ -167,6 +168,8 @@ public final class ClientModEvents {
                 CourseEnemyRenderer.provider(buzzyBeetle, 0.25F, EnemyRigProfile.BUZZY_BEETLE));
         event.registerEntityRenderer(ModEntities.CHEEP_CHEEP.get(),
                 CourseEnemyRenderer.provider(cheepCheep, 0.25F, EnemyRigProfile.CHEEP_CHEEP));
+        event.registerEntityRenderer(ModEntities.BIG_CHEEP.get(),
+                CourseEnemyRenderer.provider(bigCheep, 0.25F, EnemyRigProfile.BIG_CHEEP));
         event.registerEntityRenderer(ModEntities.PIRANHA_PLANT.get(),
                 CourseEnemyRenderer.provider(piranhaPlant, 0.55F, EnemyRigProfile.PIRANHA_PLANT));
         event.registerEntityRenderer(ModEntities.TOAD.get(), ToadRenderer::new);

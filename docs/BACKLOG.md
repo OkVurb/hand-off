@@ -162,9 +162,8 @@ The theme exists and two courses use it, but three things are placeholders and o
 only the owner can make.
 
 - ~~**No water cast.**~~ Done. `CheepCheepEntity` swims the lane at a fixed depth and turns at the
-  ends. Spiny stays alongside it as the seafloor half of the cast. Still outstanding from plan item
-  6.4: a second fish size. The reference has a large slow variant as well as the small drifting
-  one, and one fish is a cast of one.
+  ends. Spiny stays alongside it as the seafloor half of the cast. `BigCheepEntity` adds the large slow
+  variant, so plan item 6.4 is closed.
 - ~~**Nothing is actually submerged.**~~ Done. Flooded in `CourseComposer` after all geometry is
   placed, so the fluid fills what is left rather than displacing anything.
 - ~~**No swimming.**~~ **Wrong when written.** `ModFluids.WATER_TYPE` already declared

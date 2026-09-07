@@ -872,8 +872,42 @@ def cheep_cheep():
     return img
 
 
+def big_cheep():
+    """The large fish: green-grey instead of red, and blunter.
+
+    Colour is doing the work of a size cue here. Scaling the red sheet up would have produced a big
+    Cheep Cheep, which reads as the same animal standing closer -- and at this camera distance
+    "closer" and "bigger" look identical. A different hue says it is a different creature before
+    the silhouette has to.
+
+    Duller and colder than the small one on purpose: the reference paints its dangerous fish in
+    muted greens while the harmless drifting ones stay bright.
+    """
+    img = new_sheet()
+    body = (92, 124, 96)
+    base(img, BODY, body, 51)
+    scales(img, BODY, body)
+    rect(img, BODY, 0, 26, 64, 14, (206, 214, 190))
+    eyes(img, front(BODY, 12, 9, 8), 12, 9)
+
+    base(img, HEAD, body, 52)
+    scales(img, HEAD, body)
+    base(img, LIMB, shade(body, 1.16), 53, ramp=0.22)
+    base(img, HARD, (236, 238, 220), 54, ramp=0.16)
+
+    # A real mouth, unlike the small one. This fish is the threat rather than the obstacle.
+    plate = (150, 92, 88)
+    base(img, MUZZLE, plate, 55, ramp=0.14)
+    at = front(MUZZLE, 10, 6, 1)
+    fangs(img, at, 10, 3, 4, WHITE, upper=True)
+
+    base(img, TRIM, shade(body, 0.60), 56, ramp=0.20)
+    return img
+
+
 CHARACTERS = {
     "cheep_cheep": cheep_cheep,
+    "big_cheep": big_cheep,
     "goomba": goomba,
     "fire_bro": fire_bro,
     "boomerang_bro": boomerang_bro,

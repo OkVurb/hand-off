@@ -180,3 +180,26 @@ it is low: a fish is only ever seen side-on, so parts visible only from the fron
 nobody sees.
 
 300 tests, no failures, counted from XML.
+
+## Iteration 9
+
+Big Cheep, closing plan item 6.4. A separate entity type rather than a synced variant, and that
+was the codebase's own rule rather than a preference: the Koopaling note says the scale is tied to
+the registered hitbox, which is exactly why eight Koopalings share one type -- they are all the
+same size. Size is the one thing a variant cannot carry, and size is the entire difference here.
+
+Refactored CheepCheepEntity slightly so the swim speed and range are overridable, rather than
+copying the swim logic into a second class. The big one is slower as well as larger, which is what
+makes it read as mass: it commits to a direction long before it reaches you, so it can be seen
+coming from further away and dodged with more room. A bigger threat that is also a fairer one.
+
+Colour rather than scale carries the size cue in the texture. Scaling the red sheet up would have
+produced a big Cheep Cheep, which at this camera distance reads as the same animal standing closer
+-- "closer" and "bigger" look identical from a fixed side-on view. Green-grey says different
+creature before the silhouette has to.
+
+Both fish share one mesh. The model test wanted a part count for the new rig and got the same seven,
+with a note saying why: putting the size difference in the mesh as well as the hitbox would be two
+sources for one fact.
+
+301 tests, no failures, counted from XML.

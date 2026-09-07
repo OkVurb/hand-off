@@ -38,6 +38,16 @@ public class CheepCheepEntity extends CourseEnemyEntity {
     /** How far it wanders from where it was placed before turning back, in blocks. */
     private static final double RANGE = 6.0D;
 
+    /** Overridable so a larger sibling can be slower without duplicating the swim logic. */
+    protected double swimSpeed() {
+        return SWIM_SPEED;
+    }
+
+    /** Overridable for the same reason: a bigger fish patrols a longer stretch. */
+    protected double swimRange() {
+        return RANGE;
+    }
+
     /** Gentle vertical wander, so it does not read as a sprite sliding along an invisible rail. */
     private static final double BOB_AMPLITUDE = 0.02D;
     private static final double BOB_PERIOD = 55.0D;
@@ -79,12 +89,12 @@ public class CheepCheepEntity extends CourseEnemyEntity {
         if (Double.isNaN(originX)) {
             originX = getX();
         }
-        if (Math.abs(getX() - originX) > RANGE) {
+        if (Math.abs(getX() - originX) > swimRange()) {
             direction = getX() > originX ? -1.0D : 1.0D;
         }
 
         double bob = Math.sin((tickCount + tickOffset) / BOB_PERIOD) * BOB_AMPLITUDE;
-        setDeltaMovement(new Vec3(SWIM_SPEED * direction, bob, 0.0D));
+        setDeltaMovement(new Vec3(swimSpeed() * direction, bob, 0.0D));
 
         // Face the way it is going. A fish swimming backwards is the sort of thing nobody can name
         // but everybody notices.

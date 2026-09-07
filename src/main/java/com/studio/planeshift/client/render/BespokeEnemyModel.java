@@ -124,6 +124,10 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case SPINY -> spiny();
             case BUZZY_BEETLE -> buzzyBeetle();
             case CHEEP_CHEEP -> cheepCheep();
+            // The same mesh. Size comes from the registered hitbox and the rig scale, so building
+            // a second, larger set of boxes would put the difference in two places and let them
+            // disagree.
+            case BIG_CHEEP -> cheepCheep();
             case PIRANHA_PLANT -> piranhaPlant();
             case BOWSER -> bowser();
             case TOAD -> throw new IllegalArgumentException("Villager uses ToadModel");
