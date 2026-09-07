@@ -190,15 +190,18 @@ surface, vertical geysers, horizontal jets from wall nozzles. Floor, fluid and r
 **4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
 *moves* during the level. The strongest vindication of having built the fluid as a fluid.
 
-**4.5 Interiors are tinted by world.** *At least five distinct tints* — green towers, ochre desert
-caves, blue-green flooded towers, brown-grey volcano, purple ghost house. `UNDERGROUND` is one grey
-theme collapsing all of them.
+**4.5 Interiors are tinted by world.** *Built.* `Palette.forTheme(theme, world)` cuts a cave from
+the rock of the world around it, and the enemy roster now follows the same rule —
+`SegmentLibrary.cast(GenContext)` gives a snow cave, a volcano cave and a haunted flooded room their
+own casts. Those were the last two places where the shared interiors collapsed six worlds into one.
 
 **4.6 Terrain is masonry of mixed block sizes.** *The single most visible thing in the reference.*
 Big slabs, half-slabs and squares in two alternating tones; the eye reads the wall, not the grid.
 
-**4.7 Pipes are structural, and a colour set of at least five.** Whole levels are built as pipe
-lattices. Green, yellow, blue, red and magenta read as different objects. They also spawn enemies.
+**4.7 Pipes are structural, and a colour set of at least five.** *The colour set is already built* —
+all five exist as `WarpPipeBlock.Colour` with their own textures, and `SegmentLibrary.pipe()` leans
+each theme on one of them so a pipe reads as belonging to the world it is in. What remains is the
+structural half: whole levels built as pipe lattices rather than pipes as furniture.
 
 **4.8 Platforms come from a parts kit.** *Partly true already:* semisolid platforms, pillars and
 trim are registered and placed. What is missing is the specific shapes — capsule beams, mushroom

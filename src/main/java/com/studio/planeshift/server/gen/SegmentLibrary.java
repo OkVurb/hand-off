@@ -151,6 +151,44 @@ public final class SegmentLibrary {
      * drew from different rosters a course would contain two disjoint casts, and the player would
      * read that as the level being assembled from two different games.
      */
+    public static List<EntityType<?>> cast(GenContext ctx) {
+        return cast(ctx.theme(), ctx.worldTheme());
+    }
+
+    /**
+     * The roster for a sub-environment, given the world it sits inside.
+     *
+     * <p>Closes the gap the water comment below has been describing: this was keyed on theme alone,
+     * so a cave in the snow world and a cave in the volcano drew the same four enemies, and a
+     * flooded room anywhere drew the same fish. {@code Palette.forTheme} already takes the world
+     * for exactly this reason -- the rock a cave is cut through is the rock the world is made of --
+     * and the cast is the other half of that sentence. A snow cave with volcano enemies in it reads
+     * as two games spliced together just as loudly as the wrong stone would.
+     *
+     * <p>Only the interior themes vary. A grass level is a grass level whatever world it is in;
+     * it is the shared, colourless environments -- cave and water -- that were doing the
+     * collapsing.
+     */
+    public static List<EntityType<?>> cast(CourseTheme theme, CourseTheme world) {
+        if (theme == CourseTheme.UNDERGROUND && world == CourseTheme.SNOW) {
+            // A frozen cave: the things that live in the snow, plus the one that lives in caves.
+            return List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get(),
+                    ModEntities.FUZZY.get());
+        }
+        if (theme == CourseTheme.UNDERGROUND && world == CourseTheme.LAVA) {
+            return List.of(ModEntities.DRY_BONES.get(), ModEntities.BUZZY_BEETLE.get(),
+                    ModEntities.FIRE_BRO.get(), ModEntities.FUZZY.get());
+        }
+        if (theme == CourseTheme.WATER && world == CourseTheme.GHOST_HOUSE) {
+            // Flooded and haunted: the bone fish replaces the living one rather than swimming
+            // beside it, which is the substitution the reference actually makes in a dark world.
+            return List.of(ModEntities.BONE_CHEEP.get(), ModEntities.DEEP_CHEEP.get(),
+                    ModEntities.URCHIN.get(), ModEntities.BLOOPER.get());
+        }
+        return cast(theme);
+    }
+
+    /** The roster for a theme with no world context. Kept for callers that genuinely have none. */
     public static List<EntityType<?>> cast(CourseTheme theme) {
         return switch (theme) {
             case GRASS -> List.of(ModEntities.GOOMBA.get(), ModEntities.KOOPA.get(),
@@ -166,10 +204,9 @@ public final class SegmentLibrary {
                     ModEntities.FUZZY.get());
             // Spiny stays alongside the fish: it is the seafloor half of the cast, a spiked
             // thing sitting on the bottom that the player has to swim over rather than through.
-            // The bone fish swims beside the living one rather than replacing it in a darker
-            // world, which is the shape the reference actually uses -- but only because cast() is
-            // keyed on theme and cannot see which world the course sits in. GenContext knows;
-            // this does not. See BACKLOG.
+            // The bone fish swims beside the living one here. In a haunted world it replaces it
+            // instead, which is the substitution the reference makes -- see the world-aware
+            // overload above, which is where that now lives.
             case WATER -> List.of(ModEntities.CHEEP_CHEEP.get(), ModEntities.BIG_CHEEP.get(),
                     // The one fish that comes after you. Water was three patrol patterns and a
                     // Spiny, which makes an underwater level a timing puzzle with no pressure in
@@ -437,7 +474,7 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 12, y, ctx);
-            List<EntityType<?>> roster = cast(ctx.theme());
+            List<EntityType<?>> roster = cast(ctx);
             int count = 1 + ctx.difficulty() / 2;
             for (int i = 0; i <= count; i++) {
                 mob(c, roster.get(i % roster.size()), x + 3 + i * 3, y + 1, 90.0F);
@@ -462,7 +499,7 @@ public final class SegmentLibrary {
                 ctx.pitFloor(c, x + i, y);
             }
             floor(c, x + 7, 4, y, ctx);
-            mob(c, cast(ctx.theme()).get(0), x + 8, y + 1, 90.0F);
+            mob(c, cast(ctx).get(0), x + 8, y + 1, 90.0F);
             for (int i = 11; i < 14; i++) {
                 ctx.pitFloor(c, x + i, y);
             }
@@ -1052,7 +1089,7 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 18, y, ctx);
-            List<EntityType<?>> enemies = cast(ctx.theme());
+            List<EntityType<?>> enemies = cast(ctx);
             if (!enemies.isEmpty()) {
                 mob(c, enemies.get(ctx.random().nextInt(enemies.size())), x + 9, y + 1, 0.0F);
             }
@@ -1643,11 +1680,11 @@ public final class SegmentLibrary {
             // of nobody, and the inhabited-density check failed on short snow courses where one
             // empty stretch that long is most of the level. It also gives the climb a reason: a
             // shortcut that arrives next to a guard is a choice rather than a free ride.
-            mob(c, cast(ctx.theme()).get(0), x + 13, y + 5, -90.0F);
+            mob(c, cast(ctx).get(0), x + 13, y + 5, -90.0F);
             // And one at the foot of the pole. Two, because sixteen blocks is a long stretch of
             // level and a single enemy in it still left short courses under the inhabited-density
             // floor -- verified against a stashed baseline rather than guessed at.
-            mob(c, cast(ctx.theme()).get(0), x + 3, y + 1, -90.0F);
+            mob(c, cast(ctx).get(0), x + 3, y + 1, -90.0F);
         }
     };
 
@@ -2061,7 +2098,7 @@ public final class SegmentLibrary {
             }
 
             // The crew. A deck with nobody on it is a platform with a fence.
-            mob(c, cast(ctx.theme()).get(0), x + 7, y + 1, -90.0F);
+            mob(c, cast(ctx).get(0), x + 7, y + 1, -90.0F);
             coinTrail(c, x + 4, 12, y + 3, 1);
         }
     };

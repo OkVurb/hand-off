@@ -1041,3 +1041,12 @@ what lands is an ordinary Goomba, which is the reference's own rule and the reas
 this is worth building rather than being a Goomba that moves oddly -- the player
 learns that wings are a layer, not a creature. Replaced rather than mutated on
 death, because the wings live in the registered type. 358 tests, 0 failures.
+
+## Casts that know their world
+Closed a backlog item the water roster's own comment had been describing: cast()
+was keyed on theme, so a cave in the snow world and a cave in the volcano drew the
+same four enemies. Palette.forTheme already took the world for exactly this reason
+-- the rock a cave is cut through is the rock the world is made of -- and the cast
+is the other half of that sentence. Snow caves, volcano caves and haunted flooded
+rooms now have their own rosters; everything else falls through to the theme.
+358 tests, 0 failures.

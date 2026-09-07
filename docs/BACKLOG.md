@@ -213,6 +213,9 @@ Two things would fix it, and both are deliberate non-decisions rather than overs
   but only for Koopalings, via a `koopalingVariant` field on the render state. Generalising that to
   any enemy is the right answer and touches render code no test can check, which is why it was not
   done unattended.
+- ~~**Casts that know their world.**~~ **Done** — `cast(GenContext)` now resolves the world, and
+  the three interiors that were collapsing (snow cave, volcano cave, haunted water) have their own
+  rosters. Original note kept below.
 - **Casts that know their world.** `SegmentLibrary.cast()` is keyed on theme, so the bone fish swims
   beside the living one everywhere rather than replacing it in the darker worlds, which is what the
   reference actually does. `GenContext` carries `worldTheme` already; `cast()` simply is not given

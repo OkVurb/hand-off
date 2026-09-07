@@ -704,7 +704,7 @@ public final class CourseComposer {
      */
     private static void populate(CourseCanvas canvas, GenContext ctx, int[] floorAt,
                                  int from, int to, int length) {
-        List<EntityType<?>> roster = SegmentLibrary.cast(ctx.theme());
+        List<EntityType<?>> roster = SegmentLibrary.cast(ctx);
         if (roster.isEmpty()) {
             return;
         }
