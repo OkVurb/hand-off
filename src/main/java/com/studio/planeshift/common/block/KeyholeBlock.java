@@ -119,6 +119,9 @@ public class KeyholeBlock extends Block {
         // Paid before the slide, for the same reason the flagpole bonus is: onComplete reads the
         // running score to work out the end-of-course bonuses and then resets it.
         CourseScoringService.addScore(player, SECRET_EXIT_BONUS);
+        // Recorded before the slide, because beginSlide ends the course and the record has to
+        // exist by then -- this is what earns the cannon out of this world.
+        com.studio.planeshift.server.ProgressionService.recordSecretExit(player);
         CourseCompletionService.beginSlide(player, pos);
     }
 

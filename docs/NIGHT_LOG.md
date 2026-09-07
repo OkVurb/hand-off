@@ -716,3 +716,31 @@ second is a decision rather than a gap: the reference's cloud worlds are visuall
 grass and its caves, so SKY joins the deliberately-still list with the reasoning attached.
 
 340 tests, no failures, counted from XML.
+
+## Iteration 30
+
+Two plan items and a ruling.
+
+AIRSHIP_DECK is plan 6.3: the playfield as a vehicle rather than terrain. Everywhere else in this
+mod the floor is ground; an airship is an object with a silhouette, hull and prow and stern, with
+open sky under both ends so the player can see where it stops. Two courses of planking because a
+one-block deck reads as a plank bridge, ends raised because the curve is what says boat -- and the
+raised ends also stop a player walking off a deck they are seeing side-on for the first time.
+
+Then the cannon. This was in BACKLOG as a genuine disagreement rather than an oversight: the plan
+said a secret exit should unlock a cannon, and MapNodeService deliberately refused, arguing a
+shortcut that also grants access is a cheat code. The owner ruled -- make it like Mario -- and Mario
+is unambiguous here. Finding a secret exit is the achievement; the cannon is what it buys.
+
+Implemented rather than bolted on. CourseProgress.Record gains a secretExit flag, defaulting false
+so every existing save loads unchanged and simply has none recorded, which is exactly true of them.
+The keyhole records it before beginning the slide, since the slide ends the course. Both withers
+preserve it, because clearing a course must never revoke a secret exit already found there.
+
+Kept the star-coin gate on the final world. A cannon is a shortcut through the ordinary sequence,
+not a way around the one requirement the whole run is built on -- and the old code's instinct was
+right about that much even where it was wrong about the rest.
+
+Removed my own `if (false)` while doing it. It compiled and it would have shipped.
+
+340 tests, no failures, counted from XML.

@@ -110,16 +110,28 @@ public final class MapNodeService {
             return;
         }
         WorldDefinition next = WorldRegistry.allWorlds().get(index + 1);
-        if (!WorldRegistry.isWorldUnlocked(ProgressionService.get(player), next,
-                ProgressionService.bypassesLocks(player))) {
-            // Say which lock it is. A cannon that refuses without saying why is indistinguishable
-            // from one that is broken, and the coin gate in particular is invisible otherwise --
-            // the player has the castle cleared and no idea what else is being asked of them.
-            int coinsShort = WorldRegistry.starCoinsStillNeeded(
-                    ProgressionService.get(player), next);
-            player.sendSystemMessage(coinsShort > 0
-                    ? Component.translatable("message.planeshift.star_coin_gate", coinsShort)
-                    : Component.translatable("message.planeshift.cannon_locked"));
+        WorldDefinition here = WorldRegistry.allWorlds().get(index);
+        CourseProgress progress = ProgressionService.get(player);
+
+        // A secret exit is the key.
+        //
+        // This used to refuse unless the next world was already open, on the reasoning that a
+        // shortcut which also grants access is a cheat code. That is coherent, and it is not what
+        // the genre does -- and it made the cannon nearly pointless, since it only opened once the
+        // next world was reachable on foot anyway. Finding a secret exit is the achievement; the
+        // cannon is what it buys. The lock is still a lock, it is just a different key.
+        if (!ProgressionService.bypassesLocks(player)
+                && !progress.anySecretExit(here.courseIds())) {
+            player.sendSystemMessage(Component.translatable("message.planeshift.cannon_needs_secret"));
+            return;
+        }
+        // The star-coin gate still applies to the final world. A cannon is a shortcut through the
+        // ordinary sequence, not a way around the one requirement the whole run is built on --
+        // and refusing without saying why is indistinguishable from being broken.
+        int coinsShort = WorldRegistry.starCoinsStillNeeded(progress, next);
+        if (!ProgressionService.bypassesLocks(player) && coinsShort > 0) {
+            player.sendSystemMessage(
+                    Component.translatable("message.planeshift.star_coin_gate", coinsShort));
             return;
         }
         player.level().playSound(null, player.blockPosition(), ModSounds.WARP.get(),

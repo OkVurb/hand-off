@@ -62,6 +62,20 @@ public final class ProgressionService {
         update(player, p -> p.withClear(courseId, score, timeLeft));
     }
 
+    /**
+     * Records that the player left the course they are in by its secret exit.
+     *
+     * <p>Reads currentCourse for the same reason recordClear does: the keyhole knows a position,
+     * not a course id.
+     */
+    public static void recordSecretExit(ServerPlayer player) {
+        String courseId = get(player).currentCourse().orElse(null);
+        if (courseId == null) {
+            return;
+        }
+        update(player, p -> p.withSecretExit(courseId));
+    }
+
     /** Credits a star coin to the course the player is in. Capped inside {@link CourseProgress}. */
     public static void recordStarCoin(ServerPlayer player) {
         String courseId = get(player).currentCourse().orElse(null);

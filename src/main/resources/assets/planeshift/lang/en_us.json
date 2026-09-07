@@ -367,5 +367,6 @@
   "entity.planeshift.ghost_platform": "Boo Platform",
   "block.planeshift.course_lamp_ghost": "Ghost Lamp",
   "block.planeshift.course_signpost": "Signpost",
-  "block.planeshift.course_rail": "Grinder Track"
+  "block.planeshift.course_rail": "Grinder Track",
+  "message.planeshift.cannon_needs_secret": "Find a secret exit in this world to fire the cannon."
 }

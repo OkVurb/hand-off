@@ -230,5 +230,6 @@ secret exit is *how* you earn the skip; this mod's model is that the skip only s
 that under the current rule the cannon is close to pointless — it refuses unless the next world is
 already open, and if it is open you can simply walk there.
 
-Left alone because overriding a documented deliberate decision is not something to do while nobody
-is awake to disagree. It wants a ruling, not an implementation.
+**Ruled: make it like Mario.** Implemented. A secret exit in a world now unlocks that world's
+cannon; the star-coin gate on the final world still applies, because a shortcut through the ordinary
+sequence is not the same as a way around the one requirement the whole run is built on.

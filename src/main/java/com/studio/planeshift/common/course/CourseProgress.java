@@ -42,9 +42,14 @@ public record CourseProgress(Optional<String> currentCourse, Map<String, Record>
      * @param bestScore    highest score achieved on this course
      * @param bestTimeLeft most clock left at the flagpole, as a speedrun measure
      */
-    public record Record(boolean cleared, int starCoins, int bestScore, int bestTimeLeft) {
+    /**
+     * @param secretExit whether this course has been finished by its secret exit, which is a
+     *                   separate achievement from clearing it and is what earns a cannon
+     */
+    public record Record(boolean cleared, int starCoins, int bestScore, int bestTimeLeft,
+                         boolean secretExit) {
 
-        public static final Record EMPTY = new Record(false, 0, 0, 0);
+        public static final Record EMPTY = new Record(false, 0, 0, 0, false);
 
         public static final Codec<Record> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.BOOL.optionalFieldOf("cleared", false).forGetter(Record::cleared),
@@ -53,7 +58,10 @@ public record CourseProgress(Optional<String> currentCourse, Map<String, Record>
                 Codec.intRange(0, CourseState.MAX_VALUE).optionalFieldOf("best_score", 0)
                         .forGetter(Record::bestScore),
                 Codec.intRange(0, CourseState.MAX_VALUE).optionalFieldOf("best_time_left", 0)
-                        .forGetter(Record::bestTimeLeft)
+                        .forGetter(Record::bestTimeLeft),
+                // Defaults to false, so every existing save loads unchanged and simply has no
+                // secret exits recorded yet -- which is exactly true of them.
+                Codec.BOOL.optionalFieldOf("secret_exit", false).forGetter(Record::secretExit)
         ).apply(instance, Record::new));
 
         public static final StreamCodec<ByteBuf, Record> STREAM_CODEC = StreamCodec.composite(
@@ -61,6 +69,7 @@ public record CourseProgress(Optional<String> currentCourse, Map<String, Record>
                 ByteBufCodecs.VAR_INT, Record::starCoins,
                 ByteBufCodecs.VAR_INT, Record::bestScore,
                 ByteBufCodecs.VAR_INT, Record::bestTimeLeft,
+                ByteBufCodecs.BOOL, Record::secretExit,
                 Record::new);
 
         public boolean allStarCoins() {
@@ -133,13 +142,32 @@ public record CourseProgress(Optional<String> currentCourse, Map<String, Record>
         return withRecord(courseId, r -> new Record(true,
                 r.starCoins(),
                 Math.max(r.bestScore(), Math.max(0, score)),
-                Math.max(r.bestTimeLeft(), Math.max(0, timeLeft))));
+                Math.max(r.bestTimeLeft(), Math.max(0, timeLeft)),
+                // Clearing a course never revokes a secret exit already found there.
+                r.secretExit()));
+    }
+
+    /**
+     * Records that this course was finished by its secret exit.
+     *
+     * <p>Separate from {@link #withClear}: a secret exit also clears the course, but clearing does
+     * not imply a secret exit, and the cannon depends on the difference.
+     */
+    public CourseProgress withSecretExit(String courseId) {
+        return withRecord(courseId, r -> new Record(true, r.starCoins(), r.bestScore(),
+                r.bestTimeLeft(), true));
+    }
+
+    /** Whether any course in the given list has been finished by its secret exit. */
+    public boolean anySecretExit(java.util.List<String> courseIds) {
+        return courseIds.stream().anyMatch(id -> record(id).secretExit());
     }
 
     /** Credits one star coin, capped so replaying a course cannot inflate the total. */
     public CourseProgress withStarCoin(String courseId) {
         return withRecord(courseId, r -> r.starCoins() >= STAR_COINS_PER_COURSE
                 ? r
-                : new Record(r.cleared(), r.starCoins() + 1, r.bestScore(), r.bestTimeLeft()));
+                : new Record(r.cleared(), r.starCoins() + 1, r.bestScore(), r.bestTimeLeft(),
+                        r.secretExit()));
     }
 }
