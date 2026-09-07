@@ -203,3 +203,29 @@ with a note saying why: putting the size difference in the mesh as well as the h
 sources for one fact.
 
 301 tests, no failures, counted from XML.
+
+## Iteration 10
+
+Started with an audit rather than new work, because this project's recurring bug is content that is
+finished and unreachable, and after nine iterations of adding things it was worth checking I had not
+produced more of it.
+
+The audit came back clean. 62 blocks, 29 entities, 25 sounds and 14 config options, and every one of
+them is referenced outside its registry; every block is named somewhere under server/gen, so
+generation can place it. The four entities absent from server/ are projectiles, spawned by other
+entities rather than by generation, which is correct rather than a gap. Recording the clean result
+because a negative audit is worth as much as a positive one and is easy to skip.
+
+Then the third drop-crusher telegraph. Thwomp is the clearest case of the rule in the plan: a hazard
+that threatens a moment rather than a place is only fair if the moment can be seen coming, and at
+this camera distance a block hanging over the lane is easy to miss until it is already falling.
+Marked only while raised and idle -- once it commits there is nothing left to warn about, and a
+telegraph that kept drawing during the fall would read as part of the hazard rather than as notice
+of it.
+
+Section 8 remains complete and the backlog is down to one item that is explicitly the owner's call
+(which world water belongs to). Remaining real work lives in plan sections 6 and 7 outside the
+section 8 ordering: the rest of the hazards, the traversal set, world map decoration, iris wipe,
+title cards.
+
+301 tests, no failures, counted from XML.
