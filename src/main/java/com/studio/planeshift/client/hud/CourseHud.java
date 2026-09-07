@@ -177,6 +177,8 @@ public final class CourseHud {
                 x, y + 80, 0xFFFFFFFF, true);
 
         ScorePopups.render(graphics, font);
+        // The iris first: the card should be readable through the hole, not behind the black.
+        IrisWipe.render(graphics);
         TitleCard.render(graphics, font);
 
         // Mode badge and transition progress.

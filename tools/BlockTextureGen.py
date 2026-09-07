@@ -905,6 +905,32 @@ def vine(base):
     return img
 
 
+def stained_glass(glass, lead):
+    """A leaded window: coloured panes in a dark frame, with a lit centre.
+
+    Interiors in the reference are lit by things you can see -- sconces, lanterns, windows -- and
+    this mod already had the first two. A window is the one that also says something about where
+    the room is: light coming through it means there is an outside, which is most of what stops a
+    castle interior reading as a cave with square walls.
+
+    The centre pane is brighter than the rest rather than the whole tile being one colour, because
+    a flat coloured square at 16px is a block of paint and a window needs a highlight to read as
+    something light passes through.
+    """
+    img = new()
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], fill=shade(glass, 0.82))
+    # Lead came: a border and a cross, four panes.
+    d.rectangle([0, 0, S - 1, S - 1], outline=lead)
+    d.line([(S // 2 - 1, 0), (S // 2 - 1, S - 1)], fill=lead)
+    d.line([(0, S // 2 - 1), (S - 1, S // 2 - 1)], fill=lead)
+    # Each pane gets its own highlight corner, so the four do not read as one sheet.
+    for ox, oy in ((2, 2), (S // 2 + 1, 2), (2, S // 2 + 1), (S // 2 + 1, S // 2 + 1)):
+        d.rectangle([ox, oy, ox + 4, oy + 4], fill=shade(glass, 1.35))
+        d.point((ox, oy), fill=shade(glass, 1.7))
+    return img
+
+
 def axe():
     """A single-bit axe, head up, seen side on.
 
@@ -1210,6 +1236,7 @@ def build():
     out["coin_ring_block"] = ring((248, 206, 72), True)
     out["coin_ring_block_used"] = ring((132, 132, 138), False)
     out["course_vine"] = vine((66, 142, 56))
+    out["course_glass"] = stained_glass((86, 132, 214), (38, 34, 46))
     out["axe_block"] = axe()
 
     # Switches.

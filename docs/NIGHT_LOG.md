@@ -1008,3 +1008,15 @@ this has no front. It is the only rig in the model table without a face plate.
 MegaDeepCheep is the fourth run through the oversized pattern and took two lines,
 which is the evidence the "size lives in the registered hitbox" rule is paying for
 itself. 355 tests, 0 failures.
+
+## Iris wipe and castle windows
+The iris opens onto a course, paired with the title card. Scanlines rather than a
+mask texture: each row of a circle has a known half-width, so the black outside it
+is two fills -- no texture, no shader, and it cannot end up an oval. Eased out,
+because a circle growing at a constant rate covers area at an accelerating one, and
+the radius clears the corners rather than the edges or the last thing you see is
+four black triangles. The closing half is not built and the plan says why.
+
+Castle windows finish the visible-light-sources entry. Set high in the back wall:
+a window at head height reads as a doorway, and the player must never spend a jump
+finding out it is not one. 355 tests, 0 failures.

@@ -303,11 +303,25 @@ public final class BossArena {
                 }
             }
         }
+        BlockState glass = ModBlocks.COURSE_GLASS.get().defaultBlockState();
         for (int x = -4; x <= END; x++) {
             for (int y = 1; y <= 12; y++) {
                 c.set(x, y, back, castle);
             }
             lane(c, x, 13, castle);
+        }
+        // Windows in the back wall, high and evenly spaced.
+        //
+        // High because a window at head height reads as a doorway, and the player must never spend
+        // a jump finding out that it is not one. Evenly spaced because this is architecture rather
+        // than dressing -- the one thing a castle hall has that a cave does not is that somebody
+        // built it to a plan.
+        for (int x = 2; x <= END - 6; x += 9) {
+            for (int y = 7; y <= 9; y++) {
+                for (int w = 0; w < 2; w++) {
+                    c.set(x + w, y, back, glass);
+                }
+            }
         }
 
         // The clown car, over the final castle's approach.

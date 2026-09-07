@@ -275,8 +275,11 @@ public final class ClientModEvents {
                         com.studio.planeshift.client.hud.ScorePopups.add(payload.amount())));
         event.register(com.studio.planeshift.common.network.TitleCardPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
-                        com.studio.planeshift.client.hud.TitleCard.show(
-                                payload.world(), payload.level())));
+                        {
+                            com.studio.planeshift.client.hud.IrisWipe.open();
+                            com.studio.planeshift.client.hud.TitleCard.show(
+                                    payload.world(), payload.level());
+                        }));
         event.register(com.studio.planeshift.common.network.AnnouncementPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         com.studio.planeshift.client.ClientCourseState

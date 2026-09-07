@@ -240,7 +240,7 @@ so the gap was three, not seven. Corrected by reading the code rather than the f
 stained glass. Flame colour is themed — ghost houses and towers burn green. *Half of this was
 already true when written:* `COURSE_LAMP` existed and `CourseDecorator.lit()` places it in the two
 dark themes, with a comment explaining that backlighting throws platforms into silhouette. Only the
-themed colour was missing, and is now done. Stained glass in castle back walls remains open.
+themed colour was missing, and is now done. Stained glass in castle back walls is now built too: `COURSE_GLASS`, set high in the boss arena's back wall. High because a window at head height reads as a doorway, and a player must never spend a jump finding out it is not one.
 
 **5.7 Background hills carry pattern.** Rounded mounds with chevron and zigzag striping, not flat
 silhouettes. A cloud bank often sits between terrain and far hills.
@@ -325,7 +325,13 @@ unlocks a cannon between worlds.
 trees, houses, ponds, volcano cones, ice floes — around the node graph. Ours draws nodes and paths
 on a flat field.
 
-**7.4 Course and map are joined by an iris wipe** at the node just cleared.
+**7.4 Course and map are joined by an iris wipe** at the node just cleared. *The opening half is
+built*, paired with the title card: the course opens from a circle. Drawn as scanlines rather than
+a mask texture — for each row the circle has a known half-width, so the black outside it is two
+fills, needing no texture, shader or blend state, and it cannot be stretched into an oval. Eased
+out, because a circle growing at a constant rate covers area at an accelerating one. The closing
+half, onto the map node, is not built: the results screen is a `Screen` and the HUD does not draw
+under it, so it needs a different home.
 
 **7.5 Levels open on a title card** naming world and level. *Built.* An overlay rather than a
 screen -- a screen would pause input and release the mouse, turning a half-second flourish into a

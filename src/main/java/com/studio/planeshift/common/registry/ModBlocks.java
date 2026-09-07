@@ -195,6 +195,17 @@ public final class ModBlocks {
                     .noCollision()
                     .sound(SoundType.CHAIN));
 
+    /**
+     * A leaded window for castle interiors.
+     *
+     * <p>The art-direction entry about visible light sources was half done: sconces and lanterns
+     * existed and were placed, and the note said stained glass in castle back walls remained. This
+     * is that. It does a job the lamps cannot -- light through a window means there is an outside,
+     * which is most of what stops a castle interior reading as a cave with square walls.
+     */
+    public static final DeferredBlock<Block> COURSE_GLASS = courseBlock(
+            "course_glass", MapColor.COLOR_BLUE, SoundType.GLASS);
+
     public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
             "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
 
