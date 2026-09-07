@@ -462,3 +462,27 @@ Needed no rig profile: the bone fish reuses CHEEP_CHEEP, so the model test's par
 untouched. Reusing the rig is the whole point of a reskin.
 
 319 tests, no failures, counted from XML.
+
+## Iteration 20
+
+Ghost platforms, plan 6.8 -- and the finding turned inside out when I checked it against the code.
+
+The note from the sheets was that ghost-house platforms are carried by Boos, so a moving platform
+does not have to be a block. MovingPlatformEntity already extends Mob. Structurally the mod has had
+platforms-as-creatures since before tonight; what was missing was that none of them looked like one.
+The gap was presentation, not architecture, and the plan entry overstated it.
+
+So this changes presentation and nothing else. Movement is inherited untouched, which is the safety
+property rather than laziness: CourseCanvas.movingSurface declares the band a platform sweeps so the
+proof knows a pit is crossable, and a subclass that moved differently would make every one of those
+declarations false. The segment is MOVING_CROSSING copied down to its declared band, with only the
+entity swapped -- the existing proof then applies word for word.
+
+The renderer is reused outright. registerEntityRenderer's wildcard accepts a parent-typed renderer
+for a subclass type, which I checked by compiling rather than assuming, and the ghost is particles
+the entity emits rather than anything the renderer draws.
+
+Ghost house only. A Boo holding up a platform in a grass level is a floating slab with an
+unexplained effect underneath it, and the fiction is the entire justification for the reskin.
+
+319 tests, no failures, counted from XML.

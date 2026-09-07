@@ -494,6 +494,11 @@ public final class CourseComposer {
         }
         // Volcano only: the hazard is justified by the erupting background that theme draws, and
         // a rock falling out of a clear grass sky is a non sequitur.
+        // A Boo holding up a platform in a grass level is a floating slab with an unexplained
+        // effect under it. The fiction is the whole justification for the reskin.
+        if (segment == SegmentLibrary.GHOST_CROSSING) {
+            return theme == CourseTheme.GHOST_HOUSE;
+        }
         if (segment == SegmentLibrary.ERUPTION_FIELD) {
             return theme == CourseTheme.LAVA;
         }

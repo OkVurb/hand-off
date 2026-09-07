@@ -485,6 +485,33 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * The same crossing, carried by a ghost.
+     *
+     * <p>Geometry copied from {@link #MOVING_CROSSING} deliberately, down to the declared band. The
+     * band is what tells the reachability proof the pit is crossable, and a segment that changed
+     * the motion while reusing the declaration would be lying to the one check that stops
+     * unplayable courses shipping. Only the entity differs.
+     *
+     * <p>Ghost house only, gated in CourseComposer: a Boo holding up a platform in a grass level
+     * is a floating slab with an unexplained special effect underneath it.
+     */
+    static final Segment GHOST_CROSSING = new Segment() {
+        public SegmentSpec spec() {
+            return def("ghost_crossing", 18, 0, 2, Tag.MOVING, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 5, y, ctx);
+            for (int i = 5; i < 13; i++) {
+                ctx.pitFloor(c, x + i, y);
+            }
+            floor(c, x + 13, 5, y, ctx);
+            c.spawn(ModEntities.GHOST_PLATFORM.get(), x + 6.5D, y + 2, 0.5D, 0.0F, GENERATED_TAG);
+            c.movingSurface(x + 4, x + 13, y + 2);
+        }
+    };
+
     /** A vertical lift climb, where waiting is the skill. */
     static final Segment LIFT_SHAFT = new Segment() {
         public SegmentSpec spec() {
@@ -1825,6 +1852,7 @@ public final class SegmentLibrary {
         list.add(SAW_CORRIDOR);
         list.add(CHAIN_BALL_HALL);
         list.add(ERUPTION_FIELD);
+        list.add(GHOST_CROSSING);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);

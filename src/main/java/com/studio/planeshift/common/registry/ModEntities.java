@@ -27,6 +27,7 @@ import com.studio.planeshift.common.entity.KoopaEntity;
 import com.studio.planeshift.common.entity.ParatroopaEntity;
 import com.studio.planeshift.common.entity.PodobooEntity;
 import com.studio.planeshift.common.entity.LakituEntity;
+import com.studio.planeshift.common.entity.GhostPlatformEntity;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
 import com.studio.planeshift.common.entity.PiranhaPlantEntity;
 import com.studio.planeshift.common.entity.ChainBallEntity;
@@ -299,6 +300,15 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .updateInterval(1)
                     .build(key("firebar")));
+
+    /** Same platform, same motion, carried by a ghost. See {@link GhostPlatformEntity}. */
+    public static final DeferredHolder<EntityType<?>, EntityType<GhostPlatformEntity>> GHOST_PLATFORM =
+            ENTITY_TYPES.register("ghost_platform", () -> EntityType.Builder
+                    .<GhostPlatformEntity>of(GhostPlatformEntity::new, MobCategory.MISC)
+                    .sized(2.0F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .build(key("ghost_platform")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MovingPlatformEntity>> MOVING_PLATFORM =
             ENTITY_TYPES.register("moving_platform", () -> EntityType.Builder

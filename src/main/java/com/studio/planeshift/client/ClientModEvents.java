@@ -205,6 +205,9 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.BOWSER_FIRE.get(),
                 BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/bowser_fire.png"),
                         ProjectileVisualProfile.BOWSER_FIRE));
+        // The ghost platform reuses the platform renderer outright: it is the same deck, and the
+        // ghost under it is particles the entity emits rather than anything the renderer draws.
+        event.registerEntityRenderer(ModEntities.GHOST_PLATFORM.get(), MovingPlatformRenderer::new);
         event.registerEntityRenderer(ModEntities.MOVING_PLATFORM.get(), MovingPlatformRenderer::new);
         event.registerEntityRenderer(ModEntities.VOLCANIC_BOMB.get(), VolcanicBombRenderer::new);
         event.registerEntityRenderer(ModEntities.CHAIN_BALL.get(), ChainBallRenderer::new);
