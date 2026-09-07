@@ -1033,3 +1033,11 @@ urchin deliberately does not: eyes say the thing is going somewhere. The two are
 same size and nearly the same colour, so at a glance the difference is that one is
 regular and one is not -- regular reads as mineral, irregular as alive. Put in the
 cave roster, which was four things you could stomp, shell or wait out. 357 tests, 0 failures.
+
+## Para-Goomba
+The cheapest kind of content: the Goomba's walk with a hop on a clock, and the
+Paratroopa's wings lifted unchanged onto its rig. One stomp takes the wings and
+what lands is an ordinary Goomba, which is the reference's own rule and the reason
+this is worth building rather than being a Goomba that moves oddly -- the player
+learns that wings are a layer, not a creature. Replaced rather than mutated on
+death, because the wings live in the registered type. 358 tests, 0 failures.

@@ -136,6 +136,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case URCHIN -> urchin();
             case BLOOPER -> blooper();
             case FUZZY -> fuzzy();
+            case PARA_GOOMBA -> paraGoomba();
             case PIRANHA_PLANT -> piranhaPlant();
             // Same mesh, larger rig. See BIG_CHEEP above.
             case MEGA_PIRANHA_PLANT -> piranhaPlant();
@@ -504,6 +505,36 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, -1.5F, -1.5F, -1.5F, 3, 3, 3),
                     pose(at[0] * jitter, 13 + at[1] * jitter, at[2]));
         }
+        return finish(mesh);
+    }
+
+    /**
+     * The Goomba rig plus wings.
+     *
+     * <p>Repeated rather than composed, for the reason {@link #paratroopa()} gives: a
+     * LayerDefinition is baked, not composable. The wings are lifted from that rig unchanged and
+     * set on a shorter body, because the reference's winged Goomba is visibly the same pair of
+     * wings bolted to a different creature -- which is the joke, and copying it means copying the
+     * geometry rather than drawing a second kind of wing.
+     */
+    private static LayerDefinition paraGoomba() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -6, -9, -4, 12, 9, 8), pose(0, 21, 0));
+        r.addOrReplaceChild("head", box(0, 80, -5, -3, -0.5F, 10, 6, 1), pose(0, 16, -4.2F));
+        r.addOrReplaceChild("snout", box(64, 80, -6, -1.5F, -1, 12, 3, 2), pose(0, 13.5F, -4));
+        r.addOrReplaceChild("left_leg", box(0, 40, -3.5F, 0, -3, 7, 3, 6), pose(3.5F, 21, 0));
+        r.addOrReplaceChild("right_leg", box(0, 40, -3.5F, 0, -3, 7, 3, 6), pose(-3.5F, 21, 0));
+        r.addOrReplaceChild("left_wing", box(64, 80, 0, -1, -1, 9, 2, 7),
+                pose(6, 14, 3, 0, -0.25F, -0.35F));
+        r.addOrReplaceChild("right_wing", box(64, 80, -9, -1, -1, 9, 2, 7),
+                pose(-6, 14, 3, 0, 0.25F, 0.35F));
+        r.addOrReplaceChild("detail_1", box(64, 80, -3, -1, -0.5F, 5, 2, 1),
+                pose(-2.6F, 14.4F, -4.6F, 0, 0, 0.32F));
+        r.addOrReplaceChild("detail_2", box(64, 80, -2, -1, -0.5F, 5, 2, 1),
+                pose(2.6F, 14.4F, -4.6F, 0, 0, -0.32F));
+        r.addOrReplaceChild("detail_3", box(64, 40, -1, 0, -0.5F, 2, 2, 1), pose(-2, 18.6F, -4.4F));
+        r.addOrReplaceChild("detail_4", box(64, 40, -1, 0, -0.5F, 2, 2, 1), pose(2, 18.6F, -4.4F));
         return finish(mesh);
     }
 

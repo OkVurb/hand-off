@@ -182,7 +182,7 @@ public final class SegmentLibrary {
             // A cast that does not need the floor. Paratroopa and Lakitu both fly, and Bullet
             // Bill crosses open air in a straight line -- all three are at their best in a world
             // where the ground is scarce, which is why they are wasted anywhere else.
-            case SKY -> List.of(ModEntities.PARATROOPA.get(), ModEntities.LAKITU.get(),
+            case SKY -> List.of(ModEntities.PARA_GOOMBA.get(),ModEntities.PARATROOPA.get(), ModEntities.LAKITU.get(),
                     ModEntities.BULLET_BILL.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get(), ModEntities.BOOMERANG_BRO.get());
         };

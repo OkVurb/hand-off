@@ -1021,6 +1021,18 @@ def fuzzy():
     return img
 
 
+def para_goomba():
+    """The Goomba sheet with white wings.
+
+    Exactly the trick paratroopa() plays on the Koopa, and for the same stated reason: this has to
+    read as "that enemy, but flying", so the body must not change. Only the trim region does, which
+    on this rig carries the wings.
+    """
+    img = goomba()
+    base(img, TRIM, (252, 252, 255), 97, ramp=0.22)
+    return img
+
+
 def big_cheep():
     """The large fish: green-grey instead of red, and blunter.
 
@@ -1097,6 +1109,7 @@ CHARACTERS = {
     "urchin": urchin,
     "blooper": blooper,
     "fuzzy": fuzzy,
+    "para_goomba": para_goomba,
     "goomba": goomba,
     "fire_bro": fire_bro,
     "boomerang_bro": boomerang_bro,

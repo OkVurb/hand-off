@@ -58,6 +58,8 @@ public enum EnemyRigProfile {
     BLOOPER(1.35F),
     /** The fuzz ball. Same size as the urchin it is deliberately not. */
     FUZZY(1.30F),
+    /** The winged Goomba. Same scale as the walking one: the wings are the only difference. */
+    PARA_GOOMBA(1.0F),
     /** The big pursuing fish, for the same reason {@link #BIG_CHEEP} is its own entry. */
     MEGA_DEEP_CHEEP(1.90F),
     TOAD(1.0F),

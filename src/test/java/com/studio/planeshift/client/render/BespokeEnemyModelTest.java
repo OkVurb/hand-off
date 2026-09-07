@@ -76,6 +76,10 @@ class BespokeEnemyModelTest {
             // Body, face and eight tufts. Same size and colour as the urchin, and the only thing
             // separating them at a glance is that this one is irregular and has eyes.
             Map.entry(EnemyRigProfile.FUZZY, 10L),
+            // The Goomba's parts plus two wings lifted unchanged from the Paratroopa rig. The
+            // reference's winged Goomba is visibly the same wings bolted to a different creature,
+            // which is the joke, so copying it means copying the geometry.
+            Map.entry(EnemyRigProfile.PARA_GOOMBA, 11L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
             // Same count as PIRANHA_PLANT, and the equality is the assertion. Third profile in
             // this table whose whole content is "the small one, registered bigger".

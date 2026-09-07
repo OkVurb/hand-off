@@ -8,6 +8,7 @@ import com.studio.planeshift.common.entity.ChainChompEntity;
 import com.studio.planeshift.common.entity.DeepCheepEntity;
 import com.studio.planeshift.common.entity.MegaDeepCheepEntity;
 import com.studio.planeshift.common.entity.BlooperEntity;
+import com.studio.planeshift.common.entity.ParaGoombaEntity;
 import com.studio.planeshift.common.entity.FuzzyEntity;
 import com.studio.planeshift.common.entity.UrchinEntity;
 import com.studio.planeshift.common.entity.MegaPiranhaPlantEntity;
@@ -204,6 +205,14 @@ public final class ModEntities {
                             EnemyRigProfile.CHEEP_CHEEP.scaled(0.4F))
                     .clientTrackingRange(8)
                     .build(key("bone_cheep")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ParaGoombaEntity>> PARA_GOOMBA =
+            ENTITY_TYPES.register("para_goomba", () -> EntityType.Builder
+                    .of(ParaGoombaEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.PARA_GOOMBA.scaled(0.8F),
+                            EnemyRigProfile.PARA_GOOMBA.scaled(0.8F))
+                    .clientTrackingRange(8)
+                    .build(key("para_goomba")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BlooperEntity>> BLOOPER =
             ENTITY_TYPES.register("blooper", () -> EntityType.Builder
@@ -437,6 +446,7 @@ public final class ModEntities {
         event.put(MEGA_DEEP_CHEEP.get(), MegaDeepCheepEntity.createAttributes().build());
         event.put(URCHIN.get(), UrchinEntity.createAttributes().build());
         event.put(BLOOPER.get(), BlooperEntity.createAttributes().build());
+        event.put(PARA_GOOMBA.get(), ParaGoombaEntity.createAttributes().build());
         event.put(FUZZY.get(), FuzzyEntity.createAttributes().build());
         event.put(BIG_BOO.get(), BigBooEntity.createAttributes().build());
         event.put(CHAIN_CHOMP.get(), ChainChompEntity.createAttributes().build());
