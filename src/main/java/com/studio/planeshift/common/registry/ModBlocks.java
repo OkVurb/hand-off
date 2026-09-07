@@ -170,6 +170,17 @@ public final class ModBlocks {
                     .sound(SoundType.LANTERN)
                     .lightLevel(state -> 14));
 
+    /**
+     * An arrow board, planted where a route is ambiguous.
+     *
+     * <p>Navigation as set dressing rather than as UI. The reference puts these at forks and above
+     * hidden entrances, and the value is that they are part of the level -- a HUD arrow tells the
+     * player where to go, a sign in the world tells them somebody built this place with a way
+     * through it.
+     */
+    public static final DeferredBlock<Block> COURSE_SIGNPOST = courseBlock(
+            "course_signpost", MapColor.WOOD, SoundType.WOOD);
+
     public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
             "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
 

@@ -85,7 +85,9 @@ different staging.
 **3.4 Bosses have phases, and the phase change is visible.** Ordinary, then skeletal, then giant,
 with the fire changing colour. Legible without a health bar.
 
-**3.5 The arena is its own room, and it is approached.** A long uniform arcade of repeated arches
+**3.5 The arena is its own room, and it is approached.** *Already true when written:* `BossArena`
+builds an approach before the bridge, with a comment saying the castle used to be a corridor and
+this is the room it was describing. Fifth entry found to overstate its gap. A long uniform arcade of repeated arches
 runs in front of it — rhythmic, empty, visibly not the level you were just in. That corridor is
 pacing, and it is most of what makes the arena land.
 

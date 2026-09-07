@@ -365,5 +365,6 @@
   "entity.planeshift.volcanic_bomb": "Volcanic Bomb",
   "entity.planeshift.bone_cheep": "Bone Cheep",
   "entity.planeshift.ghost_platform": "Ghost Platform",
-  "block.planeshift.course_lamp_ghost": "Spectral Lamp"
+  "block.planeshift.course_lamp_ghost": "Spectral Lamp",
+  "block.planeshift.course_signpost": "Signpost"
 }

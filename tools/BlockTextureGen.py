@@ -312,6 +312,27 @@ def barber(stripe, ground, width=5):
     return lit(img, ground)
 
 
+def signboard(wood, paint):
+    """A plank board with an arrow painted on it.
+
+    Drawn rather than lettered: the reference signs are arrows, and an arrow needs no translation
+    and reads at a distance a word does not. The grain runs horizontally so the board reads as one
+    plank rather than as a fence.
+    """
+    img = Image.new("RGBA", (S, S), wood[:3] + (255,))
+    d = ImageDraw.Draw(img)
+    for y in range(0, S, 4):
+        d.line([(0, y), (S - 1, y)], fill=shade(wood, 0.86))
+    # Shaft.
+    d.line([(3, S // 2), (11, S // 2)], fill=paint[:3] + (255,))
+    d.line([(3, S // 2 + 1), (11, S // 2 + 1)], fill=paint[:3] + (255,))
+    # Head, as two converging strokes so it is a chevron rather than a triangle blob.
+    for i in range(4):
+        d.point((11 - i, S // 2 - 1 - i), fill=paint[:3] + (255,))
+        d.point((11 - i, S // 2 + 2 + i), fill=paint[:3] + (255,))
+    return lit(img, wood)
+
+
 def distant(img, haze=(186, 214, 236), amount=0.46):
     """Push a texture back into the distance.
 
@@ -1158,6 +1179,13 @@ def build():
     out["trampoline_top"] = trampoline_top((242, 152, 62))
     out["spring_pad_top"] = spring_top((214, 214, 222))
     out["warp_pipe_top"] = pipe_top((58, 176, 74))
+
+    # A signpost board. Wood with a painted arrow.
+    #
+    # Points right because the lane runs left to right and the overwhelming majority of signs will
+    # say "onward". Where one has to point back the block is placed rotated, which costs a
+    # blockstate property rather than a second texture.
+    out["course_signpost"] = signboard((156, 112, 66), (248, 240, 214))
 
     # Hazards.
     out["muncher"] = muncher()

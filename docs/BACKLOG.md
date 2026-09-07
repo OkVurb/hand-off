@@ -217,3 +217,18 @@ Two things would fix it, and both are deliberate non-decisions rather than overs
   beside the living one everywhere rather than replacing it in the darker worlds, which is what the
   reference actually does. `GenContext` carries `worldTheme` already; `cast()` simply is not given
   it. Small change, but it alters what appears in every course, so it wants a waking eye.
+
+## Secret exits versus cannons (plan 7.2) — a real disagreement, not an oversight
+
+The plan says a secret exit is precisely what unlocks a cannon between worlds. The code says
+otherwise, deliberately, and gives its reasoning in `MapNodeService.fireCannon`: a shortcut that
+also grants access "is not a shortcut, it is a cheat code — it would let a player reach the last
+world without clearing a single castle, and every unlock rule elsewhere would be decorative."
+
+Both positions are coherent and they cannot both hold. The reference's model is that finding a
+secret exit is *how* you earn the skip; this mod's model is that the skip only saves walking. Note
+that under the current rule the cannon is close to pointless — it refuses unless the next world is
+already open, and if it is open you can simply walk there.
+
+Left alone because overriding a documented deliberate decision is not something to do while nobody
+is awake to disagree. It wants a ruling, not an implementation.

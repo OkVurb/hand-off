@@ -567,3 +567,26 @@ placeholder and the build says nothing, so it is found by walking into a pipe th
 report. Adding a sixth colour and forgetting its art now fails here instead.
 
 323 tests, no failures, counted from XML.
+
+## Iteration 24
+
+Audited plan sections 3 and 7. One more overstated entry, one genuine conflict, one real gap.
+
+3.5 said the boss arena should be approached rather than entered. BossArena already builds an
+approach, and its comment makes the point better than the plan did -- the castle used to be a
+corridor, and this is the room it was describing. Fifth entry corrected.
+
+7.2 is not an oversight but a disagreement. The plan says a secret exit should unlock a cannon;
+MapNodeService.fireCannon deliberately refuses, arguing that a shortcut which also grants access is
+a cheat code that would let a player reach the last world without clearing a castle. Both positions
+are coherent and mutually exclusive, and the current rule does leave the cannon nearly pointless --
+it opens only when the next world is already reachable on foot. Left for a ruling rather than
+implemented, because overriding a documented decision with nobody awake to disagree is not my call.
+
+Signposts are the real gap, and placing them turned out to be the interesting part. The composer
+already argues, correctly, that an arrow near a secret is worse than nothing: it announces the
+secret instead of letting the player find one, which is why it leads with coins instead. The
+reference uses signs for ambiguous *open* routes, not hidden ones -- so they went on the two
+segments with genuinely two ways up, the climbing pole and the vine wall, and nowhere near a secret.
+
+323 tests, no failures, counted from XML.
