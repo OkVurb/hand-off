@@ -242,6 +242,82 @@ def ghost_house():
     return img
 
 
+def water():
+    """Seen from inside the water, not above it.
+
+    The reference's underwater levels are not a beach with a blue filter -- the whole frame is
+    submerged, the light comes down from a surface overhead rather than from a sun in a sky, and
+    the far distance fades out rather than meeting a horizon. So this skybox has no horizon line at
+    all: it is a vertical gradient from a bright, rippling ceiling to a dark floor, with shafts
+    coming down through it and silhouettes of the cast dissolving into the murk.
+    """
+    img = Image.new("RGB", (SIZE, SIZE), (26, 78, 104))
+    d = ImageDraw.Draw(img)
+    sky(d, (92, 196, 208), (14, 48, 74), bands=22)
+
+    # The surface overhead, rippling. Drawn as a bright band with a wave cut into its underside
+    # rather than as a straight line, because a ruled edge reads as a ceiling and not as water.
+    for x in range(SIZE):
+        crest = 26 + int(7 * math.sin(x * 0.045)) + int(3 * math.sin(x * 0.11))
+        d.line([(x, 0), (x, crest)], fill=(168, 232, 236))
+        d.line([(x, crest), (x, crest + 3)], fill=(212, 246, 246))
+
+    # Light shafts, angled and translucent. They are what tells the player which way is up when
+    # there is no ground in frame.
+    for x0, w in ((70, 34), (190, 22), (300, 40), (430, 26)):
+        for i in range(w):
+            x = x0 + i
+            shade = 1.0 - abs(i - w / 2.0) / (w / 2.0)
+            if shade <= 0.15:
+                continue
+            for y in range(30, int(HORIZON * 1.15)):
+                fade = max(0.0, 1.0 - y / float(HORIZON * 1.15))
+                if (x + y) % 3 == 0 and fade * shade > 0.35:
+                    d.point((x + y // 6, y), fill=(150, 226, 232))
+
+    # The cast, fading with depth.
+    cheep(d, 120, 250, 18, (18, 62, 88))
+    cheep(d, 330, 300, 14, (16, 56, 80))
+    cheep(d, 240, 390, 22, (13, 46, 68))
+    # Weed on the floor, breaking the bottom edge so the murk has something in it.
+    r = random.Random(23)
+    for _ in range(26):
+        x = r.randrange(SIZE)
+        h = r.randrange(20, 70)
+        for y in range(SIZE - h, SIZE):
+            d.point((x + int(4 * math.sin(y * 0.12)), y), fill=(20, 74, 62))
+    return img
+
+
+def cheep(draw, x, y, s, c):
+    """A fish silhouette: body, tail, one fin. Enough to read at this distance and no more."""
+    draw.ellipse([x - s, y - s * 0.6, x + s, y + s * 0.6], fill=c)
+    draw.polygon([(x + s, y), (x + s * 1.7, y - s * 0.6), (x + s * 1.7, y + s * 0.6)], fill=c)
+    draw.polygon([(x - s * 0.2, y - s * 0.55), (x + s * 0.4, y - s * 1.1),
+                  (x + s * 0.5, y - s * 0.5)], fill=c)
+
+
+def sky_theme():
+    """Above the weather: pastel gradient, cloud banks below, and nothing solid anywhere.
+
+    The floor of this one is more cloud rather than ground, because the subject of a sky level is
+    height -- there should be no visible bottom to fall to, only more sky going down.
+    """
+    img = Image.new("RGB", (SIZE, SIZE), (150, 205, 245))
+    d = ImageDraw.Draw(img)
+    sky(d, (74, 142, 226), (232, 228, 250), bands=18)
+    # Cloud banks stacked toward the bottom, largest and palest lowest, so depth reads as height.
+    for base, scale, colour in ((HORIZON + 40, 52, (255, 255, 255)),
+                                (HORIZON + 8, 40, (244, 246, 255)),
+                                (HORIZON - 36, 30, (232, 238, 252))):
+        for cx in range(-20, SIZE + 40, 96):
+            cloud(d, cx + (base % 37), base, scale, colour)
+    # A few high wisps, small and far, for the same reason the grass sky has distant hills.
+    for cx, cy, s in ((90, 70, 16), (300, 52, 12), (420, 96, 18)):
+        cloud(d, cx, cy, s)
+    return img
+
+
 THEMES = {
     "grass": grass,
     "desert": desert,
@@ -249,6 +325,11 @@ THEMES = {
     "lava": lava,
     "underground": underground,
     "ghost_house": ghost_house,
+    # Both of these existed as themes with no skybox at all. CourseSkyboxRenderer builds its
+    # texture path from the theme's own name, so a water or sky course was asking for a file that
+    # was never drawn -- eight themes, six pictures, and no error anywhere to say so.
+    "water": water,
+    "sky": sky_theme,
 }
 
 
