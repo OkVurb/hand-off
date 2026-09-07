@@ -40,7 +40,11 @@ public class BowserEntity extends CourseEnemyEntity {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(1, new BowserGoal(this));
+        // Position first, attacks second. BackgroundBossGoal owns only where he stands -- behind
+        // the play plane, reaching in -- and leaves BowserGoal's fire and charge untouched, so the
+        // staging changed without the fight being rewritten.
+        goalSelector.addGoal(1, new BackgroundBossGoal(this));
+        goalSelector.addGoal(2, new BowserGoal(this));
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 

@@ -73,6 +73,44 @@ public record PlaneRail(Direction.Axis travelAxis, double planeCoord, double hal
                 : new Vec3(planeCoord, pos.y, pos.z);
     }
 
+    /**
+     * Which way along the depth axis the camera lies, as {@code +1} or {@code -1}.
+     *
+     * <p>Everything that wants to sit in front of or behind the action needs this sign, and
+     * before it existed each caller re-derived it from {@link #lookPositive}.
+     */
+    public int cameraSign() {
+        return lookPositive ? 1 : -1;
+    }
+
+    /**
+     * A position set back from the plane, away from the camera.
+     *
+     * <p>For things that belong <em>behind</em> the action rather than in it: a boss that fills
+     * the backdrop and reaches forward, or scenery that must never be mistaken for a platform.
+     * Positive {@code backset} is further from the camera, so the caller does not have to know
+     * which side the camera is on.
+     *
+     * <p>The travel and vertical coordinates are preserved, so this composes with ordinary
+     * pathing: something can chase along the course and still never enter the corridor.
+     */
+    public Vec3 behindPlane(Vec3 pos, double backset) {
+        double depth = planeCoord - cameraSign() * backset;
+        return depthAxis() == Direction.Axis.Z
+                ? new Vec3(pos.x, pos.y, depth)
+                : new Vec3(depth, pos.y, pos.z);
+    }
+
+    /**
+     * How far in front of the plane a position sits, toward the camera.
+     *
+     * <p>Signed: negative means behind. Lets a reach-in attack ask how far it has left to travel
+     * without caring about the camera side.
+     */
+    public double depthTowardCamera(Vec3 pos) {
+        return (depthOf(pos) - planeCoord) * cameraSign();
+    }
+
     /** Removes the depth component from a velocity so momentum maps onto the plane. */
     public Vec3 flattenVelocity(Vec3 velocity) {
         return depthAxis() == Direction.Axis.Z
