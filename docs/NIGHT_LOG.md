@@ -643,3 +643,26 @@ Wrote the rule into AUTONOMOUS_BRIEF.md rather than only into this log, so it su
 reset: telegraphs are physical, hazards are solid, names come from the vocabulary already here.
 
 326 tests, no failures, counted from XML.
+
+## Iteration 27
+
+Swept the rest of last night's work for anything else built in the wrong idiom. Two found, both the
+same instinct: reasoning from Minecraft defaults rather than from the game being imitated.
+
+Underwater fog was set to 24 blocks and the comment called it generous. That was still vanilla
+thinking -- pushing a Minecraft default outward instead of asking what the reference does, which is
+nothing at all. Its underwater levels are not murky: the water is a colour over a fully visible
+screen, and every platform and coin is legible the moment it appears. Fog is how a first-person
+game says "submerged"; a side-on platformer says it with the tint and then gets out of the way.
+Pushed past any distance the camera can see, so the value is really "none".
+
+Grass pollen and cave motes, both added yesterday on the reasoning that every theme deserves some
+air. Checked the reference: its grass levels and caves are visually clean. Snow has snowfall,
+castles have embers, ghost houses have wisps, water has bubbles -- every one of those is the weather
+of that place. Pollen drifting through a meadow is a Minecraft habit.
+
+Removed both, and listed them in the test as deliberate absences rather than deleting the coverage.
+An absence that is written down is a decision; an absence that is not is a bug waiting to be
+helpfully fixed by whoever notices the omission next.
+
+326 tests, no failures, counted from XML.

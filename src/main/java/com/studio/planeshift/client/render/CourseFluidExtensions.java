@@ -30,12 +30,19 @@ public final class CourseFluidExtensions {
     /**
      * How far you can see underwater, in blocks.
      *
-     * <p>Generous on purpose. Vanilla water closes to a few blocks, which is atmospheric in a game
-     * where you can stop and look around and fatal in one where you are mid-jump. The player has
-     * to be able to read the platform they are aiming at.
+     * <p>Effectively unlimited, which is the genre's answer rather than a compromise. Underwater
+     * levels in the reference are not murky at all: the water is a colour over a fully visible
+     * screen, and every platform, fish and coin in the room is legible from the moment it comes on
+     * screen. Fog is how a first-person game says "you are submerged"; a side-on platformer says it
+     * with the tint and then gets out of the way.
+     *
+     * <p>An earlier pass set this to 24 blocks and called it generous. That was still reasoning
+     * from vanilla -- pushing a Minecraft default outward instead of asking what the game being
+     * imitated actually does. Set past any distance the camera can see, so the value is really
+     * "none" and says so.
      */
-    private static final float WATER_FOG_FAR = 24.0F;
-    private static final float WATER_FOG_NEAR = 2.0F;
+    private static final float WATER_FOG_FAR = 128.0F;
+    private static final float WATER_FOG_NEAR = 64.0F;
 
     /** Lava is nearly blind, because being in it is a mistake and not a vantage point. */
     private static final float LAVA_FOG_FAR = 3.0F;
@@ -74,15 +81,7 @@ public final class CourseFluidExtensions {
                 return new Vector4f(0.16F, 0.42F, 0.62F, 1.0F);
             }
 
-            /**
-             * How far you can see under water.
-             *
-             * <p>The fog distance is the difference between atmosphere and an unplayable level.
-             * Vanilla water closes to a few blocks, which is fine in a game where you can stop and
-             * look around and fatal in one where you are mid-jump: a platformer is about seeing
-             * the landing before committing to it. Set well back so the next platform stays
-             * readable, and the colour above does the work of feeling submerged.
-             */
+            /** No fog worth the name; the tint above does all the work. See the constants. */
             @Override
             public void modifyFogRender(Camera camera,
                                         net.minecraft.client.renderer.fog.environment.FogEnvironment environment,

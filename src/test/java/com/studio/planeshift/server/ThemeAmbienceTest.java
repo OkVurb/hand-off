@@ -36,8 +36,22 @@ class ThemeAmbienceTest {
         return dir;
     }
 
+    /**
+     * Themes that deliberately have no ambience.
+     *
+     * <p>The reference's grass levels and caves are visually clean. Its snow has snowfall, its
+     * castles have embers, its ghost houses have wisps -- all cases where the ambience is the
+     * weather of the place. Pollen in a meadow is not; it is a Minecraft habit.
+     *
+     * <p>Listed here rather than simply omitted so the test still means "nobody forgot a theme".
+     * An absence that is written down is a decision; an absence that is not is a bug waiting to be
+     * helpfully fixed.
+     */
+    private static final java.util.Set<CourseTheme> DELIBERATELY_STILL =
+            java.util.EnumSet.of(CourseTheme.GRASS, CourseTheme.UNDERGROUND);
+
     @Test
-    @DisplayName("no theme is left without ambient particles")
+    @DisplayName("no theme is left without ambience by accident")
     void everyThemeIsNamed() throws IOException {
         Path src = root().resolve(
                 "src/main/java/com/studio/planeshift/server/ServerEvents.java");
@@ -49,6 +63,9 @@ class ThemeAmbienceTest {
 
         List<String> missing = new ArrayList<>();
         for (CourseTheme theme : CourseTheme.values()) {
+            if (DELIBERATELY_STILL.contains(theme)) {
+                continue;
+            }
             if (!pass.contains("CourseTheme." + theme.name())) {
                 missing.add(theme.name());
             }

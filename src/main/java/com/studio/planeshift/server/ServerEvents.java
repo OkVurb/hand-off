@@ -143,23 +143,18 @@ public final class ServerEvents {
                     serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.BUBBLE,
                             player.getX(), player.getY() + 1.0D, player.getZ(),
                             3, 3.0D, 2.0D, 1.0D, 0.02D);
-                } else if (theme == com.studio.planeshift.common.course.CourseTheme.UNDERGROUND
-                        && player.getRandom().nextInt(8) == 0) {
-                    // Cave motes, sparse. A cave should feel still, so this is the rarest of the
-                    // set -- present enough that the air is not dead, seldom enough that it does
-                    // not read as weather.
-                    serverLevel.sendParticles(com.studio.planeshift.common.registry.ModParticles.THEME_DUST.get(),
-                            player.getX(), player.getY() + 2.0D, player.getZ(),
-                            1, 3.0D, 2.0D, 3.0D, 0.005D);
-                } else if (theme == com.studio.planeshift.common.course.CourseTheme.GRASS
-                        && player.getRandom().nextInt(10) == 0) {
-                    // Pollen drifting in sunlight. Rarest of all: a grass level is the baseline the
-                    // others are read against, so anything constant here would raise the floor for
-                    // every theme rather than characterising this one.
-                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SPORE_BLOSSOM_AIR,
-                            player.getX(), player.getY() + 2.5D, player.getZ(),
-                            1, 4.0D, 2.0D, 4.0D, 0.0D);
                 }
+                // GRASS and UNDERGROUND deliberately have none.
+                //
+                // Added both in an earlier pass on the reasoning that every theme should have some
+                // air, then checked the reference: its grass levels and its caves are visually
+                // clean. Snow has snowfall, castles have embers, ghost houses have wisps, water has
+                // bubbles -- and those are all cases where the ambience *is* the weather of that
+                // place. Pollen drifting through a grass level is a Minecraft instinct, and a cave
+                // full of motes reads as dusty rather than as still.
+                //
+                // Left as an explicit absence rather than a gap, so nobody adds them back by
+                // noticing the omission.
             }
             if (player.onGround()) {
                 // Landing closes any airborne stomp chain, so the combo ladder only rewards
