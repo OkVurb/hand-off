@@ -28,6 +28,7 @@ import com.studio.planeshift.common.entity.PodobooEntity;
 import com.studio.planeshift.common.entity.LakituEntity;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
 import com.studio.planeshift.common.entity.PiranhaPlantEntity;
+import com.studio.planeshift.common.entity.SawEntity;
 import com.studio.planeshift.common.entity.SpinyEntity;
 import com.studio.planeshift.common.entity.ThwompEntity;
 import com.studio.planeshift.common.entity.ToadEntity;
@@ -256,6 +257,14 @@ public final class ModEntities {
                     .build(key("bowser_fire")));
 
     /** Rotating castle hazard. MISC because it is a moving obstacle, not an AI mob. */
+    public static final DeferredHolder<EntityType<?>, EntityType<SawEntity>> SAW =
+            ENTITY_TYPES.register("saw", () -> EntityType.Builder
+                    .<SawEntity>of(SawEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 0.6F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .build(key("saw")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<FirebarEntity>> FIREBAR =
             ENTITY_TYPES.register("firebar", () -> EntityType.Builder
                     .<FirebarEntity>of(FirebarEntity::new, MobCategory.MISC)

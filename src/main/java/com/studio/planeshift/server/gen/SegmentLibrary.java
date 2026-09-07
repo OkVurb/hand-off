@@ -1392,6 +1392,32 @@ public final class SegmentLibrary {
     };
 
     /**
+     * A corridor with a saw running across it.
+     *
+     * <p>Built as a flat run rather than as a jumping puzzle, because the saw is the puzzle. Adding
+     * gaps underneath would make the player solve two problems whose timings have nothing to do
+     * with each other, which is not difficulty, just noise.
+     *
+     * <p>The floor is continuous for the same reason the vine wall keeps its steps: the
+     * reachability proof knows nothing about a moving hazard, so a segment whose crossing depended
+     * on one would prove as passable and play as a wall. Here the crossing is always geometrically
+     * possible and the saw sets the price of it.
+     */
+    static final Segment SAW_CORRIDOR = new Segment() {
+        public SegmentSpec spec() {
+            return def("saw_corridor", 14, 3, 2, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 14, y, ctx);
+
+            // Head height, so it is crossed by waiting rather than by ducking -- there is no duck.
+            c.spawn(ModEntities.SAW.get(), x + 7.5D, y + 2, 0.5D, 0.0F, GENERATED_TAG);
+            coinTrail(c, x + 2, 10, y + 1, 1);
+        }
+    };
+
+    /**
      * A free-standing climbing pole between two ledges.
      *
      * <p>The companion to {@link #VINE_WALL} and deliberately the opposite shape. A vine hangs on
@@ -1737,6 +1763,7 @@ public final class SegmentLibrary {
         list.add(COIN_RING_ARC);
         list.add(VINE_WALL);
         list.add(CLIMB_POLE);
+        list.add(SAW_CORRIDOR);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);

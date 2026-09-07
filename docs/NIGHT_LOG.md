@@ -360,3 +360,28 @@ Also parenthesised a condition that was relying on && binding tighter than ||. I
 correct and unreadable is a bug waiting for the next person to tidy it.
 
 312 tests, no failures, counted from XML.
+
+## Iteration 16
+
+Buzzsaws, plan 6.6. The third hazard, and the first that threatens a line rather than a point or a
+radius: a Thwomp owns the column under it, a firebar owns a disc around it, a saw owns a corridor
+the player has to cross. That is why the drawn rail matters more here than anywhere else -- without
+it the only way to learn the route is to be standing on it.
+
+It moves on a cosine sweep rather than bouncing between two ends, so it slows at the extremes. That
+is what a carriage on a track actually does, and more usefully it gives the player a moment at each
+end where the saw is briefly easy to pass.
+
+Renders nothing, following FirebarRenderer: the blade is a ring of sparks the entity emits on the
+client. No model to build, and no rotation state that can drift out of step with the position.
+
+This one passed the whole suite first time, which is worth noting against the climb pole two
+iterations ago that took four attempts. The difference was not luck -- I kept the floor continuous
+so the reachability proof was never load-bearing on a moving hazard it cannot see, and I declared
+the width the segment actually builds. Both of those were the exact lessons from that failure.
+
+Added SawPlacementTest for the usual reason: everything about a hazard entity compiles and tests
+green whether or not a single course ever contains one. Both bounds again -- it appears, and not in
+every course, because a hazard met every level is the floor.
+
+314 tests, no failures, counted from XML.

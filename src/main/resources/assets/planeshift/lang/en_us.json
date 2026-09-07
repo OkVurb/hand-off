@@ -359,5 +359,6 @@
   "entity.planeshift.big_cheep": "Big Cheep",
   "block.planeshift.course_climb_pole": "Climbing Pole",
   "gui.planeshift.banner.final_world": "The Star Road has appeared!",
-  "gui.planeshift.banner.all_cleared": "You have cleared every course!"
+  "gui.planeshift.banner.all_cleared": "You have cleared every course!",
+  "entity.planeshift.saw": "Buzzsaw"
 }
