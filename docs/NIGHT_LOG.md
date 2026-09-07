@@ -801,3 +801,11 @@ Finer sampling would not have prevented the second error -- no number of frames 
 but it would have made the first one obvious immediately.
 
 340 tests, no failures, counted from XML.
+
+## Koopaling shell dash (plan 3.2)
+Wired the shell dash. Checked the wiki first this time rather than building from frames:
+it is shared by every Koopaling and fires after *every hit*, so it is a reaction, not a
+timed attack. `hurtServer` sets `dashTicks`, the dash owns `tick()` while it runs, and it
+bounces off arena walls. Direction is away from the attacker so it never reads as a lunge
+at a player still airborne from a stomp. `spinning()` from `ShellSpinner` drives the shell
+skin. 340 tests, 0 failures.

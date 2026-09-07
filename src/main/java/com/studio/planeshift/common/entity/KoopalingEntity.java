@@ -40,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
  * a slightly different projectile is one boss fought eight times, and the whole reason to have
  * siblings is that they are not interchangeable.
  */
-public class KoopalingEntity extends CourseEnemyEntity {
+public class KoopalingEntity extends CourseEnemyEntity implements ShellSpinner {
 
     private static final EntityDataAccessor<Integer> VARIANT =
             SynchedEntityData.defineId(KoopalingEntity.class, EntityDataSerializers.INT);
@@ -60,8 +60,33 @@ public class KoopalingEntity extends CourseEnemyEntity {
     /** Upward kick a slam gives a grounded player: a stumble, not a launch. */
     private static final double SLAM_LIFT = 0.42D;
 
+    /**
+     * Synced so the client draws the shell. {@link ShellSpinner} is what the renderer asks.
+     */
+    private static final EntityDataAccessor<Boolean> DASHING =
+            SynchedEntityData.defineId(KoopalingEntity.class, EntityDataSerializers.BOOLEAN);
+
+    /**
+     * How long a shell dash lasts, in ticks.
+     *
+     * <p>Short. It exists to move the fight, not to be an attack the player waits out -- and the
+     * player has just landed a hit, so this is the beat between that and the next approach rather
+     * than a punishment for succeeding.
+     */
+    private static final int DASH_TICKS = 26;
+
+    /**
+     * Dash speed, in blocks per tick.
+     *
+     * <p>Faster than the boss walks and faster than the player runs, because a shell that can be
+     * outpaced is a shell the player simply strolls away from and the dash stops meaning anything.
+     */
+    private static final double DASH_SPEED = 0.42D;
+
     private int attackCooldown = ATTACK_INTERVAL;
     private int hopCooldown;
+    private int dashTicks;
+    private double dashDirection = 1.0D;
 
     public KoopalingEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -79,6 +104,7 @@ public class KoopalingEntity extends CourseEnemyEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(VARIANT, 0);
+        builder.define(DASHING, false);
     }
 
     @Override
@@ -113,6 +139,39 @@ public class KoopalingEntity extends CourseEnemyEntity {
         return STOMP_DAMAGE;
     }
 
+    /** {@inheritDoc} The shell shows only while the dash is running. */
+    @Override
+    public boolean spinning() {
+        return entityData.get(DASHING);
+    }
+
+    /**
+     * Every hit sends it into its shell.
+     *
+     * <p>A reaction rather than a timed attack, which is how the reference does it and is the
+     * better design regardless: a dash on a timer is something the player waits out, while a dash
+     * that follows a hit tells them the hit landed and moves the fight somewhere new. Approach,
+     * hit, scatter, approach again -- the whole rhythm of the encounter comes out of this one
+     * trigger instead of a state machine.
+     *
+     * <p>Only on damage that actually lands. Guarding on the super call means a blocked or
+     * cancelled hit does not hand the boss a free repositioning move.
+     */
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level,
+                              net.minecraft.world.damagesource.DamageSource source, float amount) {
+        boolean landed = super.hurtServer(level, source, amount);
+        if (landed && isAlive()) {
+            dashTicks = DASH_TICKS;
+            entityData.set(DASHING, true);
+            // Away from whatever hit it, so the dash reads as recoil and never as a lunge at the
+            // player who has just landed a stomp and is still in the air above it.
+            net.minecraft.world.entity.Entity attacker = source.getEntity();
+            dashDirection = attacker == null || attacker.getX() <= getX() ? 1.0D : -1.0D;
+        }
+        return landed;
+    }
+
     /** A boss must not be lockable by a move the player can repeat at will. */
     @Override
     public boolean canBeStaggered() {
@@ -131,6 +190,26 @@ public class KoopalingEntity extends CourseEnemyEntity {
         if (level().isClientSide() || !isAlive()) {
             return;
         }
+
+        // The dash owns the boss while it runs. Nothing else -- not facing, not the wand attack --
+        // happens during it, because a shell that also aimed at you would be two moves at once and
+        // the player would have no way to read either.
+        if (dashTicks > 0) {
+            dashTicks--;
+            if (horizontalCollision) {
+                // Bounce off the arena wall rather than grinding against it. The reference bosses
+                // cross the room and come back, which is what makes the dash a thing to dodge
+                // twice instead of a thing that leaves.
+                dashDirection = -dashDirection;
+            }
+            setDeltaMovement(DASH_SPEED * dashDirection, getDeltaMovement().y, 0.0D);
+            hurtMarked = true;
+            if (dashTicks == 0) {
+                entityData.set(DASHING, false);
+            }
+            return;
+        }
+
         Player target = level().getNearestPlayer(this, ENGAGE_RANGE);
         if (target == null) {
             return;
