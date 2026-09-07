@@ -968,3 +968,17 @@ constant count was the clue -- CourseReachability searches the x/y plane at z=0,
 any block in the lane centre is a wall to it whatever is beside it. A chimney needs
 to be an alcove off the route, which is a segment shape the library does not have.
 Dropped rather than shipped half-working. 351 tests, 0 failures.
+
+## The mod had boss music and eight bosses it never played it for
+CourseMusicManager decided "boss nearby" by asking for BowserEntity, written back
+when he was the only boss. Eight Koopalings were added later and nobody revisited
+the question, so the tower fights ran on ordinary course music. One predicate.
+SuperBowser needs no mention -- it extends BowserEntity, so the revived fight keeps
+the track the first one had, which is right: it is the same fight continuing.
+
+Also read the playtest pack properly and wrote up what actually collides with this
+mod. The one that matters is enhanced-movement's double jump: it does not make a
+course unbeatable, it makes every gap free and every secret trivial, which is the
+same as deleting the level design and keeping the scenery. SereneSeasons turned out
+to be harmless and that was checked rather than assumed -- it tints biome foliage,
+and no block model in this mod carries a tintindex at all. 351 tests, 0 failures.

@@ -118,9 +118,27 @@ public final class CourseMusicManager {
         }
         AABB range = minecraft.player.getBoundingBox().inflate(BOSS_RANGE);
         bossNearby = !minecraft.level
-                .getEntities((Entity) null, range, e -> e instanceof BowserEntity && e.isAlive())
+                .getEntities((Entity) null, range, CourseMusicManager::ownsTheSoundtrack)
                 .isEmpty();
         return bossNearby;
+    }
+
+    /**
+     * Whether this entity is a boss, for music purposes.
+     *
+     * <p>The Koopalings were left out of this and it was not a judgement call, it was an oversight:
+     * the check named {@code BowserEntity} back when he was the only boss in the game, and eight
+     * tower bosses were added later without anyone revisiting what "boss nearby" meant. So the
+     * mod had boss music, had eight bosses, and played it for one of them.
+     *
+     * <p>{@code SuperBowserEntity} needs no mention: it extends {@link BowserEntity}, so the
+     * revived fight keeps the track the first one had, which is right -- it is the same fight
+     * continuing, not a new one starting.
+     */
+    private static boolean ownsTheSoundtrack(Entity entity) {
+        return entity.isAlive()
+                && (entity instanceof BowserEntity
+                    || entity instanceof com.studio.planeshift.common.entity.KoopalingEntity);
     }
 
     private static void play(Mood mood, boolean hurry, Minecraft minecraft) {

@@ -57,3 +57,34 @@ way. Sodium in particular replaces large parts of the renderer, so a visual bug 
 installed has to be reproduced without it before it means anything about our code — the mod already
 has a `CourseSkyboxRenderer` and custom fluid rendering, both of which are exactly the sort of thing
 a rewritten renderer interacts with.
+
+## The playtest pack, and what fights PlaneShift
+
+Read out of `PlaneShift Playtest/mods` (52 jars) rather than guessed at. Only the ones that touch
+something this mod also touches are listed; the rest are performance or convenience and are fine.
+
+**ParCool** — *integrated, see `ParCoolBridge`.* Ships wall jump, wall slide, cling, pole climb,
+zipline, vault, roll, and more. This is most of plan 6.7 already built and better than the mod would
+have built it. PlaneShift clears its stamina inside courses and stands its own wall jump down when
+ParCool is present.
+
+**enhanced-movement** — **turn Double Jump off.** It also adds a dash, a ledge grab and
+Sandevistan-style afterimages, all configurable in its own screen. The dash is harmless and arguably
+fits; the afterimages are not this game's look but hurt nothing. The double jump does real damage:
+every gap in a generated course is sized against a proven jump arc, and `CourseReachability` proves
+completability against that arc. A double jump does not make a course unbeatable — it makes every
+gap free and every secret trivially reachable, which is the same as deleting the level design and
+leaving the scenery. Its own comment problem, in another mod.
+
+**SereneSeasons** — harmless here, and this was checked rather than assumed. It works by tinting
+biome foliage, and PlaneShift's terrain is custom blocks whose models carry no `tintindex` at all
+(zero across every block model in the mod). It cannot reach them.
+
+**better-clouds** — probably harmless, unverified. PlaneShift installs a `CustomSkyboxRenderer` for
+courses, so inside a course the sky is this mod's texture and there is nothing for a cloud renderer
+to draw on. Outside a course they should not meet. Worth a look in game if the hub sky ever looks
+wrong.
+
+**Boss Music Mod** — not usable, and not needed. It is a datapack keyed to the ender dragon and the
+wither by name, with no hook for other bosses. PlaneShift has its own boss track and its own
+proximity trigger; the fix there was in this mod, not in that one.
