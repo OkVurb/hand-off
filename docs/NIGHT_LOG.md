@@ -744,3 +744,30 @@ right about that much even where it was wrong about the rest.
 Removed my own `if (false)` while doing it. It compiled and it would have shipped.
 
 340 tests, no failures, counted from XML.
+
+## Iteration 31
+
+Installed the dev mods and made the tower bosses fly.
+
+Four mods, all verified loading together with PlaneShift: Sodium 0.8.14, Jade 21.1.7, JEI 27.37.0,
+FerriteCore 8.2.0. Client reaches the render thread with zero asset warnings. The only errors in the
+log are log-file locks from the previous client still being open, which is not a failure.
+
+Worth recording: the machine already had Sodium, in a CurseForge backup -- built for 1.21.1, not
+1.21.11. Close enough to look right in a filename and completely wrong for this game. ModernFix
+would have been the obvious fourth pick and has no 1.21.11 build, so FerriteCore took the slot.
+
+Then plan item 3.2, which is the largest remaining boss gap. Koopalings were eight ground-walking
+mobs; the reference fights them from a hovering clown car, and that is the shape of the fight rather
+than decoration. A boss on the player's own floor turns the encounter into a shoving match along a
+line whose answer is to walk forward. In the air it owns a space the player cannot reach, and the
+fight becomes about the moments it comes down.
+
+The dive is the mechanic. It hovers above jump height, tracks the player more slowly than the player
+runs, and drops on a fixed interval along a sine arch -- slowest at the bottom, which is exactly
+where the player has to meet it. Being stompable down there is the point rather than an oversight:
+three stomps defeat a Koopaling, and the dive is the game handing over those three chances on a
+rhythm that can be learned. A boss that dived only when it chose to would be a wall with a health
+bar.
+
+340 tests, no failures, counted from XML.

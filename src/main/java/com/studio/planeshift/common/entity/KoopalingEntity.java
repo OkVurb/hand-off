@@ -84,6 +84,11 @@ public class KoopalingEntity extends CourseEnemyEntity {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
+        // The clown car. A Koopaling in the reference fights from a hovering vehicle, which is not
+        // decoration -- a boss standing on the same floor as the player turns the fight into a
+        // shoving match along a line, and the answer to it is to walk forward. In the air it owns
+        // a space the player cannot reach, and the fight becomes about the moments it comes down.
+        goalSelector.addGoal(1, new ClownCarGoal(this));
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
