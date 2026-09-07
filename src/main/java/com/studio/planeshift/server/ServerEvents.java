@@ -135,6 +135,30 @@ public final class ServerEvents {
                     serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SOUL,
                             player.getX(), player.getY() + 1.0D, player.getZ(),
                             1, 3.0D, 1.0D, 3.0D, 0.01D);
+                } else if (theme == com.studio.planeshift.common.course.CourseTheme.WATER) {
+                    // Bubbles, rising. The water theme shipped tonight with no ambience at all,
+                    // which left a submerged course visually identical to a dry one apart from
+                    // its colour -- and the sheets are clear that drifting bubbles are half of
+                    // what says "under water" before anything moves.
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.BUBBLE,
+                            player.getX(), player.getY() + 1.0D, player.getZ(),
+                            3, 3.0D, 2.0D, 1.0D, 0.02D);
+                } else if (theme == com.studio.planeshift.common.course.CourseTheme.UNDERGROUND
+                        && player.getRandom().nextInt(8) == 0) {
+                    // Cave motes, sparse. A cave should feel still, so this is the rarest of the
+                    // set -- present enough that the air is not dead, seldom enough that it does
+                    // not read as weather.
+                    serverLevel.sendParticles(com.studio.planeshift.common.registry.ModParticles.THEME_DUST.get(),
+                            player.getX(), player.getY() + 2.0D, player.getZ(),
+                            1, 3.0D, 2.0D, 3.0D, 0.005D);
+                } else if (theme == com.studio.planeshift.common.course.CourseTheme.GRASS
+                        && player.getRandom().nextInt(10) == 0) {
+                    // Pollen drifting in sunlight. Rarest of all: a grass level is the baseline the
+                    // others are read against, so anything constant here would raise the floor for
+                    // every theme rather than characterising this one.
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SPORE_BLOSSOM_AIR,
+                            player.getX(), player.getY() + 2.5D, player.getZ(),
+                            1, 4.0D, 2.0D, 4.0D, 0.0D);
                 }
             }
             if (player.onGround()) {

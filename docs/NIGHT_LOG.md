@@ -486,3 +486,29 @@ Ghost house only. A Boo holding up a platform in a grass level is a floating sla
 unexplained effect underneath it, and the fiction is the entire justification for the reskin.
 
 319 tests, no failures, counted from XML.
+
+## Iteration 21
+
+Audited the remaining plan entries against the code before building anything, because 6.8 last
+iteration described a gap that was not there. That was worth doing: 5.5 was wrong too.
+
+The plan said every theme should carry an ambient particle and implied none did. Four already did --
+embers in lava, snowfall in snow, dust in desert, souls in ghost houses. The real gap was three
+themes: grass, underground, and water. Water is the one that matters, because I added that theme
+tonight and it fell straight off the end of an else-if chain, leaving a submerged course completely
+still while every other theme drifts. Nothing failed. It just looked dead.
+
+Fixed all three, with the rarity graded rather than uniform: bubbles underwater are constant,
+because that is half of what says "under water" before anything moves; cave motes are rare, because
+a cave should feel still; grass pollen is rarest of all, because a grass level is the baseline the
+other themes are read against and anything constant there raises the floor for everything.
+
+Added ThemeAmbienceTest, which reads the source and checks each theme is named in the ambience pass.
+That is a blunt instrument and the right one: the alternative is a headless client ticking to
+observe particles, which is a lot of machinery to answer "did anyone remember the new theme". It is
+scoped to the pass itself so an unrelated mention elsewhere cannot satisfy it.
+
+Corrected the plan entry too, rather than quietly ticking it off. The plan was written from footage;
+some of its entries describe gaps the code does not have.
+
+320 tests, no failures, counted from XML.

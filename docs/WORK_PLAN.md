@@ -156,7 +156,8 @@ Whatever draws the top of a fluid has to be per-fluid art.
 
 **5.5 Every theme carries one ambient particle.** Embers in castles, snowfall in ice, bubbles
 underwater, drifting motes in caves. Static geometry plus one moving particle is most of what makes
-a room feel alive.
+a room feel alive. *Done, and the entry was wrong when written:* four themes already had ambience,
+so the gap was three, not seven. Corrected by reading the code rather than the footage.
 
 **5.6 Interiors are lit by visible sources.** Sconces, lanterns, glowing crystals set into walls,
 stained glass. Flame colour is themed — ghost houses and towers burn green.
