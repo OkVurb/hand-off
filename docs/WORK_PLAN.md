@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Twenty-six of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Twenty-eight of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -163,6 +163,12 @@ Traversal that is neither walking nor jumping.
 
 **B14. Drop-crushers.** Heavy stone faces that hang above the lane and slam down when passed under.
 The mod has static spikes, which threaten a place; these threaten a moment.
+
+**B15. Firebars, and hazards that telegraph.** A whole fortress is built around bars of flame
+rotating on a hub block — singly, in pairs, and as four-armed crosses — and the game
+*draws the sweep circle* so the player can read the danger before entering it. The telegraph is the
+finding, not the firebar: a moving hazard is only fair if its reach is visible while it is out of
+the way. Nothing in the mod draws its own threat range.
 
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
