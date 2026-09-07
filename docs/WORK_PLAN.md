@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Twenty-four of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Twenty-six of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -57,7 +57,8 @@ geometry. The mod's pipes are decorative or fake by design decision.
 band; rock ledges carry a grass-and-tuft top band; ice carries a snow band. A6 recorded this as a
 snow behaviour, but it is general: the top face of a platform is drawn differently from its body in
 every theme. Cliff terrain goes further and gives the *side* a third treatment again: green top,
-horizontally striated pale rock face, white surf band where it meets the sea. So a block face is
+horizontally striated pale rock face, white surf band where it meets the sea. Tower ice goes further again and hangs an icicle
+fringe off the *underside*, so all three exposed faces get their own treatment. A block face is
 drawn by which way it points — top, side, buried — not by which block it is.
 This is `ConnectedBlock` work — the cap is exactly the up-neighbour case the property
 set already models, and it would land across every theme at once.
@@ -105,6 +106,13 @@ fight is built on. Every boss here is lane-sized and lane-bound.
 **A18. Bosses have phases, and a phase change is visible.** The final fight turns from ordinary to
 giant and skeletal, with the fire changing colour. The transformation is the tell that the fight
 moved on.
+
+**A19. Shops are architecture, not menus.** The item house is a warm gold room with wide rounded
+arches, columns, and open sky behind the openings — bright and welcoming, and built nothing
+like the level interiors it sits between. A shop reads as somewhere you have arrived.
+
+**A20. Platforms are not all cubes.** Thin ledges with a dark inset centre, and grey metal pole
+assemblies carrying switch blocks. Two shapes that are clearly furniture rather than terrain.
 
 **A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
 visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
@@ -165,7 +173,8 @@ static blocks.
 
 **C1. A world is one hue family plus one or two rare accents.** The desert set is almost entirely
 warm ochres — ground, dunes, distant structures, cave interiors — with a green pipe and blue sky as
-deliberate exceptions. Audit each theme for hue discipline.
+deliberate exceptions. *Confirmed hard by the gold underground level*, which is almost entirely one
+olive-and-gold family across walls, ledges, pipes and terrain. Audit each theme for hue discipline.
 
 **C2. Remaining skyboxes.** Five themes still carry the old generated art. Blocked on the ChatGPT
 composer refusing long prompts reliably; procedural fallback is viable since skies are mostly
@@ -231,7 +240,9 @@ node graph. Ours draws nodes and paths on a flat field.
 
 **D4. World maps are themed terrain, and special worlds break the pattern deliberately.** Each
 world's map is built from that world's own materials with scenery around the node graph; the bonus
-worlds use an abstract checkered field instead, which is what marks them as outside the sequence.
+worlds use an abstract checkered field instead, which is what marks them as outside the sequence
+— and each bonus world takes its own checker colour, hot pink for one and iridescent purple
+for another, so they are distinct from each other as well as from the main run.
 
 **D6. Level and map are joined by an iris wipe.** A circular iris closes on the course and opens
 on the map at the node you just cleared, which is what ties the two screens together as one place.
