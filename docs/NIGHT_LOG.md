@@ -308,3 +308,29 @@ ceiling. Nothing here proves it looks good -- rendering is not tested and a scre
 colour perfectly happily. That part still needs eyes.
 
 306 tests, no failures, counted from XML.
+
+## Iteration 14
+
+The iris wipe, plan 7.4. The map used to appear all at once, which made returning from a course
+feel like being dropped somewhere rather than arriving somewhere. It now opens as a circle growing
+from the selected node.
+
+Drawn as horizontal bands, because this screen has rectangle fills and nothing else: for each
+scanline the half-width of the circle at that height is solved directly and the two rectangles
+either side are filled. That is how an iris was done long before shaders and it is exact rather
+than an approximation of a circle.
+
+The radius eases out instead of growing linearly. Constant speed reads as a shutter; easing reads
+as an eye opening, which is the whole reference for the effect.
+
+Two things I checked rather than assumed. The effect latches once played, so switching worlds or
+resizing the window does not replay it -- an iris that fired on every resize would be a stutter.
+And the full radius is now a separate testable function, because there is exactly one way this
+fails visibly and permanently: too small a radius finishes the animation, stops the drawing, and
+leaves a black wedge in a corner forever. IrisGeometryTest proves every corner is covered from a
+focus anywhere on screen, including off it.
+
+Used System.currentTimeMillis() rather than importing Util.getMillis, because the file already
+tracks its walk animation that way and one screen with two clocks is a bug waiting for a slow frame.
+
+308 tests, no failures, counted from XML.

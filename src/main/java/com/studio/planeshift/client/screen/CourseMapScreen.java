@@ -103,6 +103,14 @@ public class CourseMapScreen extends Screen {
         };
     }
 
+    /**
+     * How long the iris takes to open, in milliseconds.
+     *
+     * <p>Short. This is punctuation between two screens, and punctuation the player has to wait
+     * through stops being punctuation and becomes a loading bar.
+     */
+    private static final int IRIS_MILLIS = 420;
+
     private int worldIndex;
     private int selected;
 
@@ -116,6 +124,19 @@ public class CourseMapScreen extends Screen {
      */
     private int walkFrom = -1;
     private long walkStartMs;
+
+    /**
+     * When the iris started opening, or 0 once it has finished.
+     *
+     * <p>The map used to appear all at once, which made returning from a course feel like being
+     * dropped somewhere rather than arriving somewhere. The reference joins the two screens with a
+     * circle that closes on the course and opens on the map at the node just cleared, and that is
+     * what turns a level select into a place the player has been walking through.
+     */
+    private long irisStartMs;
+
+    /** Latched once the iris has played, so switching worlds does not replay it. */
+    private boolean irisDone;
     private WorldMapLayout layout;
     private Button previousWorld;
     private Button nextWorld;
@@ -161,6 +182,11 @@ public class CourseMapScreen extends Screen {
     @Override
     protected void init() {
         layout = WorldMapLayout.forWorld(world());
+        // Only on a genuine open, not on the re-init a window resize triggers -- an iris that
+        // replayed every time the window changed size would be a stutter rather than a flourish.
+        if (irisStartMs == 0L && !irisDone) {
+            irisStartMs = System.currentTimeMillis();
+        }
         if (selected <= 0 || selected >= layout.nodes().size()) {
             selected = firstPlayable();
         }
@@ -220,6 +246,64 @@ public class CourseMapScreen extends Screen {
 
     private int mapHeight() {
         return this.height - 92;
+    }
+
+    /**
+     * The opening iris: black everywhere except a growing circle over the selected node.
+     *
+     * <p>Drawn as horizontal bands rather than as a real circle, because this screen has rectangle
+     * fills and nothing else. For each scanline the half-width of the circle at that height is
+     * solved directly, and the two rectangles either side of it are filled -- which is how an iris
+     * was done long before anyone had a shader, and is exact rather than an approximation.
+     *
+     * <p>The radius eases out rather than growing linearly. A constant-speed iris reads as a
+     * shutter; easing makes it read as an eye opening, which is the whole reference for the effect.
+     */
+    private void drawIris(GuiGraphics graphics) {
+        if (irisDone || irisStartMs == 0L) {
+            return;
+        }
+        float t = (System.currentTimeMillis() - irisStartMs) / (float) IRIS_MILLIS;
+        if (t >= 1.0F) {
+            irisDone = true;
+            return;
+        }
+
+        WorldMapLayout.Node focus = layout.node(Mth.clamp(selected, 0, layout.nodes().size() - 1));
+        int cx = nodeX(focus);
+        int cy = nodeY(focus);
+
+        double full = irisFullRadius(cx, cy, this.width, this.height);
+        double eased = 1.0D - Math.pow(1.0D - t, 3.0D);
+        double radius = eased * full;
+
+        for (int y = 0; y < this.height; y++) {
+            double dy = y - cy;
+            double inside = radius * radius - dy * dy;
+            if (inside <= 0.0D) {
+                graphics.fill(0, y, this.width, y + 1, 0xFF_000000);
+                continue;
+            }
+            int half = (int) Math.sqrt(inside);
+            if (cx - half > 0) {
+                graphics.fill(0, y, cx - half, y + 1, 0xFF_000000);
+            }
+            if (cx + half < this.width) {
+                graphics.fill(cx + half, y, this.width, y + 1, 0xFF_000000);
+            }
+        }
+    }
+
+    /**
+     * The radius at which the iris has cleared the whole screen.
+     *
+     * <p>The distance to the furthest corner from the focus. Getting this too small is the one way
+     * the effect fails visibly and permanently: the iris finishes, stops drawing, and leaves a
+     * black wedge in whichever corner it never reached. Separated out so that can be checked
+     * without rendering anything.
+     */
+    static double irisFullRadius(int cx, int cy, int width, int height) {
+        return Math.hypot(Math.max(cx, width - cx), Math.max(cy, height - cy));
     }
 
     private int nodeX(WorldMapLayout.Node node) {
@@ -469,6 +553,9 @@ public class CourseMapScreen extends Screen {
         drawPaths(graphics);
         drawNodes(graphics, progress);
         drawSelectionLabel(graphics, progress);
+        // Last, so it covers the whole screen including the buttons. An iris that widgets drew
+        // over would be a hole in the effect exactly where the eye is going.
+        drawIris(graphics);
     }
 
     private void drawTopBar(GuiGraphics graphics, CourseProgress progress) {
