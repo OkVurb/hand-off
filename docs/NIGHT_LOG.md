@@ -855,3 +855,13 @@ gained the ledge and the wall set back to hold him.
 Verified rather than assumed: with the ledge disabled the new test fails, with it
 on it passes. 344 tests, 0 failures. (Cost me the edit once -- I ran git checkout
 on an uncommitted file to undo the experiment and threw away the fix with it.)
+
+## Phase two is a climb (plan 3.4)
+Built out of blocks that already existed. The last castle's finish staircase is
+donut blocks rather than stone, so the way up to the pole falls away under the
+player while Super Bowser throws fire from the backdrop. Treads only -- the columns
+stay stone, because a fully-donut staircase would vanish under one missed step and
+leave the player waiting for respawn timers.
+
+Not built: the switch at the top that drops the floor under him. Recorded in the
+plan rather than glossed. 345 tests, 0 failures.

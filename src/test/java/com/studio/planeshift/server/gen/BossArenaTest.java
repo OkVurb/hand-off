@@ -218,4 +218,28 @@ class BossArenaTest {
         assertTrue(!c.blocks().containsKey(CourseCanvas.key(0, 0, 5)),
                 "an ordinary castle has no backdrop ledge, because it has no background boss");
     }
+
+    /**
+     * The last castle's climb falls away under the player; its supports do not.
+     *
+     * <p>Both halves matter. If the treads were stone there is no phase two, only a staircase; if
+     * the whole column were donut a single missed step would take the staircase with it and leave
+     * the player waiting at the bottom for blocks to time back in, which is a soft-lock wearing a
+     * respawn timer.
+     */
+    @Test
+    void theLastCastleClimbIsMadeOfBlocksThatFall() {
+        CourseCanvas c = BossArena.build(WorldRegistry.allWorlds().size() - 1);
+        for (int i = 0; i < 7; i++) {
+            int x = 33 + i;
+            assertEquals(ModBlocks.DONUT_BLOCK.get(),
+                    c.blocks().get(CourseCanvas.key(x, i + 1, 0)).getBlock(),
+                    "the tread at x=" + x + " should fall away");
+            if (i > 0) {
+                assertEquals(ModBlocks.COURSE_CASTLE_BLOCK.get(),
+                        c.blocks().get(CourseCanvas.key(x, i, 0)).getBlock(),
+                        "the support under x=" + x + " should not");
+            }
+        }
+    }
 }

@@ -125,9 +125,16 @@ ties visual scale to the registered hitbox. Hooked on death rather than a health
 fires whether he is out-damaged or dropped by the bridge. Same mesh, same sheet, larger rig — the
 transformation reads as size because size is the only thing that changed.
 
-*Still missing:* phase two's own shape. The reference does not simply continue the fight bigger —
-it becomes a climb up collapsing bone lifts to a switch at the top, with the floor giving way under
-him. That is an arena, not a mob, and it is the next piece.
+*Phase two's shape, built:* the last castle's finish staircase is made of donut blocks instead of
+stone, so the climb to the pole falls away under the player while Super Bowser throws fire from the
+backdrop. The mod already had the falling block and already had the staircase; the difference
+between the last castle and the other four is what the player has to do on it, not how much of it
+there is. Only the treads fall — the columns under them stay stone, or one missed step would take
+the whole staircase with it.
+
+*Still missing:* the switch at the top that drops the floor out from under him. The arena ends the
+phase by damage instead. `AxeBlock` is the mod's word for exactly this and is already in the room,
+so it is a small piece, but it is not built.
 
 **3.5 The arena is its own room, and it is approached.** *Already true when written:* `BossArena`
 builds an approach before the bridge, with a comment saying the castle used to be a corridor and

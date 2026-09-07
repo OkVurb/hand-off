@@ -233,9 +233,21 @@ public final class BossArena {
 
         // The staircase to the pole, so the top band is reachable here too. Without it a boss
         // course would be the one place in the game the 1-Up cannot be taken.
-        for (int step = 0; step < 7; step++) {
-            for (int h = 1; h <= step + 1; h++) {
-                lane(c, FLAG_X - 10 + step, h, castle);
+        //
+        // In the last castle it is built out of donut blocks instead of stone, and that is phase
+        // two. The wiki describes the second Bowser as a climb up lifts that fall when they are
+        // touched, and the mod already had that block; making the climb out of it costs no new
+        // mechanic and no new geometry, which is the point -- the difference between the last
+        // castle and the other four should be what the player has to do, not how much of it there
+        // is. Super Bowser stands in the backdrop throwing fire while they climb, which is the
+        // only thing that makes a staircase into a fight.
+        BlockState step = last ? ModBlocks.DONUT_BLOCK.get().defaultBlockState() : castle;
+        for (int i = 0; i < 7; i++) {
+            for (int h = 1; h <= i + 1; h++) {
+                // Only the tread falls away. The column under it stays stone, or a player who lost
+                // one step would find the whole staircase gone and the climb unfinishable until
+                // every block had timed back in.
+                lane(c, FLAG_X - 10 + i, h, h == i + 1 ? step : castle);
             }
         }
 
