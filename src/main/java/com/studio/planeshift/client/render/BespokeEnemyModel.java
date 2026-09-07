@@ -132,6 +132,8 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             // disagree.
             case BIG_CHEEP -> cheepCheep();
             case DEEP_CHEEP -> cheepCheep();
+            case MEGA_DEEP_CHEEP -> cheepCheep();
+            case URCHIN -> urchin();
             case PIRANHA_PLANT -> piranhaPlant();
             // Same mesh, larger rig. See BIG_CHEEP above.
             case MEGA_PIRANHA_PLANT -> piranhaPlant();
@@ -432,6 +434,30 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         }
         // The post it is bolted to.
         r.addOrReplaceChild("shell", box(0, 40, -2, -6, -2, 4, 12, 4), pose(0, 6, 20.0F));
+        return finish(mesh);
+    }
+
+    /**
+     * The urchin: a ball of spines and nothing else.
+     *
+     * <p>No face plate, unlike every other rig here. That is deliberate and it is the same point
+     * the texture makes -- eyes invite the player to look for the front, and this thing has no
+     * front. Spines on all six faces plus the diagonals of the visible plane, so the outline is
+     * points from any angle the side camera can offer.
+     */
+    private static LayerDefinition urchin() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -5, -5, -5, 10, 10, 10), pose(0, 13, 0));
+        float[][] spines = {
+            {0, 8, 0}, {0, -8, 0}, {8, 0, 0}, {-8, 0, 0}, {0, 0, 8}, {0, 0, -8},
+            {6, 6, 0}, {-6, 6, 0}, {6, -6, 0}, {-6, -6, 0},
+        };
+        for (int i = 0; i < spines.length; i++) {
+            float[] at = spines[i];
+            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, -1, -1, -1, 2, 2, 2),
+                    pose(at[0] * 0.55F, 13 + at[1] * 0.55F, at[2] * 0.55F));
+        }
         return finish(mesh);
     }
 

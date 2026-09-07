@@ -52,6 +52,10 @@ public enum EnemyRigProfile {
     BIG_CHEEP(1.90F),
     /** The pursuing fish. Same body as the red one; the difference is behaviour and palette. */
     DEEP_CHEEP(1.20F),
+    /** The spine ball. Read as a silhouette of points, so it carries a little extra scale. */
+    URCHIN(1.30F),
+    /** The big pursuing fish, for the same reason {@link #BIG_CHEEP} is its own entry. */
+    MEGA_DEEP_CHEEP(1.90F),
     TOAD(1.0F),
     /**
      * All eight tower bosses share this one. See {@link Koopaling}: the scale here is tied to the

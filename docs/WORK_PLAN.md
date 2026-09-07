@@ -162,8 +162,10 @@ it. Timings untouched: a plant is a metronome the player learns, and changing th
 this a different enemy rather than a bigger one. Its rise had to be overridden, though, or its head
 would have stayed inside its own pipe at full extension.
 
-*Not built:* Mega Deep Cheep and Mega Fuzzy. The Fuzzy does not exist in the mod at any size, so it
-belongs to §6 rather than here.
+*Not built:* the Mega Fuzzy. The Fuzzy does not exist in the mod at any size, so it belongs to §6
+rather than here. The other three of the reference's four oversized enemies are done — Big Boo,
+Mega Piranha Plant, Mega Deep Cheep — alongside the Mega Cheep-Cheep that shipped before the entry
+was written.
 
 ---
 
@@ -274,7 +276,11 @@ size or a species, it was a **behaviour** — every one of them patrolled, and a
 approaches is one the player can wait out, which in water is fatal to the pacing because swimming
 is slow. *Built:* `DeepCheepEntity`, the fish that follows. Same silhouette as the red one on
 purpose, with the difference carried by palette and by the one detail the red sheet is emphatic
-about not having — a scowl. Urchins and squid remain.
+about not having — a scowl. Also `UrchinEntity`, which is the cast's first thing that cannot be
+answered at all: fish are dodged by timing and the pursuing one by moving, and an urchin is
+geometry that hurts. It drifts vertically rather than along the corridor, so what it closes is the
+gap between floor and ceiling — a different shape of threat from anything else in the water. And
+`MegaDeepCheepEntity`, which completes the reference's oversized four. Squid remain.
 
 **6.5 Enemies reskin per world over identical behaviour.** Skeletal fish, Dry Bones, winged
 variants. Cheap cast expansion off entities that already exist.

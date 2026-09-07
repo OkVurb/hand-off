@@ -170,7 +170,8 @@ public final class SegmentLibrary {
                     // Spiny, which makes an underwater level a timing puzzle with no pressure in
                     // it -- the swimming is slow enough that a threat which never approaches is a
                     // threat the player can simply wait out.
-                    ModEntities.DEEP_CHEEP.get(),
+                    ModEntities.DEEP_CHEEP.get(), ModEntities.URCHIN.get(),
+                    ModEntities.MEGA_DEEP_CHEEP.get(),
                     ModEntities.BONE_CHEEP.get(), ModEntities.SPINY.get());
             // A cast that does not need the floor. Paratroopa and Lakitu both fly, and Bullet
             // Bill crosses open air in a straight line -- all three are at their best in a world

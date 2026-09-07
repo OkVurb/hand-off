@@ -950,6 +950,30 @@ def deep_cheep():
     return img
 
 
+def urchin():
+    """A dark spiny ball. Nothing on it is soft, and that is the whole message.
+
+    The only member of the water cast with no face. Every other enemy here has eyes, which is what
+    makes them creatures the player reads intentions from; an urchin has none, because it has no
+    intentions -- it drifts, and touching any part of it hurts. Giving it a face would invite the
+    player to look for the safe side, and there is not one.
+
+    Two-tone on purpose: near-black body, pale spike tips. At this distance the tips are the
+    silhouette, and a uniformly dark ball in dark water is a thing you find with your face.
+    """
+    img = new_sheet()
+    shell = (48, 34, 66)
+    base(img, BODY, shell, 71, ramp=0.30)
+    base(img, HEAD, shade(shell, 1.1), 72, ramp=0.28)
+    # Spikes: the hard region, pale so the points read against the murk.
+    base(img, HARD, (206, 198, 224), 73, ramp=0.26)
+    rect(img, HARD, 0, 0, 64, 3, (238, 234, 248))
+    base(img, LIMB, shade(shell, 0.85), 74, ramp=0.22)
+    base(img, MUZZLE, shade(shell, 1.2), 75, ramp=0.20)
+    base(img, TRIM, (168, 154, 196), 76, ramp=0.24)
+    return img
+
+
 def big_cheep():
     """The large fish: green-grey instead of red, and blunter.
 
@@ -1023,6 +1047,7 @@ CHARACTERS = {
     "bone_cheep": bone_cheep,
     "big_cheep": big_cheep,
     "deep_cheep": deep_cheep,
+    "urchin": urchin,
     "goomba": goomba,
     "fire_bro": fire_bro,
     "boomerang_bro": boomerang_bro,

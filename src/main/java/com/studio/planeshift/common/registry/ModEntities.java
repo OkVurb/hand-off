@@ -6,6 +6,8 @@ import com.studio.planeshift.common.entity.KoopalingEntity;
 import com.studio.planeshift.common.entity.BigBooEntity;
 import com.studio.planeshift.common.entity.ChainChompEntity;
 import com.studio.planeshift.common.entity.DeepCheepEntity;
+import com.studio.planeshift.common.entity.MegaDeepCheepEntity;
+import com.studio.planeshift.common.entity.UrchinEntity;
 import com.studio.planeshift.common.entity.MegaPiranhaPlantEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.ClownCarEntity;
@@ -200,6 +202,21 @@ public final class ModEntities {
                             EnemyRigProfile.CHEEP_CHEEP.scaled(0.4F))
                     .clientTrackingRange(8)
                     .build(key("bone_cheep")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<UrchinEntity>> URCHIN =
+            ENTITY_TYPES.register("urchin", () -> EntityType.Builder
+                    .of(UrchinEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.URCHIN.scaled(0.7F), EnemyRigProfile.URCHIN.scaled(0.7F))
+                    .clientTrackingRange(8)
+                    .build(key("urchin")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MegaDeepCheepEntity>>
+            MEGA_DEEP_CHEEP = ENTITY_TYPES.register("mega_deep_cheep", () -> EntityType.Builder
+                    .of(MegaDeepCheepEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.MEGA_DEEP_CHEEP.scaled(0.6F),
+                            EnemyRigProfile.MEGA_DEEP_CHEEP.scaled(0.4F))
+                    .clientTrackingRange(10)
+                    .build(key("mega_deep_cheep")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<DeepCheepEntity>> DEEP_CHEEP =
             ENTITY_TYPES.register("deep_cheep", () -> EntityType.Builder
@@ -401,6 +418,8 @@ public final class ModEntities {
         event.put(BONE_CHEEP.get(), CheepCheepEntity.createAttributes().build());
         event.put(BIG_CHEEP.get(), BigCheepEntity.createAttributes().build());
         event.put(DEEP_CHEEP.get(), DeepCheepEntity.createAttributes().build());
+        event.put(MEGA_DEEP_CHEEP.get(), MegaDeepCheepEntity.createAttributes().build());
+        event.put(URCHIN.get(), UrchinEntity.createAttributes().build());
         event.put(BIG_BOO.get(), BigBooEntity.createAttributes().build());
         event.put(CHAIN_CHOMP.get(), ChainChompEntity.createAttributes().build());
         event.put(PIRANHA_PLANT.get(), PiranhaPlantEntity.createAttributes().build());

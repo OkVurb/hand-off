@@ -995,3 +995,16 @@ slower than the player swims, on purpose: it exists to keep them moving, not to
 catch them. Same mesh and silhouette as the red one; the difference is the palette
 and a scowl, which the red sheet's own comment says it deliberately does not have.
 353 tests, 0 failures.
+
+## Urchin, and the last oversized fish
+The water cast could be answered entirely by timing and movement. UrchinEntity is
+the first thing in it that cannot be answered at all -- it is terrain that moves,
+and the only play is not being there. Vertical drift rather than a sideways patrol,
+so what it closes is the floor-to-ceiling gap rather than a stretch of corridor.
+
+No face, and that is the design: eyes invite the player to look for the front, and
+this has no front. It is the only rig in the model table without a face plate.
+
+MegaDeepCheep is the fourth run through the oversized pattern and took two lines,
+which is the evidence the "size lives in the registered hitbox" rule is paying for
+itself. 355 tests, 0 failures.

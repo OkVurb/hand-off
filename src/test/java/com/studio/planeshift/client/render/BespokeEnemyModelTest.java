@@ -66,6 +66,10 @@ class BespokeEnemyModelTest {
             // The same fish again. Three profiles now share this mesh -- red, big and deep -- and
             // that they all report the same count is the assertion.
             Map.entry(EnemyRigProfile.DEEP_CHEEP, 7L),
+            Map.entry(EnemyRigProfile.MEGA_DEEP_CHEEP, 7L),
+            // Body plus ten spines, and no face plate -- the only rig here without one. Eyes
+            // would invite the player to look for the front, and an urchin has no front.
+            Map.entry(EnemyRigProfile.URCHIN, 11L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
             // Same count as PIRANHA_PLANT, and the equality is the assertion. Third profile in
             // this table whose whole content is "the small one, registered bigger".
