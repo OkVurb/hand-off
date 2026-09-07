@@ -1392,6 +1392,34 @@ public final class SegmentLibrary {
     };
 
     /**
+     * Two chain balls swinging over a continuous floor.
+     *
+     * <p>Spaced so their arcs do not overlap. Overlapping pendulums produce a window that opens and
+     * closes on the product of two periods, which is a timing puzzle nobody can read at a glance --
+     * and the whole argument for drawing the arc is that the hazard should be readable. Two
+     * separate problems in a row is harder than one and still fair; one compound problem is neither.
+     *
+     * <p>Floor is unbroken, for the same reason as the saw corridor: the reachability proof cannot
+     * see a moving hazard, so a crossing that depended on one would prove passable and play as a
+     * wall. Geometry always allows the crossing; the balls set what it costs.
+     */
+    static final Segment CHAIN_BALL_HALL = new Segment() {
+        public SegmentSpec spec() {
+            return def("chain_ball_hall", 18, 3, 2, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 18, y, ctx);
+
+            // Pivots high enough that the ball at the bottom of its swing is at head height rather
+            // than at the floor: a ball that scrapes the ground is a wall with extra steps.
+            c.spawn(ModEntities.CHAIN_BALL.get(), x + 5.5D, y + 7, 0.5D, 0.0F, GENERATED_TAG);
+            c.spawn(ModEntities.CHAIN_BALL.get(), x + 13.5D, y + 7, 0.5D, 0.0F, GENERATED_TAG);
+            coinTrail(c, x + 8, 4, y + 1, 1);
+        }
+    };
+
+    /**
      * A corridor with a saw running across it.
      *
      * <p>Built as a flat run rather than as a jumping puzzle, because the saw is the puzzle. Adding
@@ -1764,6 +1792,7 @@ public final class SegmentLibrary {
         list.add(VINE_WALL);
         list.add(CLIMB_POLE);
         list.add(SAW_CORRIDOR);
+        list.add(CHAIN_BALL_HALL);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);

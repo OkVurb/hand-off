@@ -385,3 +385,28 @@ green whether or not a single course ever contains one. Both bounds again -- it 
 every course, because a hazard met every level is the floor.
 
 314 tests, no failures, counted from XML.
+
+## Iteration 17
+
+Chain balls, plan 6.6, and the fourth telegraph form. Telegraph.arc has been sitting unused since
+the night it was written, which was the right call then and is finally paid off now: a firebar shows
+reach as a circle and a saw shows path as a line, but a pendulum needs neither. Its reach is a
+circle it only travels part of, so drawing the full disc would claim ground the ball never visits
+and drawing the chord would put the warning where the ball is not. Only the arc is true.
+
+Two angle conventions meet in the entity -- the chain measures from straight down, Telegraph.arc
+measures anticlockwise from east -- and a quarter turn between them would draw the warning somewhere
+the ball never goes. That is strictly worse than drawing nothing: a telegraph the player learns to
+trust and which then lies turns a fair hazard into an unfair one. So the maths came out into static
+pure functions and ChainBallGeometryTest checks the arc endpoints land exactly on the ball at its
+swing extremes, which is the assertion that catches the quarter turn.
+
+The segment places two balls spaced so their arcs do not overlap. Overlapping pendulums open and
+close a window on the product of two periods, which nobody can read at a glance -- and readability
+is the entire argument for drawing the arc. Two separate problems in a row is harder than one and
+still fair; one compound problem is neither.
+
+Floor unbroken again, same as the saw corridor, so the reachability proof is never load-bearing on a
+hazard it cannot see. Passed first time, second iteration running.
+
+317 tests, no failures, counted from XML.

@@ -360,5 +360,6 @@
   "block.planeshift.course_climb_pole": "Climbing Pole",
   "gui.planeshift.banner.final_world": "The Star Road has appeared!",
   "gui.planeshift.banner.all_cleared": "You have cleared every course!",
-  "entity.planeshift.saw": "Buzzsaw"
+  "entity.planeshift.saw": "Buzzsaw",
+  "entity.planeshift.chain_ball": "Chain Ball"
 }

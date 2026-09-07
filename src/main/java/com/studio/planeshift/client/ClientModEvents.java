@@ -5,6 +5,7 @@ import com.studio.planeshift.client.camera.CameraDirector;
 import com.studio.planeshift.client.hud.CourseHud;
 import com.studio.planeshift.client.input.PlaneConstrainedInput;
 import com.studio.planeshift.client.music.CourseMusicManager;
+import com.studio.planeshift.client.render.ChainBallRenderer;
 import com.studio.planeshift.client.render.SawRenderer;
 import com.studio.planeshift.client.render.CourseEnemyRenderer;
 import com.studio.planeshift.client.render.CourseSkyboxRenderer;
@@ -201,6 +202,7 @@ public final class ClientModEvents {
                 BespokeProjectileRenderer.provider(PlaneShift.id("textures/entity/bowser_fire.png"),
                         ProjectileVisualProfile.BOWSER_FIRE));
         event.registerEntityRenderer(ModEntities.MOVING_PLATFORM.get(), MovingPlatformRenderer::new);
+        event.registerEntityRenderer(ModEntities.CHAIN_BALL.get(), ChainBallRenderer::new);
         event.registerEntityRenderer(ModEntities.SAW.get(), SawRenderer::new);
         event.registerEntityRenderer(ModEntities.FIREBAR.get(), FirebarRenderer::new);
     }
