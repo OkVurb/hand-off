@@ -77,8 +77,15 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> LAVA_FLOWING =
             FLUIDS.register("course_lava_flowing", () -> new BaseFlowingFluid.Flowing(lavaProperties()));
 
+    // registerBlock(name, factory, properties), not register(name, supplier).
+    //
+    // The supplier form builds the block without stamping the registry id onto its Properties, and
+    // modern NeoForge requires one -- the failure is a NullPointerException reading "Block id not
+    // set" thrown during RegisterEvent, which takes the whole mod down at load rather than failing
+    // anywhere near this line.
     public static final DeferredHolder<Block, LiquidBlock> LAVA_BLOCK =
-            FLUID_BLOCKS.register("course_lava_block", () -> new LiquidBlock(LAVA.get(),
+            FLUID_BLOCKS.registerBlock("course_lava_block",
+                    props -> new LiquidBlock(LAVA.get(), props),
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.FIRE)
                             .replaceable()
@@ -86,7 +93,7 @@ public final class ModFluids {
                             .pushReaction(PushReaction.DESTROY)
                             .noLootTable()
                             .liquid()
-                            .lightLevel(state -> 15)));
+                            .lightLevel(state -> 15));
 
     private static BaseFlowingFluid.Properties lavaProperties() {
         return new BaseFlowingFluid.Properties(LAVA_TYPE, LAVA, LAVA_FLOWING)
@@ -114,14 +121,15 @@ public final class ModFluids {
             FLUIDS.register("course_water_flowing", () -> new BaseFlowingFluid.Flowing(waterProperties()));
 
     public static final DeferredHolder<Block, LiquidBlock> WATER_BLOCK =
-            FLUID_BLOCKS.register("course_water_block", () -> new LiquidBlock(WATER.get(),
+            FLUID_BLOCKS.registerBlock("course_water_block",
+                    props -> new LiquidBlock(WATER.get(), props),
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.WATER)
                             .replaceable()
                             .strength(100.0F)
                             .pushReaction(PushReaction.DESTROY)
                             .noLootTable()
-                            .liquid()));
+                            .liquid());
 
     private static BaseFlowingFluid.Properties waterProperties() {
         return new BaseFlowingFluid.Properties(WATER_TYPE, WATER, WATER_FLOWING)
