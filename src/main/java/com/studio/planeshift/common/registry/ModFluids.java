@@ -111,7 +111,12 @@ public final class ModFluids {
                     .viscosity(1000)
                     .temperature(300)
                     .canSwim(true)
-                    .canDrown(true)
+                    // No drowning. Every underwater level in the reference lets the player stay
+                    // down as long as they like -- the water is a place with different movement,
+                    // not a timer. A breath meter would turn a level meant to be explored into one
+                    // that must be rushed, and would do it invisibly, since nothing in the course
+                    // tells the player they are on a clock.
+                    .canDrown(false)
                     .canHydrate(true)
                     .supportsBoating(true)));
 

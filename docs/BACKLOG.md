@@ -164,13 +164,15 @@ only the owner can make.
 - **No water cast.** `SegmentLibrary.cast(WATER)` returns Buzzy Beetle and Spiny, which are land
   enemies. Buzzy is the least wrong -- armoured and slow is at least the right silhouette for
   something drifting -- but the theme is not finished until fish exist. Plan item 6.4.
-- **Nothing is actually submerged.** The theme picks water-coloured blocks and a reef set piece;
-  it does not fill the course volume with the fluid. That needs `CourseWriter` to flood the lane,
-  and it needs swimming to work first, or every water course becomes an air course that is merely
-  green.
-- **No swimming.** The reachability proof rejected the first reef arch because a walking player met
-  a six-block coral wall, and it was right to. Until movement supports swimming, water courses have
-  to be built as dry courses with a marine palette, which is what they currently are.
+- ~~**Nothing is actually submerged.**~~ Done. Flooded in `CourseComposer` after all geometry is
+  placed, so the fluid fills what is left rather than displacing anything.
+- ~~**No swimming.**~~ **Wrong when written.** `ModFluids.WATER_TYPE` already declared
+  `canSwim(true)`, so the player could always swim in it -- what was missing was any water to swim
+  in. Now fixed: water courses are flooded between the spawn apron and the flagpole run, and
+  `CourseReachability` understands swimming. Left visible rather than deleted because the mistake
+  is instructive: the backlog entry was written from what the courses looked like rather than from
+  reading the fluid, and it sent the next iteration hunting for a movement feature that already
+  existed.
 - **Decision needed: where does water live?** Two grass/snow courses were rethemed
   (`w5_grassland_5`, `w15_frozen_5`) because the reference puts underwater levels *inside* existing
   worlds rather than giving them their own. The alternative is a sixth world, which changes

@@ -3,6 +3,7 @@ package com.studio.planeshift.server.gen;
 import com.studio.planeshift.common.block.FlagPoleBlock;
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.registry.ModFluids;
 import com.studio.planeshift.common.registry.ModItems;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -75,6 +76,14 @@ public final class CourseComposer {
     static final int INTRO_NET_DROP = 3;
 
     /** Slack on each end of the per-column floor map, since content starts a little before x=0. */
+    /**
+     * How far above the highest floor a water course is filled to.
+     *
+     * <p>Generous on purpose. The whole reason a submerged level plays differently is that up is a
+     * direction the player can use, and a ceiling close to the platforms takes that away again.
+     */
+    private static final int WATER_DEPTH = 14;
+
     private static final int FLOOR_MAP_MARGIN = 16;
 
     /** How far above the design floor a roaming enemy may be placed, in blocks. */
@@ -346,6 +355,17 @@ public final class CourseComposer {
         // belongs with the level rather than with the dressing.
         CourseRoutes.build(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, SPAWN_RUN, contentEnd);
         // Scenery last, so it can see the finished floor and fill in behind everything else.
+        // Water courses are filled after everything else is placed.
+        //
+        // Last, because flooding has to see the finished geometry: it fills what is still empty,
+        // so anything written afterwards would end up inside solid water instead of inside the
+        // course. The theme picked marine blocks and a reef from the moment it existed and was
+        // still, in every other respect, a dry course that happened to be green -- this is the
+        // part that makes it a water level.
+        if (theme == CourseTheme.WATER) {
+            flood(canvas, ctx, floorAt, SPAWN_RUN, contentEnd);
+        }
+
         // Decorated in spans, so the cave gets a cave's backdrop and the surface gets a sky. One
         // pass over the whole course would have painted a skyline behind the underground stretch,
         // which is the exact bug the per-span split exists to avoid.
@@ -417,6 +437,46 @@ public final class CourseComposer {
     }
 
     /** Set pieces only belong where the theme supports them. */
+    /**
+     * Fills a water course with water.
+     *
+     * <p>The spawn apron and the run up to the flagpole stay dry, which is both what the tests
+     * demand and what the reference does: a water course begins on a dry ledge and descends, so
+     * entering the water is a moment in the level rather than the state it starts in. Flooding the
+     * whole course drowned the spawn and filled the finish staircase, and two tests said so.
+     *
+     * <p>Only empty cells, and only up to a ceiling above the highest floor, so the fluid never
+     * replaces geometry and never fills the whole world. The surface sits well above the tallest
+     * platform because a water level whose surface is at head height is a swimming pool -- the
+     * point is that the space above the player is usable, which needs somewhere to go.
+     *
+     * <p>Placed as source blocks. {@code ModFluids} deliberately gives the course fluids no spread
+     * at all so a pool stays where generation put it, which means a body of water has to be
+     * written cell by cell rather than poured in and left to settle.
+     */
+    private static void flood(CourseCanvas canvas, GenContext ctx, int[] floorAt,
+                              int from, int to) {
+        BlockState water = ModFluids.WATER_BLOCK.get().defaultBlockState();
+        int highest = Integer.MIN_VALUE;
+        for (int floor : floorAt) {
+            highest = Math.max(highest, floor);
+        }
+        if (highest == Integer.MIN_VALUE) {
+            return;
+        }
+        int ceiling = highest + WATER_DEPTH;
+        int halfWidth = ctx.halfWidth();
+        for (int x = from; x < to; x++) {
+            int slot = x + FLOOR_MAP_MARGIN;
+            int floor = (slot >= 0 && slot < floorAt.length) ? floorAt[slot] : 0;
+            for (int y = floor - 6; y <= ceiling; y++) {
+                for (int z = -halfWidth; z <= halfWidth; z++) {
+                    canvas.setIfEmpty(x, y, z, water);
+                }
+            }
+        }
+    }
+
     private static boolean suitsTheme(Segment segment, CourseTheme theme) {
         if (segment == SegmentLibrary.CASTLE_BRIDGE) {
             return theme == CourseTheme.LAVA || theme == CourseTheme.UNDERGROUND;

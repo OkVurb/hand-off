@@ -128,3 +128,32 @@ laying flagpole steps. The reasoning in that comment is still right; the functio
 
 296 tests, no failures, counted from XML. Test count unchanged, which is what deleting genuinely
 unreachable code should look like.
+
+## Iteration 7
+
+Water courses now contain water. The theme had spent an iteration as a dry course with a marine
+palette, which is the failure this project keeps producing.
+
+I got one thing wrong in my own backlog and want it recorded. I wrote "no swimming" last iteration
+based on how the courses behaved; ModFluids had declared canSwim(true) from the day it was written.
+Nothing was missing from movement -- there was simply no water to swim in. The note sent this
+iteration looking for a feature that already existed, so the backlog entry is struck through rather
+than deleted.
+
+Three test failures shaped the result, all of them correct:
+- Flooding the whole course drowned the spawn and filled the finish staircase. The reference agrees
+  with the tests: a water level opens on a dry ledge and descends, so the flood is confined between
+  the spawn apron and the flagpole run.
+- The reachability proof then rejected every water course, and it was right -- it models a walker
+  and a walker cannot cross a submerged room. Taught it to swim: water is a third category, both
+  passable and supporting, which no block is. Treating water as air would have approved routes
+  ending in a drop; treating it as floor would have let the player walk on the surface.
+
+Also set canDrown(false). Every underwater level in the reference lets the player stay down
+indefinitely -- the water is a place with different movement, not a timer, and an invisible clock
+in a level meant to be explored is a bad surprise.
+
+Note for later: the suite went from 45s to about 2 minutes. Flooded courses make the reachability
+search much larger. Not a problem yet, worth watching.
+
+299 tests, no failures, counted from XML.

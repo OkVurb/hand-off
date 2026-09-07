@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.registry.ModFluids;
 import java.util.Set;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -134,10 +135,33 @@ public final class CourseReachability {
         return ONE_WAY;
     }
 
+    /**
+     * Fluids the player can hold position in.
+     *
+     * <p>Water is a third category the solver did not have. Solid blocks are floor and stop the
+     * body; passable blocks are neither. Water is passable <em>and</em> supporting: you move
+     * through it freely and you do not fall out of it, which is not something any block does.
+     *
+     * <p>Without this the proof rejected every flooded course, and it was right to -- it models a
+     * walker, and a walker cannot cross a submerged room. Teaching it to swim is the honest fix;
+     * treating water as air would have made it approve routes that end in a drop, and treating it
+     * as floor would have let the player walk on the surface.
+     */
+    private static final Set<Block> SWIMMABLE = Set.of(
+            ModFluids.WATER_BLOCK.get());
+
+    /** Whether this cell holds a fluid the player can swim in. */
+    private boolean isSwimmable(int x, int y) {
+        BlockState state = canvas.get(x, y, laneZ);
+        return state != null && SWIMMABLE.contains(state.getBlock());
+    }
+
     /** Whether this cell can be stood on. */
     private boolean isFloor(int x, int y) {
         BlockState state = canvas.get(x, y, laneZ);
-        return state != null && !PASSABLE.contains(state.getBlock());
+        return state != null
+                && !PASSABLE.contains(state.getBlock())
+                && !SWIMMABLE.contains(state.getBlock());
     }
 
     /** Whether this cell stops the player's body moving through it. */
@@ -145,6 +169,7 @@ public final class CourseReachability {
         BlockState state = canvas.get(x, y, laneZ);
         return state != null
                 && !PASSABLE.contains(state.getBlock())
+                && !SWIMMABLE.contains(state.getBlock())
                 && !ONE_WAY.contains(state.getBlock());
     }
 
@@ -153,6 +178,17 @@ public final class CourseReachability {
      * the player's own body.
      */
     public boolean isStand(int x, int y) {
+        // Floating counts as standing. In water the player holds position without anything
+        // underneath them, which is the whole difference the theme is built on -- and it has to be
+        // checked before the floor test, because the cell below open water is usually more water.
+        if (isSwimmable(x, y)) {
+            for (int h = 0; h < PLAYER_HEIGHT; h++) {
+                if (blocksBody(x, y + h)) {
+                    return false;
+                }
+            }
+            return true;
+        }
         if (!isFloor(x, y - 1)) {
             return false;
         }
