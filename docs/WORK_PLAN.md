@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Fifteen of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Eighteen of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -56,7 +56,10 @@ geometry. The mod's pipes are decorative or fake by design decision.
 **A8. Blocks are a body plus a contrasting cap row.** Green tower platforms carry an orange top
 band; rock ledges carry a grass-and-tuft top band; ice carries a snow band. A6 recorded this as a
 snow behaviour, but it is general: the top face of a platform is drawn differently from its body in
-every theme. This is `ConnectedBlock` work — the cap is exactly the up-neighbour case the property
+every theme. Cliff terrain goes further and gives the *side* a third treatment again: green top,
+horizontally striated pale rock face, white surf band where it meets the sea. So a block face is
+drawn by which way it points — top, side, buried — not by which block it is.
+This is `ConnectedBlock` work — the cap is exactly the up-neighbour case the property
 set already models, and it would land across every theme at once.
 
 **A9. Every theme carries an ambient particle.** Castles drift embers, snow levels drift flakes,
@@ -66,6 +69,15 @@ rooms feel alive; the mod's rooms are entirely still.
 **A10. A course passes through a cave and back out.** *Confirmed again.* The mountain level drops
 into an unlit cave mid-course and returns to the sky before the flagpole. This is A1 seen a second
 time in a different world, which promotes it from an observation to a pattern.
+
+**A11. Water level is a variable, not scenery.** A flooded tower has a visible surface line
+partway up the room, dry stone above and submerged rock below, and the line *moves* during the
+level. This is the strongest argument yet for having built the fluid as a fluid: a hazard block
+cannot do it.
+
+**A12. There is a post-and-beam construction kit.** Spotted vertical posts carrying horizontal
+beams, assembled as scaffolding in open air rather than stacked up from the ground. Platforms come
+from a parts kit, not only extruded from terrain.
 
 **A4. Terrain is built from mixed block sizes.** Ground reads as masonry of varying rectangles, not
 a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
@@ -102,6 +114,10 @@ sliding along a line.
 
 **B10. Enemies emerge from pipes.** A pipe is a spawner as well as a passage.
 
+**B11. Enemies have per-world reskins.** The underwater fish appears as a skeleton variant in the
+flooded tower; ground enemies appear winged in sky levels. Same behaviour, different world,
+different sprite — cheap cast expansion off entities that already exist.
+
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
 
@@ -132,6 +148,14 @@ different objects. Ours are green.
 **C8. A cloud bank sits between terrain and far hills.** On mountain levels the peaks are rooted in
 a white haze band rather than meeting the ground plane. Cheap, and it is most of why the far layer
 reads as far.
+
+**C9. Bonus worlds have their own visual language, levels included.** Not only the checkered map
+of D4: the playfield itself is framed by a chunky primary-coloured border, and the blocks are flat
+untextured plates with bolts, in pastel pink, blue and yellow. Nothing is a rock or a brick. That
+framing is what makes a bonus world read as outside the game rather than as another world in it.
+
+**C10. Interiors are lit by embedded sources.** Small glowing crystals and lamps set into the wall,
+so the light in a dark room visibly comes from somewhere. Ours are uniformly dim.
 
 **C4. Snow and the two lit themes still draw the same prop at both depths.** They use different
 decorator builders and never got the aerial-perspective treatment.
