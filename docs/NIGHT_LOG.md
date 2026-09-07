@@ -20,3 +20,18 @@ fluid existing. A course pit was filling with Minecraft lava, not ours, so none 
 work applied to the place it was most meant for.
 
 282 tests, no failures, verified by counting result XML rather than trusting the build line.
+
+## Iteration 2
+
+Finished wiring item 4. MovingPlatformEntity now marks out the two ends of its travel with a
+sparse line at its own height. A platform is only a fair jump if the player can see where it goes
+while it is still at the near end; without that the choice is between waiting a full cycle to learn
+the range and guessing.
+
+Only the endpoints and the run between them are drawn, at the platform's own height, so the line
+reads as this platform's path rather than as a floor near it.
+
+Firebar and moving platform are now both telegraphed. Telegraph.arc is still unused -- it is
+waiting on the pendulum platforms, which do not exist yet.
+
+282 tests, no failures, counted from XML.

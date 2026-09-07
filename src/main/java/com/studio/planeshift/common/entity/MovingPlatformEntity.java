@@ -77,6 +77,13 @@ public class MovingPlatformEntity extends Mob {
 
         float range = getRange();
         double speed = 0.04D;
+        // Draw the run before travelling it. A platform is only a fair jump if the player can see
+        // where it goes while it is still at the near end -- otherwise the choice is between
+        // waiting a full cycle to learn the range and guessing, and guessing is not gameplay.
+        if (!level().isClientSide() && Telegraph.due(tickCount)) {
+            telegraphRun(range);
+        }
+
         double wave = Math.sin((tickCount + tickOffset) * speed) * range;
 
         double nx = startX + (getAxis() == 0 ? wave : 0.0D);
@@ -127,6 +134,25 @@ public class MovingPlatformEntity extends Mob {
 
     public int getAxis() {
         return this.entityData.get(DATA_AXIS);
+    }
+
+    /**
+     * Marks out the two ends of this platform's travel.
+     *
+     * <p>The endpoints are what the player needs; the middle is obvious once the ends are known.
+     * Drawn at the platform's own height so the line reads as the path of this platform rather
+     * than as a floor somewhere near it.
+     */
+    private void telegraphRun(double range) {
+        double y = getY();
+        Vec3 from = getAxis() == 0
+                ? new Vec3(startX - range, y, startZ)
+                : new Vec3(startX, y, startZ - range);
+        Vec3 to = getAxis() == 0
+                ? new Vec3(startX + range, y, startZ)
+                : new Vec3(startX, y, startZ + range);
+        Telegraph.line(level(), from, to,
+                net.minecraft.core.particles.ParticleTypes.END_ROD);
     }
 
     public void setAxis(int axis) {
