@@ -56,6 +56,15 @@ public final class BossArena {
     /** How far the room runs. */
     private static final int END = 50;
 
+    /**
+     * Where the pillars stand, along the bridge.
+     *
+     * <p>Spaced four apart, which is wider than a jump is long, so crossing between two of them is
+     * a decision with a cost rather than something that happens by accident. They sit inside the
+     * bridge span so they are cover during the fight and go down with it when the axe is taken.
+     */
+    private static final int[] PILLARS = {17, 21, 25, 29};
+
     private BossArena() {
     }
 
@@ -194,6 +203,22 @@ public final class BossArena {
         for (int step = 0; step < 7; step++) {
             for (int h = 1; h <= step + 1; h++) {
                 lane(c, FLAG_X - 10 + step, h, castle);
+            }
+        }
+
+        // Pillars, standing in the back row of the lane.
+        //
+        // The wiki's account of the castle fights keeps mentioning hiding behind pillars, and the
+        // World 1 castle footage shows grey columns standing in the hall. They go at z=HALF rather
+        // than on the lane centre for two reasons: a pillar in the middle of a three-wide lane is
+        // a wall, not cover, and the gaps between them are the shelter -- the player steps into
+        // the back row where there is no column and is behind one from the camera's side.
+        //
+        // They are furniture now and load-bearing later: the seven-in-a-clown-car set-piece turns
+        // the player to stone unless they are behind something, and this is the something.
+        for (int at : PILLARS) {
+            for (int y = 1; y <= 12; y++) {
+                c.set(at, y, HALF, castle);
             }
         }
 

@@ -809,3 +809,9 @@ timed attack. `hurtServer` sets `dashTicks`, the dash owns `tick()` while it run
 bounces off arena walls. Direction is away from the attacker so it never reads as a lunge
 at a player still airborne from a stomp. `spinning()` from `ShellSpinner` drives the shell
 skin. 340 tests, 0 failures.
+
+## Boss arena pillars (plan 3.2)
+Four castle-stone columns in the back row of the bridge lane. Back row, not the
+centre: a pillar in a three-wide lane is a wall, and the gaps are what makes cover
+cover. Spaced four apart -- wider than a jump -- so moving between them costs
+something. They are also the shelter the 3.3 stone attack will need. 340 tests, 0 failures.
