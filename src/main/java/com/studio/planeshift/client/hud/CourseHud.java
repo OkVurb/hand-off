@@ -153,15 +153,28 @@ public final class CourseHud {
                     x, y + 28, TIME_NORMAL);
         }
 
-        // Lives, coins, star coins and score.
-        graphics.drawString(font, Component.translatable("hud.planeshift.lives", state.lives()),
-                x, y + 40, 0xFF4CFF4C);
-        graphics.drawString(font, Component.translatable("hud.planeshift.coins", state.coins()),
-                x, y + 52, 0xFFE7D07A);
-        graphics.drawString(font, Component.translatable("hud.planeshift.star_coins", state.starCoins()),
-                x, y + 64, 0xFFFFA500);
-        graphics.drawString(font, Component.translatable("hud.planeshift.score", state.score()),
-                x, y + 76, 0xFFFFFFFF);
+        // Lives, coins, star coins and score, as icons rather than sentences.
+        //
+        // These were four lines of "Label: value" text, which is a debug readout: the player has
+        // to read a word to find out which number they are looking at, every frame, forever. An
+        // icon is recognised rather than read, it does not need translating, and it takes a
+        // quarter of the width -- which matters here because this panel has already had to be
+        // clamped to the window once for overflowing.
+        drawLifeIcon(graphics, x, y + 40);
+        graphics.drawString(font, Integer.toString(state.lives()), x + 13, y + 41, 0xFFFFFFFF, true);
+
+        drawCoinIcon(graphics, x, y + 53);
+        graphics.drawString(font, Integer.toString(state.coins()), x + 13, y + 54, 0xFFFFFFFF, true);
+
+        // Three discrete slots, not a count. Which of the three are missing is the thing a player
+        // actually wants to know when deciding whether to replay a course; "1" does not say that.
+        for (int i = 0; i < STAR_COIN_SLOTS; i++) {
+            drawStarCoinSlot(graphics, x + i * 12, y + 66, i < state.starCoins());
+        }
+
+        // Zero padded so the panel does not reflow every time the score crosses a power of ten.
+        graphics.drawString(font, String.format("%07d", state.score()),
+                x, y + 80, 0xFFFFFFFF, true);
 
         ScorePopups.render(graphics, font);
 
@@ -294,6 +307,57 @@ public final class CourseHud {
      * <p>Hidden entirely at zero. An always-visible empty gauge is clutter for the majority of a
      * course when the player is not running.
      */
+    /** Star coins hidden in every course. Three is the genre's number and the layout assumes it. */
+    private static final int STAR_COIN_SLOTS = 3;
+
+    /**
+     * Icons drawn from rectangles rather than loaded from a texture.
+     *
+     * <p>Deliberate, and not laziness. Everything else the player looks at in this mod is drawn by
+     * a generator out of flat rectangles with a three-tone treatment -- shadow, face, highlight --
+     * and an imported icon set would be the one thing on screen from a different world. Drawing
+     * them the same way costs a few lines and means the HUD belongs to the game.
+     *
+     * <p>They are also tiny. At nine pixels a curve is two rectangles anyway.
+     */
+    private static void drawCoinIcon(GuiGraphics graphics, int x, int y) {
+        final int shadow = 0xFF_8A6A18;
+        final int face = 0xFF_E8C24A;
+        final int shine = 0xFF_F8E89A;
+        graphics.fill(x + 2, y + 1, x + 9, y + 10, shadow);
+        graphics.fill(x + 1, y + 2, x + 10, y + 9, shadow);
+        graphics.fill(x + 2, y + 2, x + 9, y + 9, face);
+        graphics.fill(x + 3, y + 3, x + 5, y + 8, shine);
+        graphics.fill(x + 4, y + 4, x + 7, y + 7, shadow);
+    }
+
+    private static void drawLifeIcon(GuiGraphics graphics, int x, int y) {
+        final int cap = 0xFF_D8342C;
+        final int capLit = 0xFF_F07A66;
+        final int skin = 0xFF_F0C89A;
+        graphics.fill(x + 1, y + 1, x + 10, y + 5, cap);
+        graphics.fill(x + 2, y + 1, x + 8, y + 2, capLit);
+        graphics.fill(x + 2, y + 5, x + 9, y + 10, skin);
+        graphics.fill(x + 3, y + 6, x + 4, y + 8, 0xFF_2B2B33);
+        graphics.fill(x + 7, y + 6, x + 8, y + 8, 0xFF_2B2B33);
+    }
+
+    /** One star-coin slot: filled when collected, a hollow socket when not. */
+    private static void drawStarCoinSlot(GuiGraphics graphics, int x, int y, boolean collected) {
+        final int socket = 0xFF_3A3A44;
+        final int rim = collected ? 0xFF_8A6A18 : 0xFF_55555F;
+        final int face = collected ? 0xFF_F0B028 : 0x00_000000;
+        // A diamond reads as a distinct pickup at this size where a five-pointed star turns to mush.
+        graphics.fill(x + 4, y, x + 7, y + 10, socket);
+        graphics.fill(x + 1, y + 3, x + 10, y + 7, socket);
+        graphics.fill(x + 4, y + 1, x + 7, y + 9, rim);
+        graphics.fill(x + 2, y + 4, x + 9, y + 6, rim);
+        if (collected) {
+            graphics.fill(x + 4, y + 3, x + 7, y + 7, face);
+            graphics.fill(x + 3, y + 4, x + 8, y + 6, face);
+        }
+    }
+
     private static void renderPMeter(GuiGraphics graphics, int x, int y, int panelRight) {
         int step = com.studio.planeshift.client.ClientCourseState.pMeter();
         if (step <= 0) {
