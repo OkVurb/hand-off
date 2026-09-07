@@ -274,13 +274,20 @@ def seed_of(colour):
 # the plain one, which stays as the item icon and as the fallback for anything still placing this
 # block without a connection state.
 CONNECTED = {
+    # A castle wall's top course is the one that has been rained on for a century. Lighter and
+    # greener than the body, and only where the wall actually ends -- an interior block of the same
+    # wall has no weather on it.
     "course_castle_block": (lambda: masonry((104, 110, 126), 71, course=5, mortar=0.72,
-                                            light=False), (104, 110, 126), {}),
+                                            light=False), (104, 110, 126),
+                            {"cap": (96, 122, 96), "cap_rows": 2}),
     # Grass is the clearest case in the whole reference: a dirt body with a green band on top,
     # and the band appears only where the block is actually the top of something.
     "course_grass_block": (lambda: drift((124, 88, 58), 25, flecks=(0.90, 1.08)),
                            (124, 88, 58), {"cap": (88, 158, 62), "cap_rows": 4}),
-    "course_sand_block": (lambda: drift((228, 196, 118), 73), (228, 196, 118), {}),
+    # Sand is lighter where the wind has been at it and darker in the body, so an exposed top
+    # reads as a surface rather than as a cut through a dune.
+    "course_sand_block": (lambda: drift((228, 196, 118), 73), (228, 196, 118),
+                          {"cap": (244, 222, 164), "cap_rows": 3}),
     "course_sandstone": (lambda: masonry((214, 182, 118), 81, course=4, mortar=0.78,
                                          light=False), (214, 182, 118), {}),
     # Volcanic rock, with a hot crust where it is exposed to the air above.
