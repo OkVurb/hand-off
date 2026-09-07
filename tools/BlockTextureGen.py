@@ -36,6 +36,11 @@ S = 16
 CLEAR = (0, 0, 0, 0)
 
 
+def _hash_seed(seed):
+    """Deterministic starting state, so these regenerate byte-identically anywhere."""
+    return (seed * 2654435761) & 0x7FFFFFFF
+
+
 def shade(c, f):
     """Scale a colour toward black (f<1) or white (f>1), keeping it opaque."""
     r, g, b = c[:3]
@@ -116,6 +121,75 @@ def planks(base, seed):
     d.line([(6, 0), (6, 3)], fill=dark)
     d.line([(11, 5), (11, 8)], fill=dark)
     d.line([(3, 10), (3, 13)], fill=dark)
+    return lit(img, base)
+
+
+def masonry(base, seed, course=5, mortar=0.70, offset=True):
+    """Stone laid in courses, with the joints staggered row to row.
+
+    Shared by the castle and the brick block because they are the same construction in different
+    colours, and because they had drifted into two hand-made textures that agreed about nothing.
+
+    The stagger is the whole point. Joints stacked directly above each other read as a grid the
+    moment a wall is more than two blocks wide, which is what a player actually builds with these.
+    """
+    img = plain(base, seed, 0.05)
+    d = ImageDraw.Draw(img)
+    joint = shade(base, mortar)
+    row = 0
+    y = course - 1
+    while y < S:
+        d.line([(0, y), (S - 1, y)], fill=joint)
+        # Vertical joints, shifted half a brick on alternate courses.
+        shift = (course if offset and row % 2 else 0)
+        x = shift
+        while x < S:
+            d.line([(x, max(0, y - course + 1)), (x, y - 1)], fill=joint)
+            x += course * 2
+        row += 1
+        y += course
+    return lit(img, base)
+
+
+def drift(base, seed, flecks=(1.10, 1.18)):
+    """A soft granular surface: snow, sand, anything the eye should read as loose material.
+
+    Deliberately fine-grained. Both textures this replaces drew hard horizontal bands, which at
+    16 pixels tall is not a ripple, it is a stripe -- and stripes tile into a wall of stripes.
+    Loose material has no structure at block scale, so neither does this: it is noise, a couple of
+    lighter flecks, and nothing that lines up with the tile edge.
+    """
+    img = plain(base, seed, 0.09)
+    d = ImageDraw.Draw(img)
+    h = _hash_seed(seed)
+    for i in range(14):
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        x = h % S
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        y = h % S
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        d.point((x, y), fill=shade(base, flecks[h % len(flecks)]))
+    return lit(img, base)
+
+
+def embers(base, glow, seed):
+    """Cooled rock with a little heat left in it.
+
+    Decorative, and it has to look decorative. This block was renamed COURSE_EMBER_BLOCK in the
+    Java precisely because it is *not* lethal and three separate readers had assumed it was -- and
+    then the texture went on being a screen of bright lava, which is the assumption they were
+    making. Mostly dark rock with veins that glow rather than a field that burns.
+    """
+    img = plain(base, seed, 0.07)
+    d = ImageDraw.Draw(img)
+    h = _hash_seed(seed)
+    for i in range(5):
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        x0 = h % S
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        y0 = h % S
+        d.line([(x0, y0), (x0 + 2, y0 + 3)], fill=shade(glow, 0.9))
+        d.point((x0 + 1, y0 + 1), fill=glow)
     return lit(img, base)
 
 
@@ -822,6 +896,14 @@ def build():
     # Interactive blocks.
     out["coin_block"] = coin_block_side((236, 182, 46), 31)
     out["coin_block_top"] = coin_block_top((236, 182, 46), 32)
+    # Surfaces that were previously hand-made and outside every convention in this file. They
+    # tile as walls and floors, so they are the ones where the seam and the grid actually showed.
+    out["course_castle_block"] = masonry((104, 110, 126), 71, course=5, mortar=0.72)
+    out["brick_block"] = masonry((178, 78, 56), 72, course=4, mortar=0.62)
+    out["course_sand_block"] = drift((228, 196, 118), 73)
+    out["course_snow_block"] = drift((238, 244, 250), 74, flecks=(0.96, 1.04))
+    out["course_magma_block"] = embers((62, 48, 52), (232, 120, 48), 75)
+
     out["hidden_question_block"] = hidden_block()
     out["toad_box"] = toad_box((238, 232, 222), (214, 62, 58), 61)
     out["toad_box_used"] = toad_box_used((238, 232, 222), 62)
