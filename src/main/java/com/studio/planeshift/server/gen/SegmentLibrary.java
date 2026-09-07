@@ -1899,6 +1899,7 @@ public final class SegmentLibrary {
         list.add(CHAIN_BALL_HALL);
         list.add(ERUPTION_FIELD);
         list.add(GHOST_CROSSING);
+        list.add(AIRSHIP_DECK);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);
@@ -1953,6 +1954,64 @@ public final class SegmentLibrary {
 
             // Coins under the arch, at the height the player already runs at.
             coinTrail(c, x + 9, 6, y + 2, 1);
+        }
+    };
+
+    /**
+     * An airship deck: the playfield as a vehicle rather than as terrain.
+     *
+     * <p>The one structural idea in the reference that nothing here had. Everywhere else the floor
+     * is ground -- grass, rock, cloud, all of it scenery you stand on. An airship is an *object*
+     * with a silhouette: a hull with a prow and a stern, and open sky under both ends. The player
+     * can see where it stops, which is the difference between standing on a level and standing on
+     * a thing.
+     *
+     * <p>Built from planking with a trim rail, and the ends rise. That upturn is most of the read:
+     * a flat plank floor is a jetty, and it is the curve at bow and stern that says boat. It also
+     * does real work, since the raised ends are what stop a player walking straight off a deck
+     * they are seeing side-on for the first time.
+     *
+     * <p>Sky only, gated in CourseComposer. An airship moored in a meadow is a shipwreck.
+     */
+    static final Segment AIRSHIP_DECK = new Segment() {
+        public SegmentSpec spec() {
+            return def("airship_deck", 20, 0, 2, Tag.GAP, Tag.ENEMY);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            BlockState plank = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
+            BlockState rail = ModBlocks.COURSE_TRIM.get().defaultBlockState();
+
+            // Approach and departure, so the deck is arrived at rather than started on.
+            floor(c, x, 3, y, ctx);
+            floor(c, x + 17, 3, y, ctx);
+
+            // The hull. Two courses of planking so it has visible thickness from the side -- a
+            // one-block deck reads as a plank bridge, not as a ship.
+            for (int i = 3; i < 17; i++) {
+                c.set(x + i, y, 0, plank);
+                c.set(x + i, y - 1, 0, plank);
+            }
+            // Prow and stern, rising at both ends.
+            for (int step = 0; step < 2; step++) {
+                c.set(x + 3 + step, y + 1 + (1 - step), 0, plank);
+                c.set(x + 16 - step, y + 1 + (1 - step), 0, plank);
+            }
+            // The rail along the deck, low enough to see over and high enough to read as a rail.
+            for (int i = 5; i < 15; i += 3) {
+                c.set(x + i, y + 1, 0, rail);
+            }
+
+            // A mast with the ship's colours, which is what makes it a vessel with someone aboard
+            // rather than a hull that happens to be flying.
+            BlockState banner = ModBlocks.COURSE_BANNER.get().defaultBlockState();
+            for (int h = 1; h <= 4; h++) {
+                c.set(x + 10, y + h, 0, h >= 3 ? banner : rail);
+            }
+
+            // The crew. A deck with nobody on it is a platform with a fence.
+            mob(c, cast(ctx.theme()).get(0), x + 7, y + 1, -90.0F);
+            coinTrail(c, x + 4, 12, y + 3, 1);
         }
     };
 

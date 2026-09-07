@@ -502,6 +502,10 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.ERUPTION_FIELD) {
             return theme == CourseTheme.LAVA;
         }
+        // An airship moored in a meadow is a shipwreck.
+        if (segment == SegmentLibrary.AIRSHIP_DECK) {
+            return theme == CourseTheme.SKY;
+        }
         if (segment == SegmentLibrary.CLOUD_SPIRE) {
             return theme == CourseTheme.SKY;
         }
