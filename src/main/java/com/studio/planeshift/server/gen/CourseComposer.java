@@ -143,6 +143,21 @@ public final class CourseComposer {
         // that the same seed gives the same course, and Random satisfies that exactly.
         RandomGenerator random = new java.util.Random(seed);
         GenContext ctx = new GenContext(theme, worldTheme, difficulty, random, halfWidth);
+
+        /*
+         * The interior stretch.
+         *
+         * A course in the reference is not one environment. It runs outdoors, drops into a cave,
+         * and comes back out before the flag -- four separate worlds in the footage do it, which
+         * is what promoted it from an observation to a pattern. Here a course has been one theme
+         * from spawn to flagpole, so the single most common transition in the genre did not exist.
+         *
+         * The cave is UNDERGROUND tinted by the world around it, which is exactly what the
+         * per-world interior work built and had nothing to call it. Sharing the same
+         * RandomGenerator keeps the whole course deterministic from one seed.
+         */
+        GenContext interior = new GenContext(CourseTheme.UNDERGROUND, worldTheme,
+                difficulty, random, halfWidth);
         CourseCanvas canvas = new CourseCanvas();
 
         int floorY = 0;
@@ -183,6 +198,22 @@ public final class CourseComposer {
 
         int contentEnd = length - FINISH_RUN;
         List<Segment> catalogue = SegmentLibrary.all();
+
+        /*
+         * Where the course goes underground, if it does at all.
+         *
+         * Roughly the middle: far enough in that the surface has been established, far enough from
+         * the end that coming back out still has somewhere to go. Not every course gets one --
+         * a transition that happens every single time stops being an event -- and themes that are
+         * already interiors are skipped, because a cave inside a cave is not a change of scene.
+         */
+        boolean interiorAllowed = theme != CourseTheme.UNDERGROUND
+                && theme != CourseTheme.GHOST_HOUSE
+                && random.nextInt(3) > 0;
+        int caveFrom = interiorAllowed
+                ? SPAWN_RUN + (int) ((contentEnd - SPAWN_RUN) * 0.34D) : Integer.MAX_VALUE;
+        int caveTo = interiorAllowed
+                ? SPAWN_RUN + (int) ((contentEnd - SPAWN_RUN) * 0.62D) : Integer.MIN_VALUE;
 
         while (cursor < contentEnd) {
             int remaining = contentEnd - cursor;
@@ -264,7 +295,9 @@ public final class CourseComposer {
             boolean introducesGaps = s.tags().contains(Segment.Tag.GAP)
                     && !taught.contains(Segment.Tag.GAP);
 
-            chosen.build(canvas, cursor, floorY, ctx);
+            // Underground for the middle stretch, the course's own theme either side of it.
+            GenContext active = (cursor >= caveFrom && cursor < caveTo) ? interior : ctx;
+            chosen.build(canvas, cursor, floorY, active);
             if (introducesGaps) {
                 netIntroduction(canvas, ctx, cursor, s.width(), floorY);
                 canvas.marker("intro_net", cursor, floorY, 0);
@@ -313,7 +346,16 @@ public final class CourseComposer {
         // belongs with the level rather than with the dressing.
         CourseRoutes.build(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, SPAWN_RUN, contentEnd);
         // Scenery last, so it can see the finished floor and fill in behind everything else.
-        CourseDecorator.decorate(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, 0, length + 6);
+        // Decorated in spans, so the cave gets a cave's backdrop and the surface gets a sky. One
+        // pass over the whole course would have painted a skyline behind the underground stretch,
+        // which is the exact bug the per-span split exists to avoid.
+        if (interiorAllowed) {
+            CourseDecorator.decorate(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, 0, caveFrom);
+            CourseDecorator.decorate(canvas, interior, floorAt, FLOOR_MAP_MARGIN, caveFrom, caveTo);
+            CourseDecorator.decorate(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, caveTo, length + 6);
+        } else {
+            CourseDecorator.decorate(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, 0, length + 6);
+        }
 
         // spawnY is a standing position, which is one above the surface block: ground(x, 0)
         // fills y=0 with solid, so the player's feet are at y=1. Reporting the surface height

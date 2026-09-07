@@ -56,3 +56,29 @@ Water is not finished and BACKLOG says so plainly -- no fish, nothing actually s
 swimming. What exists is a dry course with a marine palette.
 
 291 tests, no failures, counted from XML.
+
+## Iteration 4
+
+Plan item 7, sub-environments. A course now runs surface, drops into an interior for roughly the
+middle third, and comes back out before the flag. Four separate worlds in the footage do this,
+which is what made it a pattern rather than an observation, and until now a course was one theme
+from spawn to flagpole -- so the most common transition in the genre simply did not exist here.
+
+The cave is UNDERGROUND tinted by the world around it, which is exactly what iteration 1 built and
+had nothing to call it. The two pieces were designed a day apart and fit without adjustment, which
+is the first time that has happened on this project rather than the reverse.
+
+Decoration had to be split into spans. A single pass over the whole course would have painted a
+skyline behind the underground stretch, which is the precise bug the split exists to avoid.
+
+Added SubEnvironmentTest rather than trusting the compile. The composer can be told to swap
+contexts halfway through and still emit a course identical to the old one, and nothing in the
+existing suite would notice, because a course of pure surface segments walks from spawn to flag
+perfectly well. The test looks for deepstone -- fill only the underground palette places -- and
+asserts both bounds: some courses go under, not all of them do. Both bounds are meaningful; if
+either were violated the pair fails.
+
+The reachability proof passed across the environment joins, which was the risk the plan flagged for
+this item.
+
+293 tests, no failures, counted from XML.
