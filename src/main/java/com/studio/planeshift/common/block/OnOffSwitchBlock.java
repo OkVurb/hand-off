@@ -29,8 +29,18 @@ public class OnOffSwitchBlock extends Block implements HitFromBelowBlock {
      * covers ~912k blocks, and even a palette-skipping scan has to walk every section it
      * cannot reject. See {@link BlockAreaScan} for how the box is searched.
      */
-    private static final int RANGE_XZ = 24;
-    private static final int RANGE_Y = 8;
+    public static final int RANGE_XZ = 24;
+
+    /**
+     * Vertical reach, in blocks, above and below the switch.
+     *
+     * <p>Public because placement has to respect it and cannot see it otherwise. The boss arena
+     * put its switch nine blocks above the floor it was meant to drop, which is one block outside
+     * this box: the switch would have been hit, the sound would have played, and nothing would
+     * have happened. A number that placement depends on and cannot read is a number that gets
+     * guessed.
+     */
+    public static final int RANGE_Y = 8;
 
     public OnOffSwitchBlock(Properties properties) {
         super(properties);

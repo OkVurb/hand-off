@@ -1,6 +1,7 @@
 package com.studio.planeshift.server.gen;
 
 import com.studio.planeshift.common.block.FlagPoleBlock;
+import com.studio.planeshift.common.block.OnOffBlock;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModEntities;
 import com.studio.planeshift.common.registry.ModItems;
@@ -91,6 +92,10 @@ public final class BossArena {
      * floor under him and a wall behind him rather than the open air that was there before.
      */
     private static final int BACKDROP_HALF = 8;
+
+    /** Where the ending switch sits: beside the top tread of the climb, within reach of the ledge. */
+    private static final int SWITCH_X = FLAG_X - 3;
+    private static final int SWITCH_Y = 8;
 
     private BossArena() {
     }
@@ -284,9 +289,17 @@ public final class BossArena {
         // room the player can see rather than in a slot behind its wall.
         int back = last ? BACKDROP_HALF : HALF + 1;
         if (last) {
+            // The ledge is ON/OFF blocks, switched on, rather than stone.
+            //
+            // This is the ending the wiki describes: the player reaches the switch at the top of
+            // the climb and the floor collapses under Super Bowser. The mod already had a switch
+            // that makes a floor stop being solid, so the ending is two existing blocks placed
+            // where they mean something rather than a boss-defeat mechanism written for one fight.
+            BlockState ledge = ModBlocks.ON_OFF_BLOCK.get().defaultBlockState()
+                    .setValue(OnOffBlock.ON, true);
             for (int x = -4; x <= END; x++) {
                 for (int z = HALF + 1; z < back; z++) {
-                    c.set(x, 0, z, castle);
+                    c.set(x, 0, z, ledge);
                 }
             }
         }
@@ -306,6 +319,20 @@ public final class BossArena {
         if (last) {
             c.spawn(ModEntities.CLOWN_CAR.get(), 7.5D, 9.0D, 0.5D, 90.0F,
                     SegmentLibrary.GENERATED_TAG);
+        }
+
+        // The switch, at the top of the climb and nowhere else.
+        //
+        // Beside the top tread rather than above it: the player is standing at y=8 when they get
+        // there, so a block at that height in front of them is hittable and a block above them is
+        // in the way. Only reachable by finishing the climb, which is what makes it the ending
+        // rather than a shortcut past the fight.
+        //
+        // The height is not a taste decision. OnOffSwitchBlock reaches RANGE_Y blocks up and down,
+        // and the ledge it has to switch off is at y=0; the first version sat at y=9, one block
+        // outside its own reach, and would have played its sound and done nothing.
+        if (last) {
+            c.set(SWITCH_X, SWITCH_Y, 0, ModBlocks.ON_OFF_SWITCH.get().defaultBlockState());
         }
 
         c.marker("flag", FLAG_X, 1, 0);

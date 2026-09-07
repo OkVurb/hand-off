@@ -3,6 +3,7 @@ package com.studio.planeshift.server.gen;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.studio.planeshift.common.block.OnOffSwitchBlock;
 import com.studio.planeshift.common.course.WorldDefinition;
 import com.studio.planeshift.common.course.WorldRegistry;
 import com.studio.planeshift.common.registry.ModBlocks;
@@ -241,5 +242,51 @@ class BossArenaTest {
                         "the support under x=" + x + " should not");
             }
         }
+    }
+
+    /**
+     * The ending is reachable, and only from the top of the climb.
+     *
+     * <p>The switch turns the ledge off and drops Super Bowser out of the world. If it were
+     * placed anywhere the player could reach before climbing, the last castle would end by walking
+     * up to a button -- which is how this project's bugs usually look from the outside: correct,
+     * tested, and skipping the part that was the point.
+     */
+    @Test
+    void theLastCastleEndsWithASwitchAtTheTopOfTheClimb() {
+        CourseCanvas c = BossArena.build(WorldRegistry.allWorlds().size() - 1);
+        assertEquals(ModBlocks.ON_OFF_SWITCH.get(),
+                c.blocks().get(CourseCanvas.key(40, 8, 0)).getBlock(),
+                "the switch should sit beside the top tread");
+        assertEquals(ModBlocks.ON_OFF_BLOCK.get(),
+                c.blocks().get(CourseCanvas.key(39, 0, 5)).getBlock(),
+                "the ledge the switch turns off should be what the boss stands on");
+        // The one that actually matters, and it reads both heights back out of the canvas rather
+        // than restating them: a check written as two literals passes whatever the arena does. The
+        // first version of this placement sat nine blocks up, one outside the switch's own vertical
+        // reach -- it would have been hit, it would have made its noise, and the boss would have
+        // stood on a floor that never went away.
+        int switchY = Integer.MIN_VALUE;
+        int ledgeY = Integer.MIN_VALUE;
+        for (int y = -8; y <= 16; y++) {
+            for (int x = -4; x <= 50; x++) {
+                if (ModBlocks.ON_OFF_SWITCH.get().equals(block(c, x, y, 0))) {
+                    switchY = y;
+                }
+                if (ModBlocks.ON_OFF_BLOCK.get().equals(block(c, x, y, 5))) {
+                    ledgeY = y;
+                }
+            }
+        }
+        assertTrue(switchY != Integer.MIN_VALUE && ledgeY != Integer.MIN_VALUE,
+                "expected both a switch and a ledge in the last castle");
+        assertTrue(Math.abs(switchY - ledgeY) <= OnOffSwitchBlock.RANGE_Y,
+                "the switch at y=" + switchY + " cannot reach the ledge at y=" + ledgeY);
+    }
+
+    /** The block at a position, or null where the canvas laid nothing. */
+    private static net.minecraft.world.level.block.Block block(CourseCanvas c, int x, int y, int z) {
+        var state = c.blocks().get(CourseCanvas.key(x, y, z));
+        return state == null ? null : state.getBlock();
     }
 }

@@ -132,9 +132,11 @@ between the last castle and the other four is what the player has to do on it, n
 there is. Only the treads fall — the columns under them stay stone, or one missed step would take
 the whole staircase with it.
 
-*Still missing:* the switch at the top that drops the floor out from under him. The arena ends the
-phase by damage instead. `AxeBlock` is the mod's word for exactly this and is already in the room,
-so it is a small piece, but it is not built.
+*The ending, built:* the ledge Super Bowser stands on is ON/OFF blocks switched on, and an ON/OFF
+switch sits beside the top tread. Reaching it turns the floor off under him. Two blocks the mod
+already had, placed where they mean something, rather than a defeat mechanism written for one
+fight — and the switch is only reachable by finishing the climb, so it is the ending rather than a
+shortcut past it.
 
 **3.5 The arena is its own room, and it is approached.** *Already true when written:* `BossArena`
 builds an approach before the bridge, with a comment saying the castle used to be a corridor and

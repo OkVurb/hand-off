@@ -865,3 +865,19 @@ leave the player waiting for respawn timers.
 
 Not built: the switch at the top that drops the floor under him. Recorded in the
 plan rather than glossed. 345 tests, 0 failures.
+
+## The ending (plan 3.4, finished)
+The ledge Super Bowser stands on is ON/OFF blocks switched on; an ON/OFF switch
+sits beside the top tread of the climb. Reaching it turns the floor off under him.
+Two blocks that already existed, placed where they mean something.
+
+Nearly shipped broken: I put the switch nine blocks above the ledge, and
+OnOffSwitchBlock reaches eight. It would have been hit, made its noise, and done
+nothing -- the same shape of bug as Bowser standing on air, found the same way, by
+checking the number instead of assuming it. RANGE_Y is public now, because a
+number placement depends on and cannot read is a number that gets guessed.
+
+The test reads both heights back out of the canvas rather than restating them as
+literals; the first version I wrote compared two constants and would have passed
+whatever the arena did. Verified by moving the switch back to y=9 and watching it
+fail. 346 tests, 0 failures.
