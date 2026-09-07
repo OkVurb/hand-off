@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Thirty-six of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Thirty-eight of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -127,6 +127,13 @@ one finding in the plan that does not fit a block grid at all: it is soft geomet
 collision, not a row of blocks, and the sag is the mechanic rather than decoration. Recording it
 honestly as expensive and probably out of scope — the cheap dishonest version is a flat line of
 blocks that looks like a rope and behaves like a floor, which is worse than not having it.
+
+**A23. Lava falls, and that argues with how the fluid was built.** Vertical lava pours down cliff
+faces into the sea below. `ModFluids` sets `levelDecreasePerBlock` to 8 so the custom fluids cannot
+spread at all — deliberately, to keep a placed pool where the generator put it — and a
+non-spreading fluid cannot fall. A column of source blocks would look right and cost nothing, but it
+is worth being clear that this is a workaround for a property chosen for other reasons, not the
+fluid doing what fluids do.
 
 **A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
 visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
@@ -256,7 +263,7 @@ world.* The course leaves the house
 and finishes outdoors under a violet sky with bare dead trees as silhouettes and pale ground. Ours
 treats ghost house as indoor-only, so this palette does not exist anywhere in the mod.
 
-**C12. The volcano look is columns behind, arches in front.** Background is a wall of vertical
+**C12. The volcano look is columns behind, arches in front.** *Confirmed in detail.* Background is a wall of vertical
 basalt columns with lava seams glowing between them; the playfield is grey stone arch viaducts
 crossing above the lava. Two very specific layers, and neither is what the lava theme draws now.
 
@@ -264,6 +271,11 @@ crossing above the lava. Two very specific layers, and neither is what the lava 
 
 **C14. Castle back walls carry stained glass.** Coloured lit windows between the pillars, which
 is where the colour in an otherwise brown room comes from.
+
+**C15. The volcano tints the whole scene, not just the distance.** An orange haze sits over
+foreground and background alike, so the air itself is hot. The aerial-perspective work already
+shipped desaturates toward grey; this theme wants a warm key instead, which the current
+implementation has no way to express.
 
 **C4. Snow and the two lit themes still draw the same prop at both depths.** They use different
 decorator builders and never got the aerial-perspective treatment.
