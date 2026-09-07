@@ -988,6 +988,18 @@ def build():
     out["course_pillar_far"] = distant(out["course_pillar"])
     out["course_cloud_block_far"] = distant(out["course_cloud_block"])
 
+    # Native replacements for the vanilla blocks five of the six themes were built out of.
+    #
+    # A theme's fill sits under every surface block, three deep, so it is on screen constantly --
+    # and a vanilla block brings Minecraft's palette and drawing conventions with it, gets none of
+    # this file's lighting treatment, none of the connected edges, and none of the aerial
+    # perspective. Two materials in one frame drawn by two different hands.
+    out["course_sandstone"] = masonry((214, 182, 118), 81, course=4, mortar=0.78)
+    out["course_desert_brick"] = masonry((186, 118, 74), 82, course=4, mortar=0.70)
+    out["course_basalt"] = drift((58, 54, 62), 83, flecks=(0.86, 1.12))
+    out["course_deepstone"] = drift((74, 76, 88), 84, flecks=(0.88, 1.10))
+    out["course_ghost_beam"] = planks((84, 62, 48), 85)
+
     out["hidden_question_block"] = hidden_block()
     out["toad_box"] = toad_box((238, 232, 222), (214, 62, 58), 61)
     out["toad_box_used"] = toad_box_used((238, 232, 222), 62)

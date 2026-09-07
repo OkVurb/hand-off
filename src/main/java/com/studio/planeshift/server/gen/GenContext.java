@@ -114,32 +114,32 @@ public final class GenContext {
                         null);
                 case DESERT -> new Palette(
                         ModBlocks.COURSE_SAND_BLOCK.get().defaultBlockState(),
-                        Blocks.SANDSTONE.defaultBlockState(),
-                        Blocks.ORANGE_TERRACOTTA.defaultBlockState(),
+                        ModBlocks.COURSE_SANDSTONE.get().defaultBlockState(),
+                        ModBlocks.COURSE_DESERT_BRICK.get().defaultBlockState(),
                         ModBlocks.COURSE_SAND_BLOCK.get().defaultBlockState(),
                         null);
                 case SNOW -> new Palette(
                         ModBlocks.COURSE_SNOW_BLOCK.get().defaultBlockState(),
-                        Blocks.PACKED_ICE.defaultBlockState(),
-                        Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState(),
+                        ModBlocks.COURSE_ICE_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_SNOW_BLOCK.get().defaultBlockState(),
                         null);
                 case LAVA -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.BLACKSTONE.defaultBlockState(),
+                        ModBlocks.COURSE_BASALT.get().defaultBlockState(),
                         ModBlocks.COURSE_EMBER_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         Blocks.LAVA.defaultBlockState());
                 case UNDERGROUND -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.DEEPSLATE.defaultBlockState(),
-                        Blocks.PURPLE_TERRACOTTA.defaultBlockState(),
+                        ModBlocks.COURSE_DEEPSTONE.get().defaultBlockState(),
+                        ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         null);
                 case GHOST_HOUSE -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.DARK_OAK_PLANKS.defaultBlockState(),
-                        Blocks.DARK_OAK_LOG.defaultBlockState(),
+                        ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_GHOST_BEAM.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         null);
             };

@@ -91,6 +91,27 @@ public final class ModBlocks {
      * by air -- see {@code distant()} in BlockTextureGen -- which is the cue the eye actually
      * reads distance from.
      */
+    /**
+     * Native terrain materials, replacing the vanilla blocks five of the six themes were built
+     * out of.
+     *
+     * <p>A theme's fill sits under every surface block, three deep, so it is on screen constantly.
+     * A vanilla block there brings Minecraft's palette and drawing conventions with it and takes
+     * none of this mod's: not the lighting ramp, not the connected edges, not the aerial
+     * perspective. Two materials in one frame drawn by two different hands, and the fill is the
+     * one you see most.
+     */
+    public static final DeferredBlock<Block> COURSE_SANDSTONE = courseBlock(
+            "course_sandstone", MapColor.SAND, SoundType.STONE);
+    public static final DeferredBlock<Block> COURSE_DESERT_BRICK = courseBlock(
+            "course_desert_brick", MapColor.TERRACOTTA_ORANGE, SoundType.STONE);
+    public static final DeferredBlock<Block> COURSE_BASALT = courseBlock(
+            "course_basalt", MapColor.COLOR_BLACK, SoundType.STONE);
+    public static final DeferredBlock<Block> COURSE_DEEPSTONE = courseBlock(
+            "course_deepstone", MapColor.DEEPSLATE, SoundType.DEEPSLATE);
+    public static final DeferredBlock<Block> COURSE_GHOST_BEAM = courseBlock(
+            "course_ghost_beam", MapColor.WOOD, SoundType.WOOD);
+
     public static final DeferredBlock<Block> COURSE_HEDGE_FAR = courseBlock(
             "course_hedge_far", MapColor.PLANT, SoundType.GRASS);
     public static final DeferredBlock<Block> COURSE_PILLAR_FAR = courseBlock(
