@@ -123,6 +123,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case HAMMER_BRO -> hammerBro();
             case SPINY -> spiny();
             case BUZZY_BEETLE -> buzzyBeetle();
+            case CHEEP_CHEEP -> cheepCheep();
             case PIRANHA_PLANT -> piranhaPlant();
             case BOWSER -> bowser();
             case TOAD -> throw new IllegalArgumentException("Villager uses ToadModel");
@@ -579,6 +580,33 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         r.addOrReplaceChild("left_arm", box(0, 40, 0, 0, -2, 4, 3, 4), pose(5, 21, 3, 0, 0, -0.15F));
         r.addOrReplaceChild("right_arm", box(0, 40, -4, 0, -2, 4, 3, 4), pose(-5, 21, 3, 0, 0, 0.15F));
         return finish(mesh);
+    }
+
+    /**
+     * A fish: one fat body, a tail, and fins.
+     *
+     * <p>Built almost entirely from the body box because a Cheep Cheep is seen side-on and never
+     * turns. The limbs that every other rig here uses for arms and legs are fins instead, which is
+     * why they are flat and offset rather than square and paired -- reusing the limb region keeps
+     * it on the shared six-region sheet rather than needing a texture layout of its own.
+     */
+    private static LayerDefinition cheepCheep() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -6, -4, -4, 12, 8, 8), pose(0, 20, 0));
+        // The head is a short taper rather than a separate lump: a fish has no neck, and a gap
+        // between head and body at this scale reads as two animals.
+        r.addOrReplaceChild("head", box(64, 0, -4, -3, -3, 7, 6, 6), pose(0, 20, -5.5F));
+        // Tail fin, upright and flat, the one part that shows movement from the side.
+        r.addOrReplaceChild("left_arm", box(0, 40, -1, -4, 0, 2, 8, 5), pose(0, 20, 5.5F));
+        // Pectoral fins, low and swept back.
+        r.addOrReplaceChild("right_arm", box(0, 40, -4, -1, -1, 4, 2, 3), pose(-4.5F, 20, -1));
+        r.addOrReplaceChild("left_leg", box(0, 40, 0, -1, -1, 4, 2, 3), pose(4.5F, 20, -1));
+        // Dorsal fin.
+        r.addOrReplaceChild("right_leg", box(0, 40, -2, -3, -1, 4, 3, 2), pose(0, 15.5F, 0));
+        // Lips.
+        r.addOrReplaceChild("detail_1", box(0, 80, -2, -1.5F, -1, 4, 3, 2), pose(0, 20, -8.5F));
+        return LayerDefinition.create(mesh, 128, 128);
     }
 
     private static LayerDefinition buzzyBeetle() {

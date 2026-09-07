@@ -457,10 +457,7 @@ public final class CourseStructureService {
             case DESERT -> List.of(ModEntities.SPINY.get(), ModEntities.LAKITU.get());
             case SNOW -> List.of(ModEntities.GOOMBA.get(), ModEntities.BUZZY_BEETLE.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.THWOMP.get());
-            // Water has no cast of its own yet. Reusing the beetle keeps a submerged course
-            // populated rather than empty, and an empty course is a worse first impression than a
-            // slightly wrong one -- see BACKLOG, the fish are still to be built.
-            case WATER -> List.of(ModEntities.BUZZY_BEETLE.get());
+            case WATER -> List.of(ModEntities.CHEEP_CHEEP.get());
             case UNDERGROUND -> List.of(ModEntities.BOO.get(), ModEntities.BUZZY_BEETLE.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get());
         };

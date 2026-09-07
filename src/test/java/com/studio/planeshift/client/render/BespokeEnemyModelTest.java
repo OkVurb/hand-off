@@ -48,6 +48,11 @@ class BespokeEnemyModelTest {
             Map.entry(EnemyRigProfile.HAMMER_BRO, 13L),
             Map.entry(EnemyRigProfile.SPINY, 15L),
             Map.entry(EnemyRigProfile.BUZZY_BEETLE, 14L),
+            // Body, head, tail fin, two pectorals, a dorsal and lips. Far fewer parts than
+            // anything else here, and deliberately so: a Cheep Cheep is only ever seen side-on
+            // because it never turns to face the player, so parts that would only be visible from
+            // the front or back would cost geometry nobody ever sees.
+            Map.entry(EnemyRigProfile.CHEEP_CHEEP, 7L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
             // Body, shell, head, snout, jaw, two arms, two legs, a three-piece crest and a
             // two-piece wand. No separate eye boxes, unlike the Koopa it is built from: the crest

@@ -157,3 +157,26 @@ Note for later: the suite went from 45s to about 2 minutes. Flooded courses make
 search much larger. Not a problem yet, worth watching.
 
 299 tests, no failures, counted from XML.
+
+## Iteration 8
+
+Cheep Cheep. Water courses had been populated by Buzzy Beetles standing in for fish, which was the
+least wrong land enemy available and was still a land enemy sitting at the bottom of a flooded room.
+
+Eight places had to agree for one enemy to exist: texture generator, rig profile, entity class,
+registration, attributes, renderer, bespoke model, and two cast lists. The compiler found three of
+the misses on its own -- a missing import, an unhandled switch case in BespokeEnemyModel -- which is
+the argument for those switches being exhaustive.
+
+The behaviour is deliberately dumb: cross the lane, turn at the ends, bob slightly. A Cheep Cheep in
+the reference does not hunt, and that is the point of it. The threat is that it is somewhere along
+the route you have to swim, so the player's job is timing rather than combat; an enemy that chased
+would turn a paced swim into a scramble.
+
+BespokeEnemyModelTest caught the new rig and demanded its part count. That table carries a warning
+against editing numbers to make red tests green -- a previous pass halved every entry to accommodate
+a broken rewrite and shipped a one-part Thwomp. Seven is the real count here and the entry says why
+it is low: a fish is only ever seen side-on, so parts visible only from the front would be geometry
+nobody sees.
+
+300 tests, no failures, counted from XML.

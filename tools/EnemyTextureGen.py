@@ -834,7 +834,46 @@ def boomerang_bro():
     return _bro((72, 148, 196), 78)
 
 
+def cheep_cheep():
+    """Red body, white belly, big round eye.
+
+    The one enemy in the cast read side-on and nothing else, because it never turns to face the
+    player -- it swims past. So the silhouette does all the work, and the silhouette is almost
+    entirely body: a fat red oval with a pale underside and fins.
+
+    The eye is oversized and not angry. Every other enemy here scowls, and copying that onto a
+    fish makes it a piranha; a Cheep Cheep is dangerous because it is in the way, not because it
+    is hunting you, and the blank round eye is what says so.
+    """
+    img = new_sheet()
+    body = (206, 62, 58)
+    base(img, BODY, body, 41)
+    scales(img, BODY, body)
+    # Pale belly along the lower third, where the light does not reach.
+    rect(img, BODY, 0, 26, 64, 14, (242, 214, 196))
+    eyes(img, front(BODY, 12, 9, 8), 12, 9, angry=False)
+
+    base(img, HEAD, body, 42)
+    scales(img, HEAD, body)
+
+    # Fins and tail: lighter red, so they read as separate from the mass rather than as its edge.
+    base(img, LIMB, shade(body, 1.18), 43, ramp=0.22)
+
+    # Lips and fin rays.
+    base(img, HARD, (248, 226, 214), 44, ramp=0.16)
+
+    # The mouth plate: a small round O, not a scowl.
+    plate = (238, 176, 168)
+    base(img, MUZZLE, plate, 45, ramp=0.14)
+    at = front(MUZZLE, 10, 6, 1)
+    rect(img, MUZZLE, at[0] + 3, at[1] + 1, 4, 4, shade(plate, 0.55))
+
+    base(img, TRIM, shade(body, 0.62), 46, ramp=0.20)
+    return img
+
+
 CHARACTERS = {
+    "cheep_cheep": cheep_cheep,
     "goomba": goomba,
     "fire_bro": fire_bro,
     "boomerang_bro": boomerang_bro,

@@ -37,6 +37,8 @@ public enum EnemyRigProfile {
     SPINY(1.25F),
     BUZZY_BEETLE(1.25F),
     PIRANHA_PLANT(1.05F),
+    /** Read side-on and never head-on, so it carries a little more visual scale than it needs. */
+    CHEEP_CHEEP(1.20F),
     TOAD(1.0F),
     /**
      * All eight tower bosses share this one. See {@link Koopaling}: the scale here is tied to the

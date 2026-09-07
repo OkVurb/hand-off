@@ -134,11 +134,9 @@ public final class SegmentLibrary {
             case SNOW -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get(), ModEntities.DRY_BONES.get(), ModEntities.FIRE_BRO.get());
             case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get());
-            // Placeholder until the fish exist. Buzzy Beetle is the least wrong land enemy to put
-            // under water -- it is armoured and slow, which is at least the right silhouette for a
-            // drifting thing -- but it is still a land enemy, and the theme is not finished until
-            // it is replaced. See BACKLOG.
-            case WATER -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get());
+            // Spiny stays alongside the fish: it is the seafloor half of the cast, a spiked
+            // thing sitting on the bottom that the player has to swim over rather than through.
+            case WATER -> List.of(ModEntities.CHEEP_CHEEP.get(), ModEntities.SPINY.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get(), ModEntities.BOOMERANG_BRO.get());
         };
     }

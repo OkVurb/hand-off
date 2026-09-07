@@ -354,5 +354,6 @@
   "block.planeshift.course_wood_distant_warm": "Sunbaked Timber",
   "block.planeshift.course_coral": "Reef Coral",
   "message.planeshift.cannon_locked": "That world is still sealed. Clear the castle before it.",
-  "message.planeshift.star_coin_gate": "The final world needs %s more Star Coins."
+  "message.planeshift.star_coin_gate": "The final world needs %s more Star Coins.",
+  "entity.planeshift.cheep_cheep": "Cheep Cheep"
 }
