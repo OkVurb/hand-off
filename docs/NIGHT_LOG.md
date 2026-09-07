@@ -771,3 +771,33 @@ rhythm that can be learned. A boss that dived only when it chose to would be a w
 bar.
 
 340 tests, no failures, counted from XML.
+
+## Iteration 32
+
+The owner asked whether the Koopalings really fight as a group in a shared vehicle, and whether I
+had read the wiki. I had not -- I read it off contact sheets and treated one frame as a rule. Two
+plan entries were wrong and one shipped feature was a regression.
+
+Corrected, reverted, and then the tooling gap behind it fixed.
+
+The sheets already cover 100% of the video: 15427 seconds at one frame per six seconds is 2571
+frames across 108 sheets, and the arithmetic leaves no gap. Nothing was missed in the sense of
+sections. What was missed is resolution -- one frame in 180 -- which is fine for finding where
+something happens and useless for reading how it works. A forty-second boss fight is four frames at
+that rate: enough to see a boss exists, not enough to see what it does.
+
+So VideoFrames gained a `dense` mode: sheets over an arbitrary slice at one or two frames a second.
+Ran it over the World 1 castle at 1fps and the fight is legible for the first time. The boss walks
+the floor of an arched hall, retreats into its shell and spin-dashes along the ground, then emerges
+and walks again. Grey pillars stand in the arena, which is what the wiki means about hiding behind
+them. Three stomps.
+
+The useful part: KoopaEntity already implements a shell state, and the renderer already reads
+inShell() for it. A Koopaling spin-dash is that mechanic at boss scale, not a new one. So the plan
+entry now says what to build and what to build it from, instead of describing a vehicle that does
+not exist in this game.
+
+Finer sampling would not have prevented the second error -- no number of frames tells you a rule --
+but it would have made the first one obvious immediately.
+
+340 tests, no failures, counted from XML.

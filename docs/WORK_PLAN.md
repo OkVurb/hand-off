@@ -90,8 +90,15 @@ them, then fires magic from his wand. Three hits from jumps or ground pounds. `K
 eight ground-walking mobs with `STOMPS_TO_DEFEAT = 3` was already correct, and closer to the
 reference than the "fix" I built. A `ClownCarGoal` was written, shipped and reverted on this basis.
 
-*What is actually missing*: the charge, the closing walls, the self-stun on impact, and the wand
-volley between charges. The staging was right; the moveset is what has no equivalent here.
+*What is actually missing*, now read from a one-frame-per-second pass over the World 1 castle
+fight rather than from a six-second sample: the boss walks the floor of an arched hall, **retreats
+into its shell and spin-dashes along the ground**, then emerges and walks again. Grey pillars stand
+in the arena, which is what the wiki means by hiding behind pillars. Stomping is the answer, three
+times.
+
+*And the mod already has most of this.* `KoopaEntity` implements a shell state -- the renderer even
+reads `inShell()` for it. A Koopaling spin-dash is that mechanic at boss scale and speed, not a new
+one. The staging was never the gap and neither, it turns out, is the hard part of the moveset.
 
 **3.3 The Koopalings appear as a group in one clown car — but only once, and not as the usual
 fight.** Corrected against the wiki. Five Koopalings are the castle bosses of the main worlds and

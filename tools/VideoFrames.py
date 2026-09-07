@@ -27,6 +27,7 @@ and models in this mod are all generated from primitives, and that is deliberate
 Requires ffmpeg and ffprobe on PATH.
 
 Run:  python tools/VideoFrames.py sheets <video> <outdir> [--every 60] [--cols 6] [--rows 4]
+      python tools/VideoFrames.py dense <video> <outdir> <start> <end> [--every 1] [--tag name]
       python tools/VideoFrames.py at <video> <outdir> <seconds> [<seconds> ...]
 """
 
@@ -49,6 +50,43 @@ def dimensions(video):
          "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x", video],
         capture_output=True, text=True, check=True).stdout.strip()
     return out
+
+
+def dense(video, outdir, start, end, every=1, cols=6, rows=4, cell=360, tag="dense"):
+    """Sheets of one slice of the video, sampled finely.
+
+    The coarse pass covers the whole video at one frame every few seconds, which is right for
+    finding *where* something happens and useless for reading *how* it works. A boss fight lasting
+    forty seconds is four frames at that rate -- enough to see that a boss exists, not enough to see
+    that it charges, stuns itself on a wall, and then fires between charges.
+
+    That gap has cost real work. Two plan entries were written from single frames of a boss and both
+    were wrong: one was a cutscene read as a fight, the other a one-off encounter read as the rule.
+    Finer sampling would not have prevented the second -- no number of frames tells you a rule --
+    but it would have made the first obvious.
+
+    So this exists for movesets: pick the seconds a fight occupies and sample them at one or two
+    frames a second.
+    """
+    span = end - start
+    frames = max(1, int(span // every))
+    per_sheet = cols * rows
+    total_sheets = (frames + per_sheet - 1) // per_sheet
+    os.makedirs(outdir, exist_ok=True)
+    print("dense: %ds..%ds (%ds) at 1 frame/%ds -> %d frames -> %d sheets of %dx%d"
+          % (start, end, span, every, frames, total_sheets, cols, rows))
+
+    for index in range(total_sheets):
+        offset = start + index * per_sheet * every
+        out = os.path.join(outdir, "%s_%03d.jpg" % (tag, index))
+        cmd = ["ffmpeg", "-y", "-loglevel", "error",
+               "-ss", str(offset), "-t", str(per_sheet * every), "-i", video,
+               "-vf", "fps=1/%s,scale=%d:-1,tile=%dx%d" % (every, cell, cols, rows),
+               "-frames:v", "1", out]
+        subprocess.run(cmd, check=True)
+        print("  %s  %.1f s -> %.1f s" % (os.path.basename(out), offset,
+                                          offset + per_sheet * every))
+    return total_sheets
 
 
 def sheets(video, outdir, every=60, cols=6, rows=4, cell=360):
@@ -117,6 +155,17 @@ def main():
             elif a == "--rows":
                 rows = int(args[i + 1])
         sheets(video, outdir, every, cols, rows)
+    elif mode == "dense":
+        # dense <video> <outdir> <start> <end> [--every N] [--tag name]
+        start, end = float(sys.argv[4]), float(sys.argv[5])
+        args = sys.argv[6:]
+        every, tag = 1, "dense"
+        for i, a in enumerate(args):
+            if a == "--every":
+                every = float(args[i + 1])
+            elif a == "--tag":
+                tag = args[i + 1]
+        dense(video, outdir, start, end, every, tag=tag)
     elif mode == "at":
         at(video, outdir, [float(a) for a in sys.argv[4:]])
     else:
