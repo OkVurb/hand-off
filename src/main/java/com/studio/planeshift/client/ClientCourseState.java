@@ -82,4 +82,24 @@ public final class ClientCourseState {
         return pMeter;
     }
 
+
+    /**
+     * A banner the server has asked for, waiting for a screen to draw it.
+     *
+     * <p>Latched rather than shown immediately: the moment it is sent, the player is still sliding
+     * down a flagpole, and the screen that should carry the news opens a second later. Whoever
+     * draws it takes it, so it is shown exactly once.
+     */
+    private static String announcement;
+
+    public static void setAnnouncement(String key) {
+        announcement = key;
+    }
+
+    /** Takes the pending announcement, if any, clearing it. */
+    public static String takeAnnouncement() {
+        String key = announcement;
+        announcement = null;
+        return key;
+    }
 }

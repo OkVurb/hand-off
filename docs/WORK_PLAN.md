@@ -311,8 +311,12 @@ the world table, and the failure mode of two tables disagreeing is a blank card 
 **7.6 Levels carry signposts** — arrow boards planted in terrain where a route is ambiguous.
 Navigation as set dressing rather than UI.
 
-**7.7 Progress is announced.** "Star World has appeared!", "You've cleared all of the courses in the
-game!" — banner moments marking structural change.
+**7.7 Progress is announced.** *Half was already built:* the final-world banner draws on the
+results screen. The other string, `banner.all_cleared`, had been sitting in the language file with
+nothing able to say it. *Now built* — a small `AnnouncementPayload`, separate from the results
+packet because that one already fills all eight `StreamCodec.composite` slots and a ninth field
+would mean a hand-written codec. Latched on the client and taken once when the results screen is
+built, so finishing the game says so on that screen and never again.
 
 **7.8 Clearing a castle plays a scene**, and the credits roll over a *playable* level.
 

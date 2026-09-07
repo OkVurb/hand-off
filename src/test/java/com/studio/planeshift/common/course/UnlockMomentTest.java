@@ -87,4 +87,33 @@ class UnlockMomentTest {
                 WorldRegistry.justOpenedFinalWorld(after, penultimate().bossCourseId(), 0),
                 "clearing the gating castle with the coins already found should announce");
     }
+
+    /**
+     * Finishing the game says so once.
+     *
+     * <p>The banner string sat in the language file for the whole life of the codebase with
+     * nothing able to say it. The trap in wiring it up is that "everything is cleared" is true
+     * forever after, so a check that asks only that would fire on every subsequent results screen.
+     */
+    @Test
+    void clearingTheLastCourseAnnouncesOnceAndNotAgain() {
+        CourseProgress all = CourseProgress.DEFAULT;
+        for (WorldDefinition world : WorldRegistry.allWorlds()) {
+            for (String courseId : world.courseIds()) {
+                all = all.withClear(courseId, 0, 0);
+            }
+        }
+        assertTrue(WorldRegistry.justClearedEverything(all, false),
+                "the clear that completed the game should announce it");
+        assertFalse(WorldRegistry.justClearedEverything(all, true),
+                "replaying a cleared course should not announce it again");
+    }
+
+    /** An incomplete run says nothing, however much of it is done. */
+    @Test
+    void anUnfinishedRunAnnouncesNothing() {
+        CourseProgress some = CourseProgress.DEFAULT.withClear(
+                WorldRegistry.allWorlds().get(0).courseIds().get(0), 0, 0);
+        assertFalse(WorldRegistry.justClearedEverything(some, false));
+    }
 }

@@ -25,8 +25,18 @@ public class CourseResultsScreen extends Screen {
 
     private final CourseResultsPayload results;
 
+    /**
+     * A run-level banner the server sent, taken once.
+     *
+     * <p>Taken in the constructor rather than in {@code render}: the take clears it, and a render
+     * that clears state runs sixty times a second and would show the news for one frame.
+     */
+    private final Component runBanner;
+
     public CourseResultsScreen(CourseResultsPayload results) {
         super(Component.translatable("gui.planeshift.results"));
+        String key = com.studio.planeshift.client.ClientCourseState.takeAnnouncement();
+        this.runBanner = key == null ? null : Component.translatable(key);
         this.results = results;
     }
 
@@ -82,6 +92,7 @@ public class CourseResultsScreen extends Screen {
                 Component.literal(Integer.toString(results.score())));
 
         drawUnlockBanner(graphics, top, panelHeight());
+        drawRunBanner(graphics, top, panelHeight());
 
         if (results.newBestScore()) {
             Component best = Component.translatable("gui.planeshift.results.new_best");
@@ -114,7 +125,23 @@ public class CourseResultsScreen extends Screen {
             return;
         }
         Component banner = Component.translatable("gui.planeshift.banner.final_world");
-        int y = top + panelHeight + 10;
+        drawBanner(graphics, banner, top + panelHeight + 10);
+    }
+
+    /**
+     * The run-level banner, if the server sent one.
+     *
+     * <p>Taken once when the screen is built, so finishing the game says so on this screen and the
+     * next results screen is an ordinary results screen again.
+     */
+    private void drawRunBanner(GuiGraphics graphics, int top, int panelHeight) {
+        if (runBanner == null) {
+            return;
+        }
+        drawBanner(graphics, runBanner, top + panelHeight + 28);
+    }
+
+    private void drawBanner(GuiGraphics graphics, Component banner, int y) {
         int w = this.font.width(banner);
         int x = this.width / 2 - w / 2;
         graphics.fill(x - 8, y - 4, x + w + 8, y + 12, 0xCC_000000);

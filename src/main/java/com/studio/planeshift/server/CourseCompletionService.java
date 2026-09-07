@@ -49,6 +49,7 @@ public final class CourseCompletionService {
 
         String courseId = ProgressionService.get(player).currentCourse().orElse("");
         int previousBest = ProgressionService.get(player).record(courseId).bestScore();
+        boolean clearedBefore = ProgressionService.get(player).cleared(courseId);
 
         // Bonuses are added to the running score, so this must happen before the state reset.
         CourseScoringService.Results results = CourseScoringService.finishCourse(player);
@@ -93,6 +94,14 @@ public final class CourseCompletionService {
                 progress.starCoins(courseId),
                 state.lives(),
                 results.finalScore() > previousBest));
+
+        // The one banner that is about the run rather than the course. The string has been in the
+        // language file since long before anything could say it.
+        if (WorldRegistry.justClearedEverything(progress, clearedBefore)) {
+            PacketDistributor.sendToPlayer(player,
+                    new com.studio.planeshift.common.network.AnnouncementPayload(
+                            "gui.planeshift.banner.all_cleared"));
+        }
 
         // A castle clear earns a send-off. Everything else just returns to the map: making a
         // routine clear stop for dialogue would wear out very fast across fifty courses.

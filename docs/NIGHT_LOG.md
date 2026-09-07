@@ -903,3 +903,16 @@ At the inherited 1.2 blocks the big plant's head would still be inside its own p
 at full extension, and the rise-and-fall the player times their run against would
 have happened out of sight. A hitbox and a mesh scale together; a hand-written
 animation distance does not. 348 tests, 0 failures.
+
+## Title cards and the finish banner (7.5, 7.7)
+Title card: an overlay, not a Screen -- a screen would pause input and release the
+mouse, turning a half-second flourish into a dialog. The packet carries the two
+display strings rather than a course id, which settles the backlog question: the
+client would otherwise need its own copy of the world table.
+
+The all-cleared banner string had been in the language file the whole time with
+nothing able to say it. Wired via a separate small payload, because the results
+packet already fills all eight composite slots. Two traps hit and fixed on the way:
+"everything is cleared" is true forever after, so the check needed the before-state
+too; and taking the latched banner inside render() clears it sixty times a second
+and shows the news for one frame. Both are covered by tests. 350 tests, 0 failures.

@@ -164,6 +164,32 @@ public final class WorldRegistry {
         return !(bossWasCleared && coinsWereEnough);
     }
 
+    /**
+     * Whether this clear was the one that finished the game.
+     *
+     * <p>The string for this banner has been in the language file the whole time, spoken by
+     * nothing. The reference marks the moment; the mod counted it and said nothing, which is the
+     * same shape as the star coins that gated nothing.
+     *
+     * <p>Everything is cleared now, and this course was not cleared before. The second half is
+     * what stops the banner reappearing on every replay of an already-finished game, which would
+     * turn a once-in-a-run moment into wallpaper. It cannot be derived from {@code after} -- the
+     * clear is already recorded there -- so the caller passes what it knew beforehand, the same
+     * shape as {@link #justOpenedFinalWorld} taking the coins earned this run.
+     *
+     * @param clearedBefore whether the course just finished was already cleared before this run
+     */
+    public static boolean justClearedEverything(CourseProgress after, boolean clearedBefore) {
+        for (WorldDefinition world : ORDERED) {
+            for (String courseId : world.courseIds()) {
+                if (!after.cleared(courseId)) {
+                    return false;
+                }
+            }
+        }
+        return !clearedBefore;
+    }
+
     public static boolean isUnlocked(CourseProgress progress, String courseId) {
         return isUnlocked(progress, courseId, false);
     }

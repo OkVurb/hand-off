@@ -265,6 +265,10 @@ public final class ClientModEvents {
                 (payload, context) -> context.enqueueWork(() ->
                         com.studio.planeshift.client.hud.TitleCard.show(
                                 payload.world(), payload.level())));
+        event.register(com.studio.planeshift.common.network.AnnouncementPayload.TYPE,
+                (payload, context) -> context.enqueueWork(() ->
+                        com.studio.planeshift.client.ClientCourseState
+                                .setAnnouncement(payload.key())));
         event.register(OpenToadShopPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new ToadShopScreen())));
