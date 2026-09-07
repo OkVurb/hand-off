@@ -138,6 +138,30 @@ public final class ModBlocks {
      * which is what makes the whole theme cheap -- coral is the thing that says "under water"
      * without a single new terrain block.
      */
+    /**
+     * A striped climbing pole.
+     *
+     * <p>The second climbable in the mod, after the vine, and it exists because the reference has
+     * two and uses them for different things: a vine hangs on a wall and is climbed where it is,
+     * while a pole stands free in a room and is the reason to cross to it.
+     *
+     * <p>The spiral stripe is not decoration. A climbing player is rendered with the same pose
+     * whether they are moving or not, so nothing on the character says the climb is happening --
+     * the stripe passing the eye is what carries the motion, and a plain pole reads as standing
+     * still against a post.
+     *
+     * <p>A {@link CourseVineBlock}, because that class is already "ordinary climbable scenery that
+     * may exist in quantity", which is exactly what this is. A new class would have been the same
+     * code under a different name.
+     */
+    public static final DeferredBlock<CourseVineBlock> COURSE_CLIMB_POLE =
+            BLOCKS.registerBlock("course_climb_pole", CourseVineBlock::new,
+                    BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_RED)
+                            .strength(0.6F)
+                            .noOcclusion()
+                            .sound(SoundType.WOOD));
+
     public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
             "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
 

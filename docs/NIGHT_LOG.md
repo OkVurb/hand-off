@@ -229,3 +229,32 @@ section 8 ordering: the rest of the hazards, the traversal set, world map decora
 title cards.
 
 301 tests, no failures, counted from XML.
+
+## Iteration 11
+
+Climbing poles, from plan section 6.7. The second climbable after the vine, and the reference uses
+the two differently: a vine hangs on a wall and is climbed where it is, a pole stands in open space
+so crossing to it is half the problem. The spiral stripe is not decoration -- a climbing player is
+rendered in the same pose whether moving or not, so the stripe passing the eye is what carries the
+motion.
+
+This iteration was mostly me being wrong, four times, and the tests being right each time.
+
+1. Invented my own segment spacing: a four-block gap with a rise in it. The reachability proof
+   rejected 188 of 5250 courses. Rebuilt on VINE_WALL's proven skeleton and changed only the thing
+   the segment is actually about.
+2. Declared width 14 while building 16, so the next segment landed on my exit shelf. A segment that
+   lies about its width does not break where the lie is, it breaks wherever the neighbour lands.
+3. Forgot to add the pole to the solver's PASSABLE set, so a six-block climbable read as a
+   six-block wall. The proof was right given what it had been told.
+4. An enemy-density failure I assumed was mine to fix by adding enemies to the new segment. Adding
+   them changed nothing, because the failing seed's course does not contain the segment at all --
+   adding anything to the catalogue reshuffles the RNG for every seed, and that one landed just
+   under the floor. I only found this by stashing my changes and confirming the baseline passed.
+
+The fix for the fourth was not to move the threshold. The roaming pass already says in its own
+comment that a single sample lands on a pit often enough to leave stretches empty; it was trying
+four times, and tight snow layouts give a slot few valid columns. Six tries is the pass working
+harder at the job it already had.
+
+301 tests, no failures, counted from XML.

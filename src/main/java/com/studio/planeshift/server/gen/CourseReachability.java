@@ -90,6 +90,11 @@ public final class CourseReachability {
             ModBlocks.BRICK_BLOCK.get(),
             ModBlocks.SECRET_VINE.get(),
             ModBlocks.COURSE_VINE.get(),
+            // The climbing pole, for the same reason as the vine: it is climbed and walked
+            // through, not stood against. Omitting it made a six-block pole read as a six-block
+            // wall and the proof rejected every course containing one -- correctly, given what it
+            // had been told.
+            ModBlocks.COURSE_CLIMB_POLE.get(),
             ModBlocks.LOOP_TRIGGER.get(),
             ModBlocks.COIN_RING_BLOCK.get(),
             // The axe is touched, not climbed: it sits in the player's path on purpose and must

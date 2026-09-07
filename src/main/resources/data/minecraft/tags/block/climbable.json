@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "planeshift:course_vine"
+    "planeshift:course_vine",
+    "planeshift:course_climb_pole"
   ]
 }

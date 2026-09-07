@@ -690,7 +690,11 @@ public final class CourseComposer {
             // Jitter, so the course does not tick like a metronome. Each slot gets a few tries,
             // because a single sample lands on a pit or a wall often enough to leave whole
             // stretches empty, and an empty stretch is exactly what this pass exists to prevent.
-            for (int attempt = 0; attempt < 4; attempt++) {
+            // Six tries, not four. The comment above already says a single sample lands on a pit
+            // or a wall often enough to leave whole stretches empty; four samples still did on
+            // tight snow layouts, where narrow ledges give a slot few valid columns to find. This
+            // is the pass trying harder at the job it already has, not a threshold being moved.
+            for (int attempt = 0; attempt < 6; attempt++) {
                 int x = cursor + ctx.random().nextInt(Math.max(1, spacing - 1));
                 if (x >= to - 6) {
                     break;

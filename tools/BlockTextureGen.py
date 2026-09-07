@@ -296,6 +296,22 @@ CONNECTED = {
 }
 
 
+def barber(stripe, ground, width=5):
+    """A diagonal stripe that wraps, for a climbing pole.
+
+    The slope is one pixel across for one pixel down, so the stripe returns to its starting column
+    after exactly S rows and the tile meets itself when stacked. Any other slope leaves a jog at
+    every block boundary, which turns a helix into a row of unrelated marks -- and the helix is the
+    whole point, since it is what shows the player climbing when the character model does not.
+    """
+    img = Image.new("RGBA", (S, S), ground[:3] + (255,))
+    px = img.load()
+    for y in range(S):
+        for i in range(width):
+            px[(y + i) % S, y] = stripe[:3] + (255,)
+    return lit(img, ground)
+
+
 def distant(img, haze=(186, 214, 236), amount=0.46):
     """Push a texture back into the distance.
 
@@ -1081,6 +1097,11 @@ def build():
     # is the whole reason water turned out cheap. Two hues rather than one, because a reef reads as
     # a crowd of separate organisms and a single pink makes it read as painted rock.
     out["course_coral"] = drift((206, 92, 138), 91, flecks=(0.82, 1.22))
+
+    # The climbing pole. A diagonal stripe, drawn so it meets itself top and bottom -- the tile has
+    # to wrap or a stack of them shows a break at every block, and the break is exactly what the
+    # stripe exists to avoid: it is there to read as one continuous helix while the player moves.
+    out["course_climb_pole"] = barber((214, 70, 66), (238, 232, 224))
     out["course_snow_block"] = drift((238, 244, 250), 74, flecks=(0.96, 1.04))
     out["course_magma_block"] = embers((62, 48, 52), (232, 120, 48), 75)
 

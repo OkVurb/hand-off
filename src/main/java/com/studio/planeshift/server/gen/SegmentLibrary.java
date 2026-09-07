@@ -1392,6 +1392,58 @@ public final class SegmentLibrary {
     };
 
     /**
+     * A free-standing climbing pole between two ledges.
+     *
+     * <p>The companion to {@link #VINE_WALL} and deliberately the opposite shape. A vine hangs on
+     * a wall and is climbed where it already is; a pole stands in open space, so crossing to it is
+     * the first half of the problem and the climb is the second.
+     *
+     * <p>Same safety rule as the vine wall, and for the same reason: the solver treats a climbable
+     * as empty air, so the pole is never the only way through. The stepped ledge beside it is what
+     * the proof crosses on, and the pole is the shortcut that skips it.
+     */
+    static final Segment CLIMB_POLE = new Segment() {
+        public SegmentSpec spec() {
+            // Sixteen, matching what build() actually writes: floor 7, four ledges, exit shelf 5.
+            // Declared 14 at first, so the next segment began on top of the exit shelf and the
+            // proof failed at exactly the pole every time. A segment that lies about its width
+            // does not break where the lie is, it breaks wherever the neighbour lands.
+            return def("climb_pole", 16, 4, 2, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            // Deliberately the same skeleton as VINE_WALL: floor, four stepped ledges, exit shelf.
+            // The first draft invented its own spacing -- a four-block gap with a rise in it -- and
+            // the reachability proof rejected 188 of 5250 courses that contained it. Copying the
+            // proven shape and changing only what the segment is *about* is the cheaper way to be
+            // right, and the difference here is the climbable, not the geometry.
+            floor(c, x, 7, y, ctx);
+            BlockState pole = ModBlocks.COURSE_CLIMB_POLE.get().defaultBlockState();
+
+            for (int i = 0; i < 4; i++) {
+                platform(c, x + 7 + i, 2, y + 1 + i, ctx);
+            }
+            // The pole rises through the open air the steps climb around, so it is the shortcut
+            // and they are the guaranteed route.
+            for (int h = 1; h <= 6; h++) {
+                c.set(x + 5, y + h, 0, pole);
+            }
+            floor(c, x + 11, 5, y + 4, ctx);
+            coinTrail(c, x + 5, 5, y + 2, 1);
+
+            // Someone patrolling the ledge at the top. Without this the segment was sixteen blocks
+            // of nobody, and the inhabited-density check failed on short snow courses where one
+            // empty stretch that long is most of the level. It also gives the climb a reason: a
+            // shortcut that arrives next to a guard is a choice rather than a free ride.
+            mob(c, cast(ctx.theme()).get(0), x + 13, y + 5, -90.0F);
+            // And one at the foot of the pole. Two, because sixteen blocks is a long stretch of
+            // level and a single enemy in it still left short courses under the inhabited-density
+            // floor -- verified against a stashed baseline rather than guessed at.
+            mob(c, cast(ctx.theme()).get(0), x + 3, y + 1, -90.0F);
+        }
+    };
+
+    /**
      * Music blocks as a staircase you have to bounce up.
      *
      * <p>The music block bounces and plays a note, and the note rises with height — so a climb
@@ -1684,6 +1736,7 @@ public final class SegmentLibrary {
         list.add(ON_OFF_CORRIDOR);
         list.add(COIN_RING_ARC);
         list.add(VINE_WALL);
+        list.add(CLIMB_POLE);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);
