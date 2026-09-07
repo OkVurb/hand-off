@@ -176,18 +176,6 @@ public final class CourseStructureService {
         }
     }
 
-    private static void placeGroundSlice(ServerLevel level, BlockPos start, int floorY,
-                                         int offset, Palette palette) {
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-        for (int depth = -LANE_HALF_WIDTH; depth <= LANE_HALF_WIDTH; depth++) {
-            cursor.set(start.getX() + offset, floorY, start.getZ() + depth);
-            level.setBlock(cursor, palette.surface(), UPDATE_FLAGS);
-            for (int below = 1; below <= 3; below++) {
-                cursor.setY(floorY - below);
-                level.setBlock(cursor, palette.fill(), UPDATE_FLAGS);
-            }
-        }
-    }
 
     private static void placePitAccent(ServerLevel level, BlockPos start, int floorY,
                                        int offset, CourseTheme theme) {
@@ -200,15 +188,6 @@ public final class CourseStructureService {
         }
     }
 
-    private static void buildStartLandmark(ServerLevel level, BlockPos start, Palette palette) {
-        for (int y = 0; y <= 4; y++) {
-            set(level, start.offset(-3, y, 0), palette.accent());
-        }
-        for (int x = -3; x <= 1; x++) {
-            set(level, start.offset(x, 4, 0), palette.accent());
-        }
-        set(level, start.offset(4, 0, 0), ModBlocks.SPRING_PAD.get().defaultBlockState());
-    }
 
     private static void buildRewardRun(ServerLevel level, BlockPos start) {
         for (int x = 16; x <= 22; x++) {
@@ -221,46 +200,6 @@ public final class CourseStructureService {
         set(level, start.offset(31, 3, 0), ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
     }
 
-    /**
-     * Ledges spread along the course, one per set piece.
-     *
-     * <p>The count comes from {@code setPieceCount}, which is derived from the course length, so a
-     * 224-block course is genuinely denser rather than the same six platforms stretched out. The
-     * heights cycle rather than being random: the player should be able to read a rhythm.
-     */
-    private static void buildPlatformSet(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
-                                         Palette palette) {
-        int count = plan.setPieceCount();
-        int usable = plan.length() - 30;
-        int stride = Math.max(8, usable / count);
-
-        for (int i = 0; i < count; i++) {
-            int offset = 18 + stride * i;
-            if (offset + 8 >= plan.length() - 8) {
-                break;
-            }
-            int height = 3 + (i % 3);
-            int width = 4 + (i % 3);
-            platform(level, start, offset, height, width, palette.platform());
-
-            // Every other ledge carries a prize row, so the platforms are worth climbing rather
-            // than only worth clearing.
-            if (i % 2 == 0) {
-                set(level, start.offset(offset + 1, height + 4, 0),
-                        ModBlocks.QUESTION_BLOCK.get().defaultBlockState());
-                set(level, start.offset(offset + 2, height + 4, 0),
-                        ModBlocks.BRICK_BLOCK.get().defaultBlockState());
-            }
-        }
-
-        // One hidden block deliberately placed over a pit: reachable only by jumping out over
-        // nothing, which is the whole joke.
-        int[] pit = plan.gapAfter(plan.length() / 3);
-        if (pit != null) {
-            set(level, start.offset(pit[0] + 1, 4, 0),
-                    ModBlocks.HIDDEN_QUESTION_BLOCK.get().defaultBlockState());
-        }
-    }
 
     private static void buildMechanicSet(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
         int mid = plan.midpoint();
@@ -283,36 +222,7 @@ public final class CourseStructureService {
         set(level, start.offset(plan.length() - 17, 1, 0), ModBlocks.PRIZE_CACHE.get().defaultBlockState());
     }
 
-        private static void buildStaircaseObstacle(ServerLevel level, BlockPos start, CourseLayoutPlan plan, Palette palette) {
-        // Place a classic pyramid/staircase obstacle near the start
-        int base = 25;
-        if (plan.hasGroundAt(base) && plan.hasGroundAt(base + 8)) {
-            for (int h = 0; h < 4; h++) {
-                for (int x = base + h; x <= base + 8 - h; x++) {
-                    set(level, start.offset(x, 1 + h, 0), palette.surface());
-                }
-            }
-        }
-    }
 
-    private static void buildFinish(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
-                                    Palette palette) {
-        int finish = plan.length();
-        set(level, start.offset(finish, 1, 0), ModBlocks.FLAG_POLE.get().defaultBlockState()
-                .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.BASE));
-        for (int y = 2; y <= 6; y++) {
-            set(level, start.offset(finish, y, 0), ModBlocks.FLAG_POLE.get().defaultBlockState()
-                    .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.POLE));
-        }
-        set(level, start.offset(finish, 7, 0), ModBlocks.FLAG_POLE.get().defaultBlockState()
-                .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.TOP));
-        for (int step = 0; step < 5; step++) {
-            for (int x = finish - 10 + step; x <= finish - 6 + step; x++) {
-                set(level, start.offset(x, step + 1, 0), palette.accent());
-            }
-        }
-        set(level, start.offset(finish + 4, 1, 0), ModBlocks.WARP_PIPE.get().defaultBlockState());
-    }
 
     /**
      * A donut-block bridge over one of the pits, so a gap the player could jump becomes a gap
@@ -390,57 +300,7 @@ public final class CourseStructureService {
                 ModBlocks.SECRET_VINE.get().defaultBlockState());
     }
 
-    /**
-     * Coin Heaven: a cloud platform high above the course, lined with coins.
-     *
-     * <p>Sits directly above the secret vine so the climb leads somewhere, and high enough that
-     * it cannot be reached by ordinary jumping — the vine has to be found first.
-     */
-    private static void buildCoinHeaven(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
-                                        Palette palette) {
-        int anchor = plan.midpoint() - 34;
-        int heavenY = 22;
-        for (int x = anchor - 2; x <= anchor + 14; x++) {
-            for (int depth = -LANE_HALF_WIDTH; depth <= LANE_HALF_WIDTH; depth++) {
-                set(level, start.offset(x, heavenY, depth),
-                        ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState());
-            }
-        }
-        for (int x = anchor; x <= anchor + 12; x += 2) {
-            spawnCoin(level, start.getX() + x, start.getY() + heavenY + 1.5D, start.getZ());
-        }
-    }
 
-    /**
-     * The castle finale: a bridge over a lava pit, a firebar to time, and the axe that drops the
-     * bridge. Replaces the plain flag ending for the lava theme.
-     */
-    private static void buildCastleFinale(ServerLevel level, BlockPos start, CourseLayoutPlan plan,
-                                          Palette palette) {
-        int bridgeStart = plan.length() - 22;
-        int bridgeEnd = plan.length() - 10;
-
-        // Hollow the floor into a lava pit under the bridge.
-        for (int x = bridgeStart; x <= bridgeEnd; x++) {
-            for (int depth = -LANE_HALF_WIDTH; depth <= LANE_HALF_WIDTH; depth++) {
-                set(level, start.offset(x, 0, depth), Blocks.LAVA.defaultBlockState());
-                set(level, start.offset(x, -1, depth), Blocks.LAVA.defaultBlockState());
-            }
-            set(level, start.offset(x, 1, 0), ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
-        }
-
-        // The axe sits past the far end; taking it collapses the bridge back toward the pit.
-        set(level, start.offset(bridgeEnd + 2, 2, 0), ModBlocks.AXE_BLOCK.get().defaultBlockState());
-
-        // Castle walls, so the arena reads as an interior rather than an open pit.
-        for (int y = 2; y <= 8; y++) {
-            set(level, start.offset(bridgeStart - 2, y, 0), palette.accent());
-            set(level, start.offset(bridgeEnd + 5, y, 0), palette.accent());
-        }
-
-        spawnFirebar(level, start, (bridgeStart + bridgeEnd) / 2, 6, 4, 1.0F);
-        spawnFirebar(level, start, bridgeEnd - 2, 6, 3, -1.0F);
-    }
 
     private static void buildGhostHouseLoop(ServerLevel level, BlockPos start, CourseLayoutPlan plan) {
         int loopX = plan.midpoint() + 15;
@@ -623,35 +483,6 @@ public final class CourseStructureService {
         level.setBlock(pos, state, UPDATE_FLAGS);
     }
 
-    private record Palette(BlockState surface, BlockState fill, BlockState accent,
-                           BlockState platform) {
-        static Palette forTheme(CourseTheme theme) {
-            return switch (theme) {
-                case WATER -> new Palette(ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_DEEPSTONE.get().defaultBlockState(),
-                        ModBlocks.COURSE_CORAL.get().defaultBlockState(),
-                        ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState());
-                case GRASS -> new Palette(ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
-                        Blocks.DIRT.defaultBlockState(), ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState());
-                case DESERT -> new Palette(ModBlocks.COURSE_SAND_BLOCK.get().defaultBlockState(),
-                        Blocks.SANDSTONE.defaultBlockState(), Blocks.ORANGE_TERRACOTTA.defaultBlockState(),
-                        ModBlocks.COURSE_SAND_BLOCK.get().defaultBlockState());
-                case SNOW -> new Palette(ModBlocks.COURSE_SNOW_BLOCK.get().defaultBlockState(),
-                        Blocks.PACKED_ICE.defaultBlockState(), Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState(),
-                        ModBlocks.COURSE_SNOW_BLOCK.get().defaultBlockState());
-                case LAVA -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.BLACKSTONE.defaultBlockState(), ModBlocks.COURSE_EMBER_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
-                case UNDERGROUND -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.DEEPSLATE.defaultBlockState(), Blocks.PURPLE_TERRACOTTA.defaultBlockState(),
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
-                case GHOST_HOUSE -> new Palette(ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
-                        Blocks.DARK_OAK_PLANKS.defaultBlockState(), Blocks.DARK_OAK_LOG.defaultBlockState(),
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState());
-            };
-        }
-    }
 }
 
 

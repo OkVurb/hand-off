@@ -104,3 +104,27 @@ submerging water courses, swimming, and the duplicate vanilla-block palette in
 CourseStructureService.
 
 296 tests, no failures, counted from XML.
+
+## Iteration 6
+
+Backlog, not the work plan -- section 8 finished last iteration.
+
+Investigated the duplicate palette in CourseStructureService and found something larger than the
+backlog note described. The palette was not merely a stale copy: it and the seven methods consuming
+it were an entire dead subsystem, an older hand-placement course builder superseded by
+CourseComposer plus CourseWriter. Every one of the eight members appeared exactly once in the file,
+its own definition, and the class has a single public entry point that reaches none of them.
+
+Removed: buildStartLandmark, buildStaircaseObstacle, buildCastleFinale, buildCoinHeaven,
+buildFinish, buildPlatformSet, placeGroundSlice, and the Palette record. 658 lines to 489.
+
+The compiler is the proof here, not my reading -- if anything had referenced them the build would
+have failed. It did fail once mid-way, when my brace-matcher skipped a method indented differently
+from the rest and left Palette referenced; that is exactly the failure mode this approach is
+supposed to surface, and it surfaced.
+
+Also corrected a javadoc in ModBlocks that cited CourseStructureService.buildFinish as the thing
+laying flagpole steps. The reasoning in that comment is still right; the function it named was dead.
+
+296 tests, no failures, counted from XML. Test count unchanged, which is what deleting genuinely
+unreachable code should look like.

@@ -197,8 +197,9 @@ public final class ModBlocks {
      * special collision. But three separate readers - two review agents and one of the authors -
      * independently proposed adding it to a "kills whatever stands on it" set purely on the
      * strength of the word <em>magma</em>, and one of those very nearly shipped. It is also what
-     * {@code CourseStructureService.buildFinish} lays the flagpole steps from, so treating it as
-     * lethal would have killed enemies standing on the goal.
+     * lethal would have killed enemies standing on the goal, since the flagpole steps are laid
+     * from it. (That reference used to name {@code CourseStructureService.buildFinish}, which was
+     * dead code and has been removed; the reasoning holds regardless of which builder places it.)
      *
      * <p>The registry id is deliberately still {@code course_magma_block}: renaming that would
      * churn the blockstate, model, item model, lang entry and texture for no gain, and would break
