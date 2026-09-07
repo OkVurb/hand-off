@@ -258,3 +258,28 @@ four times, and tight snow layouts give a slot few valid columns. Six tries is t
 harder at the job it already had.
 
 301 tests, no failures, counted from XML.
+
+## Iteration 12
+
+Went looking for title cards (plan 7.5) and stopped short of them on purpose.
+
+The client cannot name the course it is in: CourseState carries the theme but not the course id.
+Adding one means extending a hand-written STREAM_CODEC, two parallel lists of fields in matching
+order with nothing enforcing that they match. Get it wrong and it does not throw -- the bytes are
+still consumed, just read as the wrong fields, so a coin count quietly lands in a lives counter and
+surfaces as a gameplay oddity nobody traces to networking.
+
+There was no round-trip test on that codec, and the suite's existing withersPreserveNewFields test
+says this record has been extended before and that extending it is where the bugs come from. So this
+iteration wrote the missing net rather than the feature: CourseStateCodecTest, with every field set
+away from its default, because a codec that reads two fields in the wrong order still round-trips
+correctly when both hold the same value.
+
+Then I checked the test actually bites, by swapping two encodes deliberately and confirming it went
+red before restoring. A safety net that has never been seen to catch anything is a guess.
+
+Title cards are in the backlog with the reason, and one open question that wants a waking answer:
+sync the course id and translate client-side, or sync a Component. That is a UI direction question,
+not a plumbing one.
+
+304 tests, no failures, counted from XML.

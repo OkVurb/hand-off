@@ -185,3 +185,19 @@ only the owner can make.
 `Blocks.ORANGE_TERRACOTTA`. The migration to native course blocks appears to have covered
 `GenContext` and missed this one. Worth checking which of the two actually reaches a player before
 deleting either.
+
+## Title cards (plan 7.5) — blocked on a sync field
+
+The client cannot name the course it is in. `CourseState` carries the theme but not the course id,
+and `CourseHud` already tracks a course-start tick, so the card itself is a small piece of work
+sitting behind a networking change.
+
+Adding the id means extending a hand-written `STREAM_CODEC` -- two parallel lists of fields whose
+agreement nothing enforces. That is now covered by `CourseStateCodecTest`, so the change is safe to
+make; it was not when the iteration started, which is why the test came first and the field did not.
+
+Left for a waking decision because it is a design question as much as a plumbing one: the card
+wants a display name, and course display names currently live in the lang file keyed by course id,
+which the client would then look up. Syncing the id and translating client-side is the cheap route;
+syncing a `Component` is the flexible one. Worth ten seconds of thought from someone who knows which
+way the rest of the UI is going.
