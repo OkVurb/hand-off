@@ -334,3 +334,29 @@ Used System.currentTimeMillis() rather than importing Util.getMillis, because th
 tracks its walk animation that way and one screen with two clocks is a bug waiting for a slow frame.
 
 308 tests, no failures, counted from XML.
+
+## Iteration 15
+
+Progress banners, plan 7.7. The results screen now announces the moment the final world opens.
+
+This mattered more than it looks because of the star-coin gate added earlier tonight. A lock quietly
+becoming unlocked is invisible: the player who finally crosses the threshold is looking at the
+results screen, not the map, and without saying so the only evidence is a node that stopped being
+grey on a screen they may not open for a while. The collectable that gates the world would never get
+credited with having done anything.
+
+Needed no networking change, which is why it got done and title cards did not. The client already
+holds CourseProgress as an attachment, and "did this clear open it" is derivable by subtracting the
+run's own contribution from current progress rather than by remembering the previous state -- so
+nothing is synced and nothing is persisted.
+
+The cost of that trick is arithmetic that is easy to get subtly wrong in a way that fires the banner
+on every subsequent clear, and a celebration that repeats is worse than none because it teaches the
+player to ignore it. So UnlockMomentTest was written before the UI: fires on the coin crossing,
+fires on the gating boss clear, stays silent while locked, and specifically does not fire again on
+the next course.
+
+Also parenthesised a condition that was relying on && binding tighter than ||. It was correct;
+correct and unreadable is a bug waiting for the next person to tidy it.
+
+312 tests, no failures, counted from XML.

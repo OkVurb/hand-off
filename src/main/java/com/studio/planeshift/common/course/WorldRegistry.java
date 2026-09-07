@@ -132,6 +132,38 @@ public final class WorldRegistry {
                 && ORDERED.get(ORDERED.size() - 1).worldId().equals(world.worldId());
     }
 
+    /**
+     * Whether clearing one course is what opened the final world.
+     *
+     * <p>The reference announces structural change -- "Star World has appeared!" -- and the reason
+     * is that a lock quietly becoming unlocked is invisible. The player who finally crosses the
+     * star-coin threshold is looking at a results screen, not at the map, and without a banner the
+     * only evidence is a node that stopped being grey on a screen they may not open for a while.
+     *
+     * <p>Computed by subtracting the run's own contribution rather than by remembering the
+     * previous state, so it needs nothing synced and nothing persisted: if the world is open now
+     * and would not have been without this clear, this clear is what opened it.
+     */
+    public static boolean justOpenedFinalWorld(CourseProgress after, String clearedCourseId,
+                                               int starCoinsThisRun) {
+        if (ORDERED.isEmpty()) {
+            return false;
+        }
+        WorldDefinition last = ORDERED.get(ORDERED.size() - 1);
+        if (!isWorldUnlocked(after, last)) {
+            return false;
+        }
+        // The same test against progress as it stood before this course was cleared.
+        // Parenthesised rather than leaning on && binding tighter than ||. The reading is "there
+        // is no previous world, or its boss was already cleared and it was not cleared just now".
+        boolean bossWasCleared = ORDERED.size() < 2
+                || (after.cleared(ORDERED.get(ORDERED.size() - 2).bossCourseId())
+                    && !ORDERED.get(ORDERED.size() - 2).bossCourseId().equals(clearedCourseId));
+        boolean coinsWereEnough =
+                after.totalStarCoins() - starCoinsThisRun >= FINAL_WORLD_STAR_COINS;
+        return !(bossWasCleared && coinsWereEnough);
+    }
+
     public static boolean isUnlocked(CourseProgress progress, String courseId) {
         return isUnlocked(progress, courseId, false);
     }

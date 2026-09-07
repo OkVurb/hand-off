@@ -3,6 +3,9 @@ package com.studio.planeshift.client.screen;
 import com.studio.planeshift.client.gui.PlaneShiftGui;
 import com.studio.planeshift.common.course.CourseProgress;
 import com.studio.planeshift.common.network.CourseResultsPayload;
+import net.minecraft.client.Minecraft;
+import com.studio.planeshift.common.registry.ModAttachments;
+import com.studio.planeshift.common.course.WorldRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -78,12 +81,46 @@ public class CourseResultsScreen extends Screen {
         row(graphics, left, y, "gui.planeshift.results.score",
                 Component.literal(Integer.toString(results.score())));
 
+        drawUnlockBanner(graphics, top, panelHeight());
+
         if (results.newBestScore()) {
             Component best = Component.translatable("gui.planeshift.results.new_best");
             graphics.drawString(this.font, best,
                     this.width / 2 - this.font.width(best) / 2, top + panelHeight() - 12,
                     PlaneShiftGui.COIN_YELLOW, true);
         }
+    }
+
+    /**
+     * Announces the moment the final world opens.
+     *
+     * <p>A lock quietly becoming unlocked is invisible. The player who finally crosses the
+     * star-coin threshold is looking at this screen, not at the map, and without saying so the
+     * only evidence is a node that stopped being grey on a screen they may not open for a while --
+     * so the collectable that gates it never gets credited with having done anything.
+     *
+     * <p>Drawn below the panel rather than inside it, because the rows above are about this course
+     * and this is about the game. Putting it in the list would make the largest thing that has
+     * happened all run look like another statistic.
+     */
+    private void drawUnlockBanner(GuiGraphics graphics, int top, int panelHeight) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null) {
+            return;
+        }
+        CourseProgress progress = minecraft.player.getData(ModAttachments.COURSE_PROGRESS);
+        if (!WorldRegistry.justOpenedFinalWorld(progress, results.courseId(),
+                results.starCoins())) {
+            return;
+        }
+        Component banner = Component.translatable("gui.planeshift.banner.final_world");
+        int y = top + panelHeight + 10;
+        int w = this.font.width(banner);
+        int x = this.width / 2 - w / 2;
+        graphics.fill(x - 8, y - 4, x + w + 8, y + 12, 0xCC_000000);
+        graphics.fill(x - 8, y - 4, x + w + 8, y - 3, PlaneShiftGui.COIN_YELLOW);
+        graphics.fill(x - 8, y + 11, x + w + 8, y + 12, PlaneShiftGui.COIN_YELLOW);
+        graphics.drawString(this.font, banner, x, y, PlaneShiftGui.COIN_YELLOW, true);
     }
 
     private void row(GuiGraphics graphics, int left, int y, String labelKey, Component value) {
