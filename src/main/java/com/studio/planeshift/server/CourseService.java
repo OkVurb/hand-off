@@ -114,11 +114,38 @@ public final class CourseService {
         // The course movement baseline has to follow the state change, not precede it: it reads
         // inCourse() to decide whether to apply.
         CourseMovementService.refresh(player);
+        // The card naming where they have arrived. Sent after the state change so the HUD it
+        // draws over is already showing this course rather than the last one.
+        announce(player, courseId);
         CourseScoringService.startCourse(player);
         ProgressionService.enterCourse(player, courseId);
         // A player who has moved on should not still be being thanked for the last course.
         ToadDialogueService.clear(player);
         return true;
+    }
+
+    /**
+     * Tells the client which course this is, so it can open on a title card.
+     *
+     * <p>The names are resolved here rather than on the client. The server already holds the world
+     * table; making the client hold a second copy to turn an id into a name is two tables that can
+     * disagree, and the failure mode is a blank card nobody notices until someone renames a world.
+     *
+     * <p>A course outside the world table -- a test course, a hand-built id -- gets no card rather
+     * than a card reading "null". Nothing is gated on it, so silence is the right failure.
+     */
+    private static void announce(ServerPlayer player, String courseId) {
+        com.studio.planeshift.common.course.WorldDefinition world =
+                com.studio.planeshift.common.course.WorldRegistry.worldForCourse(courseId);
+        if (world == null) {
+            return;
+        }
+        int index = world.courseIds().indexOf(courseId) + 1;
+        int worldNumber = com.studio.planeshift.common.course.WorldRegistry
+                .worldIndex(world.worldId()) + 1;
+        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,
+                new com.studio.planeshift.common.network.TitleCardPayload(
+                        world.displayName(), worldNumber + "-" + index));
     }
 
     /**

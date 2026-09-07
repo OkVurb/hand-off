@@ -261,6 +261,10 @@ public final class ClientModEvents {
         event.register(ScorePopupPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         com.studio.planeshift.client.hud.ScorePopups.add(payload.amount())));
+        event.register(com.studio.planeshift.common.network.TitleCardPayload.TYPE,
+                (payload, context) -> context.enqueueWork(() ->
+                        com.studio.planeshift.client.hud.TitleCard.show(
+                                payload.world(), payload.level())));
         event.register(OpenToadShopPayload.TYPE,
                 (payload, context) -> context.enqueueWork(() ->
                         Minecraft.getInstance().setScreen(new ToadShopScreen())));

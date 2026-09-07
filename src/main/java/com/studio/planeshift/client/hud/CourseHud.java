@@ -177,6 +177,7 @@ public final class CourseHud {
                 x, y + 80, 0xFFFFFFFF, true);
 
         ScorePopups.render(graphics, font);
+        TitleCard.render(graphics, font);
 
         // Mode badge and transition progress.
         if (PlaneShiftConfig.CLIENT.showModeBadge.get()) {

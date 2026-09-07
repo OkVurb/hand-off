@@ -302,7 +302,11 @@ on a flat field.
 
 **7.4 Course and map are joined by an iris wipe** at the node just cleared.
 
-**7.5 Levels open on a title card** naming world and level.
+**7.5 Levels open on a title card** naming world and level. *Built.* An overlay rather than a
+screen -- a screen would pause input and release the mouse, turning a half-second flourish into a
+dialog to dismiss. The packet carries the two display strings rather than a course id, which
+settles the question the backlog was holding open: the client would otherwise need its own copy of
+the world table, and the failure mode of two tables disagreeing is a blank card nobody notices.
 
 **7.6 Levels carry signposts** — arrow boards planted in terrain where a route is ambiguous.
 Navigation as set dressing rather than UI.

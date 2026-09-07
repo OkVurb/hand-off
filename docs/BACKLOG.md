@@ -233,3 +233,5 @@ already open, and if it is open you can simply walk there.
 **Ruled: make it like Mario.** Implemented. A secret exit in a world now unlocks that world's
 cannon; the star-coin gate on the final world still applies, because a shortcut through the ordinary
 sequence is not the same as a way around the one requirement the whole run is built on.
+
+- ~~Title cards: decide between syncing a course id and syncing a `Component`.~~ Decided and built: neither. The server sends the two finished display strings, so there is no second copy of the world table to drift.
