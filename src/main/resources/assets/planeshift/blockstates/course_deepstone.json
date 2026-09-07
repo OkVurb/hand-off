@@ -1,7 +1,52 @@
 {
   "variants": {
-    "": {
-      "model": "planeshift:block/course_deepstone"
+    "down=false,east=false,up=false,west=false": {
+      "model": "planeshift:block/course_deepstone_0"
+    },
+    "down=false,east=false,up=true,west=false": {
+      "model": "planeshift:block/course_deepstone_1"
+    },
+    "down=true,east=false,up=false,west=false": {
+      "model": "planeshift:block/course_deepstone_2"
+    },
+    "down=true,east=false,up=true,west=false": {
+      "model": "planeshift:block/course_deepstone_3"
+    },
+    "down=false,east=false,up=false,west=true": {
+      "model": "planeshift:block/course_deepstone_4"
+    },
+    "down=false,east=false,up=true,west=true": {
+      "model": "planeshift:block/course_deepstone_5"
+    },
+    "down=true,east=false,up=false,west=true": {
+      "model": "planeshift:block/course_deepstone_6"
+    },
+    "down=true,east=false,up=true,west=true": {
+      "model": "planeshift:block/course_deepstone_7"
+    },
+    "down=false,east=true,up=false,west=false": {
+      "model": "planeshift:block/course_deepstone_8"
+    },
+    "down=false,east=true,up=true,west=false": {
+      "model": "planeshift:block/course_deepstone_9"
+    },
+    "down=true,east=true,up=false,west=false": {
+      "model": "planeshift:block/course_deepstone_10"
+    },
+    "down=true,east=true,up=true,west=false": {
+      "model": "planeshift:block/course_deepstone_11"
+    },
+    "down=false,east=true,up=false,west=true": {
+      "model": "planeshift:block/course_deepstone_12"
+    },
+    "down=false,east=true,up=true,west=true": {
+      "model": "planeshift:block/course_deepstone_13"
+    },
+    "down=true,east=true,up=false,west=true": {
+      "model": "planeshift:block/course_deepstone_14"
+    },
+    "down=true,east=true,up=true,west=true": {
+      "model": "planeshift:block/course_deepstone_15"
     }
   }
 }

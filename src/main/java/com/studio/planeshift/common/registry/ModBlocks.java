@@ -50,13 +50,13 @@ public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(PlaneShift.MOD_ID);
 
     /** Bright, durable terrain tiles used by the generated 2.5D courses. */
-    public static final DeferredBlock<Block> COURSE_GRASS_BLOCK = courseBlock(
+    public static final DeferredBlock<ConnectedBlock> COURSE_GRASS_BLOCK = connectedBlock(
             "course_grass_block", MapColor.GRASS, SoundType.GRASS);
     public static final DeferredBlock<Block> COURSE_DIRT_BLOCK = courseBlock(
             "course_dirt_block", MapColor.DIRT, SoundType.GRAVEL);
     public static final DeferredBlock<Block> COURSE_CLOUD_BLOCK = courseBlock(
             "course_cloud_block", MapColor.SNOW, SoundType.WOOL);
-    public static final DeferredBlock<Block> COURSE_SAND_BLOCK = courseBlock(
+    public static final DeferredBlock<ConnectedBlock> COURSE_SAND_BLOCK = connectedBlock(
             "course_sand_block", MapColor.SAND, SoundType.SAND);
     // ------------------------------------------------------------------ decoration
     //
@@ -101,13 +101,13 @@ public final class ModBlocks {
      * perspective. Two materials in one frame drawn by two different hands, and the fill is the
      * one you see most.
      */
-    public static final DeferredBlock<Block> COURSE_SANDSTONE = courseBlock(
+    public static final DeferredBlock<ConnectedBlock> COURSE_SANDSTONE = connectedBlock(
             "course_sandstone", MapColor.SAND, SoundType.STONE);
     public static final DeferredBlock<Block> COURSE_DESERT_BRICK = courseBlock(
             "course_desert_brick", MapColor.TERRACOTTA_ORANGE, SoundType.STONE);
-    public static final DeferredBlock<Block> COURSE_BASALT = courseBlock(
+    public static final DeferredBlock<ConnectedBlock> COURSE_BASALT = connectedBlock(
             "course_basalt", MapColor.COLOR_BLACK, SoundType.STONE);
-    public static final DeferredBlock<Block> COURSE_DEEPSTONE = courseBlock(
+    public static final DeferredBlock<ConnectedBlock> COURSE_DEEPSTONE = connectedBlock(
             "course_deepstone", MapColor.DEEPSLATE, SoundType.DEEPSLATE);
     public static final DeferredBlock<Block> COURSE_GHOST_BEAM = courseBlock(
             "course_ghost_beam", MapColor.WOOD, SoundType.WOOD);
@@ -444,6 +444,22 @@ public final class ModBlocks {
                     .strength(0.8F)
                     .noOcclusion()
                     .sound(SoundType.WOOL));
+
+    /**
+     * A course block that draws its own edges from its neighbours.
+     *
+     * <p>Same properties as {@link #courseBlock}; the only difference is the class, and therefore
+     * the four boolean properties and the sixteen models behind them. Worth its own helper because
+     * the list of blocks that want this is now longer than the list that does not: anything built
+     * into walls or terrain wants it, and only props and one-off set pieces do not.
+     */
+    private static DeferredBlock<ConnectedBlock> connectedBlock(String name, MapColor mapColor,
+                                                                 SoundType sound) {
+        return BLOCKS.registerBlock(name, ConnectedBlock::new, BlockBehaviour.Properties.of()
+                .mapColor(mapColor)
+                .strength(1.5F, 6.0F)
+                .sound(sound));
+    }
 
     private static DeferredBlock<Block> courseBlock(String name, MapColor mapColor,
                                                      SoundType sound) {

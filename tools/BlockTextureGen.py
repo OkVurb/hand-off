@@ -222,12 +222,73 @@ def edged(flat, base, mask):
     return img
 
 
+def capped(flat, base, mask, cap=None, cap_rows=3, fringe=None, fringe_depth=3):
+    """Edges, plus a real material band on the top face and an optional fringe below.
+
+    ``edged`` draws light and shade where a block ends, which removes the banding but keeps every
+    block the same material all the way up. The reference does something stronger: the top face of
+    a platform is a *different material* from its body -- grass over rock, snow over ice, moss over
+    stone -- and the underside can carry its own growth, an icicle fringe hanging off a ledge.
+
+    So the rule is not "a block has a cap". It is that a face is drawn according to which way it
+    points and whether anything is against it, which is exactly what the connection mask already
+    says. ``cap`` paints the top rows when nothing is above; ``fringe`` hangs teeth from the bottom
+    when nothing is below. Give neither and this is ``edged``.
+
+    The fringe is deliberately ragged rather than a clean band. A straight line along the underside
+    reads as another block; teeth of uneven length read as something that grew there.
+    """
+    img = flat.copy()
+    d = ImageDraw.Draw(img)
+
+    if cap is not None and not mask & 1:
+        for row in range(cap_rows):
+            # Slightly darker going down so the band has its own form rather than sitting flat.
+            d.line([(0, row), (S - 1, row)], fill=shade(cap, 1.10 - 0.12 * row))
+        # A broken row underneath, so the join between cap and body is not a ruled line.
+        h = _hash_seed(seed_of(base) + 977)
+        for x in range(S):
+            h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+            if h % 3:
+                d.point((x, cap_rows), fill=shade(cap, 0.88))
+
+    if fringe is not None and not mask & 2:
+        h = _hash_seed(seed_of(base) + 613)
+        for x in range(S):
+            h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+            depth = h % (fringe_depth + 1)
+            for row in range(depth):
+                y = S - 1 - row
+                d.point((x, y), fill=shade(fringe, 1.06 - 0.10 * row))
+
+    return edged(img, base, mask)
+
+
+def seed_of(colour):
+    """A stable seed from a colour, so a block's scatter is its own but never random per run."""
+    r, g, b = colour[:3]
+    return r * 65536 + g * 256 + b
+
+
 # Blocks that draw their own edges from their neighbours. Each entry produces sixteen sheets plus
 # the plain one, which stays as the item icon and as the fallback for anything still placing this
 # block without a connection state.
 CONNECTED = {
     "course_castle_block": (lambda: masonry((104, 110, 126), 71, course=5, mortar=0.72,
-                                            light=False), (104, 110, 126)),
+                                            light=False), (104, 110, 126), {}),
+    # Grass is the clearest case in the whole reference: a dirt body with a green band on top,
+    # and the band appears only where the block is actually the top of something.
+    "course_grass_block": (lambda: drift((124, 88, 58), 25, flecks=(0.90, 1.08)),
+                           (124, 88, 58), {"cap": (88, 158, 62), "cap_rows": 4}),
+    "course_sand_block": (lambda: drift((228, 196, 118), 73), (228, 196, 118), {}),
+    "course_sandstone": (lambda: masonry((214, 182, 118), 81, course=4, mortar=0.78,
+                                         light=False), (214, 182, 118), {}),
+    # Volcanic rock, with a hot crust where it is exposed to the air above.
+    "course_basalt": (lambda: drift((58, 54, 62), 83, flecks=(0.86, 1.12)),
+                      (58, 54, 62), {"cap": (128, 64, 40), "cap_rows": 2}),
+    # Cave stone: nothing on top, but stalactite teeth where a ledge overhangs.
+    "course_deepstone": (lambda: drift((74, 76, 88), 84, flecks=(0.88, 1.10)),
+                         (74, 76, 88), {"fringe": (108, 112, 128), "fringe_depth": 3}),
     # brick_block is deliberately absent for now. It is a BrickBlock, not a plain Block -- it
     # implements HitFromBelowBlock and breaks when hit from underneath -- so converting it means
     # changing its superclass rather than its registration, and that is worth doing only once the
@@ -1094,10 +1155,10 @@ def main():
     # The connected variants. Sixteen per block, named by their connection mask, which is the
     # contract with ConnectedBlock.mask().
     extra = 0
-    for name, (draw, base) in sorted(CONNECTED.items()):
+    for name, (draw, base, opts) in sorted(CONNECTED.items()):
         flat = draw()
         for mask in range(16):
-            edged(flat, base, mask).save(
+            capped(flat, base, mask, **opts).save(
                 os.path.join(target, "%s_%d.png" % (name, mask)))
             extra += 1
     print("wrote %d connected variants" % extra)
