@@ -151,6 +151,55 @@ def masonry(base, seed, course=5, mortar=0.70, offset=True, light=True):
     return lit(img, base) if light else img
 
 
+def coursed_rubble(base, seed, mortar=0.68, light=True):
+    """Stone laid in mixed sizes: big slabs, half-slabs and squares in two tones.
+
+    ``masonry`` lays one brick size in even courses, which is correct for a brick block and wrong
+    for a castle wall. The reference's walls are the most visible thing in the whole game and they
+    are emphatically *not* a grid -- the eye reads the wall, not the module, because the stones are
+    different sizes and the joints only sometimes line up.
+
+    Three courses of unequal height rather than four equal ones, each split into stones whose widths
+    sum to sixteen. That is what makes it tile: every row closes exactly at the block edge, so a
+    wall of these has no seam, while inside the tile nothing repeats at the same interval twice.
+
+    Two tones, chosen per stone from a hash of its position. One flat colour makes the sizes
+    invisible at this resolution -- the variation is what tells the player the stones are separate
+    at all, and the tones stay close together so the wall reads as one material rather than as
+    chequerwork.
+    """
+    img = plain(base, seed, 0.05)
+    d = ImageDraw.Draw(img)
+    joint = shade(base, mortar)
+
+    # Heights sum to 16; widths per course sum to 16. Both are what makes the tile seamless.
+    courses = [
+        (6, [10, 6]),
+        (4, [6, 4, 6]),
+        (6, [7, 9]),
+    ]
+    y = 0
+    for index, (height, widths) in enumerate(courses):
+        x = 0
+        for slot, width in enumerate(widths):
+            k = (_hash_seed(seed + index * 7 + slot) >> 5) % 3
+            tone = shade(base, 1.0 + (k - 1) * 0.075)
+            d.rectangle([x, y, x + width - 1, y + height - 1], fill=tone)
+            x += width
+        y += height
+
+    # Joints last, so no stone paints over its own edge.
+    y = 0
+    for height, widths in courses:
+        d.line([(0, y + height - 1), (S - 1, y + height - 1)], fill=joint)
+        x = 0
+        for width in widths[:-1]:
+            x += width
+            d.line([(x - 1, y), (x - 1, y + height - 2)], fill=joint)
+        y += height
+    return lit(img, base) if light else img
+
+
 def drift(base, seed, flecks=(1.10, 1.18)):
     """A soft granular surface: snow, sand, anything the eye should read as loose material.
 
@@ -277,8 +326,10 @@ CONNECTED = {
     # A castle wall's top course is the one that has been rained on for a century. Lighter and
     # greener than the body, and only where the wall actually ends -- an interior block of the same
     # wall has no weather on it.
-    "course_castle_block": (lambda: masonry((104, 110, 126), 71, course=5, mortar=0.72,
-                                            light=False), (104, 110, 126),
+    # Mixed sizes rather than one brick module. See coursed_rubble: a castle wall is the most
+    # visible surface in the game and the reference's is not a grid.
+    "course_castle_block": (lambda: coursed_rubble((104, 110, 126), 71, mortar=0.72,
+                                                   light=False), (104, 110, 126),
                             {"cap": (96, 122, 96), "cap_rows": 2}),
     # Grass is the clearest case in the whole reference: a dirt body with a green band on top,
     # and the band appears only where the block is actually the top of something.

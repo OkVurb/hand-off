@@ -198,6 +198,13 @@ own casts. Those were the last two places where the shared interiors collapsed s
 **4.6 Terrain is masonry of mixed block sizes.** *The single most visible thing in the reference.*
 Big slabs, half-slabs and squares in two alternating tones; the eye reads the wall, not the grid.
 
+*Built for the castle block*, which is the wall the player sees most: `coursed_rubble` lays three
+courses of unequal height, each split into stones whose widths sum to sixteen — that is what keeps
+it seamless, since every row closes exactly at the tile edge while nothing inside repeats at the
+same interval twice. Two tones per stone from a position hash, kept close together so the wall
+reads as one material rather than as chequerwork. `masonry` stays for the brick block, where one
+module is correct. Sandstone and the other coursed blocks have not been converted yet.
+
 **4.7 Pipes are structural, and a colour set of at least five.** *The colour set is already built* —
 all five exist as `WarpPipeBlock.Colour` with their own textures, and `SegmentLibrary.pipe()` leans
 each theme on one of them so a pipe reads as belonging to the world it is in. What remains is the

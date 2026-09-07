@@ -1057,3 +1057,15 @@ and a semisolid platform is a cap. It adds a shape the library did not have -- a
 platform held up by a line rather than extruded from terrain, so the space under it
 stays open. Caps are semisolid so they can be jumped up through; a mushroom you have
 to walk around to climb is a wall with a hat. 358 tests, 0 failures.
+
+## Castle walls stop being a grid
+The plan calls mixed-size masonry the single most visible thing in the reference,
+and the castle block was one brick module in even courses. coursed_rubble lays three
+courses of unequal height, each split into stones whose widths sum to sixteen -- the
+sums are what make it tile, since every row closes at the block edge while nothing
+inside repeats at the same interval twice.
+
+Two tones per stone, hashed from position and kept close together: one flat colour
+makes the sizes invisible at 16px, and tones far apart make chequerwork rather than
+stone. masonry stays for the brick block, where a single module is the right answer.
+Sixteen connected variants regenerated. 358 tests, 0 failures.
