@@ -48,7 +48,15 @@ public enum EnemyRigProfile {
      * chances to let the art and the hitbox disagree.
      */
     KOOPALING(1.15F),
-    BOWSER(1.0F);
+    BOWSER(1.0F),
+    /**
+     * Bowser after the Koopalings revive him. The one profile whose whole job is being bigger.
+     *
+     * <p>A separate entry rather than a multiplier applied at render time, for the reason this
+     * enum exists: the number here is also the number the hitbox is registered with, and the two
+     * drifting apart is what makes a stomp land on the art and pass through the mob.
+     */
+    SUPER_BOWSER(2.4F);
 
     private final float visualScale;
 

@@ -63,7 +63,11 @@ class BespokeEnemyModelTest {
             // needs the trim region for its colour, and a box picks a material, so the eyes are
             // painted onto the head's front face instead.
             Map.entry(EnemyRigProfile.KOOPALING, 14L),
-            Map.entry(EnemyRigProfile.BOWSER, 19L));
+            Map.entry(EnemyRigProfile.BOWSER, 19L),
+            // Same count as BOWSER, and that is the assertion worth having: the revived form is
+            // the same mesh at a larger rig scale, so the day these two numbers differ is the day
+            // somebody built a second Bowser by accident.
+            Map.entry(EnemyRigProfile.SUPER_BOWSER, 19L));
 
     @ParameterizedTest(name = "{0} bakes as a complete bespoke mesh")
     @EnumSource(value = EnemyRigProfile.class, names = "TOAD", mode = EnumSource.Mode.EXCLUDE)

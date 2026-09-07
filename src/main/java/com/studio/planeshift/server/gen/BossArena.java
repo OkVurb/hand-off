@@ -171,7 +171,13 @@ public final class BossArena {
         c.item(ModItems.BARRIER_CHARM.get(), 8.5D, 1.5D, 0.5D);
 
         // Bowser, on the bridge, facing back down it at the approaching player.
-        c.spawn(ModEntities.BOWSER.get(), 23.5D, 1.0D, 0.5D, 90.0F, SegmentLibrary.GENERATED_TAG);
+        boolean last = worldIndex >= CLOWN_CAR_WORLD;
+        c.spawn(ModEntities.BOWSER.get(), 23.5D, 1.0D, 0.5D, 90.0F, SegmentLibrary.GENERATED_TAG,
+                entity -> {
+                    if (last && entity instanceof com.studio.planeshift.common.entity.BowserEntity b) {
+                        b.setRevives(true);
+                    }
+                });
 
         // Firebars over the bridge, spread across the span rather than stacked, so they read as
         // separate clocks instead of one wall of fire.

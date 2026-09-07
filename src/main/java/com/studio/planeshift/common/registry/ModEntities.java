@@ -5,6 +5,7 @@ import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.common.entity.KoopalingEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.ClownCarEntity;
+import com.studio.planeshift.common.entity.SuperBowserEntity;
 import com.studio.planeshift.common.entity.BoomerangProjectile;
 import com.studio.planeshift.common.entity.BowserEntity;
 import com.studio.planeshift.common.entity.BowserFire;
@@ -261,6 +262,15 @@ public final class ModEntities {
                     .updateInterval(3)
                     .build(key("bowser")));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<SuperBowserEntity>> SUPER_BOWSER =
+            ENTITY_TYPES.register("super_bowser", () -> EntityType.Builder
+                    .<SuperBowserEntity>of(SuperBowserEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.SUPER_BOWSER.scaled(1.3F),
+                            EnemyRigProfile.SUPER_BOWSER.scaled(1.7F))
+                    .clientTrackingRange(16)
+                    .updateInterval(3)
+                    .build(key("super_bowser")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<BowserFire>> BOWSER_FIRE =
             ENTITY_TYPES.register("bowser_fire", () -> EntityType.Builder
                     .<BowserFire>of(BowserFire::new, MobCategory.MISC)
@@ -346,6 +356,7 @@ public final class ModEntities {
         event.put(BULLET_BILL.get(), BulletBillEntity.createAttributes().build());
         event.put(BOO.get(), BooEntity.createAttributes().build());
         event.put(BOWSER.get(), BowserEntity.createAttributes().build());
+        event.put(SUPER_BOWSER.get(), SuperBowserEntity.createAttributes().build());
         event.put(MOVING_PLATFORM.get(), MovingPlatformEntity.createAttributes().build());
         event.put(LAKITU.get(), LakituEntity.createAttributes().build());
         event.put(HAMMER_BRO.get(), HammerBroEntity.createAttributes().build());

@@ -114,8 +114,20 @@ the last castle a shape of its own. *Built:* `ClownCarEntity` over the approach 
 arena, resolving its flash with a single raycast so the rule the player learns is the rule the code
 runs, with pillars on the walk-in as the cover.
 
-**3.4 Bosses have phases, and the phase change is visible.** Ordinary, then skeletal, then giant,
-with the fire changing colour. Legible without a health bar.
+**3.4 Bosses have phases, and the phase change is visible.** Written from frames as "ordinary,
+then skeletal, then giant, with the fire changing colour"; the wiki gives the actual staging for the
+final castle and it is simpler. Bowser is fought, dropped into the lava, and then **the Koopalings
+use their wands to revive him as an enormous Super Bowser**, who is fought again. Two phases, and
+the change is size.
+
+*Built:* `SuperBowserEntity`, a second registration rather than a flag because `EnemyRigProfile`
+ties visual scale to the registered hitbox. Hooked on death rather than a health threshold, so it
+fires whether he is out-damaged or dropped by the bridge. Same mesh, same sheet, larger rig — the
+transformation reads as size because size is the only thing that changed.
+
+*Still missing:* phase two's own shape. The reference does not simply continue the fight bigger —
+it becomes a climb up collapsing bone lifts to a switch at the top, with the floor giving way under
+him. That is an arena, not a mob, and it is the next piece.
 
 **3.5 The arena is its own room, and it is approached.** *Already true when written:* `BossArena`
 builds an approach before the bridge, with a comment saying the castle used to be a corridor and

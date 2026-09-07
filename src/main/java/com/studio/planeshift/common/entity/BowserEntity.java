@@ -24,8 +24,50 @@ import net.minecraft.world.level.Level;
  */
 public class BowserEntity extends CourseEnemyEntity {
 
+    /**
+     * Whether going down puts him back up again, larger.
+     *
+     * <p>Off by default and switched on by {@code BossArena} for the last world only. Every castle
+     * has a Bowser in it; only the last one has this, because a fight that ends twice is a climax
+     * the first time and a chore the other four.
+     */
+    private boolean revives;
+
     public BowserEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
+    }
+
+    /** Marks this Bowser as the one the Koopalings will put back together. */
+    public void setRevives(boolean revives) {
+        this.revives = revives;
+    }
+
+    /**
+     * The phase change, at the only moment it can be missed from.
+     *
+     * <p>Hooked on death rather than on a health threshold so it fires however he goes down --
+     * out-damaged on the bank, or dropped in the lava when the bridge falls. A threshold would have
+     * been skippable by the bridge, which is the ending the arena is actually built around.
+     */
+    @Override
+    public void die(net.minecraft.world.damagesource.DamageSource cause) {
+        boolean again = revives && !level().isClientSide();
+        super.die(cause);
+        if (again && level() instanceof net.minecraft.server.level.ServerLevel server) {
+            SuperBowserEntity.reviveFrom(this, server);
+        }
+    }
+
+    @Override
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("Revives", revives);
+    }
+
+    @Override
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        super.readAdditionalSaveData(input);
+        revives = input.getBooleanOr("Revives", false);
     }
 
     public static AttributeSupplier.Builder createAttributes() {

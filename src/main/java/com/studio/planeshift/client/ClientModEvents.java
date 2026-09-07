@@ -184,6 +184,11 @@ public final class ClientModEvents {
                         0.7F, EnemyRigProfile.KOOPALING));
         event.registerEntityRenderer(ModEntities.BOWSER.get(),
                 CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.BOWSER));
+        // Same art, same texture, drawn to the larger profile. The transformation reads as size
+        // because size is the only thing that changed -- a second sheet would have made it a
+        // different character rather than the same one, put back together bigger.
+        event.registerEntityRenderer(ModEntities.SUPER_BOWSER.get(),
+                CourseEnemyRenderer.provider(bowser, 1.0F, EnemyRigProfile.SUPER_BOWSER));
         // The three hazards built last night as invisible entities with particle clouds for
         // visuals. They are solid objects in this genre -- a disc, a ball, a rock -- and a scatter
         // of sparks where one should be is most of what made them feel wrong.

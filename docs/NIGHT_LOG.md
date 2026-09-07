@@ -828,3 +828,12 @@ penalty), ClownCarEntity hovering over the approach of the last world's arena,
 flash resolved with one raycast so the rule the player learns is the rule that
 runs, eyes lit during the wind-up, approach pillars as the cover, baked mesh and
 texture. 341 tests, 0 failures. Not yet seen in-game.
+
+## Super Bowser (plan 3.4)
+The wiki again disagreed with the plan: the final castle's phase change is not
+skeletal-then-giant with recoloured fire, it is Bowser knocked into the lava and
+revived enormous by the Koopalings' wands. Built that. A second entity type rather
+than a flag, because rig scale is tied to the registered hitbox and a bigger Bowser
+has to be registered bigger. Hooked on death, not on a health threshold, so the
+bridge drop cannot skip it. Only the last world's arena sets the flag.
+342 tests, 0 failures. Phase two's climb is not built yet and is recorded as such.
