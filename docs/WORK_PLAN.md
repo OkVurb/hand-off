@@ -4,7 +4,10 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our own
 words, and feed original generated art and original code.
 
-**Method note.** All 108 sheets have now been read. An earlier draft of this plan was written off
+**Method note.** All 108 sheets have now been read. *Sheets show what a frame looked like, not
+what the rules are* -- two boss entries here were wrong because a single frame was read as a
+pattern, and were only corrected by checking the wiki. Prefer the wiki for mechanics; use the
+sheets for how things look. An earlier draft of this plan was written off
 five of them and called complete, which was too thin a base for the word. Findings marked
 *confirmed* recurred across worlds; those that did not are single sightings, and a few of those are
 the most interesting entries here.
@@ -81,12 +84,25 @@ player works across small platforms over lava. **The most 2.5D-native idea in th
 one this project is best placed to take** — the Z axis already exists and the fight is built on it.
 Every boss in the mod is lane-sized and lane-bound.
 
-**3.2 Bosses fly.** Koopalings ride a hovering vehicle and attack downward. `Koopaling` is eight
-ground-walking mobs.
+**3.2 ~~Bosses fly.~~ Wrong — checked against the wiki, not the footage.** In NSMB2 the Koopalings
+fight **on the ground**, in a castle room: Roy charges, the walls close in, he stuns himself on
+them, then fires magic from his wand. Three hits from jumps or ground pounds. `Koopaling` being
+eight ground-walking mobs with `STOMPS_TO_DEFEAT = 3` was already correct, and closer to the
+reference than the "fix" I built. A `ClownCarGoal` was written, shipped and reverted on this basis.
 
-**3.3 The Koopalings fight as a group, in one shared vehicle.** The final encounter puts all seven
-in a single car. One fight with seven riders, not seven fights — different arithmetic, not just
-different staging.
+*What is actually missing*: the charge, the closing walls, the self-stun on impact, and the wand
+volley between charges. The staging was right; the moveset is what has no equivalent here.
+
+**3.3 The Koopalings appear as a group in one clown car — but only once, and not as the usual
+fight.** Corrected against the wiki. Five Koopalings are the castle bosses of the main worlds and
+two more of the special worlds, each fought alone in their own castle. The seven-in-one-car
+appearance is a *single set-piece* in World 6-Castle, where the five required ride inside and the
+two optional hang off the outside, and their only attack turns the player to stone — avoided by
+hiding behind pillars.
+
+So this is one specific encounter to build, not a change to how bosses work. Reading it off a
+contact sheet as "how the Koopalings fight" was exactly the mistake of treating one frame as a
+pattern.
 
 **3.4 Bosses have phases, and the phase change is visible.** Ordinary, then skeletal, then giant,
 with the fire changing colour. Legible without a health bar.
