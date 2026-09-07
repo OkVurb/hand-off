@@ -124,6 +124,18 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> COURSE_WOOD_DISTANT = courseBlock(
             "course_wood_distant", MapColor.WOOD, SoundType.WOOD);
 
+    /**
+     * The backdrop set hazed toward hot air rather than cold sky.
+     *
+     * <p>Aerial perspective is not a single colour. A volcano tints its whole scene orange,
+     * foreground included; washing its far layer toward the same blue-grey used everywhere else
+     * would say "distant and cold" in the one room where that is exactly wrong.
+     */
+    public static final DeferredBlock<Block> COURSE_HEDGE_DISTANT_WARM = courseBlock(
+            "course_hedge_distant_warm", MapColor.TERRACOTTA_ORANGE, SoundType.GRASS);
+    public static final DeferredBlock<Block> COURSE_WOOD_DISTANT_WARM = courseBlock(
+            "course_wood_distant_warm", MapColor.TERRACOTTA_ORANGE, SoundType.WOOD);
+
     public static final DeferredBlock<Block> COURSE_HEDGE_FAR = courseBlock(
             "course_hedge_far", MapColor.PLANT, SoundType.GRASS);
     public static final DeferredBlock<Block> COURSE_PILLAR_FAR = courseBlock(

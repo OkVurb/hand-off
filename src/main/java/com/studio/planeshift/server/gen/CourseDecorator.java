@@ -2,6 +2,7 @@ package com.studio.planeshift.server.gen;
 
 import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.registry.ModFluids;
 import java.util.random.RandomGenerator;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -116,9 +117,14 @@ public final class CourseDecorator {
     private static void backdrop(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                                  int from, int to, int[] floorAt, int margin) {
         switch (ctx.theme()) {
-            case GHOST_HOUSE, UNDERGROUND, LAVA ->
+            // Caves draw nothing. The reference ice caverns are black behind the terrain, and the
+            // translucent ice reads precisely because the void behind it is empty -- filling that
+            // with a decorated wall is what turns a cavern into a corridor. "Draw nothing" is a
+            // real third case, not a gap in the switch.
+            case UNDERGROUND -> { }
+            case GHOST_HOUSE, LAVA ->
                     backWall(canvas, ctx, random, from, to, floorAt, margin);
-            default -> skyline(canvas, random, from, to, floorAt, margin);
+            default -> skyline(canvas, ctx, random, from, to, floorAt, margin);
         }
     }
 
@@ -132,18 +138,43 @@ public final class CourseDecorator {
                                  int from, int to, int[] floorAt, int margin) {
         BlockState stone = ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState();
         BlockState opening = ModBlocks.COURSE_LATTICE.get().defaultBlockState();
+        BlockState board = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
+        BlockState check = ModBlocks.COURSE_TILE.get().defaultBlockState();
         final int arch = 7;
+
+        // How long a stretch of wall keeps one motif. A single ghost house in the reference runs
+        // arched windows, then check wallpaper, then plain boarding; one motif for a whole course
+        // is why every indoor stretch here looked like the same room repeated. Rooms are long, so
+        // this sits well above the arch spacing, and the two rhythms must not divide into each
+        // other or the wall collapses back into one pattern.
+        final int roomLength = 23;
         for (int x = from; x < to; x++) {
             int slot = x + margin;
             if (slot < 0 || slot >= floorAt.length) {
                 continue;
             }
             int floor = floorAt[slot];
+            int motif = Math.floorMod(Math.floorDiv(x, roomLength), 3);
             for (int h = 1; h <= 9; h++) {
-                boolean windowRow = h >= 3 && h <= 6;
-                boolean windowCol = Math.floorMod(x, arch) >= 2 && Math.floorMod(x, arch) <= 4;
-                canvas.setIfEmpty(x, floor + h, BACKDROP_Z,
-                        windowRow && windowCol ? opening : stone);
+                BlockState here;
+                switch (motif) {
+                    // Boarding: plain timber, no openings. The undecorated stretch between two
+                    // decorated ones is what makes the decorated ones read as decoration.
+                    case 1 -> here = board;
+                    // Check wallpaper, in two-block squares rather than one: a single-block check
+                    // at this distance dithers into flat grey and stops being a pattern at all.
+                    case 2 -> {
+                        boolean dark = ((Math.floorDiv(x, 2) + Math.floorDiv(h, 2)) & 1) == 0;
+                        here = dark ? check : stone;
+                    }
+                    default -> {
+                        boolean windowRow = h >= 3 && h <= 6;
+                        boolean windowCol = Math.floorMod(x, arch) >= 2
+                                && Math.floorMod(x, arch) <= 4;
+                        here = windowRow && windowCol ? opening : stone;
+                    }
+                }
+                canvas.setIfEmpty(x, floor + h, BACKDROP_Z, here);
             }
         }
     }
@@ -154,7 +185,7 @@ public final class CourseDecorator {
      * <p>Sparse on purpose. A continuous line of scenery is a wall painted green; the gaps are
      * what make the shapes read as separate objects standing at a distance.
      */
-    private static void skyline(CourseCanvas canvas, RandomGenerator random,
+    private static void skyline(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                                 int from, int to, int[] floorAt, int margin) {
         int x = from;
         while (x < to) {
@@ -164,36 +195,105 @@ public final class CourseDecorator {
                 continue;
             }
             int floor = floorAt[slot];
-            if (random.nextInt(3) == 0) {
-                tree(canvas, random, x, floor);
+            if (ctx.theme() == CourseTheme.LAVA && random.nextInt(5) == 0) {
+                // Between the cones rather than on them: a fall reads as coming from somewhere
+                // off the top of the frame, which is most of why it looks like a cliff face.
+                lavaFall(canvas, random, x, floor, floor + 7 + random.nextInt(4));
+                x += 4 + random.nextInt(5);
+            } else if (random.nextInt(3) == 0) {
+                tree(canvas, ctx, random, x, floor);
                 x += 5 + random.nextInt(4);
             } else {
-                x += hill(canvas, random, x, floor) + 2 + random.nextInt(5);
+                x += hill(canvas, ctx, random, x, floor) + 2 + random.nextInt(5);
             }
         }
     }
 
     /** A rounded mound. Returns its width so the caller can space the next shape past it. */
-    private static int hill(CourseCanvas canvas, RandomGenerator random, int x, int floor) {
-        BlockState mass = ModBlocks.COURSE_HEDGE_DISTANT.get().defaultBlockState();
+    private static int hill(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
+                            int x, int floor) {
+        BlockState mass = distantMass(ctx);
         int width = 7 + random.nextInt(7);
         int peak = 3 + random.nextInt(3);
         for (int i = 0; i < width; i++) {
-            // A rounded profile rather than a triangle: distance flattens a hill's shoulders, and
-            // a triangle at this scale reads as a tent.
             double t = (double) i / (width - 1);
-            int h = (int) Math.round(peak * Math.sin(Math.PI * t));
-            for (int y = 1; y <= h; y++) {
+            for (int y = 1; y <= profile(ctx, t, peak); y++) {
                 canvas.setIfEmpty(x + i, floor + y, BACKDROP_Z, mass);
             }
         }
         return width;
     }
 
+    /**
+     * Height of a background silhouette at fraction {@code t} across its width.
+     *
+     * <p>Shape is per theme, and it is one of the clearest per-world reads there is: grass rolls,
+     * snow and ice are angular crystalline cliffs, volcanoes are steep cones, desert is flat-topped
+     * mesa. One sine curve for every exterior gave six worlds the same horizon, which costs more
+     * than it sounds, because the horizon is on screen continuously and nothing else is.
+     */
+    private static int profile(GenContext ctx, double t, int peak) {
+        double ridge = 1.0D - Math.abs(2.0D * t - 1.0D);
+        return switch (ctx.theme()) {
+            // Cone: steep sides to a sharp top, and taller than it is wide would suggest.
+            case LAVA -> (int) Math.round(peak * ridge * 1.15D);
+            // Angular: the ridge quantised into steps, so the edge reads as fractured rather than
+            // cut. Three steps is enough to break the line without turning it into a staircase.
+            case SNOW -> (int) Math.round(peak * (Math.round(ridge * 3.0D) / 3.0D));
+            // Mesa: rises fast, then flat. Sun-baked rock does not have shoulders.
+            case DESERT -> (int) Math.round(peak * Math.min(1.0D, Math.min(t, 1.0D - t) * 4.0D));
+            // Rounded. Distance flattens the shoulders, and a triangle at this scale is a tent.
+            default -> (int) Math.round(peak * Math.sin(Math.PI * t));
+        };
+    }
+
+    /**
+     * A sheet of lava pouring down the backdrop.
+     *
+     * <p>Placed as a column of source blocks rather than let flow. {@code ModFluids} sets
+     * {@code levelDecreasePerBlock} to 8 so a pool stays exactly where the generator puts it,
+     * which is what a hand-authored course wants and which also means the fluid cannot fall at
+     * all. Stacking sources gives the reference read -- lava pouring off a cliff into the sea
+     * below -- without giving up the placement guarantee the rest of generation depends on.
+     *
+     * <p>On the backdrop plane only, so it is scenery: a fall the player could swim into would be
+     * a hazard that the reachability proof knows nothing about.
+     */
+    private static void lavaFall(CourseCanvas canvas, RandomGenerator random,
+                                 int x, int floor, int top) {
+        BlockState lava = ModFluids.LAVA_BLOCK.get().defaultBlockState();
+        int width = 1 + random.nextInt(2);
+        for (int i = 0; i < width; i++) {
+            for (int y = floor + 1; y <= top; y++) {
+                canvas.setIfEmpty(x + i, y, BACKDROP_Z, lava);
+            }
+        }
+    }
+
+    /**
+     * The far-layer material for this theme.
+     *
+     * <p>Split out because the haze colour is a property of the air in the room, not of the prop:
+     * a hill and a tree standing at the same distance must be washed by the same air or the depth
+     * cue stops working.
+     */
+    private static BlockState distantMass(GenContext ctx) {
+        return (ctx.theme() == CourseTheme.LAVA
+                ? ModBlocks.COURSE_HEDGE_DISTANT_WARM.get()
+                : ModBlocks.COURSE_HEDGE_DISTANT.get()).defaultBlockState();
+    }
+
+    private static BlockState distantTrunk(GenContext ctx) {
+        return (ctx.theme() == CourseTheme.LAVA
+                ? ModBlocks.COURSE_WOOD_DISTANT_WARM.get()
+                : ModBlocks.COURSE_WOOD_DISTANT.get()).defaultBlockState();
+    }
+
     /** A trunk with a rounded crown. */
-    private static void tree(CourseCanvas canvas, RandomGenerator random, int x, int floor) {
-        BlockState trunk = ModBlocks.COURSE_WOOD_DISTANT.get().defaultBlockState();
-        BlockState leaf = ModBlocks.COURSE_HEDGE_DISTANT.get().defaultBlockState();
+    private static void tree(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
+                             int x, int floor) {
+        BlockState trunk = distantTrunk(ctx);
+        BlockState leaf = distantMass(ctx);
         int height = 3 + random.nextInt(3);
         for (int h = 1; h <= height; h++) {
             canvas.setIfEmpty(x, floor + h, BACKDROP_Z, trunk);

@@ -349,5 +349,7 @@
   "block.planeshift.course_deepstone": "Deep Stone",
   "block.planeshift.course_ghost_beam": "Ghost House Beam",
   "block.planeshift.course_hedge_distant": "Distant Foliage",
-  "block.planeshift.course_wood_distant": "Distant Timber"
+  "block.planeshift.course_wood_distant": "Distant Timber",
+  "block.planeshift.course_hedge_distant_warm": "Sunbaked Foliage",
+  "block.planeshift.course_wood_distant_warm": "Sunbaked Timber"
 }

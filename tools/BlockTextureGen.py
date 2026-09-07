@@ -1091,6 +1091,15 @@ def build():
     out["course_hedge_distant"] = distant(out["course_hedge"], amount=0.68)
     out["course_wood_distant"] = distant(out["course_wood_block"], amount=0.68)
 
+    # The warm set, for the volcano. Aerial perspective is not always a blue-grey wash: the
+    # reference tints its whole volcano scene orange, foreground included, so the air itself reads
+    # as hot. Hazing toward the same cool sky there would have said "far away and cold", which is
+    # the one thing the room is not. Same operation, different air.
+    out["course_hedge_distant_warm"] = distant(out["course_hedge"], haze=(214, 132, 82),
+                                               amount=0.68)
+    out["course_wood_distant_warm"] = distant(out["course_wood_block"], haze=(214, 132, 82),
+                                              amount=0.68)
+
     # Native replacements for the vanilla blocks five of the six themes were built out of.
     #
     # A theme's fill sits under every surface block, three deep, so it is on screen constantly --
