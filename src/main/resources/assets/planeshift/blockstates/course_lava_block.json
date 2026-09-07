@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "level=0": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=1": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=2": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=3": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=4": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=5": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=6": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=7": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=8": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=9": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=10": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=11": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=12": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=13": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=14": {
+      "model": "planeshift:block/course_lava_block"
+    },
+    "level=15": {
+      "model": "planeshift:block/course_lava_block"
+    }
+  }
+}
