@@ -5,6 +5,7 @@ import com.studio.planeshift.common.block.BrickBlock;
 import com.studio.planeshift.common.block.BulletBillCannonBlock;
 import com.studio.planeshift.common.block.CheckpointBeaconBlock;
 import com.studio.planeshift.common.block.CoinBlock;
+import com.studio.planeshift.common.block.ConnectedBlock;
 import com.studio.planeshift.common.block.CoinRingBlock;
 import com.studio.planeshift.common.block.ConveyorBlock;
 import com.studio.planeshift.common.block.CourseIceBlock;
@@ -104,8 +105,18 @@ public final class ModBlocks {
                     // nothing to say. 0.85 is slippery enough to feel like footing you have to
                     // respect, loose enough to still stop on a ledge.
                     .friction(0.85F));
-    public static final DeferredBlock<Block> COURSE_CASTLE_BLOCK = courseBlock(
-            "course_castle_block", MapColor.DEEPSLATE, SoundType.DEEPSLATE_BRICKS);
+    /**
+     * Castle stone, and the first block to draw its own edges from its neighbours.
+     *
+     * <p>A ConnectedBlock rather than a plain one. Courses are built out of walls of this -- the
+     * boss arena and the tower are almost nothing else -- and a wall is exactly where the baked
+     * per-block highlight read as stripes. See {@link ConnectedBlock}.
+     */
+    public static final DeferredBlock<ConnectedBlock> COURSE_CASTLE_BLOCK =
+            BLOCKS.registerBlock("course_castle_block", ConnectedBlock::new, p -> p
+                    .mapColor(MapColor.DEEPSLATE)
+                    .strength(1.5F, 6.0F)
+                    .sound(SoundType.DEEPSLATE_BRICKS));
     /**
      * The LAVA theme's decorative accent. <b>Not a hazard.</b>
      *

@@ -124,7 +124,7 @@ def planks(base, seed):
     return lit(img, base)
 
 
-def masonry(base, seed, course=5, mortar=0.70, offset=True):
+def masonry(base, seed, course=5, mortar=0.70, offset=True, light=True):
     """Stone laid in courses, with the joints staggered row to row.
 
     Shared by the castle and the brick block because they are the same construction in different
@@ -148,7 +148,7 @@ def masonry(base, seed, course=5, mortar=0.70, offset=True):
             x += course * 2
         row += 1
         y += course
-    return lit(img, base)
+    return lit(img, base) if light else img
 
 
 def drift(base, seed, flecks=(1.10, 1.18)):
@@ -191,6 +191,48 @@ def embers(base, glow, seed):
         d.line([(x0, y0), (x0 + 2, y0 + 3)], fill=shade(glow, 0.9))
         d.point((x0 + 1, y0 + 1), fill=glow)
     return lit(img, base)
+
+
+def edged(flat, base, mask):
+    """Draw a block's edges only on the sides where it has no neighbour of its own kind.
+
+    ``mask`` is the four-bit connection state from ConnectedBlock: bit 0 up, bit 1 down, bit 2
+    west, bit 3 east, set when that side *is* connected. So mask 15 is a block in the middle of a
+    wall and gets no edges at all, which in any wall worth the name is most of them.
+
+    This is what lit() was always approximating. It bakes a highlight on the top row of every
+    block because Minecraft shades whole faces and an unlit run of blocks is one flat slab -- but
+    it cannot tell the top of a wall from the middle of one, so a stack put a shadow against a
+    highlight every sixteen pixels and read as stripes. Here the block knows, so the edge appears
+    where the material genuinely stops. Interior blocks have no seam and the outline of a platform
+    gets sharper rather than softer.
+    """
+    img = flat.copy()
+    d = ImageDraw.Draw(img)
+    if not mask & 1:                      # nothing above: catch the light
+        d.line([(0, 0), (S - 1, 0)], fill=shade(base, 1.24))
+        d.line([(0, 1), (S - 1, 1)], fill=shade(base, 1.10))
+    if not mask & 2:                      # nothing below: the underside falls away
+        d.line([(0, S - 1), (S - 1, S - 1)], fill=shade(base, 0.72))
+        d.line([(0, S - 2), (S - 1, S - 2)], fill=shade(base, 0.86))
+    if not mask & 4:                      # open to the west
+        d.line([(0, 0), (0, S - 1)], fill=shade(base, 0.84))
+    if not mask & 8:                      # open to the east
+        d.line([(S - 1, 0), (S - 1, S - 1)], fill=shade(base, 0.92))
+    return img
+
+
+# Blocks that draw their own edges from their neighbours. Each entry produces sixteen sheets plus
+# the plain one, which stays as the item icon and as the fallback for anything still placing this
+# block without a connection state.
+CONNECTED = {
+    "course_castle_block": (lambda: masonry((104, 110, 126), 71, course=5, mortar=0.72,
+                                            light=False), (104, 110, 126)),
+    # brick_block is deliberately absent for now. It is a BrickBlock, not a plain Block -- it
+    # implements HitFromBelowBlock and breaks when hit from underneath -- so converting it means
+    # changing its superclass rather than its registration, and that is worth doing only once the
+    # castle has proved the pipeline in game.
+}
 
 
 def tiles(a, b, seed):
@@ -952,6 +994,17 @@ def main():
     made = build()
     for name, img in sorted(made.items()):
         img.save(os.path.join(target, name + ".png"))
+
+    # The connected variants. Sixteen per block, named by their connection mask, which is the
+    # contract with ConnectedBlock.mask().
+    extra = 0
+    for name, (draw, base) in sorted(CONNECTED.items()):
+        flat = draw()
+        for mask in range(16):
+            edged(flat, base, mask).save(
+                os.path.join(target, "%s_%d.png" % (name, mask)))
+            extra += 1
+    print("wrote %d connected variants" % extra)
     print("wrote %d block textures to %s" % (len(made), target))
     return 0
 
