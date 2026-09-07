@@ -119,6 +119,8 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case THWOMP -> thwomp();
             case BULLET_BILL -> bulletBill();
             case BOO -> boo();
+            // Same mesh, larger rig. See BIG_CHEEP above.
+            case BIG_BOO -> boo();
             case LAKITU -> lakitu();
             case HAMMER_BRO -> hammerBro();
             case SPINY -> spiny();

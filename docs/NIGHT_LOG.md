@@ -881,3 +881,14 @@ The test reads both heights back out of the canvas rather than restating them as
 literals; the first version I wrote compared two constants and would have passed
 whatever the arena did. Verified by moving the switch back to y=9 and watching it
 fail. 346 tests, 0 failures.
+
+## Big Boo (plan 3.6)
+Checked the wiki first: Big Boo, Mega Cheep-Cheep, Mega Deep Cheep, Mega Fuzzy,
+Mega Piranha Plant. The mod had already shipped a Mega Cheep-Cheep without calling
+it one, and with it the pattern -- separate registration, same mesh, larger rig,
+because scale is tied to the hitbox.
+
+Built Big Boo the same way, and placed it in the same commit rather than
+registering it and moving on: the ghost-house climb's last landing carries it. That
+segment's comment already said the pressure builds with the height; now the climb
+arrives somewhere. Behaviour unchanged on purpose. 347 tests, 0 failures.

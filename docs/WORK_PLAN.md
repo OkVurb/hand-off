@@ -144,8 +144,19 @@ this is the room it was describing. Fifth entry found to overstate its gap. A lo
 runs in front of it — rhythmic, empty, visibly not the level you were just in. That corridor is
 pacing, and it is most of what makes the arena land.
 
-**3.6 Giant variants of ordinary enemies serve as set-piece threats.** An oversized Boo fills half
-the screen and pursues along the level — the same background-scale idea as 3.1, at lower cost.
+**3.6 Giant variants of ordinary enemies serve as set-piece threats.** Confirmed against the wiki:
+the reference has Big Boos, Mega Cheep-Cheeps, Mega Deep Cheeps, Mega Fuzzies and Mega Piranha
+Plants. The mod already shipped one of these without calling it that — `BigCheepEntity` is a Mega
+Cheep-Cheep, and it already established the pattern the rest need.
+
+*Built:* `BigBooEntity`, and it is placed rather than merely registered — the ghost-house climb's
+last landing carries it, which is what that segment's own comment was already describing ("the
+pressure builds with the height") without ever paying for it. Behaviour deliberately unchanged: a
+Boo is already answered by looking at it, and a faster big one would be answering a question nobody
+asked. What changes is that it fills the corridor.
+
+*Still to do:* the Mega Piranha Plant, same pattern. The Fuzzy does not exist in the mod at all and
+is a different entry.
 
 ---
 

@@ -867,8 +867,12 @@ public final class SegmentLibrary {
                     lane(c, ctx, sx + i, sy, semi);
                 }
                 // One Boo per landing, so the pressure builds with the height rather than all of
-                // it arriving at once.
-                mob(c, ModEntities.BOO.get(), sx + 1, sy + 2, 0.0F);
+                // it arriving at once -- and the last one is a Big Boo, which is what the build
+                // was already describing without ever paying for it. A climb whose pressure rises
+                // step by step should arrive somewhere, and the reference's answer to "arrive
+                // somewhere" is an enemy that fills the corridor rather than a faster one.
+                mob(c, step == 3 ? ModEntities.BIG_BOO.get() : ModEntities.BOO.get(),
+                        sx + 1, sy + 2, 0.0F);
             }
 
             coinTrail(c, x + 5, 8, y + 5, 2);

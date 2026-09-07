@@ -3,6 +3,7 @@ package com.studio.planeshift.common.registry;
 import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.common.entity.KoopalingEntity;
+import com.studio.planeshift.common.entity.BigBooEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.ClownCarEntity;
 import com.studio.planeshift.common.entity.SuperBowserEntity;
@@ -137,6 +138,13 @@ public final class ModEntities {
                     .sized(EnemyRigProfile.BOO.scaled(0.6F), EnemyRigProfile.BOO.scaled(0.6F))
                     .clientTrackingRange(8)
                     .build(key("boo")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BigBooEntity>> BIG_BOO =
+            ENTITY_TYPES.register("big_boo", () -> EntityType.Builder
+                    .of(BigBooEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.BIG_BOO.scaled(0.6F), EnemyRigProfile.BIG_BOO.scaled(0.6F))
+                    .clientTrackingRange(10)
+                    .build(key("big_boo")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<LakituEntity>> LAKITU =
             ENTITY_TYPES.register("lakitu", () -> EntityType.Builder
@@ -365,6 +373,7 @@ public final class ModEntities {
         event.put(CHEEP_CHEEP.get(), CheepCheepEntity.createAttributes().build());
         event.put(BONE_CHEEP.get(), CheepCheepEntity.createAttributes().build());
         event.put(BIG_CHEEP.get(), BigCheepEntity.createAttributes().build());
+        event.put(BIG_BOO.get(), BigBooEntity.createAttributes().build());
         event.put(PIRANHA_PLANT.get(), PiranhaPlantEntity.createAttributes().build());
     }
 

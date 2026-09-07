@@ -159,6 +159,8 @@ public final class ClientModEvents {
                 CourseEnemyRenderer.provider(bulletBill, 0.15F, EnemyRigProfile.BULLET_BILL));
         event.registerEntityRenderer(ModEntities.BOO.get(),
                 CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.BOO));
+        event.registerEntityRenderer(ModEntities.BIG_BOO.get(),
+                CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.BIG_BOO));
         event.registerEntityRenderer(ModEntities.LAKITU.get(),
                 CourseEnemyRenderer.provider(lakitu, 0.22F, EnemyRigProfile.LAKITU));
         event.registerEntityRenderer(ModEntities.HAMMER_BRO.get(),

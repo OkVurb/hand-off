@@ -44,6 +44,9 @@ class BespokeEnemyModelTest {
             Map.entry(EnemyRigProfile.THWOMP, 11L),
             Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
             Map.entry(EnemyRigProfile.BOO, 11L),
+            // Same count as BOO, and that equality is the assertion: the big one is the small one
+            // at a larger rig scale, so the day these differ somebody has built a second ghost.
+            Map.entry(EnemyRigProfile.BIG_BOO, 11L),
             Map.entry(EnemyRigProfile.LAKITU, 12L),
             Map.entry(EnemyRigProfile.HAMMER_BRO, 13L),
             Map.entry(EnemyRigProfile.SPINY, 15L),

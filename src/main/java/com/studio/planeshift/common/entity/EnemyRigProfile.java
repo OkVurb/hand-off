@@ -32,6 +32,11 @@ public enum EnemyRigProfile {
     THWOMP(1.05F),
     BULLET_BILL(1.30F),
     BOO(1.25F),
+    /**
+     * The big ghost. Same mesh, larger registration, for the reason {@link #BIG_CHEEP} is: size
+     * lives in the hitbox, so it cannot live in a variant flag.
+     */
+    BIG_BOO(2.6F),
     LAKITU(1.10F),
     HAMMER_BRO(1.15F),
     SPINY(1.25F),
