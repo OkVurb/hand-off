@@ -502,6 +502,9 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.ERUPTION_FIELD) {
             return theme == CourseTheme.LAVA;
         }
+        if (segment == SegmentLibrary.CLOUD_SPIRE) {
+            return theme == CourseTheme.SKY;
+        }
         if (segment == SegmentLibrary.REEF_ARCH) {
             return theme == CourseTheme.WATER;
         }

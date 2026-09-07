@@ -31,7 +31,7 @@ public final class WorldRegistry {
         register("frozen", "Frozen Peaks", CourseTheme.SNOW, 11);
         register("volcano", "Volcano", CourseTheme.LAVA, 21);
         register("haunted", "Haunted Manor", CourseTheme.GHOST_HOUSE, 31);
-        register("sky", "Sky Kingdom", CourseTheme.GRASS, 41);
+        register("sky", "Sky Kingdom", CourseTheme.SKY, 41);
     }
 
     private WorldRegistry() {

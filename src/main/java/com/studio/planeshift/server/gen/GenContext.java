@@ -212,6 +212,15 @@ public final class GenContext {
                         ModBlocks.COURSE_CORAL.get().defaultBlockState(),
                         ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
                         null);
+                // Cloud underfoot, cloud beneath that, and mushroom caps for the platforms that
+                // are not cloud. There is no fill material in the ordinary sense -- nothing is
+                // buried up here, so the "fill" is simply more cloud.
+                case SKY -> new Palette(
+                        ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_CLOUD_BLOCK_FAR.get().defaultBlockState(),
+                        ModBlocks.COURSE_TRIM.get().defaultBlockState(),
+                        ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
+                        null);
                 case GHOST_HOUSE -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState(),

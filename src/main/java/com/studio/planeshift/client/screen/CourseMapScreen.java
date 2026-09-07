@@ -87,6 +87,7 @@ public class CourseMapScreen extends Screen {
             case UNDERGROUND -> 0xFF_5A5348;
             case GHOST_HOUSE -> 0xFF_6A5A82;
             case WATER -> 0xFF_4FA7A0;
+            case SKY -> 0xFF_C9E2FA;
             default -> 0xFF_66C24E;
         };
     }
@@ -99,6 +100,7 @@ public class CourseMapScreen extends Screen {
             case UNDERGROUND -> 0xFF_332F28;
             case GHOST_HOUSE -> 0xFF_3B3050;
             case WATER -> 0xFF_246E72;
+            case SKY -> 0xFF_7FA8CC;
             default -> 0xFF_3E8F38;
         };
     }
@@ -531,6 +533,13 @@ public class CourseMapScreen extends Screen {
                     graphics.fill(x, y + size, x + 2, y + size * 2, 0x55_2E8F6A);
                     graphics.fill(x + 4, y + size + 2, x + 6, y + size * 2, 0x55_2E8F6A);
                     graphics.fill(x + size, y, x + size + 2, y + 2, 0x44_CFF0FF);
+                }
+                // Banked cloud, denser and larger than the grass world's wisps -- up here the
+                // clouds are the terrain rather than something drifting over it.
+                case SKY -> {
+                    graphics.fill(x, y, x + size * 3, y + size, 0x44_FFFFFF);
+                    graphics.fill(x + size, y - size / 2, x + size * 2, y + 1, 0x44_FFFFFF);
+                    graphics.fill(x + size / 2, y + size, x + size * 2, y + size + 2, 0x33_D8E8F8);
                 }
                 // Clouds, as before. The grass world keeps exactly what it had.
                 default -> {

@@ -52,6 +52,13 @@ public final class CourseLesson {
      */
     public static ThemeRules rules(CourseTheme theme) {
         return switch (theme) {
+            // Above the clouds, where height is the subject. Gaps and overhead work, and nothing
+            // unstable: cloud is already the least reassuring floor in the game, and adding
+            // crumbling ground on top of it stops being a lesson and becomes a coin flip.
+            case SKY -> new ThemeRules(
+                    List.of(Segment.Tag.GAP, Segment.Tag.CLIMB, Segment.Tag.MOVING),
+                    Set.of(Segment.Tag.GAP, Segment.Tag.CLIMB),
+                    Set.of(Segment.Tag.UNSTABLE));
             // Submerged. Movement is the lesson: a gap underwater is not a jump, it is a swim, so
             // the emphasis falls on vertical space and on overhead threats the player must rise
             // past rather than on ground the player must cross.

@@ -39,7 +39,7 @@ class ThemeAmbienceTest {
     /**
      * Themes that deliberately have no ambience.
      *
-     * <p>The reference's grass levels and caves are visually clean. Its snow has snowfall, its
+     * <p>The reference's grass levels, caves and cloud worlds are visually clean. Its snow has snowfall, its
      * castles have embers, its ghost houses have wisps -- all cases where the ambience is the
      * weather of the place. Pollen in a meadow is not; it is a Minecraft habit.
      *
@@ -48,7 +48,7 @@ class ThemeAmbienceTest {
      * helpfully fixed.
      */
     private static final java.util.Set<CourseTheme> DELIBERATELY_STILL =
-            java.util.EnumSet.of(CourseTheme.GRASS, CourseTheme.UNDERGROUND);
+            java.util.EnumSet.of(CourseTheme.GRASS, CourseTheme.UNDERGROUND, CourseTheme.SKY);
 
     @Test
     @DisplayName("no theme is left without ambience by accident")

@@ -690,3 +690,29 @@ client is the oracle for that; the server is the oracle for world behaviour. I c
 briefly this iteration and nearly reported a false all-clear.
 
 331 tests, no failures, counted from XML.
+
+## Iteration 29
+
+Plan item 6.2, the sky theme, following the water theme's path exactly -- enum, palette, lesson
+rules, cast, set piece, and made reachable.
+
+Made reachable is the important half. The "Sky Kingdom" world existed and was themed GRASS, which
+the sheets had flagged as a mismatch: its map is clouds and its levels are about height, and it was
+generating meadows. Its ten courses are rethemed and the world registry now agrees with its own
+name.
+
+The cast is the point of the theme rather than decoration. Paratroopa, Lakitu and Bullet Bill all
+ignore the floor, and an enemy that ignores the floor is only interesting where the floor is the
+scarce thing -- which is to say all three were being wasted everywhere else in the game.
+
+CLOUD_SPIRE is the climax: five mushroom caps rising, gaps tightening as it climbs, each on a short
+stalk so it reads as growing rather than floating. Tightening matters -- a climb with even spacing
+is a staircase turned sideways, and a climax should put its hardest jump where a miss costs most.
+
+Two tests written yesterday caught the new theme immediately, which is the first time this session
+that guards I wrote earlier have paid off on work I did later. MapGroundColoursTest failed because
+SKY reused another world's map palette; ThemeAmbienceTest failed because it had no ambience. The
+second is a decision rather than a gap: the reference's cloud worlds are visually clean, same as its
+grass and its caves, so SKY joins the deliberately-still list with the reasoning attached.
+
+340 tests, no failures, counted from XML.

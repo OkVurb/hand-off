@@ -22,7 +22,17 @@ public enum CourseTheme implements StringRepresentable {
      * lighter where it is nearer the surface. A blue sky behind an underwater level reads as a
      * hole in the world.
      */
-    WATER("water", 0xFF2E7A6A, 0xFF3FA8B8);
+    WATER("water", 0xFF2E7A6A, 0xFF3FA8B8),
+
+    /**
+     * Above the clouds.
+     *
+     * <p>Ground colour is cloud-white rather than a terrain hue, because in this theme the thing
+     * you stand on *is* the sky -- there is no rock under it and no horizon behind it. The sky
+     * colour is the deeper blue of real altitude: the reference's cloud worlds are bluer than its
+     * grass worlds, not paler, because you are looking through less air rather than more.
+     */
+    SKY("sky", 0xFFF2F6FF, 0xFF5FA8F0);
 
     public static final Codec<CourseTheme> CODEC = StringRepresentable.fromEnum(CourseTheme::values);
 

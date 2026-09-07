@@ -167,6 +167,11 @@ public final class SegmentLibrary {
             // this does not. See BACKLOG.
             case WATER -> List.of(ModEntities.CHEEP_CHEEP.get(), ModEntities.BIG_CHEEP.get(),
                     ModEntities.BONE_CHEEP.get(), ModEntities.SPINY.get());
+            // A cast that does not need the floor. Paratroopa and Lakitu both fly, and Bullet
+            // Bill crosses open air in a straight line -- all three are at their best in a world
+            // where the ground is scarce, which is why they are wasted anywhere else.
+            case SKY -> List.of(ModEntities.PARATROOPA.get(), ModEntities.LAKITU.get(),
+                    ModEntities.BULLET_BILL.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get(), ModEntities.BOOMERANG_BRO.get());
         };
     }
@@ -1951,8 +1956,46 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * Sky climax: the tower of mushroom caps.
+     *
+     * <p>Vertical, because the whole theme is about height, and built from capsule platforms on
+     * stalks rather than cloud so the climb reads as *structure* against a floor that has been
+     * vague all level. Cloud is where you walk up here; the mushrooms are where you are meant to.
+     *
+     * <p>The gaps close as it rises. A climb that keeps the same spacing throughout is just a
+     * staircase turned sideways -- tightening it means the last jump is the hardest, which is
+     * where a climax should put its difficulty rather than at the bottom where a miss costs least.
+     */
+    static final Segment CLOUD_SPIRE = new Segment() {
+        public SegmentSpec spec() {
+            return def("cloud_spire", 22, 6, 3, Tag.SETPIECE, Tag.CLIMB, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 6, y, ctx);
+
+            BlockState cap = ModBlocks.COURSE_TRIM.get().defaultBlockState();
+            BlockState stalk = ModBlocks.COURSE_PILLAR.get().defaultBlockState();
+
+            // Five caps, rising, each one further along and higher than the last.
+            int[] capX = {7, 10, 13, 15, 17};
+            int[] capY = {2, 3, 4, 5, 6};
+            for (int i = 0; i < capX.length; i++) {
+                for (int w = 0; w < 3; w++) {
+                    c.set(x + capX[i] + w, y + capY[i], 0, cap);
+                }
+                // A short stalk under each, so they read as growing from below rather than
+                // floating -- the one thing that separates a mushroom from a cloud.
+                c.set(x + capX[i] + 1, y + capY[i] - 1, 0, stalk);
+            }
+            floor(c, x + 19, 3, y + 6, ctx);
+            coinTrail(c, x + 8, 10, y + 4, 1);
+        }
+    };
+
     public static List<Segment> setPieces() {
         return List.of(CASTLE_BRIDGE, GREAT_OAK, SAND_CAUSEWAY, FROZEN_GAUNTLET,
-                HAUNTED_ASCENT, REEF_ARCH);
+                HAUNTED_ASCENT, REEF_ARCH, CLOUD_SPIRE);
     }
 }
