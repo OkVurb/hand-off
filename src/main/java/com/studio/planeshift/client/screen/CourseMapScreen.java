@@ -37,6 +37,19 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 public class CourseMapScreen extends Screen {
 
     private static final int NODE = 18;
+
+    /**
+     * How long the token takes to walk one link, in milliseconds.
+     *
+     * <p>Short enough not to be a wait and long enough to read as travel. The whole point of the
+     * walk is that moving between two courses costs a moment, so the map is a place rather than a
+     * list of buttons -- but a map that makes the player wait to look at the next level is worse
+     * than one that snaps.
+     */
+    private static final int WALK_MS = 300;
+
+    /** Height of the token's hop as it crosses, in pixels. */
+    private static final float HOP = 7.0F;
     private static final int PATH_WIDTH = 5;
 
     private static final int PATH = 0xFF_E8CC6A;
@@ -61,6 +74,17 @@ public class CourseMapScreen extends Screen {
 
     private int worldIndex;
     private int selected;
+
+    /**
+     * The node the token is walking away from, or -1 when it is standing still.
+     *
+     * <p>{@link #selected} moves to the destination immediately so every other piece of the screen
+     * -- the highlight, the title, what Enter does -- is already talking about where the player is
+     * going. Only the drawn token lags behind, and input is refused until it arrives, so the two
+     * can never disagree about where the player actually is.
+     */
+    private int walkFrom = -1;
+    private long walkStartMs;
     private WorldMapLayout layout;
     private Button previousWorld;
     private Button nextWorld;
@@ -201,6 +225,11 @@ public class CourseMapScreen extends Screen {
     // ------------------------------------------------------------------ input
 
     private void enterSelected() {
+        // Refused while travelling. Entering a course the token has not reached yet would let the
+        // player skip the walk entirely, and then the walk is decoration rather than movement.
+        if (walking()) {
+            return;
+        }
         WorldMapLayout.Node node = layout.node(selected);
         if (!unlocked(node)) {
             return;
@@ -215,8 +244,27 @@ public class CourseMapScreen extends Screen {
         Minecraft.getInstance().setScreen(null);
     }
 
+    /** True while the token is still crossing a link. */
+    private boolean walking() {
+        return walkFrom >= 0 && System.currentTimeMillis() - walkStartMs < WALK_MS;
+    }
+
+    /** 0 at the node just left, 1 at the node being entered. */
+    private float walkProgress() {
+        if (walkFrom < 0) {
+            return 1.0F;
+        }
+        float t = (System.currentTimeMillis() - walkStartMs) / (float) WALK_MS;
+        return Math.max(0.0F, Math.min(1.0F, t));
+    }
+
     /** Moves the token to the nearest node in a direction, following the drawn links. */
     private void step(int dx, int dy) {
+        // One link at a time. Without this a held arrow key queues moves and the token slides
+        // across half the world, which is exactly the "map as a list" feel the walk is for.
+        if (walking()) {
+            return;
+        }
         WorldMapLayout.Node from = layout.node(selected);
         int bestIndex = -1;
         double bestScore = Double.MAX_VALUE;
@@ -247,12 +295,17 @@ public class CourseMapScreen extends Screen {
             }
         }
         if (bestIndex >= 0) {
+            walkFrom = selected;
+            walkStartMs = System.currentTimeMillis();
             selected = bestIndex;
         }
     }
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (walking()) {
+            return true;
+        }
         for (int i = 0; i < layout.nodes().size(); i++) {
             WorldMapLayout.Node node = layout.node(i);
             if (node.type() == WorldMapLayout.NodeType.START) {
@@ -410,10 +463,26 @@ public class CourseMapScreen extends Screen {
             }
         }
 
-        // The player token sits on the selected node, the way Mario stands on the map.
+        // The token walks the path between nodes rather than jumping to the destination.
         WorldMapLayout.Node current = layout.node(selected);
         int tx = nodeX(current);
         int ty = nodeY(current) - NODE / 2 - 8;
+        if (walkFrom >= 0) {
+            WorldMapLayout.Node origin = layout.node(walkFrom);
+            float t = walkProgress();
+            // Smoothstep, so the token leans into the step and settles rather than moving at a
+            // constant rate and stopping dead.
+            float eased = t * t * (3.0F - 2.0F * t);
+            tx = Math.round(nodeX(origin) + (nodeX(current) - nodeX(origin)) * eased);
+            ty = Math.round(nodeY(origin) + (nodeY(current) - nodeY(origin)) * eased)
+                    - NODE / 2 - 8
+                    // A hop. One arc per link is what makes it read as a character travelling
+                    // rather than a marker being dragged.
+                    - Math.round(HOP * (float) Math.sin(Math.PI * eased));
+            if (t >= 1.0F) {
+                walkFrom = -1;
+            }
+        }
         graphics.fill(tx - 4, ty - 6, tx + 4, ty + 2, TOKEN);
         graphics.fill(tx - 3, ty - 8, tx + 3, ty - 5, TOKEN);
         graphics.fill(tx - 2, ty + 2, tx + 2, ty + 5, 0xFF_2B4FA8);
