@@ -182,4 +182,40 @@ class BossArenaTest {
         }
         throw new AssertionError("no flagpole in the boss arena");
     }
+
+    /**
+     * The enormous Bowser has something to stand on.
+     *
+     * <p>He is held five blocks behind the play plane, and for a long time the arena laid floor
+     * across the three-block lane and nothing else -- so a background boss stood over a hole, fell,
+     * and was killed by his own out-of-world check before the player got near him. The fight the
+     * whole progression points at was ending before it started, and nothing failed, because an
+     * arena with no boss left in it is still an arena.
+     *
+     * <p>Asserted along the whole room rather than at one column, because he tracks the player
+     * from end to end and a ledge with a gap in it is the same bug in a smaller place.
+     */
+    @Test
+    void theLastCastleHasFloorWhereTheBackgroundBossStands() {
+        CourseCanvas c = BossArena.build(WorldRegistry.allWorlds().size() - 1);
+        List<String> holes = new ArrayList<>();
+        for (int x = -4; x <= 50; x++) {
+            for (int z = 2; z <= 7; z++) {
+                if (!c.blocks().containsKey(CourseCanvas.key(x, 0, z))) {
+                    holes.add(x + "," + z);
+                }
+            }
+        }
+        assertEquals(List.of(), holes, "the background boss would fall through these");
+    }
+
+    /** The other four castles are unchanged: no ledge, and the wall still close in. */
+    @Test
+    void ordinaryCastlesAreNotWidened() {
+        CourseCanvas c = BossArena.build(0);
+        assertTrue(c.blocks().containsKey(CourseCanvas.key(0, 1, 2)),
+                "an ordinary castle keeps its wall one block off the lane");
+        assertTrue(!c.blocks().containsKey(CourseCanvas.key(0, 0, 5)),
+                "an ordinary castle has no backdrop ledge, because it has no background boss");
+    }
 }

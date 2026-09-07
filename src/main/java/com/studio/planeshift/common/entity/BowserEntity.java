@@ -37,6 +37,27 @@ public class BowserEntity extends CourseEnemyEntity {
         super(type, level);
     }
 
+    /**
+     * Whether this Bowser stands behind the play plane.
+     *
+     * <p>False here, and that is a correction rather than a default. He was given
+     * {@link BackgroundBossGoal} on the strength of the reference's last boss filling the screen
+     * from the backdrop -- but the wiki is specific that the last castle is fought twice, and it is
+     * the <em>second</em> Bowser who is enormous. The first is fought in a corridor, which is what
+     * the arena builds and what the axe is for.
+     *
+     * <p>It was also actively broken. The goal eases the boss five blocks behind the plane, the
+     * arena only lays floor across the three-block lane, and nothing is built out there -- so the
+     * first Bowser walked off the back of his own arena and {@code tick()} killed him for leaving
+     * the world. The fight the whole progression points at was ending before the player reached
+     * it. This project's characteristic bug, found once more: finished, tested, unreachable.
+     *
+     * @see SuperBowserEntity
+     */
+    protected boolean fightsFromTheBackdrop() {
+        return false;
+    }
+
     /** Marks this Bowser as the one the Koopalings will put back together. */
     public void setRevives(boolean revives) {
         this.revives = revives;
@@ -82,10 +103,12 @@ public class BowserEntity extends CourseEnemyEntity {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        // Position first, attacks second. BackgroundBossGoal owns only where he stands -- behind
-        // the play plane, reaching in -- and leaves BowserGoal's fire and charge untouched, so the
-        // staging changed without the fight being rewritten.
-        goalSelector.addGoal(1, new BackgroundBossGoal(this));
+        if (fightsFromTheBackdrop()) {
+            // Position first, attacks second. BackgroundBossGoal owns only where he stands and
+            // leaves BowserGoal's fire and charge untouched, so the staging changes without the
+            // fight being rewritten.
+            goalSelector.addGoal(1, new BackgroundBossGoal(this));
+        }
         goalSelector.addGoal(2, new BowserGoal(this));
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }

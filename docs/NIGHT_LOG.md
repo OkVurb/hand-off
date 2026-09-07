@@ -837,3 +837,21 @@ than a flag, because rig scale is tied to the registered hitbox and a bigger Bow
 has to be registered bigger. Hooked on death, not on a health threshold, so the
 bridge drop cannot skip it. Only the last world's arena sets the flag.
 342 tests, 0 failures. Phase two's climb is not built yet and is recorded as such.
+
+## The first Bowser was killing himself (found while building phase two)
+Chasing the reference's phase-two climb, I checked where BackgroundBossGoal
+actually puts a boss: five blocks behind the play plane. The arena lays floor
+across the three-block lane and nothing else. So Bowser eased out past the back
+wall, stood over nothing, fell, and BowserEntity.tick killed him for leaving the
+world -- in every castle in the game. Nothing failed, because an arena with no
+boss left in it is still an arena.
+
+The wiki says the same thing the fix does: the last castle is fought twice, and
+it is the *second* Bowser who is enormous. The first is a corridor fight, which is
+what the arena builds and what the axe is for. So the backdrop staging moved to
+SuperBowserEntity, where it is both correct and survivable, and the last castle
+gained the ledge and the wall set back to hold him.
+
+Verified rather than assumed: with the ledge disabled the new test fails, with it
+on it passes. 344 tests, 0 failures. (Cost me the edit once -- I ran git checkout
+on an uncommitted file to undo the experiment and threw away the fix with it.)

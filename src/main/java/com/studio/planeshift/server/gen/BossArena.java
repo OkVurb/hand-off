@@ -76,13 +76,21 @@ public final class BossArena {
     private static final int[] APPROACH_PILLARS = {1, 5, 9, 13};
 
     /**
-     * Which world gets the clown car.
+     * The last world, whose castle is the only one built differently.
      *
-     * <p>One castle, not five. The wiki is specific that this happens in the final castle, and the
-     * reason it works there is that it happens once -- a hazard with no defeat condition is a
-     * set-piece the first time and a tax every time after.
+     * <p>It gets the clown car over its approach, the Bowser who comes back bigger, and the depth
+     * to hold him. One castle, not five: the wiki is specific that all three happen in the final
+     * castle, and each of them is a set-piece the first time and a tax every time after.
      */
-    private static final int CLOWN_CAR_WORLD = 4;
+    private static final int LAST_WORLD = 4;
+
+    /**
+     * Where the last castle's back wall stands.
+     *
+     * <p>Two blocks past where {@code BackgroundBossGoal} holds a boss, so the enormous Bowser has
+     * floor under him and a wall behind him rather than the open air that was there before.
+     */
+    private static final int BACKDROP_HALF = 8;
 
     private BossArena() {
     }
@@ -171,7 +179,7 @@ public final class BossArena {
         c.item(ModItems.BARRIER_CHARM.get(), 8.5D, 1.5D, 0.5D);
 
         // Bowser, on the bridge, facing back down it at the approaching player.
-        boolean last = worldIndex >= CLOWN_CAR_WORLD;
+        boolean last = worldIndex >= LAST_WORLD;
         c.spawn(ModEntities.BOWSER.get(), 23.5D, 1.0D, 0.5D, 90.0F, SegmentLibrary.GENERATED_TAG,
                 entity -> {
                     if (last && entity instanceof com.studio.planeshift.common.entity.BowserEntity b) {
@@ -254,9 +262,25 @@ public final class BossArena {
 
         // Walls and a ceiling, so it reads as a room. Open at negative Z like every other interior
         // in the mod, because that is where the camera is.
+        // The room's back wall, and -- in the last castle only -- the ledge in front of it.
+        //
+        // Super Bowser is held five blocks behind the play plane, and until this was built there
+        // was nothing out there to stand on: the arena laid floor across the three-block lane and
+        // stopped. A background boss over a hole falls out of the world and kills itself, which is
+        // this project's own characteristic bug wearing boss armour. The wall moves back to make
+        // room for him rather than the ledge being squeezed in front of it, so he stands in the
+        // room the player can see rather than in a slot behind its wall.
+        int back = last ? BACKDROP_HALF : HALF + 1;
+        if (last) {
+            for (int x = -4; x <= END; x++) {
+                for (int z = HALF + 1; z < back; z++) {
+                    c.set(x, 0, z, castle);
+                }
+            }
+        }
         for (int x = -4; x <= END; x++) {
             for (int y = 1; y <= 12; y++) {
-                c.set(x, y, HALF + 1, castle);
+                c.set(x, y, back, castle);
             }
             lane(c, x, 13, castle);
         }
@@ -267,7 +291,7 @@ public final class BossArena {
         // between themselves and it is not hit. That is the whole encounter, and it is a different
         // verb -- get past -- from everything else in the game, which is what earns it a place at
         // the last castle rather than a place in the rotation.
-        if (worldIndex >= CLOWN_CAR_WORLD) {
+        if (last) {
             c.spawn(ModEntities.CLOWN_CAR.get(), 7.5D, 9.0D, 0.5D, 90.0F,
                     SegmentLibrary.GENERATED_TAG);
         }

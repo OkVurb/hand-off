@@ -35,6 +35,20 @@ public class SuperBowserEntity extends BowserEntity {
         super(type, level);
     }
 
+    /**
+     * This one does stand in the backdrop, and is the only thing in the game that does.
+     *
+     * <p>It is the staging the plan's first boss entry asks for and the reason the entry is worth
+     * having: a boss standing off the rail changes the question from "can I get past it" to "can I
+     * read what it is about to do". Applied to the first Bowser it was both wrong to the reference
+     * and fatal to him; applied here it is exactly right, because being too big for the corridor is
+     * the whole content of the transformation.
+     */
+    @Override
+    protected boolean fightsFromTheBackdrop() {
+        return true;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return BowserEntity.createAttributes()
                 // Not double. The first fight already took the player's supplies, and a second bar
