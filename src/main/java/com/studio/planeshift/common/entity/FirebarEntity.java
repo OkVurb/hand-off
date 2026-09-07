@@ -83,6 +83,13 @@ public class FirebarEntity extends Entity {
             spawnFlames(next);
             return;
         }
+        // Draw the reach before it arrives. A bar is only fair if the player can see how far it
+        // comes while it is still pointing somewhere else; without this the first warning at our
+        // camera distance is the hit itself.
+        if (Telegraph.due(tickCount)) {
+            Telegraph.ring(level(), position(), barLength(),
+                    net.minecraft.core.particles.ParticleTypes.SMALL_FLAME);
+        }
         hurtAlongBar(next);
     }
 
