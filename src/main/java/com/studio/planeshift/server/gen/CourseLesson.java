@@ -52,6 +52,13 @@ public final class CourseLesson {
      */
     public static ThemeRules rules(CourseTheme theme) {
         return switch (theme) {
+            // Submerged. Movement is the lesson: a gap underwater is not a jump, it is a swim, so
+            // the emphasis falls on vertical space and on overhead threats the player must rise
+            // past rather than on ground the player must cross.
+            case WATER -> new ThemeRules(
+                    List.of(Segment.Tag.GAP, Segment.Tag.OVERHEAD, Segment.Tag.ENEMY),
+                    Set.of(Segment.Tag.GAP, Segment.Tag.OVERHEAD),
+                    Set.of(Segment.Tag.UNSTABLE));
             // The teaching world. Gaps and enemies, the two things everything else builds on.
             case GRASS -> new ThemeRules(
                     List.of(Segment.Tag.GAP, Segment.Tag.ENEMY, Segment.Tag.BLOCKS),

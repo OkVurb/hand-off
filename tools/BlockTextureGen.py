@@ -1076,6 +1076,11 @@ def build():
     out["course_castle_block"] = masonry((104, 110, 126), 71, course=5, mortar=0.72)
     out["brick_block"] = masonry((178, 78, 56), 72, course=4, mortar=0.62)
     out["course_sand_block"] = drift((228, 196, 118), 73)
+
+    # Coral. The one new block the water theme needs -- everything else it reuses from land, which
+    # is the whole reason water turned out cheap. Two hues rather than one, because a reef reads as
+    # a crowd of separate organisms and a single pink makes it read as painted rock.
+    out["course_coral"] = drift((206, 92, 138), 91, flecks=(0.82, 1.22))
     out["course_snow_block"] = drift((238, 244, 250), 74, flecks=(0.96, 1.04))
     out["course_magma_block"] = embers((62, 48, 52), (232, 120, 48), 75)
 

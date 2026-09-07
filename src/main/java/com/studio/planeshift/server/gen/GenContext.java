@@ -201,6 +201,17 @@ public final class GenContext {
                         ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         null);
+                // Water reuses the ordinary land blocks on purpose. The reference builds its
+                // underwater levels from the same green-capped terrain as its grass levels; what
+                // makes them read as submerged is the light shafts, the fluid, the coral and the
+                // cast, none of which is terrain art. Giving water its own tileset would have been
+                // the expensive way to arrive at a worse-matched result.
+                case WATER -> new Palette(
+                        ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_DEEPSTONE.get().defaultBlockState(),
+                        ModBlocks.COURSE_CORAL.get().defaultBlockState(),
+                        ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
+                        null);
                 case GHOST_HOUSE -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState(),

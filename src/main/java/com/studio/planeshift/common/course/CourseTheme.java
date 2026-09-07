@@ -12,7 +12,17 @@ public enum CourseTheme implements StringRepresentable {
     SNOW("snow", 0xFFFFFFFF, 0xFF88AAFF),
     LAVA("lava", 0xFF331111, 0xFFAA3300),
     UNDERGROUND("underground", 0xFF332222, 0xFF000000),
-    GHOST_HOUSE("ghost_house", 0xFF221133, 0xFF000000);
+    GHOST_HOUSE("ghost_house", 0xFF221133, 0xFF000000),
+
+    /**
+     * Submerged courses.
+     *
+     * <p>The sky colour here is the water above rather than air, because underwater the whole
+     * frame is the fluid: there is no horizon to fade to and the "sky" is simply more water,
+     * lighter where it is nearer the surface. A blue sky behind an underwater level reads as a
+     * hole in the world.
+     */
+    WATER("water", 0xFF2E7A6A, 0xFF3FA8B8);
 
     public static final Codec<CourseTheme> CODEC = StringRepresentable.fromEnum(CourseTheme::values);
 

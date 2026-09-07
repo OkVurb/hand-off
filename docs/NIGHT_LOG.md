@@ -35,3 +35,24 @@ Firebar and moving platform are now both telegraphed. Telegraph.arc is still unu
 waiting on the pendulum platforms, which do not exist yet.
 
 282 tests, no failures, counted from XML.
+
+## Iteration 3
+
+Plan item 6, the water theme. Theme, palette, lesson rules, cast slot, a coral block and a reef
+set piece. Two courses rethemed to use it (w5_grassland_5, w15_frozen_5) so it is reachable rather
+than registered-and-orphaned.
+
+Two tests caught real mistakes, which is the useful part of this iteration. SetPieceCoverageTest
+failed first: water had no climax, exactly the "four themes reserve a slot and never fill it" bug
+that test was written for. Then CourseGenerationTest rejected the reef arch -- I had built solid
+coral columns with the way through above head height, which is how a reef reads once you can swim,
+and swimming does not exist. A walking player met a six-block wall. Rebuilt as an overhead arch
+with the floor left open: same silhouette, no promise the movement code cannot keep.
+
+Found and recorded, not fixed: CourseStructureService has its own duplicate Palette still built
+from vanilla Blocks.DIRT and Blocks.SANDSTONE, missed by the native-block migration.
+
+Water is not finished and BACKLOG says so plainly -- no fish, nothing actually submerged, no
+swimming. What exists is a dry course with a marine palette.
+
+291 tests, no failures, counted from XML.

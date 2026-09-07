@@ -131,6 +131,16 @@ public final class ModBlocks {
      * foreground included; washing its far layer toward the same blue-grey used everywhere else
      * would say "distant and cold" in the one room where that is exactly wrong.
      */
+    /**
+     * Seafloor growth: the accent block for submerged courses.
+     *
+     * <p>The one piece of genuinely new art water needs. Everything else it reuses from land,
+     * which is what makes the whole theme cheap -- coral is the thing that says "under water"
+     * without a single new terrain block.
+     */
+    public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
+            "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
+
     public static final DeferredBlock<Block> COURSE_HEDGE_DISTANT_WARM = courseBlock(
             "course_hedge_distant_warm", MapColor.TERRACOTTA_ORANGE, SoundType.GRASS);
     public static final DeferredBlock<Block> COURSE_WOOD_DISTANT_WARM = courseBlock(

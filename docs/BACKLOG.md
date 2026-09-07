@@ -155,3 +155,31 @@ Prefer anything in group C. That is where the pattern lives: this project's char
 not broken code, it is correct code that no player can reach, and it never fails a build or a test.
 Every item there was found by asking "what is registered, and what actually appears in a game?" —
 the same question is worth asking again of anything not yet audited.
+
+## Water theme — what is still missing (from plan item 6.1)
+
+The theme exists and two courses use it, but three things are placeholders and one is a decision
+only the owner can make.
+
+- **No water cast.** `SegmentLibrary.cast(WATER)` returns Buzzy Beetle and Spiny, which are land
+  enemies. Buzzy is the least wrong -- armoured and slow is at least the right silhouette for
+  something drifting -- but the theme is not finished until fish exist. Plan item 6.4.
+- **Nothing is actually submerged.** The theme picks water-coloured blocks and a reef set piece;
+  it does not fill the course volume with the fluid. That needs `CourseWriter` to flood the lane,
+  and it needs swimming to work first, or every water course becomes an air course that is merely
+  green.
+- **No swimming.** The reachability proof rejected the first reef arch because a walking player met
+  a six-block coral wall, and it was right to. Until movement supports swimming, water courses have
+  to be built as dry courses with a marine palette, which is what they currently are.
+- **Decision needed: where does water live?** Two grass/snow courses were rethemed
+  (`w5_grassland_5`, `w15_frozen_5`) because the reference puts underwater levels *inside* existing
+  worlds rather than giving them their own. The alternative is a sixth world, which changes
+  progression and is not a call to make unattended.
+
+## Duplicate palette on vanilla blocks
+
+`CourseStructureService` carries its own private `Palette` record, separate from
+`GenContext.Palette`, and it is still built from vanilla `Blocks.DIRT`, `Blocks.SANDSTONE` and
+`Blocks.ORANGE_TERRACOTTA`. The migration to native course blocks appears to have covered
+`GenContext` and missed this one. Worth checking which of the two actually reaches a player before
+deleting either.

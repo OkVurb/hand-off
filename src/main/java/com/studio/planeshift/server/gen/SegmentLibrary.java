@@ -134,6 +134,11 @@ public final class SegmentLibrary {
             case SNOW -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.KOOPA.get());
             case LAVA -> List.of(ModEntities.HAMMER_BRO.get(), ModEntities.BUZZY_BEETLE.get(), ModEntities.DRY_BONES.get(), ModEntities.FIRE_BRO.get());
             case UNDERGROUND -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get(), ModEntities.DRY_BONES.get(), ModEntities.BOB_OMB.get());
+            // Placeholder until the fish exist. Buzzy Beetle is the least wrong land enemy to put
+            // under water -- it is armoured and slow, which is at least the right silhouette for a
+            // drifting thing -- but it is still a land enemy, and the theme is not finished until
+            // it is replaced. See BACKLOG.
+            case WATER -> List.of(ModEntities.BUZZY_BEETLE.get(), ModEntities.SPINY.get());
             case GHOST_HOUSE -> List.of(ModEntities.BOO.get(), ModEntities.KOOPA.get(), ModEntities.BOOMERANG_BRO.get());
         };
     }
@@ -1691,8 +1696,54 @@ public final class SegmentLibrary {
     }
 
     /** Set pieces, which the composer places at most one of. */
+    /**
+     * Water climax: the reef arch.
+     *
+     * <p>Vertical, where the other set pieces are horizontal, because that is the one thing a
+     * submerged course has that a dry one does not. On land a gap is crossed; under water the
+     * space above the player is as available as the space in front, so the climax is a wall of
+     * coral with the way through near its top rather than a span to be jumped.
+     *
+     * <p>The coral is placed on the lane rather than behind it. Every other decorative block in
+     * the mod sits on a backdrop plane and cannot be touched, and the sheets are clear that reef
+     * growth is on the playfield -- it is scenery you swim between, not scenery you look at.
+     */
+    static final Segment REEF_ARCH = new Segment() {
+        public SegmentSpec spec() {
+            return def("reef_arch", 24, 0, 3, Tag.SETPIECE, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 24, y, ctx);
+
+            BlockState coral = ModBlocks.COURSE_CORAL.get().defaultBlockState();
+
+            // The arch hangs rather than blocks. The first draft ran solid coral columns from the
+            // floor with the way through above head height, which is how a reef reads once the
+            // player can swim -- and the reachability proof rejected it immediately, because
+            // swimming does not exist yet and a walking player met a six-block wall. The proof was
+            // right, and the fix is the honest one: build the arch overhead and leave the floor
+            // open, so it is the same silhouette without a promise the movement code cannot keep.
+            for (int h = 4; h <= 8; h++) {
+                lane(c, ctx, x + 8, y + h, coral);
+                lane(c, ctx, x + 15, y + h, coral);
+            }
+            for (int i = 8; i <= 15; i++) {
+                lane(c, ctx, x + i, y + 9, coral);
+            }
+            // Single-block growth on the floor: stepped over, not climbed, so it is texture
+            // underfoot rather than another wall.
+            for (int i = 10; i <= 13; i += 3) {
+                lane(c, ctx, x + i, y + 1, coral);
+            }
+
+            // Coins under the arch, at the height the player already runs at.
+            coinTrail(c, x + 9, 6, y + 2, 1);
+        }
+    };
+
     public static List<Segment> setPieces() {
         return List.of(CASTLE_BRIDGE, GREAT_OAK, SAND_CAUSEWAY, FROZEN_GAUNTLET,
-                HAUNTED_ASCENT);
+                HAUNTED_ASCENT, REEF_ARCH);
     }
 }

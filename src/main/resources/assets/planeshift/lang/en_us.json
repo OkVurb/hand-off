@@ -212,7 +212,7 @@
   "course.planeshift.w2_grassland_2": "1-2 Rolling Hills",
   "course.planeshift.w3_grassland_3": "1-3 Hidden Hollow",
   "course.planeshift.w4_grassland_4": "1-4 Windmill Way",
-  "course.planeshift.w5_grassland_5": "1-5 Bramble Bridge",
+  "course.planeshift.w5_grassland_5": "1-5 Sunken Shallows",
   "course.planeshift.w6_grassland_6": "1-6 Pipeworks",
   "course.planeshift.w7_grassland_7": "1-7 Cloudtop Detour",
   "course.planeshift.w8_grassland_8": "1-8 Thornfield",
@@ -222,7 +222,7 @@
   "course.planeshift.w12_frozen_2": "2-2 Glacier Steps",
   "course.planeshift.w13_frozen_3": "2-3 Icebound Cavern",
   "course.planeshift.w14_frozen_4": "2-4 Snowfall Pass",
-  "course.planeshift.w15_frozen_5": "2-5 Frozen Falls",
+  "course.planeshift.w15_frozen_5": "2-5 Glacial Depths",
   "course.planeshift.w16_frozen_6": "2-6 The White Maze",
   "course.planeshift.w17_frozen_7": "2-7 Powder Drift",
   "course.planeshift.w18_frozen_8": "2-8 Crystal Shelf",
@@ -351,5 +351,6 @@
   "block.planeshift.course_hedge_distant": "Distant Foliage",
   "block.planeshift.course_wood_distant": "Distant Timber",
   "block.planeshift.course_hedge_distant_warm": "Sunbaked Foliage",
-  "block.planeshift.course_wood_distant_warm": "Sunbaked Timber"
+  "block.planeshift.course_wood_distant_warm": "Sunbaked Timber",
+  "block.planeshift.course_coral": "Reef Coral"
 }

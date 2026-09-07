@@ -390,6 +390,9 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.FROZEN_GAUNTLET) {
             return theme == CourseTheme.SNOW;
         }
+        if (segment == SegmentLibrary.REEF_ARCH) {
+            return theme == CourseTheme.WATER;
+        }
         if (segment == SegmentLibrary.HAUNTED_ASCENT) {
             return theme == CourseTheme.GHOST_HOUSE;
         }
