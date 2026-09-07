@@ -112,7 +112,14 @@ public final class MapNodeService {
         WorldDefinition next = WorldRegistry.allWorlds().get(index + 1);
         if (!WorldRegistry.isWorldUnlocked(ProgressionService.get(player), next,
                 ProgressionService.bypassesLocks(player))) {
-            player.sendSystemMessage(Component.translatable("message.planeshift.cannon_locked"));
+            // Say which lock it is. A cannon that refuses without saying why is indistinguishable
+            // from one that is broken, and the coin gate in particular is invisible otherwise --
+            // the player has the castle cleared and no idea what else is being asked of them.
+            int coinsShort = WorldRegistry.starCoinsStillNeeded(
+                    ProgressionService.get(player), next);
+            player.sendSystemMessage(coinsShort > 0
+                    ? Component.translatable("message.planeshift.star_coin_gate", coinsShort)
+                    : Component.translatable("message.planeshift.cannon_locked"));
             return;
         }
         player.level().playSound(null, player.blockPosition(), ModSounds.WARP.get(),

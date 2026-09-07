@@ -82,3 +82,25 @@ The reachability proof passed across the environment joins, which was the risk t
 this item.
 
 293 tests, no failures, counted from XML.
+
+## Iteration 5
+
+Plan item 8, the last one. Star coins now gate the final world at 60 of the 120 available before
+it. They had been tracked, counted and displayed for the life of the codebase while gating nothing,
+which is the same shape as every other bug found on this project: finished, correct, unreachable.
+
+The risk in fixing it is the opposite failure -- a requirement set somewhere a player cannot reach
+turns a goal into a wall. StarCoinGateTest pins both ends: the gate is real, and there are enough
+coins before the final world to open it with margin. It asserts the requirement is under two thirds
+of what is available, so it never demands a near-perfect run of everything preceding it.
+
+Found while wiring the message: message.planeshift.cannon_locked was referenced by MapNodeService
+and did not exist in en_us.json at all, so a player refused by a cannon saw the raw translation key.
+Added, along with a separate message naming the shortfall -- a cannon that refuses without saying
+why is indistinguishable from one that is broken, and the coin gate is invisible otherwise.
+
+Section 8 of the work plan is now complete. Remaining work is the backlog: the water cast, actually
+submerging water courses, swimming, and the duplicate vanilla-block palette in
+CourseStructureService.
+
+296 tests, no failures, counted from XML.

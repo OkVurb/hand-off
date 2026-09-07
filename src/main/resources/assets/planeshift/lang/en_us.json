@@ -352,5 +352,7 @@
   "block.planeshift.course_wood_distant": "Distant Timber",
   "block.planeshift.course_hedge_distant_warm": "Sunbaked Foliage",
   "block.planeshift.course_wood_distant_warm": "Sunbaked Timber",
-  "block.planeshift.course_coral": "Reef Coral"
+  "block.planeshift.course_coral": "Reef Coral",
+  "message.planeshift.cannon_locked": "That world is still sealed. Clear the castle before it.",
+  "message.planeshift.star_coin_gate": "The final world needs %s more Star Coins."
 }

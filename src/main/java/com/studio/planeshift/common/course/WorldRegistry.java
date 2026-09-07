@@ -95,6 +95,43 @@ public final class WorldRegistry {
      *   <li>The first course of a world opens when the previous world's boss course is cleared.</li>
      * </ul>
      */
+    /**
+     * Star coins needed before the last world opens.
+     *
+     * <p>The mod has tracked star coins for the whole life of the codebase and spent them on
+     * nothing: three per course, collected, counted, displayed, and gating precisely zero doors.
+     * The reference puts its final world behind a count, which is what makes the optional
+     * collectable not optional -- a coin you can always skip is decoration, and a player who
+     * skipped every one of them was never asked to notice they existed.
+     *
+     * <p>Sixty is deliberately reachable. There are three coins in each of the fifty courses, so
+     * this is sixty of the hundred and twenty available before the final world -- half. A player
+     * who has been picking up coins when they are on the way will already have it; a player who
+     * has ignored them entirely has four worlds of courses to go back to, and knows exactly what
+     * to do. A gate you cannot see how to open is a wall.
+     */
+    public static final int FINAL_WORLD_STAR_COINS = 60;
+
+    /**
+     * How many star coins are still needed before the given world will open.
+     *
+     * <p>Zero when the world is not gated or the requirement is already met. Exposed so the map
+     * screen can say "you need eleven more" rather than greying a node out with no explanation,
+     * which is the difference between a goal and a dead end.
+     */
+    public static int starCoinsStillNeeded(CourseProgress progress, WorldDefinition world) {
+        if (!isFinalWorld(world)) {
+            return 0;
+        }
+        return Math.max(0, FINAL_WORLD_STAR_COINS - progress.totalStarCoins());
+    }
+
+    /** Whether this is the last world in the run, and therefore the gated one. */
+    public static boolean isFinalWorld(WorldDefinition world) {
+        return !ORDERED.isEmpty()
+                && ORDERED.get(ORDERED.size() - 1).worldId().equals(world.worldId());
+    }
+
     public static boolean isUnlocked(CourseProgress progress, String courseId) {
         return isUnlocked(progress, courseId, false);
     }
@@ -135,7 +172,13 @@ public final class WorldRegistry {
         if (worldIndex <= 0) {
             return true;
         }
-        return progress.cleared(ORDERED.get(worldIndex - 1).bossCourseId());
+        if (!progress.cleared(ORDERED.get(worldIndex - 1).bossCourseId())) {
+            return false;
+        }
+        // The coin gate sits on top of the boss requirement rather than replacing it, so the
+        // final world needs both the previous castle cleared and the coins found. Checked last
+        // because clearing the castle is the thing the player is already trying to do.
+        return starCoinsStillNeeded(progress, world) == 0;
     }
 
     /** A world is open when its first course is. Used by the map screen to grey out a page. */
