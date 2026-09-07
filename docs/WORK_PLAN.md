@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Twenty-eight of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Thirty of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -85,8 +85,9 @@ gothic windows, a diamond-check wallpaper, and plain wooden boarding in differen
 `backWall()` draws one arch motif for the whole course, so every indoor stretch looks like the same
 room repeated.
 
-**A14. Platforms tilt.** Several are drawn at an angle and pivot under the player. Everything the
-mod places is grid-aligned and level.
+**A14. Platforms tilt.** *Confirmed, and they are a specific object:* brown wooden planks hung at
+an angle that seesaw under the player's weight. They are the dominant platform of the later ghost
+houses, not an occasional flourish. Everything the mod places is grid-aligned and level.
 
 **A15. Airship levels: the playfield is a vehicle.** Golden ribbed hulls with upturned prow and
 stern, floating over a cloud sea, with a skull flag flying. The ground is a shaped object with its
@@ -113,6 +114,11 @@ like the level interiors it sits between. A shop reads as somewhere you have arr
 
 **A20. Platforms are not all cubes.** Thin ledges with a dark inset centre, and grey metal pole
 assemblies carrying switch blocks. Two shapes that are clearly furniture rather than terrain.
+
+**A21. There is a third liquid, and its surface is not a flat line.** A black tar pool hangs in
+rounded lobes along its top edge, like something too thick to level off. Two fluids are registered;
+this is a third, and it is the one that argues hardest that a fluid surface is art rather than a
+plane — lava has a bright crust line, water has a clean rippling line, tar drips.
 
 **A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
 visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
@@ -170,6 +176,14 @@ rotating on a hub block — singly, in pairs, and as four-armed crosses — and 
 finding, not the firebar: a moving hazard is only fair if its reach is visible while it is out of
 the way. Nothing in the mod draws its own threat range.
 
+**B16. Platforms hang from lines and swing.** A plank slung under a diagonal cable with a
+counterweight, swinging as a pendulum. Distinct from the rotating arms of B8: that turns about a
+hub, this hangs and sways.
+
+**B17. Striped poles are climbed.** Barber-pole spirals running floor to ceiling, used vertically.
+A second climbable after the vines of B9, and the spiral is doing real work — it animates the
+climb without animating the player.
+
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
 
@@ -195,8 +209,9 @@ walkable surface, not only behind it. Every decorator prop is placed behind the 
 **C6. Sky levels come in more than one palette, and none of them is the grass sky lightened.**
 Recorded first as "the sky world is pastel" off a snow-sky level — pink, lavender and mint
 over a heavily blurred far layer. The airship world is the other case: bright cyan with large white
-cumulus and a very pale low-contrast horizon. Both are strongly aerial; neither is the day sky with
-the brightness pushed up.
+cumulus and a very pale low-contrast horizon. The high desert is a third: cream and gold with soft
+banked cloud. All are strongly aerial; none is the day sky with the brightness pushed up. Treat sky
+colour as per-world data, not as one gradient with a brightness knob.
 
 **C7. Pipes are a colour set.** Green, yellow, blue and red pipes appear in one level and read as
 different objects. Ours are green.
@@ -213,7 +228,8 @@ framing is what makes a bonus world read as outside the game rather than as anot
 **C10. Interiors are lit by embedded sources.** Small glowing crystals and lamps set into the wall,
 so the light in a dark room visibly comes from somewhere. Ours are uniformly dim.
 
-**C11. The ghost theme has an exterior, and it is purple twilight.** The course leaves the house
+**C11. The ghost theme has an exterior, and it is purple twilight.** *Confirmed on a second
+world.* The course leaves the house
 and finishes outdoors under a violet sky with bare dead trees as silhouettes and pale ground. Ours
 treats ghost house as indoor-only, so this palette does not exist anywhere in the mod.
 
