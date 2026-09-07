@@ -270,6 +270,43 @@ def distant(img, haze=(186, 214, 236), amount=0.46):
     return out
 
 
+def molten(body, hot, crust, seed):
+    """A liquid surface: molten base, cooling crust plates, hot cracks between them.
+
+    Authored at 16 pixels rather than downscaled to them, which is the whole point. A generated
+    1254px lava texture was tried first and turned to orange mush at this size -- its crust plates
+    were smaller than a pixel once resized, so every feature averaged away and it tiled as diagonal
+    noise. Features have to be drawn at the size they will be seen. The colours here still come
+    from that generated image; only the structure is drawn locally.
+
+    Shared by lava and water because they are the same construction -- a base with plates and
+    highlights on it -- at different temperatures.
+    """
+    img = plain(body, seed, 0.10)
+    d = ImageDraw.Draw(img)
+    h = _hash_seed(seed)
+    for i in range(5):
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        x0 = h % S
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        y0 = h % S
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        w = 3 + h % 4
+        # Drawn with wrap, so a plate crossing the edge continues on the far side and the tile
+        # stays seamless.
+        for dy in range(2 + h % 2):
+            for dx in range(w):
+                img.putpixel(((x0 + dx) % S, (y0 + dy) % S), crust + (255,))
+    for i in range(7):
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        x0 = h % S
+        h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+        y0 = h % S
+        img.putpixel((x0, y0), hot + (255,))
+        img.putpixel(((x0 + 1) % S, y0), hot + (255,))
+    return img
+
+
 def tiles(a, b, seed):
     img = new()
     d = ImageDraw.Draw(img)

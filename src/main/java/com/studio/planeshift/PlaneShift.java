@@ -6,6 +6,7 @@ import com.studio.planeshift.common.network.ModNetworking;
 import com.studio.planeshift.common.registry.ModAttachments;
 import com.studio.planeshift.common.registry.ModAttributes;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.registry.ModFluids;
 import com.studio.planeshift.common.registry.ModCreativeTabs;
 import com.studio.planeshift.common.registry.ModEffects;
 import com.studio.planeshift.common.registry.ModEntities;
@@ -46,6 +47,9 @@ public final class PlaneShift {
         LOGGER.info("PlaneShift bootstrapping (common)");
         ModAttachments.ATTACHMENTS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
+        ModFluids.FLUID_TYPES.register(modBus);
+        ModFluids.FLUIDS.register(modBus);
+        ModFluids.FLUID_BLOCKS.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModEntities.ENTITY_TYPES.register(modBus);
         ModCreativeTabs.TABS.register(modBus);

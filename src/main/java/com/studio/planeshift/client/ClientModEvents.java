@@ -236,4 +236,16 @@ public final class ClientModEvents {
             minecraft.setScreen(new ToadShopScreen());
         }
     }
+
+    /**
+     * Client-side look of the course fluids: translucency, tint and how far you see inside one.
+     *
+     * <p>Registered here rather than on the FluidType itself so no client class is loaded on a
+     * dedicated server.
+     */
+    @SubscribeEvent
+    public static void onRegisterClientExtensions(
+            net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        com.studio.planeshift.client.render.CourseFluidExtensions.register(event);
+    }
 }
