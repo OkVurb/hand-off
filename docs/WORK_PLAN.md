@@ -122,7 +122,9 @@ Big slabs, half-slabs and squares in two alternating tones; the eye reads the wa
 **4.7 Pipes are structural, and a colour set of at least five.** Whole levels are built as pipe
 lattices. Green, yellow, blue, red and magenta read as different objects. They also spawn enemies.
 
-**4.8 Platforms come from a parts kit.** Post-and-beam scaffolding in open air, thin ledges with
+**4.8 Platforms come from a parts kit.** *Partly true already:* semisolid platforms, pillars and
+trim are registered and placed. What is missing is the specific shapes — capsule beams, mushroom
+caps on stalks, thin ledges with inset centres. Post-and-beam scaffolding in open air, thin ledges with
 dark inset centres, capsule beams, mushroom capsules on stalks, metal grate panels, pole-mounted
 switch blocks. Not all cubes, and not all extruded from terrain.
 
@@ -160,7 +162,10 @@ a room feel alive. *Done, and the entry was wrong when written:* four themes alr
 so the gap was three, not seven. Corrected by reading the code rather than the footage.
 
 **5.6 Interiors are lit by visible sources.** Sconces, lanterns, glowing crystals set into walls,
-stained glass. Flame colour is themed — ghost houses and towers burn green.
+stained glass. Flame colour is themed — ghost houses and towers burn green. *Half of this was
+already true when written:* `COURSE_LAMP` existed and `CourseDecorator.lit()` places it in the two
+dark themes, with a comment explaining that backlighting throws platforms into silhouette. Only the
+themed colour was missing, and is now done. Stained glass in castle back walls remains open.
 
 **5.7 Background hills carry pattern.** Rounded mounds with chevron and zigzag striping, not flat
 silhouettes. A cloud bank often sits between terrain and far hills.

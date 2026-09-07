@@ -162,6 +162,14 @@ public final class ModBlocks {
                             .noOcclusion()
                             .sound(SoundType.WOOD));
 
+    /** The ghost-house lamp: same fitting, cold green flame. See BlockTextureGen. */
+    public static final DeferredBlock<Block> COURSE_LAMP_GHOST =
+            BLOCKS.registerBlock("course_lamp_ghost", Block::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GREEN)
+                    .strength(0.6F)
+                    .sound(SoundType.LANTERN)
+                    .lightLevel(state -> 14));
+
     public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
             "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
 

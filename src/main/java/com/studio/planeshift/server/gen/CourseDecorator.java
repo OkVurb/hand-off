@@ -97,8 +97,8 @@ public final class CourseDecorator {
             case GRASS -> hedgerow(canvas, random, x, floorY, z, far);
             case DESERT -> column(canvas, random, x, floorY, z, 4, far);
             case SNOW -> drift(canvas, random, x, floorY, z);
-            case LAVA -> lit(canvas, random, x, floorY, z, true);
-            case GHOST_HOUSE -> lit(canvas, random, x, floorY, z, false);
+            case LAVA -> lit(canvas, ctx, random, x, floorY, z, true);
+            case GHOST_HOUSE -> lit(canvas, ctx, random, x, floorY, z, false);
             case UNDERGROUND -> column(canvas, random, x, floorY, z, 6, far);
         }
     }
@@ -369,9 +369,14 @@ public final class CourseDecorator {
      * throws the platforms into silhouette — which is the single most useful thing decoration can
      * do for readability in a side-on game.
      */
-    private static void lit(CourseCanvas canvas, RandomGenerator random,
+    private static void lit(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                             int x, int floorY, int z, boolean banners) {
-        BlockState lamp = ModBlocks.COURSE_LAMP.get().defaultBlockState();
+        // Flame colour is themed. A warm lamp says somebody lives here, which is the one thing a
+        // ghost house is not; and in a dark room a cold light also separates scenery from the fire
+        // hazards, which the player has to tell apart at a glance.
+        BlockState lamp = (ctx.theme() == CourseTheme.GHOST_HOUSE
+                ? ModBlocks.COURSE_LAMP_GHOST.get()
+                : ModBlocks.COURSE_LAMP.get()).defaultBlockState();
         BlockState trim = ModBlocks.COURSE_TRIM.get().defaultBlockState();
         int height = 3 + random.nextInt(3);
         for (int h = 1; h < height; h++) {

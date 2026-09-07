@@ -512,3 +512,31 @@ Corrected the plan entry too, rather than quietly ticking it off. The plan was w
 some of its entries describe gaps the code does not have.
 
 320 tests, no failures, counted from XML.
+
+## Iteration 22
+
+Second audit pass over plan sections 4 and 5. Two more entries overstated their gaps, making four
+found in three iterations.
+
+5.6 said interiors want visible light sources. COURSE_LAMP already existed and CourseDecorator.lit()
+already places it in both dark themes -- with a comment explaining that backlighting throws
+platforms into silhouette, which is a better argument than the one in my plan entry. The only part
+genuinely missing was the second sentence: flame colour is themed. Done now, and the reasoning is
+not decorative -- a warm lamp says somebody lives here, which is exactly what a ghost house is not,
+and in a dark room a cold light also separates scenery from the fire hazards, which the player has
+to tell apart at a glance.
+
+4.8 said platforms come from a parts kit as though none existed. Semisolid platforms, pillars and
+trim are registered and placed. The real gap is narrower: the specific shapes from the sheets --
+capsule beams, mushroom caps on stalks, thin ledges with inset centres.
+
+Corrected both entries in the plan rather than working from them. The pattern is now clear enough to
+name: the plan was written by reading footage and asking "does the mod do this", and I answered that
+question from memory of the code rather than from the code. Four entries have been wrong in the same
+direction -- the mod having more than I credited it with -- which is the pleasant direction to be
+wrong in and still wrong.
+
+Genuine remaining gap confirmed by this pass: pipes are one colour. The sheets show at least five
+reading as different objects.
+
+320 tests, no failures, counted from XML.

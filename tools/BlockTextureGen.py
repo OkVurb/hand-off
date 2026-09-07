@@ -1071,6 +1071,14 @@ def build():
     out["course_lattice"] = lattice((136, 96, 54))
     out["course_banner"] = banner((198, 54, 62), (240, 214, 118), 19)
     out["course_lamp"] = lamp((252, 226, 150), (128, 96, 44))
+
+    # The ghost-house lamp. Same fitting, cold flame.
+    #
+    # Colour is doing real work rather than decorating: a warm lamp says somebody lives here, and a
+    # ghost house is precisely a building where nobody does. Green also separates the light from
+    # the fire hazards, which matters more here than anywhere -- in a dark room the player has to
+    # tell at a glance which glowing thing is scenery and which one hurts.
+    out["course_lamp_ghost"] = lamp((150, 252, 186), (44, 110, 78))
     out["course_hedge"] = hedge((46, 112, 48), 21)
     out["course_cloud_block"] = cloud((238, 244, 255), 22)
     out["course_ice_block"] = ice((176, 216, 240))
