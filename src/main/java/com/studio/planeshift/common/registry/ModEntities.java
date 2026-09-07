@@ -4,6 +4,7 @@ import com.studio.planeshift.PlaneShift;
 import com.studio.planeshift.common.entity.EnemyRigProfile;
 import com.studio.planeshift.common.entity.KoopalingEntity;
 import com.studio.planeshift.common.entity.BigBooEntity;
+import com.studio.planeshift.common.entity.MegaPiranhaPlantEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.ClownCarEntity;
 import com.studio.planeshift.common.entity.SuperBowserEntity;
@@ -198,6 +199,14 @@ public final class ModEntities {
                     .clientTrackingRange(8)
                     .build(key("big_cheep")));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<MegaPiranhaPlantEntity>>
+            MEGA_PIRANHA_PLANT = ENTITY_TYPES.register("mega_piranha_plant", () ->
+                    EntityType.Builder.of(MegaPiranhaPlantEntity::new, MobCategory.MONSTER)
+                    .sized(EnemyRigProfile.MEGA_PIRANHA_PLANT.scaled(0.55F),
+                            EnemyRigProfile.MEGA_PIRANHA_PLANT.scaled(1.15F))
+                    .clientTrackingRange(10)
+                    .build(key("mega_piranha_plant")));
+
     public static final DeferredHolder<EntityType<?>, EntityType<PiranhaPlantEntity>> PIRANHA_PLANT =
             ENTITY_TYPES.register("piranha_plant", () -> EntityType.Builder
                     .of(PiranhaPlantEntity::new, MobCategory.MONSTER)
@@ -375,6 +384,7 @@ public final class ModEntities {
         event.put(BIG_CHEEP.get(), BigCheepEntity.createAttributes().build());
         event.put(BIG_BOO.get(), BigBooEntity.createAttributes().build());
         event.put(PIRANHA_PLANT.get(), PiranhaPlantEntity.createAttributes().build());
+        event.put(MEGA_PIRANHA_PLANT.get(), MegaPiranhaPlantEntity.createAttributes().build());
     }
 
     private ModEntities() {

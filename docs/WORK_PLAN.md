@@ -155,8 +155,15 @@ pressure builds with the height") without ever paying for it. Behaviour delibera
 Boo is already answered by looking at it, and a faster big one would be answering a question nobody
 asked. What changes is that it fills the corridor.
 
-*Still to do:* the Mega Piranha Plant, same pattern. The Fuzzy does not exist in the mod at all and
-is a different entry.
+*Also built:* `MegaPiranhaPlantEntity`, on the tall middle pipe of `piranha_pipes` — the segment
+already varied its pipe heights so the row would not read as a fence, so the odd pipe out is where
+the threat belongs and the shape of the segment says so before the player is close enough to see
+it. Timings untouched: a plant is a metronome the player learns, and changing the beat would make
+this a different enemy rather than a bigger one. Its rise had to be overridden, though, or its head
+would have stayed inside its own pipe at full extension.
+
+*Not built:* Mega Deep Cheep and Mega Fuzzy. The Fuzzy does not exist in the mod at any size, so it
+belongs to §6 rather than here.
 
 ---
 

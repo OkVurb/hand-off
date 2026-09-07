@@ -42,6 +42,8 @@ public enum EnemyRigProfile {
     SPINY(1.25F),
     BUZZY_BEETLE(1.25F),
     PIRANHA_PLANT(1.05F),
+    /** The big plant. Same mesh at a larger registration, as with {@link #BIG_BOO}. */
+    MEGA_PIRANHA_PLANT(2.2F),
     /** Read side-on and never head-on, so it carries a little more visual scale than it needs. */
     CHEEP_CHEEP(1.20F),
     /** The large fish. Its size comes from the registered hitbox; this only matches the art. */

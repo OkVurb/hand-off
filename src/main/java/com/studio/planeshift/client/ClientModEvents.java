@@ -177,6 +177,9 @@ public final class ClientModEvents {
                 CourseEnemyRenderer.provider(bigCheep, 0.25F, EnemyRigProfile.BIG_CHEEP));
         event.registerEntityRenderer(ModEntities.PIRANHA_PLANT.get(),
                 CourseEnemyRenderer.provider(piranhaPlant, 0.55F, EnemyRigProfile.PIRANHA_PLANT));
+        event.registerEntityRenderer(ModEntities.MEGA_PIRANHA_PLANT.get(),
+                CourseEnemyRenderer.provider(piranhaPlant, 0.55F,
+                        EnemyRigProfile.MEGA_PIRANHA_PLANT));
         event.registerEntityRenderer(ModEntities.TOAD.get(), ToadRenderer::new);
         // The texture passed here is only a fallback: CourseEnemyRenderer picks the real sheet
         // from the synced variant, because all eight siblings share this one entity type.

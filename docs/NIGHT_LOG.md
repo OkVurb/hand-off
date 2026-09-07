@@ -892,3 +892,14 @@ Built Big Boo the same way, and placed it in the same commit rather than
 registering it and moving on: the ghost-house climb's last landing carries it. That
 segment's comment already said the pressure builds with the height; now the climb
 arrives somewhere. Behaviour unchanged on purpose. 347 tests, 0 failures.
+
+## Mega Piranha Plant (plan 3.6)
+Same pattern, third time. Placed on the tall middle pipe of piranha_pipes, which
+the segment already made taller than its neighbours so the row would not read as a
+fence -- so the odd pipe out is where the threat goes.
+
+One thing that was not just scale: the emerge height had to become overridable.
+At the inherited 1.2 blocks the big plant's head would still be inside its own pipe
+at full extension, and the rise-and-fall the player times their run against would
+have happened out of sight. A hitbox and a mesh scale together; a hand-written
+animation distance does not. 348 tests, 0 failures.

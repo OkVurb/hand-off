@@ -55,6 +55,17 @@ public class PiranhaPlantEntity extends CourseEnemyEntity {
         this.setNoGravity(true);
     }
 
+    /**
+     * How far out of the pipe this plant rises.
+     *
+     * <p>Overridable because it is a function of the body, not of the pipe: a plant twice the size
+     * that rose the same distance would still have its head inside its own plumbing, and the cycle
+     * the player is supposed to read would happen out of sight.
+     */
+    protected double emergeHeight() {
+        return EMERGE_HEIGHT;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 12.0D)
@@ -136,7 +147,7 @@ public class PiranhaPlantEntity extends CourseEnemyEntity {
 
     private void applyExtension(float value) {
         entityData.set(EXTENSION, value);
-        setPos(getX(), baseY + value * EMERGE_HEIGHT, getZ());
+        setPos(getX(), baseY + value * emergeHeight(), getZ());
     }
 
     /**

@@ -488,8 +488,13 @@ public final class SegmentLibrary {
                 for (int h = 1; h <= height; h++) {
                     c.setLane(px, y + h, pipe, ctx.halfWidth());
                 }
-                // Spawn inside the top block of the pipe so baseY starts hidden
-                mob(c, ModEntities.PIRANHA_PLANT.get(), px, y + height, 0.0F);
+                // Spawn inside the top block of the pipe so baseY starts hidden. The middle pipe
+                // is the tall one, and its tenant is the big plant: the segment already varies the
+                // heights so the row does not read as a fence, and putting the one thing worth
+                // looking at on the odd pipe out means the shape of the segment is telling the
+                // player where the threat is before they are close enough to see it.
+                mob(c, i == 1 ? ModEntities.MEGA_PIRANHA_PLANT.get() : ModEntities.PIRANHA_PLANT.get(),
+                        px, y + height, 0.0F);
             }
         }
     };

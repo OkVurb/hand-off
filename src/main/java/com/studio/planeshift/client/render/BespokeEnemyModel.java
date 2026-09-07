@@ -131,6 +131,8 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             // disagree.
             case BIG_CHEEP -> cheepCheep();
             case PIRANHA_PLANT -> piranhaPlant();
+            // Same mesh, larger rig. See BIG_CHEEP above.
+            case MEGA_PIRANHA_PLANT -> piranhaPlant();
             case BOWSER -> bowser();
             // The same mesh again, for the same reason BIG_CHEEP reuses its own: the revived
             // Bowser is the same character put back together larger, and the size lives in the

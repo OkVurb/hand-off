@@ -61,6 +61,9 @@ class BespokeEnemyModelTest {
             // put the difference in two places and let them drift apart.
             Map.entry(EnemyRigProfile.BIG_CHEEP, 7L),
             Map.entry(EnemyRigProfile.PIRANHA_PLANT, 15L),
+            // Same count as PIRANHA_PLANT, and the equality is the assertion. Third profile in
+            // this table whose whole content is "the small one, registered bigger".
+            Map.entry(EnemyRigProfile.MEGA_PIRANHA_PLANT, 15L),
             // Body, shell, head, snout, jaw, two arms, two legs, a three-piece crest and a
             // two-piece wand. No separate eye boxes, unlike the Koopa it is built from: the crest
             // needs the trim region for its colour, and a box picks a material, so the eyes are
