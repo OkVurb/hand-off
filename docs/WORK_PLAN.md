@@ -4,10 +4,9 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Sheets were sampled across worlds rather than read end to end. Consecutive sheets
-inside one world are near-identical — the same room two minutes apart — so a spread sample covers
-every world and level type at a fraction of the cost. Worth going deeper per-world when a specific
-job needs it.
+**Method note.** Roughly a dozen of the 108 sheets read so far, spread to cover every world and
+level type; more being worked through. An earlier draft of this plan was written off five sheets and
+called complete, which was too thin a base for the word.
 
 ---
 
@@ -37,6 +36,19 @@ floor of hazard under the entire course is a different tension and a different f
 brown-grey. `UNDERGROUND` is one grey theme used everywhere, collapsing six distinct interiors into
 one.
 
+**A5. Silhouette shape is per theme, and this contradicts what was built.** Grass uses rounded
+hills; ice and snow use angular crystalline cliff shapes; volcano uses steep cones. `CourseDecorator
+.hill()` currently draws a sine profile for every exterior theme, which is right for grass and wrong
+for the other two. The rounded-vs-angular distinction is one of the clearest per-world reads there
+is.
+
+**A6. Snow sits on top of blocks as a separate cap.** Ice levels show a white cap band on the upper
+face of otherwise blue-grey blocks, independent of the block itself. This is a per-block top
+treatment, not a different block.
+
+**A7. Pipes are structural.** A whole level is built as a lattice of pipes forming the walkable
+geometry. The mod's pipes are decorative or fake by design decision.
+
 **A4. Terrain is built from mixed block sizes.** Ground reads as masonry of varying rectangles, not
 a uniform 1×1 grid. `ConnectedBlock` already exists and currently serves only castle stone.
 
@@ -51,6 +63,9 @@ exists (`43678fd`), so this is theme + generation + cast, not plumbing.
 **B2. Sky.** Cloud platforms, pale palette, height as the subject.
 
 **B3. Water cast.** Fish enemies of at least two sizes. Blocked on B1.
+
+**B5. Giant enemy variants.** A scaled-up version of an ordinary enemy used as a set-piece
+threat. The mod has one size per enemy.
 
 **B4. Animated background elements.** Volcanoes erupt; background is not static. All mod scenery is
 static blocks.
@@ -70,6 +85,12 @@ gradient.
 **C3. Connected textures beyond castle stone.** Terrain, brick and ice all want edge treatment.
 The machinery is built and proven.
 
+**C5. Foreground detail sits on the playfield itself.** Flowers and tufts are scattered on the
+walkable surface, not only behind it. Every decorator prop is placed behind the lane.
+
+**C6. The sky world is pastel, not blue.** Pink, lavender and mint rather than a brighter day sky,
+with a very soft low-contrast far layer. A sky theme cannot be the grass sky lightened.
+
 **C4. Snow and the two lit themes still draw the same prop at both depths.** They use different
 decorator builders and never got the aerial-perspective treatment.
 
@@ -87,6 +108,10 @@ features; in the reference a secret exit is precisely what unlocks a cannon betw
 node graph. Ours draws nodes and paths on a flat field.
 
 ---
+
+**D4. World maps are themed terrain, and special worlds break the pattern deliberately.** Each
+world's map is built from that world's own materials with scenery around the node graph; the bonus
+worlds use an abstract checkered field instead, which is what marks them as outside the sequence.
 
 ## E. Ordering
 
