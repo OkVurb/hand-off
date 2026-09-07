@@ -916,3 +916,14 @@ packet already fills all eight composite slots. Two traps hit and fixed on the w
 "everything is cleared" is true forever after, so the check needed the before-state
 too; and taking the latched banner inside render() clears it sixty times a second
 and shows the news for one frame. Both are covered by tests. 350 tests, 0 failures.
+
+## Chain Chomp (6.6, last one)
+Checked the rest of 6.6 first and five of the six were already there -- the Thwomp
+is the drop-crusher the entry describes. The Chomp was the real gap, and it is the
+only threat in the mod answered by position rather than timing: it owns a radius,
+the edge does not move, and the chain is drawn so the player can see where it is.
+
+Tether is clamped rather than repelled, so the reach measured by eye is the reach
+you get. No goals at all -- a navigator that did not know about the chain would drag
+it off its post. Placed in its own segment, wider than the reach, with the coins
+inside it. 351 tests, 0 failures.

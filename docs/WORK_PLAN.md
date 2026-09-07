@@ -274,9 +274,14 @@ over a cloud sea, under a skull flag. Standard staging for a boss.
 **6.5 Enemies reskin per world over identical behaviour.** Skeletal fish, Dry Bones, winged
 variants. Cheap cast expansion off entities that already exist.
 
-**6.6 Hazards the mod lacks.** Drop-crushers that slam when passed under (threatening a *moment*,
-not a place); firebars; buzzsaws; spike balls on chains; volcanic bombs raining from erupting
-background volcanoes *into the lane*; Chain Chomps tethered to posts.
+**6.6 Hazards the mod lacks.** ~~All six.~~ Five were already built or built since: the Thwomp is
+the drop-crusher, and firebars, saws, chain balls and volcanic bombs all exist. *The last one, the
+Chain Chomp, is now built* — and it is the one worth having for a reason the others do not cover.
+Every threat in the mod is either a place (a Thwomp owns a column, a firebar owns a disc) or a
+thing that travels. A Chomp is a **radius**: ground that belongs to it, whose edge the player can
+see because the chain is drawn, and which is answered by *position* rather than by timing. Its
+segment is wider than its reach and the coins are inside it, because a hazard with a free route
+past it is a hazard nobody looks at.
 
 **6.7 Traversal the mod lacks.** Swingable ropes, climbable vines, barber-pole spirals (the stripe
 animates the climb without animating the player), spider-web mesh, beanstalks.

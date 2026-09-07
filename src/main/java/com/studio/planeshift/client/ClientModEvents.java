@@ -159,6 +159,9 @@ public final class ClientModEvents {
                 CourseEnemyRenderer.provider(bulletBill, 0.15F, EnemyRigProfile.BULLET_BILL));
         event.registerEntityRenderer(ModEntities.BOO.get(),
                 CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.BOO));
+        event.registerEntityRenderer(ModEntities.CHAIN_CHOMP.get(),
+                CourseEnemyRenderer.provider(PlaneShift.id("textures/entity/chain_chomp.png"),
+                        0.9F, EnemyRigProfile.CHAIN_CHOMP));
         event.registerEntityRenderer(ModEntities.BIG_BOO.get(),
                 CourseEnemyRenderer.provider(boo, 0.22F, EnemyRigProfile.BIG_BOO));
         event.registerEntityRenderer(ModEntities.LAKITU.get(),

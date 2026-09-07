@@ -119,6 +119,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
             case THWOMP -> thwomp();
             case BULLET_BILL -> bulletBill();
             case BOO -> boo();
+            case CHAIN_CHOMP -> chainChomp();
             // Same mesh, larger rig. See BIG_CHEEP above.
             case BIG_BOO -> boo();
             case LAKITU -> lakitu();
@@ -405,6 +406,34 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
      * <p>Face contract: the 8x6x7 head box at (64,0), reusing the standard slot so the sheet does
      * not need a bespoke face size for one creature.
      */
+    /**
+     * The Chomp: one heavy ball, mostly mouth, on a chain.
+     *
+     * <p>Deliberately the least articulated rig in the set. A Chomp has no limbs, no shell and no
+     * silhouette beyond a sphere -- what makes it read is that it is enormous, black and toothed,
+     * and every part added beyond that is a part that can catch light and soften it.
+     *
+     * <p>The chain links are real geometry rather than a texture strip because the tether is the
+     * mechanic: the player judges how far the thing can reach by looking at it, so the chain has to
+     * be where the reach actually ends.
+     */
+    private static LayerDefinition chainChomp() {
+        MeshDefinition mesh = emptyMesh();
+        PartDefinition r = mesh.getRoot();
+        r.addOrReplaceChild("body", box(0, 0, -7, -7, -7, 14, 14, 14), pose(0, 11, 0));
+        // The face plate, carrying the teeth the generator paints in the head region.
+        r.addOrReplaceChild("head", box(64, 0, -6, -6, -1, 12, 12, 1), pose(0, 11, -7.2F));
+        // Four links running back to the post. Spaced so the gaps read at distance -- a solid bar
+        // would say "this is fixed" where a chain says "this has slack".
+        for (int i = 0; i < 4; i++) {
+            r.addOrReplaceChild("detail_" + (i + 1), box(0, 40, -1, -1, -1, 2, 2, 2),
+                    pose(0, 8, 8.0F + i * 3.0F));
+        }
+        // The post it is bolted to.
+        r.addOrReplaceChild("shell", box(0, 40, -2, -6, -2, 4, 12, 4), pose(0, 6, 20.0F));
+        return finish(mesh);
+    }
+
     private static LayerDefinition podoboo() {
         MeshDefinition mesh = emptyMesh();
         PartDefinition r = mesh.getRoot();

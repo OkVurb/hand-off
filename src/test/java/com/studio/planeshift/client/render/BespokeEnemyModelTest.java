@@ -44,6 +44,9 @@ class BespokeEnemyModelTest {
             Map.entry(EnemyRigProfile.THWOMP, 11L),
             Map.entry(EnemyRigProfile.BULLET_BILL, 11L),
             Map.entry(EnemyRigProfile.BOO, 11L),
+            // Ball, face plate, four chain links and the post. The least articulated rig here:
+            // a Chomp is a sphere and a mouth, and every part beyond that softens it.
+            Map.entry(EnemyRigProfile.CHAIN_CHOMP, 7L),
             // Same count as BOO, and that equality is the assertion: the big one is the small one
             // at a larger rig scale, so the day these differ somebody has built a second ghost.
             Map.entry(EnemyRigProfile.BIG_BOO, 11L),

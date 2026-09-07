@@ -32,6 +32,8 @@ public enum EnemyRigProfile {
     THWOMP(1.05F),
     BULLET_BILL(1.30F),
     BOO(1.25F),
+    /** The Chomp. Large on purpose: its whole threat is that it is bigger than the gap. */
+    CHAIN_CHOMP(1.55F),
     /**
      * The big ghost. Same mesh, larger registration, for the reason {@link #BIG_CHEEP} is: size
      * lives in the hitbox, so it cannot live in a variant flag.

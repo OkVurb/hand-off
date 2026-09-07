@@ -809,6 +809,54 @@ def bob_omb():
     return img
 
 
+def chain_chomp():
+    """A black iron ball that is mostly teeth, on a grey chain.
+
+    Two colours and one shape. The Chomp reads at any distance because it is the darkest thing on
+    screen with a band of white across the middle -- the teeth are the character, and everything
+    else on the sheet exists to keep them legible. Built off the Bob-omb's cast-iron treatment for
+    that reason: it is the one surface in the set that already looks like heavy machinery, and the
+    Chomp is the same material with a worse temper.
+
+    The chain gets the hard region and is deliberately lighter than the ball. A chain that read as
+    dark as the Chomp would merge with it, and the tether is the whole reason the player can judge
+    how far this thing can reach.
+    """
+    img = new_sheet()
+    iron = (30, 30, 38)
+
+    def cast(region, colour, seed):
+        base(img, region, colour, seed, ramp=0.34)
+        ox, oy = region
+        w, h = REGION_SIZE[region]
+        dr = ImageDraw.Draw(img)
+        for i in range(9):
+            dr.line([(ox + 5 + i, oy + 4), (ox + 14 + i, oy + 13)], fill=shade(colour, 1.7))
+
+    cast(BODY, iron, 231)
+    cast(HEAD, (36, 36, 46), 232)
+    eyes(img, front(HEAD, 8, 5, 7), 8, 5, sclera=WHITE, pupil=INK)
+
+    # The teeth: a white band low on the face, cut into a zigzag. Drawn rather than shaded,
+    # because a soft mouth on a black ball is a smudge.
+    dr = ImageDraw.Draw(img)
+    ox, oy = HEAD
+    rect(img, HEAD, 6, 22, 52, 10, WHITE)
+    for i in range(0, 52, 6):
+        dr.polygon([(ox + 6 + i, oy + 22), (ox + 9 + i, oy + 28), (ox + 12 + i, oy + 22)],
+                   fill=shade(iron, 1.0))
+        dr.polygon([(ox + 6 + i, oy + 32), (ox + 9 + i, oy + 26), (ox + 12 + i, oy + 32)],
+                   fill=shade(iron, 1.0))
+
+    # Feet region unused by the rig; kept dark so nothing bright leaks if it ever is.
+    base(img, LIMB, (34, 34, 42), 233, ramp=0.2)
+    # The chain, and the post it is bolted to.
+    base(img, HARD, (146, 150, 162), 234, ramp=0.3)
+    base(img, MUZZLE, (96, 84, 66), 235, ramp=0.24)
+    base(img, TRIM, (176, 178, 190), 236, ramp=0.22)
+    return img
+
+
 def _bro(armour, seed):
     """The Hammer Bro sheet with a different uniform.
 
@@ -961,6 +1009,7 @@ CHARACTERS = {
     "buzzy_beetle": buzzy_beetle,
     "piranha_plant": piranha_plant,
     "bowser": bowser,
+    "chain_chomp": chain_chomp,
 }
 
 

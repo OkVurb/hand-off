@@ -473,6 +473,35 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * A Chomp on a post, and a strip of ground it owns.
+     *
+     * <p>The segment is wider than the Chomp's reach on purpose. Every other threat in the library
+     * is answered by timing or by height; this one is answered by <em>position</em> -- there is
+     * ground here that is safe and ground that is not, the boundary does not move, and the player
+     * can see exactly where it is because the chain is drawn.
+     *
+     * <p>The coins are placed inside the radius. A hazard with a safe route past it and nothing on
+     * the dangerous side is a hazard the player walks around without ever looking at it.
+     */
+    static final Segment CHOMP_POST = new Segment() {
+        public SegmentSpec spec() {
+            return def("chomp_post", 16, 0, 2, Tag.ENEMY);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            // The post, so the tether has something visible to be attached to. A chain running
+            // back to nothing reads as an enemy that happens to stop rather than one that is held.
+            for (int h = 1; h <= 2; h++) {
+                c.setLane(x + 8, y + h, ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        ctx.halfWidth());
+            }
+            mob(c, ModEntities.CHAIN_CHOMP.get(), x + 8, y + 4, 90.0F);
+            coinTrail(c, x + 6, 4, y + 2, 1);
+        }
+    };
+
     /** Pipes with Piranha Plants: timing, not reflexes. */
     static final Segment PIRANHA_PIPES = new Segment() {
         public SegmentSpec spec() {
@@ -1874,6 +1903,7 @@ public final class SegmentLibrary {
         list.add(ENEMY_LINE);
         list.add(LEDGE_PATROL);
         list.add(HAMMER_PERCH);
+        list.add(CHOMP_POST);
         list.add(PIRANHA_PIPES);
         list.add(MOVING_CROSSING);
         list.add(LIFT_SHAFT);
