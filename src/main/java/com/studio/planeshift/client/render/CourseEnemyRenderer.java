@@ -61,7 +61,9 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
         super.extractRenderState(entity, state, partialTick);
         state.squishY = entity.squishScaleY(partialTick);
         state.squishXZ = entity.squishScaleXZ(partialTick);
-        state.inShell = (entity instanceof com.studio.planeshift.common.entity.KoopaEntity k) && k.inShell();
+        // Anything that withdraws into a shell, not just a Koopa. The tower bosses do it too.
+        state.inShell = (entity instanceof com.studio.planeshift.common.entity.ShellSpinner s)
+                && s.spinning();
         state.koopalingVariant =
                 entity instanceof com.studio.planeshift.common.entity.KoopalingEntity boss
                         ? boss.variant().ordinal() : -1;

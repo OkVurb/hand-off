@@ -40,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
  * <p>A sliding shell that is stomped again stops rather than reversing, so the player can always
  * regain control of one they have lost track of.
  */
-public class KoopaEntity extends CourseEnemyEntity {
+public class KoopaEntity extends CourseEnemyEntity implements ShellSpinner {
 
     private static final EntityDataAccessor<Boolean> IN_SHELL =
             SynchedEntityData.defineId(KoopaEntity.class, EntityDataSerializers.BOOLEAN);
@@ -95,6 +95,12 @@ public class KoopaEntity extends CourseEnemyEntity {
         if (!inShell()) {
             goalSelector.addGoal(1, new LanePatrolGoal(this, 1.0D, isRed()));
         }
+    }
+
+    /** {@inheritDoc} For a Koopa the shell shows whenever it is in one, sliding or parked. */
+    @Override
+    public boolean spinning() {
+        return inShell();
     }
 
     public boolean inShell() {
