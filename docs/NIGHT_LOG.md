@@ -1050,3 +1050,10 @@ same four enemies. Palette.forTheme already took the world for exactly this reas
 is the other half of that sentence. Snow caves, volcano caves and haunted flooded
 rooms now have their own rosters; everything else falls through to the theme.
 358 tests, 0 failures.
+
+## Mushroom stalks
+The cheapest thing on the parts-kit list: no new block, because a pillar is a stalk
+and a semisolid platform is a cap. It adds a shape the library did not have -- a
+platform held up by a line rather than extruded from terrain, so the space under it
+stays open. Caps are semisolid so they can be jumped up through; a mushroom you have
+to walk around to climb is a wall with a hat. 358 tests, 0 failures.

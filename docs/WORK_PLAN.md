@@ -206,8 +206,14 @@ structural half: whole levels built as pipe lattices rather than pipes as furnit
 **4.8 Platforms come from a parts kit.** *Partly true already:* semisolid platforms, pillars and
 trim are registered and placed. What is missing is the specific shapes — capsule beams, mushroom
 caps on stalks, thin ledges with inset centres. Post-and-beam scaffolding in open air, thin ledges with
-dark inset centres, capsule beams, mushroom capsules on stalks, metal grate panels, pole-mounted
-switch blocks. Not all cubes, and not all extruded from terrain.
+dark inset centres, capsule beams, metal grate panels, pole-mounted switch blocks. Not all cubes,
+and not all extruded from terrain.
+
+*Mushroom capsules on stalks are built* — `MUSHROOM_STALKS`, and it needed no new block: a pillar
+is a stalk and a semisolid platform is a cap. What it adds is a shape the library did not have, a
+platform supported by a line rather than by terrain, so the space underneath stays open and getting
+on top is a separate decision from the ground below. Semisolid caps specifically: a mushroom you
+have to walk around to climb is a wall with a hat.
 
 **4.9 Rope is walkable terrain, and it sags.** Cables strung between anchor posts, hanging in a
 catenary and deforming under the player's weight. **The one finding that does not fit a block grid

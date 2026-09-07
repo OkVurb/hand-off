@@ -551,6 +551,45 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * Mushroom capsules on stalks: three caps at three heights, each on a thin pole.
+     *
+     * <p>From the parts-kit entry, and the cheapest thing on that list because it needs no new
+     * block -- a pillar is a stalk and a semisolid platform is a cap. What it adds is a shape the
+     * library did not have: a platform with nothing under it but a line, so the space beneath is
+     * open and crossable and the platform above is a separate decision from the ground below.
+     * Every other elevated surface here is either extruded from the terrain or floating with no
+     * visible support at all.
+     *
+     * <p>Semisolid caps specifically, so they can be jumped up through. A mushroom you have to
+     * walk around to get on top of is a wall with a hat.
+     */
+    static final Segment MUSHROOM_STALKS = new Segment() {
+        public SegmentSpec spec() {
+            return def("mushroom_stalks", 16, 0, 2, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            BlockState stalk = ModBlocks.COURSE_PILLAR.get().defaultBlockState();
+            BlockState cap = ModBlocks.SEMISOLID_PLATFORM.get().defaultBlockState();
+
+            // Heights rise then fall, so the run reads as a arc rather than a staircase and the
+            // player comes back down to the floor inside the segment rather than at its edge.
+            int[] at = {3, 8, 13};
+            int[] high = {3, 5, 3};
+            for (int i = 0; i < at.length; i++) {
+                for (int h = 1; h < high[i]; h++) {
+                    c.set(x + at[i], y + h, 0, stalk);
+                }
+                for (int w = -1; w <= 1; w++) {
+                    c.set(x + at[i] + w, y + high[i], 0, cap);
+                }
+            }
+            coinTrail(c, x + 8, 4, y + 7, 1);
+        }
+    };
+
     /** Pipes with Piranha Plants: timing, not reflexes. */
     static final Segment PIRANHA_PIPES = new Segment() {
         public SegmentSpec spec() {
@@ -1952,6 +1991,7 @@ public final class SegmentLibrary {
         list.add(ENEMY_LINE);
         list.add(LEDGE_PATROL);
         list.add(HAMMER_PERCH);
+        list.add(MUSHROOM_STALKS);
         list.add(CHOMP_POST);
         list.add(PIRANHA_PIPES);
         list.add(MOVING_CROSSING);
