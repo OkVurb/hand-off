@@ -1069,3 +1069,16 @@ Two tones per stone, hashed from position and kept close together: one flat colo
 makes the sizes invisible at 16px, and tones far apart make chequerwork rather than
 stone. masonry stays for the brick block, where a single module is the right answer.
 Sixteen connected variants regenerated. 358 tests, 0 failures.
+
+## A lava sea
+Volcano courses had lava under each gap and nowhere else. One pass now lays it at
+a single depth for the whole course, four below the lowest floor: a per-column depth
+follows the terrain and reads as a lava river with hills in it. Fills only what is
+still empty and runs after the routes, so it cannot overwrite deliberate geometry,
+and sitting under every walkable surface keeps it clear of the reachability proof.
+
+The test I wrote first asserted all lava sits at one height, and it failed --
+correctly. Set-piece segments build raised lava channels, and so does the reference.
+The finding was never "one lava height", it was "the bottom of the level is one
+surface", so the test now asserts continuity of the deepest lava instead. Kept the
+weaker claim rather than the tidier one. 360 tests, 0 failures.

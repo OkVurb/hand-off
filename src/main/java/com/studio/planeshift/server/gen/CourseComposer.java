@@ -366,6 +366,7 @@ public final class CourseComposer {
         // The high road, before scenery: it needs the floor map and it writes real geometry, so it
         // belongs with the level rather than with the dressing.
         CourseRoutes.build(canvas, ctx, floorAt, FLOOR_MAP_MARGIN, SPAWN_RUN, contentEnd);
+        lavaSea(canvas, ctx, floorAt, length);
         // Scenery last, so it can see the finished floor and fill in behind everything else.
         // Water courses are filled after everything else is placed.
         //
@@ -750,6 +751,51 @@ public final class CourseComposer {
     }
 
     /** Records the floor a stretch of course was designed around. */
+    /**
+     * One continuous lava sea under a volcano course, rather than a puddle under each gap.
+     *
+     * <p>The plan is emphatic and it was confirmed across worlds: the reference's lava is a band
+     * running the whole width of the level with the platforming built over it, not a series of
+     * unrelated pits. The difference is not decorative. A pit is a thing the player crosses and
+     * then stops thinking about; a sea is a condition the whole level is played above, and every
+     * gap in the floor is a window onto the same danger rather than a new one.
+     *
+     * <p>Laid at a single depth for the entire course: four below the <em>lowest</em> floor
+     * anywhere in it. A depth measured per column would follow the terrain up and down, which is a
+     * lava river with hills in it and reads as wrong immediately -- a liquid finds one level. It
+     * also guarantees the sea is under every walkable surface rather than intersecting one, which
+     * is what keeps this pass out of the reachability proof's way entirely.
+     *
+     * <p>Fills only what is still empty, and runs after the routes are built, so it can never
+     * replace geometry somebody else placed deliberately -- including the pit floors the segments
+     * lay themselves, which now simply become part of the same surface.
+     */
+    private static void lavaSea(CourseCanvas canvas, GenContext ctx, int[] floorAt, int length) {
+        if (ctx.theme() != CourseTheme.LAVA || ctx.palette().hazard() == null) {
+            return;
+        }
+        int lowest = Integer.MAX_VALUE;
+        for (int floor : floorAt) {
+            lowest = Math.min(lowest, floor);
+        }
+        if (lowest == Integer.MAX_VALUE) {
+            return;
+        }
+        int seaY = lowest - 4;
+        for (int x = -FLOOR_MAP_MARGIN; x < length + FLOOR_MAP_MARGIN; x++) {
+            for (int z = -ctx.halfWidth(); z <= ctx.halfWidth(); z++) {
+                if (canvas.isEmpty(x, seaY, z)) {
+                    canvas.set(x, seaY, z, ctx.palette().hazard());
+                }
+                // A floor under the sea, so it is a surface the player looks down at rather than
+                // a sheet hanging in the void with sky visible under it.
+                if (canvas.isEmpty(x, seaY - 1, z)) {
+                    canvas.set(x, seaY - 1, z, ctx.palette().fill());
+                }
+            }
+        }
+    }
+
     private static void recordFloor(int[] floorAt, int from, int width, int floorY, int length) {
         for (int x = from; x < from + width; x++) {
             int slot = x + FLOOR_MAP_MARGIN;

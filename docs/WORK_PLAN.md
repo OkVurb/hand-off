@@ -184,8 +184,21 @@ god rays raking down between the arches. Volcano levels set against sky. The the
 partition.
 
 **4.3 A lava sea, not lava pits.** *Confirmed across worlds.* A continuous band across the whole
-bottom with a bright crust line, crossed on narrow bridges — and it emits: fireballs out of its own
-surface, vertical geysers, horizontal jets from wall nozzles. Floor, fluid and room all emit.
+bottom, crossed on narrow bridges — and it emits: fireballs out of its own surface, vertical
+geysers, horizontal jets from wall nozzles. Floor, fluid and room all emit.
+
+*The sea is built.* One `lavaSea` pass lays it at a single depth for the whole course, four below
+the lowest floor anywhere in it — a per-column depth would follow the terrain up and down, which is
+a lava river with hills in it, and a liquid finds one level. It fills only what is still empty and
+runs after the routes, so it can never replace deliberate geometry, and being under every walkable
+surface keeps it out of the reachability proof entirely. A test asserts continuity rather than
+uniformity: set-piece segments build raised lava channels of their own, the reference has those
+too, and the finding was always about the bottom of the level rather than about every drop of lava
+in it.
+
+*Still missing:* the emission. Fireballs out of the surface, geysers and wall jets are all
+unbuilt — `PodobooEntity` is the closest thing and it is placed by segments rather than by the
+sea itself.
 
 **4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
 *moves* during the level. The strongest vindication of having built the fluid as a fluid.
