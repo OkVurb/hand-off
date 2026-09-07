@@ -946,3 +946,25 @@ Kept the newer one on the owner's call. It is also the better block: a real post
 board rather than a painted cube. The two segment placements were repointed to it and
 the old block, its texture entry, the now-dead signboard() generator helper and its
 three asset files are gone. 351 tests, 0 failures.
+
+## ParCool instead of building the verbs myself
+The playtest instance has ParCool, and it ships exactly what plan 6.7 was asking
+for: wall jump, wall slide, cling, pole climb, zipline, vault, roll. Most of 6.7
+was never terrain, it was verbs, and the terrain half (vines, barber poles,
+beanstalks) already existed.
+
+Built ParCoolBridge. It clears stamina inside courses via parcool:inexhaustible --
+Mario has never had a stamina bar -- and stands PlaneShift's own wall jump down when
+ParCool is loaded. That one is off by default and its own comment says why: in a
+course packed with blocks it fired on almost any airborne moment and read as a free
+double jump. ParCool's asks the player to actually be against a wall.
+
+Looked up by registry id rather than compiled against ParCool, so nothing has to
+ship somebody else's jar in this repo and the mod runs identically without it.
+
+Three failed attempts at a wall-kick chimney, recorded in BACKLOG: full-lane walls
+rejected 189 of 6000 courses, raised walls 201, a centre column 189 again. The
+constant count was the clue -- CourseReachability searches the x/y plane at z=0, so
+any block in the lane centre is a wall to it whatever is beside it. A chimney needs
+to be an alcove off the route, which is a segment shape the library does not have.
+Dropped rather than shipped half-working. 351 tests, 0 failures.

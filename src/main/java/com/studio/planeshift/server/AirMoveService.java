@@ -430,6 +430,12 @@ public final class AirMoveService {
         if (!PlaneShiftConfig.SERVER.wallJump.get()) {
             return;
         }
+        // ...and stand down entirely when ParCool is installed, whatever the config says. It has a
+        // wall jump that asks the player to actually be against a wall and facing it, which is the
+        // thing this one could never tell. Two wall jumps on one key is worse than either.
+        if (com.studio.planeshift.server.integration.ParCoolBridge.parkourAvailable()) {
+            return;
+        }
         if (player.getLastClientInput().jump() && velocity.y <= 0.0D) {
             player.setDeltaMovement(velocity.x, WALL_JUMP_STRENGTH, velocity.z);
             player.hurtMarked = true;

@@ -283,8 +283,17 @@ see because the chain is drawn, and which is answered by *position* rather than 
 segment is wider than its reach and the coins are inside it, because a hazard with a free route
 past it is a hazard nobody looks at.
 
-**6.7 Traversal the mod lacks.** Swingable ropes, climbable vines, barber-pole spirals (the stripe
-animates the climb without animating the player), spider-web mesh, beanstalks.
+**6.7 Traversal the mod lacks.** Climbable vines, barber poles and beanstalks all exist —
+`COURSE_VINE`, `COURSE_CLIMB_POLE` and `SECRET_VINE`, which sprouts one. What was actually missing
+was not terrain but **verbs**, and the modpack already has them: ParCool ships wall jump, wall
+slide, cling, pole climb, zipline, vault and roll. Rebuilding those as blocks would be a worse copy
+of a mod the player is already running.
+
+*So the division is:* ParCool owns what the player can do, PlaneShift owns the terrain that asks
+for it, and `ParCoolBridge` is the seam. It clears stamina inside courses (Mario has never had a
+stamina bar, and a wall kick that fails because a meter emptied is a death the player cannot read)
+and stands PlaneShift's own wall jump down when ParCool is present — that one is off by default
+anyway, its own comment admitting it reads as a free double jump.
 
 **6.8 Platforms that are enemies.** Ghost-house platforms are carried by Boos. A moving platform
 does not have to be a block.

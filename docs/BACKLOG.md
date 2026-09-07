@@ -235,3 +235,11 @@ cannon; the star-coin gate on the final world still applies, because a shortcut 
 sequence is not the same as a way around the one requirement the whole run is built on.
 
 - ~~Title cards: decide between syncing a course id and syncing a `Component`.~~ Decided and built: neither. The server sends the two finished display strings, so there is no second copy of the world table to drift.
+
+- **A wall-kick chimney needs an alcove, not a corridor.** Tried three shapes for a two-faced shaft
+  ParCool's wall jump could climb: full-lane walls (189 of 6000 courses unreachable), the same
+  raised above head height (201), and a single centre column (189 again). The constant is the
+  clue -- `CourseReachability` searches the x/y plane at z=0, so *any* block in the lane centre is a
+  wall to it regardless of what is beside it. A chimney has to be built off the route as an alcove
+  the player enters and leaves from the same side, which is a segment shape the library does not
+  have yet. Not attempted further; the ParCool integration itself does not depend on it.
