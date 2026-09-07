@@ -3,6 +3,7 @@ package com.studio.planeshift.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.studio.planeshift.client.gui.PlaneShiftGui;
 import com.studio.planeshift.common.course.CourseProgress;
+import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.course.CourseState;
 import com.studio.planeshift.common.course.WorldDefinition;
 import com.studio.planeshift.common.course.WorldMapLayout;
@@ -69,8 +70,38 @@ public class CourseMapScreen extends Screen {
     private static final int CANNON = 0xFF_3C4450;
     private static final int TOKEN = 0xFF_E8342E;
 
-    private static final int GRASS_TOP = 0xFF_66C24E;
-    private static final int GRASS_BOTTOM = 0xFF_3E8F38;
+    /**
+     * Ground colours per world.
+     *
+     * <p>Every map used to be the same grassy field, including the volcano's and the ice world's.
+     * The reference builds each world map out of that world's own materials, and the reason is not
+     * decorative: the map is the first thing seen after clearing the previous castle, so it is
+     * where the next world introduces itself. A green field in front of World 6 says the game
+     * forgot where it was.
+     */
+    static int groundTop(CourseTheme theme) {
+        return switch (theme) {
+            case DESERT -> 0xFF_E3C878;
+            case SNOW -> 0xFF_DCEAF5;
+            case LAVA -> 0xFF_8C4A32;
+            case UNDERGROUND -> 0xFF_5A5348;
+            case GHOST_HOUSE -> 0xFF_6A5A82;
+            case WATER -> 0xFF_4FA7A0;
+            default -> 0xFF_66C24E;
+        };
+    }
+
+    static int groundBottom(CourseTheme theme) {
+        return switch (theme) {
+            case DESERT -> 0xFF_B9954C;
+            case SNOW -> 0xFF_A8C4DC;
+            case LAVA -> 0xFF_4E2418;
+            case UNDERGROUND -> 0xFF_332F28;
+            case GHOST_HOUSE -> 0xFF_3B3050;
+            case WATER -> 0xFF_246E72;
+            default -> 0xFF_3E8F38;
+        };
+    }
 
     private int worldIndex;
     private int selected;
@@ -358,14 +389,71 @@ public class CourseMapScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // A grassy field rather than the shared themed panel: this screen is a place, and the
-        // background is most of what says so.
-        graphics.fillGradient(0, 0, this.width, this.height, GRASS_TOP, GRASS_BOTTOM);
-        for (int i = 0; i < 14; i++) {
+        // A field rather than the shared themed panel: this screen is a place, and the background
+        // is most of what says so. Which field depends on the world.
+        CourseTheme theme = world().primaryTheme();
+        graphics.fillGradient(0, 0, this.width, this.height, groundTop(theme), groundBottom(theme));
+        drawScenery(graphics, theme);
+    }
+
+    /**
+     * Scenery scattered behind the node graph.
+     *
+     * <p>Placed from a fixed arithmetic sequence rather than a random source, so the map looks the
+     * same every time it is opened. A map whose furniture moves between visits is one nobody can
+     * build a mental image of, and the whole argument for a map over a list of buttons is that it
+     * can be pictured.
+     *
+     * <p>Deliberately drawn from flat rectangles in the screen's own idiom rather than as textures.
+     * Every shape here is two or three fills; a map that needed an art pipeline to gain a tree
+     * would not have gained one tonight.
+     */
+    private void drawScenery(GuiGraphics graphics, CourseTheme theme) {
+        int count = 14;
+        for (int i = 0; i < count; i++) {
             int x = (i * 137) % Math.max(1, this.width);
             int y = 40 + (i * 89) % Math.max(1, this.height - 80);
-            graphics.fill(x, y, x + 10, y + 3, 0x22_FFFFFF);
-            graphics.fill(x + 3, y - 2, x + 8, y + 1, 0x22_FFFFFF);
+            int size = 6 + (i * 5) % 7;
+            switch (theme) {
+                // Dunes: low, wide, and paler than the ground so they read as light on sand.
+                case DESERT -> {
+                    graphics.fill(x, y + size, x + size * 3, y + size + 3, 0x33_FFF0C0);
+                    graphics.fill(x + size, y + size - 2, x + size * 2, y + size + 1, 0x33_FFF0C0);
+                }
+                // Ice floes, and the darker water they sit in.
+                case SNOW -> {
+                    graphics.fill(x, y, x + size * 2, y + size, 0x55_FFFFFF);
+                    graphics.fill(x + 1, y + 1, x + size * 2 - 1, y + size - 1, 0x44_CFE7FF);
+                }
+                // Volcano cones with a bright crater. Two triangles would be better; two stacked
+                // rectangles are what this screen's vocabulary has, and at this size they read.
+                case LAVA -> {
+                    graphics.fill(x, y + size, x + size * 2, y + size + 4, 0x66_3A1C12);
+                    graphics.fill(x + size / 2, y + size / 2, x + size + size / 2, y + size + 1,
+                            0x66_5A2A18);
+                    graphics.fill(x + size - 1, y + size / 2 - 1, x + size + 2, y + size / 2 + 1,
+                            0x88_FF8844);
+                }
+                // Bare trees: a trunk and two branches, no canopy.
+                case GHOST_HOUSE -> {
+                    graphics.fill(x + size / 2, y, x + size / 2 + 2, y + size * 2, 0x66_2A2038);
+                    graphics.fill(x, y + 2, x + size / 2, y + 4, 0x66_2A2038);
+                    graphics.fill(x + size / 2 + 2, y + 5, x + size, y + 7, 0x66_2A2038);
+                }
+                // Stalagmites, rising from the bottom of their slot rather than hanging.
+                case UNDERGROUND -> graphics.fill(x, y + size, x + size, y + size * 2, 0x55_7A7060);
+                // Weed beds and a bubble.
+                case WATER -> {
+                    graphics.fill(x, y + size, x + 2, y + size * 2, 0x55_2E8F6A);
+                    graphics.fill(x + 4, y + size + 2, x + 6, y + size * 2, 0x55_2E8F6A);
+                    graphics.fill(x + size, y, x + size + 2, y + 2, 0x44_CFF0FF);
+                }
+                // Clouds, as before. The grass world keeps exactly what it had.
+                default -> {
+                    graphics.fill(x, y, x + 10, y + 3, 0x22_FFFFFF);
+                    graphics.fill(x + 3, y - 2, x + 8, y + 1, 0x22_FFFFFF);
+                }
+            }
         }
     }
 

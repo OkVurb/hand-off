@@ -283,3 +283,28 @@ sync the course id and translate client-side, or sync a Component. That is a UI 
 not a plumbing one.
 
 304 tests, no failures, counted from XML.
+
+## Iteration 13
+
+World map decoration, plan 7.3. The map background was one hardcoded grassy gradient for every
+world -- the volcano's map and the ice world's map were both green fields. The reference builds each
+map from its own world's materials, and the reason is not decorative: the map is the first thing
+seen after clearing the previous castle, so it is where the next world introduces itself. A green
+field in front of World 6 says the game forgot where it was.
+
+Six ground palettes and six kinds of scenery: dunes, ice floes, volcano cones with a lit crater,
+bare trees, stalagmites, weed beds. All drawn from flat rectangles in the screen's existing idiom
+rather than as textures -- every shape is two or three fills, and a map that needed an art pipeline
+to gain a tree would not have gained one tonight.
+
+The scenery comes from a fixed arithmetic sequence rather than a random source, so the map is
+identical every time it is opened. A map whose furniture moves between visits is one nobody can
+build a mental image of, and being picturable is the whole argument for a map over a list of
+buttons.
+
+Added MapGroundColoursTest, which pins the two claims that can be checked without rendering: the
+palettes are genuinely distinct, and each darkens downward so the field reads as ground rather than
+ceiling. Nothing here proves it looks good -- rendering is not tested and a screen draws a wrong
+colour perfectly happily. That part still needs eyes.
+
+306 tests, no failures, counted from XML.
