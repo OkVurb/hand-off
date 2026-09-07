@@ -4,7 +4,7 @@ Built from a sampled walkthrough recording (4h17m at one frame per six seconds, 
 sheets), the owner's screenshots, and the wiki page for that game. Observations are ours, in our
 own words, and feed original generated art and original code.
 
-**Method note.** Thirty-eight of the 108 sheets read so far, spread to cover every world and level
+**Method note.** Forty of the 108 sheets read so far, spread to cover every world and level
 type; more being worked through. An earlier draft of this plan was written off five sheets and
 called complete, which was too thin a base for the word. Items below are marked *confirmed* where a
 later sheet independently repeated an earlier read.
@@ -116,10 +116,10 @@ like the level interiors it sits between. A shop reads as somewhere you have arr
 **A20. Platforms are not all cubes.** Thin ledges with a dark inset centre, and grey metal pole
 assemblies carrying switch blocks. Two shapes that are clearly furniture rather than terrain.
 
-**A21. There is a third liquid, and its surface is not a flat line.** A black tar pool hangs in
-rounded lobes along its top edge, like something too thick to level off. Two fluids are registered;
-this is a third, and it is the one that argues hardest that a fluid surface is art rather than a
-plane — lava has a bright crust line, water has a clean rippling line, tar drips.
+**A21. There are four liquids, and each has its own surface treatment.** Lava carries a bright
+crust line, water a clean rippling one, tar hangs in rounded drip lobes, and a purple poison swamp
+meets the terrain in a fringe of pink crystalline spikes. Four fluids, four different edges, no
+shared flat plane between them — whatever draws the top of a fluid has to be per-fluid art. Two are registered; two are not.
 
 **A22. Rope is walkable terrain, and it sags.** A whole sky world is built on cables strung
 between anchor posts that hang in a catenary and **deform under the player's weight**. This is the
@@ -134,6 +134,16 @@ spread at all — deliberately, to keep a placed pool where the generator put it
 non-spreading fluid cannot fall. A column of source blocks would look right and cost nothing, but it
 is worth being clear that this is a workaround for a property chosen for other reasons, not the
 fluid doing what fluids do.
+
+**A24. Forest ground is stacked cut logs.** The terrain is felled timber seen end-on, with
+concentric growth rings on every cut face and moss capping the top. A theme identity carried
+entirely by one block's face art, which is the cheapest kind there is.
+
+**A25. Ice is translucent, and its backdrop is nothing at all.** Cyan ice blocks let the dark
+behind them show through, and the ice caves draw **no background** — black with faint mist. The
+ice reads precisely because the void behind it is empty. `backdrop()` currently switches between a
+decorated wall and a silhouette skyline for every theme; drawing nothing is a third case, and here
+it is the right one.
 
 **A4. Terrain is built from mixed block sizes.** *Confirmed repeatedly, and it is the single most
 visible thing in the reference.* Desert walls are laid up from big slabs, half-slabs and squares in
