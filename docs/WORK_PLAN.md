@@ -346,10 +346,36 @@ moon over teal terrain.
 **5.3 A world is one hue family plus one or two rare accents.** *Confirmed hard by the gold
 underground*, one olive-and-gold family across walls, ledges, pipes and terrain.
 
-*Partial, 2026-09-07:* cave structural accents and ledges now use their world's existing sandstone,
-ice, basalt or ghost-beam material. Previously only floors/fill followed the world while these
-repeated surfaces reverted to shared brick/castle blocks. This does not finish the entry: pipe,
-prop and background families still need a joint visual review before moving to 5.7.
+*Done, 2026-09-07.* Reached in three passes, all of them measured off the shipped PNGs rather than
+argued from a colour table, because the palette lives in `BlockTextureGen.py` and the sheet is what
+the player looks at.
+
+- **Cave structure.** Structural accents and ledges use their world's existing sandstone, ice,
+  basalt or ghost-beam material. Previously only floors/fill followed the world while these
+  repeated surfaces reverted to shared brick/castle blocks.
+- **Terrain.** `COURSE_CASTLE_BLOCK` measures hue 223 and was the floor of both the volcano and the
+  ghost house; both now use their own rock and timber. Basalt was also retinted warm, 58,54,62 to
+  62,48,46. Water's fill was `COURSE_DEEPSTONE` at hue 232 — cave rock under a grass lid, 176
+  degrees across one silhouette — and is now dirt, which is what the entry's own "water reuses the
+  land blocks" decision always implied.
+- **Background and props.** The indoor back wall is the largest surface in an indoor course and was
+  the last thing not following the world: its own comment said "in the room's own colour" while the
+  code said castle stone for every theme. Ghost house now walls in its structural timber, the
+  volcano in basalt. The other three wall materials were already in family and were left alone.
+  The outdoor far layer is **exempt by design** — `distant()` hazes it toward the sky on purpose,
+  so its hue is meant to leave the terrain family; that is aerial perspective, not a violation.
+- **Pipes.** Reviewed and correct as they stood. Four sit in their world's family (desert 43/48,
+  snow 203/215, lava 8/2), water's magenta 319 belongs to its coral accent 336, and the ghost-house
+  magenta and grass-world green 113 are this entry's "rare accents" doing their job. Measurements
+  recorded in `SegmentLibrary.pipe` so they are not taken again.
+
+Guarded by `HueFamilyTest`, two cases, both verified by deliberate breakage.
+
+*Two defects found while doing this, both recorded in code:* `COURSE_HEDGE_DISTANT_WARM` and
+`COURSE_WOOD_DISTANT_WARM` are registered, drawn and unreachable, because the branch selecting them
+fires on `LAVA` and `LAVA` draws a back wall rather than a skyline. And `SegmentLibrary.pipe` opened
+by reading `Colour.values()` into an unused local under a comment claiming pipe colour came from the
+course seed; neither the local nor the seeding ever did anything.
 
 **5.4 Each fluid has its own surface treatment.** Four liquids, four different edges: lava has a
 bright crust, water a clean ripple, tar hangs in drip lobes, poison grows pink crystalline spikes.
@@ -514,17 +540,15 @@ world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progre
 | 2 — corrections | **Complete.** 2.5 turned out to be a false premise; a gametest says so. |
 | 3 — bosses | **Complete.** |
 | 4 — structure | 4.1–4.3, 4.5, 4.6 done. **Left: 4.4, 4.7, 4.8.** 4.9 out of scope by decision. |
-| 5 — art direction | 5.1, 5.5, 5.6, 5.8 done. **Left: 5.2 (partly), 5.3, 5.4, 5.7, 5.9, 5.10.** |
+| 5 — art direction | 5.1, 5.3, 5.5, 5.6, 5.8 done. **Left: 5.2 (partly), 5.4, 5.7, 5.9, 5.10.** |
 | 6 — missing content | 6.1, 6.4–6.9 done. **Left: 6.2, 6.3.** |
 | 7 — interface | 7.1, 7.2, 7.5–7.7 done. **Left: 7.3, 7.4 (half), 7.8, 7.9.** |
 
 ### What to do next, and why in this order
 
-1. **5.3 — one hue family per world.** Cheapest thing with the widest reach: it is a palette table,
-   no new mechanics, and it is the entry the reference confirms hardest. Everything else in §5 looks
-   better once the families are right.
+1. ~~**5.3 — one hue family per world.**~~ **Done 2026-09-07**, see the entry in §5.
 2. **5.7 — pattern on the background hills.** `profile()` already gives each theme its own silhouette
-   shape; this adds striping inside it. Same file, same pass, no new systems.
+   shape; this adds striping inside it. Same file, same pass, no new systems. **Next.**
 3. **4.8 — the rest of the parts kit.** Post-and-beam scaffolding, thin ledges with inset centres,
    capsule beams, grate panels. Each is a segment or a block, none of them interact, and they can be
    done one at a time and shipped one at a time.

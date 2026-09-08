@@ -345,8 +345,8 @@ CONNECTED = {
     "course_sandstone": (lambda: coursed_rubble((214, 182, 118), 81, mortar=0.78,
                                                 light=False), (214, 182, 118), {}),
     # Volcanic rock, with a hot crust where it is exposed to the air above.
-    "course_basalt": (lambda: drift((58, 54, 62), 83, flecks=(0.86, 1.12)),
-                      (58, 54, 62), {"cap": (128, 64, 40), "cap_rows": 2}),
+    "course_basalt": (lambda: drift((62, 48, 46), 83, flecks=(0.86, 1.12)),
+                      (62, 48, 46), {"cap": (128, 64, 40), "cap_rows": 2}),
     # Cave stone: nothing on top, but stalactite teeth where a ledge overhangs.
     "course_deepstone": (lambda: drift((74, 76, 88), 84, flecks=(0.88, 1.10)),
                          (74, 76, 88), {"fringe": (108, 112, 128), "fringe_depth": 3}),
@@ -1271,7 +1271,7 @@ def build():
     # perspective. Two materials in one frame drawn by two different hands.
     out["course_sandstone"] = masonry((214, 182, 118), 81, course=4, mortar=0.78)
     out["course_desert_brick"] = masonry((186, 118, 74), 82, course=4, mortar=0.70)
-    out["course_basalt"] = drift((58, 54, 62), 83, flecks=(0.86, 1.12))
+    out["course_basalt"] = drift((62, 48, 46), 83, flecks=(0.86, 1.12))
     out["course_deepstone"] = drift((74, 76, 88), 84, flecks=(0.88, 1.10))
     out["course_ghost_beam"] = planks((84, 62, 48), 85)
 

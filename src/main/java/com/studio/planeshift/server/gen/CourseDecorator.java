@@ -197,7 +197,7 @@ public final class CourseDecorator {
      */
     private static void backWall(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                                  int from, int to, int[] floorAt, int margin) {
-        BlockState stone = ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState();
+        BlockState stone = backWallMass(ctx.theme());
         BlockState opening = ModBlocks.COURSE_LATTICE.get().defaultBlockState();
         BlockState board = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
         BlockState check = ModBlocks.COURSE_TILE.get().defaultBlockState();
@@ -238,6 +238,35 @@ public final class CourseDecorator {
                 canvas.setIfEmpty(x, floor + h, BACKDROP_Z, here);
             }
         }
+    }
+
+    /**
+     * The dominant material of an indoor back wall, in the room's own colour.
+     *
+     * <p>§5.3. The prose four methods up already said "in the room's own colour"; the code said
+     * {@code COURSE_CASTLE_BLOCK} for every indoor theme, which measures hue 223 -- blue-grey.
+     * Against a ghost house floored in timber at hue 30 that is 193 degrees of disagreement, and
+     * against a volcano floored in basalt at hue 8 it is 145, so both rooms were a cold stone box
+     * with the world's own materials stuck to the front of it. The wall is the largest single
+     * surface in an indoor course and it was the one thing not following the world.
+     *
+     * <p>Only the wall mass moves. The other three materials were already in family and stay:
+     * boarding at 30, the lattice opening at 31, and the check tile is achromatic so it belongs to
+     * every family. That is why this is a one-material change rather than a new tileset.
+     *
+     * <p>The motifs stay distinct because they were never distinguished by hue -- boarding is
+     * planks, the wall is masonry, the check is a two-block chequer. Texture carries the rhythm.
+     */
+    static BlockState backWallMass(CourseTheme theme) {
+        return switch (theme) {
+            // Its own structural timber. A ghost house in the reference is a wooden building.
+            case GHOST_HOUSE -> ModBlocks.COURSE_GHOST_BEAM.get().defaultBlockState();
+            // The rock the world is made of, matching the palette fix in GenContext.
+            case LAVA -> ModBlocks.COURSE_BASALT.get().defaultBlockState();
+            // A castle really is stone, so the shared block stays the default for anything that
+            // reaches this wall without a material of its own.
+            default -> ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState();
+        };
     }
 
     /**
@@ -337,6 +366,18 @@ public final class CourseDecorator {
      * <p>Split out because the haze colour is a property of the air in the room, not of the prop:
      * a hill and a tree standing at the same distance must be washed by the same air or the depth
      * cue stops working.
+     *
+     * <p><b>The warm branch is currently unreachable.</b> It is selected on {@code LAVA}, but
+     * {@link #backdrop} sends {@code LAVA} to {@link #backWall} and only the {@code skyline} path
+     * reaches {@link #hill} and {@link #tree}, which are this method's only callers. So
+     * {@code COURSE_HEDGE_DISTANT_WARM} and {@code COURSE_WOOD_DISTANT_WARM} are registered,
+     * drawn and never placed. Kept rather than deleted because an outdoor volcano exterior is a
+     * plausible variant and the art already exists; recorded here so the next reader does not go
+     * looking for why a volcano's far hills are the wrong colour when it has no far hills at all.
+     *
+     * <p>Deliberately not judged by {@code HueFamilyTest}: {@code distant()} hazes the far layer
+     * toward the sky on purpose, so its hue is meant to leave the terrain family. Aerial
+     * perspective is the mechanism, not a violation of it.
      */
     private static BlockState distantMass(GenContext ctx) {
         return (ctx.theme() == CourseTheme.LAVA

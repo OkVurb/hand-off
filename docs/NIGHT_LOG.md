@@ -1282,3 +1282,55 @@ blockstates do carry exactly sixteen level=N variants, and LiquidBlock geometry
 comes from FluidState, so identical baked models are correct there.
 
 Full build green. 377 unit tests, 10 gametests, 0 failures. Still no runtime playtest.
+
+## Iteration 33
+
+WORK_PLAN 5.3, finished. Inherited Codex's uncommitted checkpoint -- warm basalt, the volcano and
+ghost house moved off castle stone, and a new HueFamilyTest -- rather than starting again.
+
+Audited the inherited test before trusting it, and it was measuring almost nothing. It resolved a
+block's texture by assuming the file was named after the block, and returned null when the guess
+missed; the caller read null as "grey, skip". On this codebase the guess misses often --
+course_dirt_block is drawn with course_dirt.png, COURSE_EMBER_BLOCK registers as
+course_magma_block -- so both were silently unmeasured. A check that looks at nothing and passes is
+worse than no check, because it reports safety it never established. Now resolved through the
+block's model JSON, failing loudly on anything unresolvable. Proved it by pointing
+course_dirt_block at the blue-grey cave rock: GRASS then fails at 176 degrees, where before it
+passed.
+
+With the test honest, the offender it had been hiding showed up immediately. Water's fill was
+deepstone at hue 232 under a grass surface at 48 -- cave wall under a grass lid, 176 degrees in one
+silhouette. Dirt now, which is what that palette's own "water reuses the land blocks" comment had
+always implied it should be.
+
+Then the half of the entry the palette could not reach. The indoor back wall is the largest single
+surface in an indoor course, and its own comment said "in the room's own colour" while the code
+said castle stone for every theme: 193 degrees against a ghost house floored in timber, 145 against
+a volcano floored in basalt. Both rooms were a cold stone box with the world's materials stuck to
+the front. Ghost house walls in its structural timber now, the volcano in basalt. Only the wall mass
+moved -- boarding at 30, lattice at 31 and an achromatic check tile were already in family, which is
+why this is one material and not a tileset. The motifs still read apart because they were never
+told apart by hue; planks, masonry and a two-block chequer are different textures.
+
+Reviewed pipes and changed none of them, which is the useful outcome. Four sit in their world's
+family already (desert 43/48, snow 203/215, lava 8/2), water's magenta 319 belongs to its coral
+accent 336, and ghost-house magenta with the grass world's green 113 are the entry's own "one or
+two rare accents" doing the job. Forcing a pipe into family would remove the contrast it exists
+for. Measurements written into SegmentLibrary.pipe so the next reader does not take them again. The
+outdoor far layer is exempt for the same kind of reason: distant() hazes it toward the sky on
+purpose, so leaving the terrain family is the mechanism, not a breach of it.
+
+Two things found in passing, recorded rather than quietly patched. COURSE_HEDGE_DISTANT_WARM and
+COURSE_WOOD_DISTANT_WARM are registered, drawn and unreachable -- the branch selecting them fires
+on LAVA, and LAVA draws a back wall, never a skyline, so the volcano has no far hills to be the
+wrong colour. Kept, because an outdoor volcano is plausible and the art exists; the comment now
+says so, which is cheaper than someone rediscovering it. And SegmentLibrary.pipe opened by reading
+Colour.values() into an unused local, under a comment claiming pipe colour came from the course
+seed. Neither the local nor the seeding ever did anything.
+
+Both new assertions verified by deliberate breakage, not by watching them pass.
+
+Full build green. 379 unit tests, 0 failures, counted from the result XML. No gametest run, no
+server run -- no data-pack files were touched -- and no client run. Every claim above is measured
+hue arithmetic against the shipped sheets. Whether the volcano now reads hot is still a question
+for a controller, and nothing here answers it.

@@ -117,16 +117,27 @@ public final class SegmentLibrary {
     }
 
     /**
-     * A pipe in a colour chosen from the course seed.
+     * A pipe in its world's colour.
      *
-     * <p>Deterministic rather than random per placement, so a course looks the same every time it
-     * is generated -- and stable within a course, so two pipes in one level are the same colour
-     * unless a segment deliberately asks otherwise. The reference uses colour to tell destinations
-     * apart, which only works if the colour means something; recolouring every pipe independently
-     * would make it mean nothing.
+     * <p>One colour per theme, so a pipe reads as belonging to the world it is in, and so two
+     * pipes in one level match. The reference uses colour to tell destinations apart, which only
+     * works if the colour means something; recolouring every pipe independently would make it mean
+     * nothing.
+     *
+     * <p>The previous version of this comment said the colour was "chosen from the course seed"
+     * and the method opened by reading {@code Colour.values()} into an unused local. Neither was
+     * true -- the switch below has always been the whole implementation. Both removed rather than
+     * left to imply a seeding mechanism that does not exist.
+     *
+     * <p>§5.3 review, measured off the shipped sheets: four of these sit inside their world's own
+     * hue family -- desert sand 43 against a yellow pipe 48, snow ice 203 against blue 215, lava
+     * basalt 8 against red 2. Water's magenta at 319 belongs to that world's coral accent at 336.
+     * Ghost house magenta and the grass world's green pipe at 113 are the entry's "one or two rare
+     * accents" doing their job: a pipe is a landmark and is allowed to be the thing that pops.
+     * Recorded here so this does not get re-measured, and deliberately not asserted in
+     * {@code HueFamilyTest} -- forcing a pipe into family would remove the contrast it exists for.
      */
     private static BlockState pipe(GenContext ctx) {
-        WarpPipeBlock.Colour[] all = WarpPipeBlock.Colour.values();
         WarpPipeBlock.Colour colour = switch (ctx.theme()) {
             // Each theme leans on one colour, so a pipe reads as belonging to the world it is in.
             case DESERT -> WarpPipeBlock.Colour.YELLOW;

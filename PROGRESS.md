@@ -6,15 +6,65 @@
 
 ## Current State
 
-**Last updated:** 2026-09-07 (Codex paused at owner request)
-**Build status:** RED — `checkNoRawCuboidScan` flags existing `ToadBoxBlock.betweenClosed`; 377 unit tests rerun, zero failures/errors. See `docs/HANDOFF_CLAUDE.md`.
-**GameTest status:** GREEN — `runGameTestServer` reports all 7 required tests passed
-**Server launch:** GREEN — `.\gradlew runServer` reaches `Done (6.296s)!`
-**Client launch:** GREEN — course 1 generated and rendered with the fixed side camera and skybox
+**Last updated:** 2026-09-07 (Devin — §5.3 finished in the main tree)
+**Build status:** GREEN — full `.\gradlew build` passes; 379 unit tests, zero failures/errors
+**GameTest status:** Not run this session. The 7 passing gametests are historical, not re-verified.
+**Server launch:** Not run this session; no `src/main/resources/data/` files were touched.
+**Client launch:** Not run this session. **Nothing in §5.3 has been looked at in-game.**
 **Open PRs:** None
-**Open branches:** `devin/work`
+**Open branches:** `devin/work`, `claude/work`
 
 ## What Was Done This Session
+
+### Devin — WORK_PLAN §5.3 finished (one hue family per world)
+
+Worked in the main tree at `C:\Dev\PlaneShift` on `main`. Picked up Codex's uncommitted checkpoint
+work rather than starting fresh, and finished the entry.
+
+**The stale handoff is resolved.** `docs/HANDOFF_CLAUDE.md` and the Codex prompt both describe a red
+build blocked on `ToadBoxBlock.betweenClosed`. That was fixed and pushed in `fb336e1c`, along with
+five pre-existing `checkTextureAssets` failures. `main` and `origin/main` are level.
+
+**Found and fixed the defect in the inherited test.** `HueFamilyTest` resolved a block's texture by
+assuming it was named after the block, and returned null when the guess missed — which the caller
+treated as "grey, skip it". On this codebase that guess misses often: `course_dirt_block` is drawn
+with `course_dirt.png`, and `COURSE_EMBER_BLOCK` is registered as `course_magma_block`. Both were
+silently unmeasured, so the check reported safety it had never established. It now resolves textures
+through the block's model JSON and fails loudly on anything unresolvable. Proved by pointing
+`course_dirt_block` at the blue-grey cave rock and confirming GRASS then fails at 176 degrees.
+
+**Then found the offender that had been hiding behind it.** Water's fill was `COURSE_DEEPSTONE` at
+hue 232 under a grass surface at 48 — cave wall under a grass lid, 176 degrees in one silhouette.
+Now dirt, which is what that palette's own "water reuses the land blocks" comment always implied.
+
+**Finished the background/prop half of the entry.** The indoor back wall is the largest single
+surface in an indoor course, and its own comment said "in the room's own colour" while the code
+said `COURSE_CASTLE_BLOCK` for every theme. Against a ghost house floored in timber that is 193
+degrees of disagreement; against a volcano floored in basalt, 145. Ghost house now walls in its
+structural timber and the volcano in basalt; the other three wall materials measured in-family and
+were left alone. Guarded by a second `HueFamilyTest` case, verified by deliberate breakage.
+
+**Reviewed pipes and changed nothing.** Four sit in their world's family (desert 43/48, snow
+203/215, lava 8/2), water's magenta 319 belongs to its coral accent 336, and ghost-house magenta
+plus the grass world's green 113 are the entry's "rare accents" working as intended. Measurements
+recorded in `SegmentLibrary.pipe` so nobody measures them again. The outdoor far layer is exempt by
+design: `distant()` hazes it toward the sky on purpose.
+
+**Two defects found in passing, both recorded in code rather than quietly patched:**
+- `COURSE_HEDGE_DISTANT_WARM` and `COURSE_WOOD_DISTANT_WARM` are registered, drawn and
+  **unreachable** — the branch picking them fires on `LAVA`, and `LAVA` draws a back wall, never a
+  skyline. Kept, because an outdoor volcano is a plausible variant and the art exists.
+- `SegmentLibrary.pipe` read `Colour.values()` into an unused local beneath a comment claiming pipe
+  colour came from the course seed. Neither was ever true. Both removed.
+
+**What to do next:** §5.7, pattern on the background hills — `profile()` in `CourseDecorator`
+already gives each theme its own silhouette, so this adds striping inside an existing shape.
+Then §4.8 parts kit and §7.9 shop architecture.
+
+**Shared files touched** (for whoever is mid-way through one): `GenContext.java`,
+`CourseDecorator.java`, `SegmentLibrary.java`, `tools/BlockTextureGen.py`, the `course_basalt`
+textures, and `docs/WORK_PLAN.md`. **Nothing here has been played.** The whole entry is measured
+hue arithmetic and a green build; whether the volcano now reads hot is a question for a controller.
 
 ### Codex — partial world palette pass, paused
 

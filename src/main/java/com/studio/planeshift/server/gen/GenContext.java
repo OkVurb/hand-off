@@ -195,11 +195,19 @@ public final class GenContext {
                         ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_SNOW_BLOCK.get().defaultBlockState(),
                         null);
+                // Volcanic rock underfoot, not castle stone.
+                //
+                // §5.3: a world is one hue family. Measured off the shipped sheets, the castle
+                // block sits at hue 223 -- blue-grey -- so a volcano floored with it was cool
+                // structure under a hot sky, which is the one thing this entry says the reference
+                // never does. Basalt is the rock this world is made of and now reads warm; the
+                // castle block stays where a castle actually is, which is the boss arena and the
+                // bridge segments that build one.
                 case LAVA -> new Palette(
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_BASALT.get().defaultBlockState(),
                         ModBlocks.COURSE_BASALT.get().defaultBlockState(),
                         ModBlocks.COURSE_EMBER_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_BASALT.get().defaultBlockState(),
                         ModFluids.LAVA_BLOCK.get().defaultBlockState());
                 case UNDERGROUND -> new Palette(
                         ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
@@ -212,9 +220,17 @@ public final class GenContext {
                 // makes them read as submerged is the light shafts, the fluid, the coral and the
                 // cast, none of which is terrain art. Giving water its own tileset would have been
                 // the expensive way to arrive at a worse-matched result.
+                //
+                // §5.3: the fill was deepstone, which broke the sentence above rather than
+                // following it. Deepstone is the rock a cave is cut through -- hue 232, the same
+                // blue-grey family as the castle block -- so every bank the player dug past was
+                // cave wall under a grass lid, 176 degrees apart in one silhouette. Dirt is what
+                // is under grass in the grass world, and this world is built from the grass
+                // world's blocks by the decision recorded directly above. The coral accent is
+                // where water is allowed to stop looking like land, and it stays.
                 case WATER -> new Palette(
                         ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_DEEPSTONE.get().defaultBlockState(),
+                        ModBlocks.COURSE_DIRT_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_CORAL.get().defaultBlockState(),
                         ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
                         null);
@@ -227,11 +243,15 @@ public final class GenContext {
                         ModBlocks.COURSE_TRIM.get().defaultBlockState(),
                         ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
                         null);
+                // Boards, not masonry. A ghost house in the reference is a wooden building, and
+                // the same measurement applies: floored with the blue-grey castle block it was a
+                // cold stone room with warm timber decoration stuck to it. Wood was already the
+                // fill; making it the floor as well is what turns three materials into a family.
                 case GHOST_HOUSE -> new Palette(
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_GHOST_BEAM.get().defaultBlockState(),
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState(),
                         null);
             };
         }
