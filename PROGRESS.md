@@ -10,7 +10,9 @@
 **Build status:** GREEN — full `.\gradlew build` passes; 383 unit tests, zero failures/errors
 **GameTest status:** 11 passing, re-verified this session.
 **Server launch:** Not run this session.
-**Client launch:** Not run this session. **None of sections 4–7 has been looked at in-game.**
+**Client launch:** RUN and clean — block atlas stitched, sixteen atlases, zero `Missing model` /
+`No model loaded` / `Unable to load` / `Failed to load`. Every block and entity added this session
+resolves its art. **Loading is not playing: none of sections 4–7 has been *played*.**
 **Open PRs:** None
 **Open branches:** `devin/work`, `claude/work`
 

@@ -1509,3 +1509,21 @@ either side, and it is the owner's call. Written up in BACKLOG.
 
 385 tests, 11 gametests, full build green. Still unplayed, which is now the largest
 thing left by a wide margin.
+
+## Finally launched the client
+Section 8's list is exhausted, so this iteration did the thing the brief says matters
+more than the next feature: loaded the real client and looked at the assets.
+
+Fifteen-odd blocks went in this session -- tufts, grate, ledge, log ends, the hedge
+band, three bonus-room materials, castle glass -- plus new entity rigs and textures,
+and not one of them had ever been through a client load. The unit suite structurally
+cannot see that class of bug: a model pointing at a texture that does not exist passes
+every test and then renders as the missing-model placeholder.
+
+Result: clean. The block atlas stitched at 2048x2048, sixteen atlases built, and zero
+matches for Missing model, No model loaded, Unable to load or Failed to load. The mod
+loads and its art resolves.
+
+What this still does not tell anyone is whether the game is any good. Loading is not
+playing, and nothing in sections 4 to 7 has been played. That needs a person at the
+controls, which is where this stops being something I can do alone.
