@@ -49,6 +49,13 @@ public final class CourseDecorator {
     /** How far apart decoration clusters are placed, before jitter. */
     private static final int SPACING = 9;
 
+    /** Blocks between one chevron band and the next, and how thick a band is. */
+    private static final int STRIPE_PERIOD = 4;
+    private static final int STRIPE_WIDTH = 2;
+
+    /** Minimum clear sky between two cloud banks. */
+    private static final int CLOUD_GAP = 11;
+
     private CourseDecorator() {
     }
 
@@ -277,6 +284,9 @@ public final class CourseDecorator {
      */
     private static void skyline(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                                 int from, int to, int[] floorAt, int margin) {
+        // Hills first, then the bank in front of them: cloudBank uses setIfEmpty at a nearer
+        // depth, so the order only matters for reading the code, but a reader who finds the bank
+        // written first will reasonably expect the hills to be occluded by it.
         int x = from;
         while (x < to) {
             int slot = x + margin;
@@ -297,21 +307,86 @@ public final class CourseDecorator {
                 x += hill(canvas, ctx, random, x, floor) + 2 + random.nextInt(5);
             }
         }
-    }
 
-    /** A rounded mound. Returns its width so the caller can space the next shape past it. */
+        cloudBank(canvas, ctx, random, from, to, floorAt, margin);
+    }
+    /**
+     * A mound with pattern in it. Returns its width so the caller can space the next shape past it.
+     *
+     * <p>§5.7: the reference's background hills are not flat silhouettes. They carry chevron and
+     * zigzag striping, and that matters more than decoration usually does here — the horizon is on
+     * screen continuously, so a flat shape is the one piece of art the player looks at for the
+     * whole level without ever being given anything to look <em>at</em>.
+     *
+     * <p>The stripe has its own block, hazed to exactly the same distance as the mass it sits in.
+     * An unhazed colour would read as a foreground object standing in front of the hill rather than
+     * as a pattern on it. It is deliberately not the distant trunk material, which was the first
+     * choice and was wrong for a reason worth keeping: trees are made of that, so a stripe sharing
+     * it cannot be told from the forest -- not by the player, and not by a test.
+     *
+     * <p>Chevrons rather than horizontal bands, and mirrored about the mound's own centre: the
+     * pattern follows the shape, which is what makes it look painted on a hill rather than ruled
+     * across the screen behind one.
+     */
     private static int hill(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                             int x, int floor) {
         BlockState mass = distantMass(ctx);
+        BlockState stripe = ModBlocks.COURSE_HEDGE_DISTANT_BAND.get().defaultBlockState();
         int width = 7 + random.nextInt(7);
         int peak = 3 + random.nextInt(3);
+        // Every mound gets its bands offset, or a row of them stripes in unison and the horizon
+        // reads as one long fence.
+        int phase = random.nextInt(STRIPE_PERIOD);
+        int centre = (width - 1) / 2;
         for (int i = 0; i < width; i++) {
             double t = (double) i / (width - 1);
-            for (int y = 1; y <= profile(ctx, t, peak); y++) {
-                canvas.setIfEmpty(x + i, floor + y, BACKDROP_Z, mass);
+            int height = profile(ctx, t, peak);
+            for (int y = 1; y <= height; y++) {
+                // The chevron: distance from the centre added to height, so the band bends at the
+                // peak instead of crossing it. Never on the top row -- a striped skyline edge is
+                // a dotted line, and the outline is the thing the shape is read by.
+                boolean banded = y < height
+                        && (y + Math.abs(i - centre) + phase) % STRIPE_PERIOD < STRIPE_WIDTH;
+                canvas.setIfEmpty(x + i, floor + y, BACKDROP_Z, banded ? stripe : mass);
             }
         }
         return width;
+    }
+
+    /**
+     * A bank of cloud between the terrain and the far hills.
+     *
+     * <p>The other half of §5.7. It is a depth cue rather than weather: something at a middle
+     * distance is what tells the eye the hills are further away than the level, and without it the
+     * backdrop is two layers that could be at any two distances.
+     *
+     * <p>Drawn at {@link #FAR_Z}, one step in front of the hills and one behind the props, which is
+     * the only place it can go and still be between them. Not in the sky theme, where the ground is
+     * already cloud and a bank of it would read as more floor.
+     */
+    private static void cloudBank(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
+                                  int from, int to, int[] floorAt, int margin) {
+        if (ctx.theme() == CourseTheme.SKY) {
+            return;
+        }
+        BlockState cloud = ModBlocks.COURSE_CLOUD_BLOCK_FAR.get().defaultBlockState();
+        int x = from + random.nextInt(CLOUD_GAP);
+        while (x < to) {
+            int slot = x + margin;
+            if (slot < 0 || slot >= floorAt.length) {
+                break;
+            }
+            // Two rows, and ragged: a flat slab at this distance is a shelf rather than cloud.
+            int base = floorAt[slot] + 5 + random.nextInt(3);
+            int length = 5 + random.nextInt(6);
+            for (int i = 0; i < length && x + i < to; i++) {
+                int rows = i == 0 || i == length - 1 ? 1 : 2;
+                for (int y = 0; y < rows; y++) {
+                    canvas.setIfEmpty(x + i, base + y, FAR_Z, cloud);
+                }
+            }
+            x += length + CLOUD_GAP + random.nextInt(CLOUD_GAP);
+        }
     }
 
     /**

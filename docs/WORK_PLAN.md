@@ -392,8 +392,23 @@ already true when written:* `COURSE_LAMP` existed and `CourseDecorator.lit()` pl
 dark themes, with a comment explaining that backlighting throws platforms into silhouette. Only the
 themed colour was missing, and is now done. Stained glass in castle back walls is now built too: `COURSE_GLASS`, set high in the boss arena's back wall. High because a window at head height reads as a doorway, and a player must never spend a jump finding out it is not one.
 
-**5.7 Background hills carry pattern.** Rounded mounds with chevron and zigzag striping, not flat
-silhouettes. A cloud bank often sits between terrain and far hills.
+**5.7 Background hills carry pattern.** *Built.* `hill()` bands its outline with chevrons —
+mirrored about each mound's own centre, so the pattern follows the shape rather than ruling across
+the screen behind it — and never on the top row, because a striped skyline edge is a dotted line and
+the outline is what the shape is read by. Each mound's bands are phase-offset or a row of them
+stripes in unison and the horizon becomes a fence.
+
+`cloudBank()` adds the middle distance at `FAR_Z`, one step in front of the hills and one behind the
+props. It is a depth cue rather than weather: without something between them, the backdrop is two
+layers at no particular distance. Not in the sky theme, where the ground is already cloud and a bank
+of it reads as more floor.
+
+*The band needed its own block*, and that is the interesting part. It was first drawn in the distant
+trunk material — already hazed to the right distance, no new asset. Two versions of the test then
+passed with the striping switched **off**: the first was counting tree trunks, and the second, which
+tried to tell a stripe from a trunk by its neighbours, was defeated by a tree's own crown. A pattern
+that shares a material with the things it is drawn among cannot be told from them, by the build or
+by the player.
 
 **5.8 Foreground detail sits on the playfield itself.** *Built.* `groundCover` scatters tufts on the
 lane floor — green in grass, frosted in snow, dry in the desert — sparsely and only where the floor
@@ -540,29 +555,28 @@ world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progre
 | 2 — corrections | **Complete.** 2.5 turned out to be a false premise; a gametest says so. |
 | 3 — bosses | **Complete.** |
 | 4 — structure | 4.1–4.3, 4.5, 4.6 done. **Left: 4.4, 4.7, 4.8.** 4.9 out of scope by decision. |
-| 5 — art direction | 5.1, 5.3, 5.5, 5.6, 5.8 done. **Left: 5.2 (partly), 5.4, 5.7, 5.9, 5.10.** |
+| 5 — art direction | 5.1, 5.3, 5.5–5.8 done. **Left: 5.2 (partly), 5.4, 5.9, 5.10.** |
 | 6 — missing content | 6.1, 6.4–6.9 done. **Left: 6.2, 6.3.** |
 | 7 — interface | 7.1, 7.2, 7.5–7.7 done. **Left: 7.3, 7.4 (half), 7.8, 7.9.** |
 
 ### What to do next, and why in this order
 
-1. ~~**5.3 — one hue family per world.**~~ **Done 2026-09-07**, see the entry in §5.
-2. **5.7 — pattern on the background hills.** `profile()` already gives each theme its own silhouette
-   shape; this adds striping inside it. Same file, same pass, no new systems. **Next.**
-3. **4.8 — the rest of the parts kit.** Post-and-beam scaffolding, thin ledges with inset centres,
+*Done since this list was written: 5.3 (hue families) and 5.7 (hill pattern and cloud bank).*
+
+1. **4.8 — the rest of the parts kit.** Post-and-beam scaffolding, thin ledges with inset centres,
    capsule beams, grate panels. Each is a segment or a block, none of them interact, and they can be
    done one at a time and shipped one at a time.
-4. **7.9 — the shop as architecture.** `ToadHouseRoom` exists and is a wooden box; the reference's is
+2. **7.9 — the shop as architecture.** `ToadHouseRoom` exists and is a wooden box; the reference's is
    a warm gold room with wide arches and open sky behind them. One room, hand-built, high payoff for
    how the game reads between courses.
-5. **7.4 — the closing half of the iris.** The opening is built. The closing one needs a home,
+3. **7.4 — the closing half of the iris.** The opening is built. The closing one needs a home,
    because the results screen is a `Screen` and the HUD does not draw under it.
-6. **4.4 — water level as a variable.** The most interesting thing left, and the most expensive: it
+4. **4.4 — water level as a variable.** The most interesting thing left, and the most expensive: it
    needs runtime block editing over a marked band and a story for what the reachability proof is
    told about a floor that moves.
-7. **6.3 — airships.** A whole theme: hull geometry, a cloud sea, a skull flag. Large, self-contained,
+5. **6.3 — airships.** A whole theme: hull geometry, a cloud sea, a skull flag. Large, self-contained,
    and the last big *content* gap.
-8. **7.3 — themed world maps** and **7.8 — the castle scene and credits level.** Presentation work
+6. **7.3 — themed world maps** and **7.8 — the castle scene and credits level.** Presentation work
    that only pays once the rest reads well.
 
 ### Two things that are recorded rather than built

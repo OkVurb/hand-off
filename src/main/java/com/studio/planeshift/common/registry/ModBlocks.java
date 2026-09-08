@@ -237,6 +237,18 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> COURSE_WOOD_DISTANT_WARM = courseBlock(
             "course_wood_distant_warm", MapColor.TERRACOTTA_ORANGE, SoundType.WOOD);
 
+    /**
+     * The banding drawn inside a far hill.
+     *
+     * <p>Its own block rather than a reuse of {@code COURSE_WOOD_DISTANT}, and the reason is a test
+     * that could not otherwise exist: a stripe sharing a material with tree trunks cannot be told
+     * from the forest, and the first two versions of {@code HillPatternTest} passed with the
+     * banding switched off because they were counting trees. A pattern needs to be distinguishable
+     * from the things it is drawn among, by the player and by the build.
+     */
+    public static final DeferredBlock<Block> COURSE_HEDGE_DISTANT_BAND = courseBlock(
+            "course_hedge_distant_band", MapColor.PLANT, SoundType.GRASS);
+
     public static final DeferredBlock<Block> COURSE_HEDGE_FAR = courseBlock(
             "course_hedge_far", MapColor.PLANT, SoundType.GRASS);
     public static final DeferredBlock<Block> COURSE_PILLAR_FAR = courseBlock(

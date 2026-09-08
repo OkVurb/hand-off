@@ -1334,3 +1334,27 @@ Full build green. 379 unit tests, 0 failures, counted from the result XML. No ga
 server run -- no data-pack files were touched -- and no client run. Every claim above is measured
 hue arithmetic against the shipped sheets. Whether the volcano now reads hot is still a question
 for a controller, and nothing here answers it.
+
+## 5.7 — pattern on the hills, and a test that would not stay honest
+Chevrons banded inside the existing hill outline, mirrored about each mound's own
+centre so the pattern follows the shape, phase-offset per mound so a row of them
+does not stripe in unison, and never on the top row -- a striped skyline edge is a
+dotted line and the outline is what the shape is read by. Plus cloudBank at FAR_Z,
+between the hills and the props: a depth cue, not weather. Skipped in the sky theme,
+whose ground is already cloud.
+
+The band needed its own block and that was the whole lesson. Drawn first in the
+distant trunk material -- already hazed correctly, no new asset -- and then the test
+passed with the striping switched off, twice. The first version counted that material
+anywhere in the far layer and was measuring trees. The second tried to tell a stripe
+from a trunk by having hill material either side, which a tree's own crown defeats.
+A pattern sharing a material with the things it is drawn among cannot be told from
+them, by the build or by the player. Gave the band its own hazed block and the
+question became answerable.
+
+Also dropped an assertion rather than loosening it: "the sky draws no cloud bank"
+cannot be measured by block identity, because COURSE_CLOUD_BLOCK_FAR is that theme's
+own fill. The guard stands in the code; the reason it is untested is written down.
+
+Both surviving assertions verified by switching the feature off and watching them
+fail. 381 tests.

@@ -391,6 +391,17 @@ def rail(metal, rivet):
     return img
 
 
+def shade_image(img, factor):
+    """Scale every pixel toward black, keeping alpha. Used to make a darker sibling of a texture."""
+    out = img.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            px[x, y] = (int(r * factor), int(g * factor), int(b * factor), a)
+    return out
+
+
 def distant(img, haze=(186, 214, 236), amount=0.46):
     """Push a texture back into the distance.
 
@@ -1252,6 +1263,13 @@ def build():
     # The third layer. Pushed back harder than the "far" set, because it sits a block further
     # away again and the whole point of a third band is that the eye can tell it from the second.
     out["course_hedge_distant"] = distant(out["course_hedge"], amount=0.68)
+    # The banding drawn inside a far hill. Hazed to exactly the same distance as the mass it sits
+    # in -- a stripe in an unhazed colour would read as a foreground object standing in front of
+    # the hill rather than as a pattern on it -- and then darkened, which is the only difference.
+    # Its own block, rather than reusing the distant trunk, because the trunk is what trees are
+    # made of and a pattern that shares a material with the forest cannot be told from the forest.
+    out["course_hedge_distant_band"] = distant(
+            shade_image(out["course_hedge"], 0.74), amount=0.68)
     out["course_wood_distant"] = distant(out["course_wood_block"], amount=0.68)
 
     # The warm set, for the volcano. Aerial perspective is not always a blue-grey wash: the

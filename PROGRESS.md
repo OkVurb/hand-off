@@ -6,15 +6,33 @@
 
 ## Current State
 
-**Last updated:** 2026-09-07 (Devin — §5.3 finished in the main tree)
-**Build status:** GREEN — full `.\gradlew build` passes; 379 unit tests, zero failures/errors
-**GameTest status:** Not run this session. The 7 passing gametests are historical, not re-verified.
+**Last updated:** 2026-09-08 (Claude — §5.7 finished in the main tree)
+**Build status:** GREEN — full `.\gradlew build` passes; 381 unit tests, zero failures/errors
+**GameTest status:** Not run this session. The 10 passing gametests are historical, not re-verified.
 **Server launch:** Not run this session; no `src/main/resources/data/` files were touched.
-**Client launch:** Not run this session. **Nothing in §5.3 has been looked at in-game.**
+**Client launch:** Not run this session. **Nothing in §5.7 has been looked at in-game.**
 **Open PRs:** None
 **Open branches:** `devin/work`, `claude/work`
 
 ## What Was Done This Session
+
+### Claude — WORK_PLAN §5.7 finished (pattern on the background hills)
+
+`CourseDecorator.hill()` now bands its outline with chevrons, mirrored about each mound's centre and
+phase-offset per mound, never on the top row. `cloudBank()` adds a middle distance at `FAR_Z`,
+skipped in the sky theme whose ground is already cloud.
+
+New block `COURSE_HEDGE_DISTANT_BAND` — the band could not share the distant-trunk material,
+because two versions of `HillPatternTest` passed with the striping switched off while measuring
+trees. Both surviving assertions were verified by disabling the feature and watching them fail.
+
+One assertion was dropped rather than loosened: "the sky draws no cloud bank" is not measurable by
+block identity, since `COURSE_CLOUD_BLOCK_FAR` is that theme's own fill. The guard stands in code
+and the reason it is untested is recorded in the test file.
+
+Next per §8: **4.8 — the rest of the parts kit.**
+
+### Earlier this session
 
 ### Devin — WORK_PLAN §5.3 finished (one hue family per world)
 
