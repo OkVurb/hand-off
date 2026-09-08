@@ -274,7 +274,7 @@ def semisolid_platform():
         # A lip along the underside of the leading edge. It catches shadow, which is what stops a
         # thin deck reading as a floating sheet of paper at this camera distance.
         box((0, 9, 0), (16, 11, 3), {"*": "#side"}, shade=False),
-    ])
+    ], "minecraft:cutout")
 
 
 def inset_ledge():
@@ -396,7 +396,7 @@ def axe_block_taken():
            "mark": t("axe_block_taken")}
     return model(tex, [
         box((3, 0, 3), (13, 3, 13), {"*": "#stone", "up": "#mark"}, cullfaces=("down",)),
-    ])
+    ], "minecraft:cutout")
 
 
 BUILDERS = {

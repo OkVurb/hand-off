@@ -290,6 +290,83 @@ tasks.register('checkBlockLoot') {
     }
 }
 
+/*
+ * A texture with holes in it needs a model that expects holes.
+ *
+ * A block model with no render_type renders solid, and solid ignores alpha: every transparent
+ * pixel comes out as a hole straight through the block with nothing behind it. The warp pipe was
+ * shipping like that -- its mouth was drawn as a circle on an empty tile, so the four corners of
+ * every pipe in the game were see-through notches -- and twelve other models had the same fault,
+ * including three ground-cover blocks added the same week.
+ *
+ * Nothing else catches it. The texture is present, the model is valid, the atlas stitches, the
+ * client loads without a warning, and the game draws holes.
+ */
+tasks.register('checkCutoutRenderTypes') {
+    group = 'verification'
+    description = 'Fails if a model uses a texture with transparency but no cutout render type.'
+
+    def modelDir = file('src/main/resources/assets/planeshift/models/block')
+    def textureDir = file('src/main/resources/assets/planeshift/textures/block')
+
+    inputs.dir(modelDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(textureDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/cutout-render-types.txt'))
+
+    doLast {
+        def slurper = new groovy.json.JsonSlurper()
+        def problems = []
+        def transparent = [:]
+
+        modelDir.eachFile { f ->
+            if (!f.name.endsWith('.json')) return
+            def model = slurper.parse(f)
+            if (model.render_type != null) return
+            def textures = model.textures ?: [:]
+            textures.each { key, value ->
+                if (!(value instanceof String) || !value.startsWith('planeshift:block/')) return
+                def name = value.substring(value.lastIndexOf('/') + 1)
+                def png = new File(textureDir, name + '.png')
+                if (!png.isFile()) return
+                def holed = transparent.get(name)
+                if (holed == null) {
+                    def image = javax.imageio.ImageIO.read(png)
+                    holed = false
+                    if (image != null && image.colorModel.hasAlpha()) {
+                        // Flat scan rather than a labelled break: Gradle's script parser reads a
+                        // statement label as a property assignment and refuses the file.
+                        int pixels = image.width * image.height
+                        for (int i = 0; i < pixels && !holed; i++) {
+                            int x = i % image.width
+                            int y = (int) (i / image.width)
+                            if ((image.getRGB(x, y) >>> 24) < 255) {
+                                holed = true
+                            }
+                        }
+                    }
+                    transparent[name] = holed
+                }
+                if (holed) {
+                    problems << (f.name + ' draws ' + name + '.png, which has transparent pixels, '
+                            + 'with no cutout render type: they will render as holes')
+                }
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/cutout-render-types.txt'))
+        report.parentFile.mkdirs()
+        report.text = problems.isEmpty()
+                ? ('OK: no opaque model draws a texture with holes in it' + System.lineSeparator())
+                : ('CUTOUT PROBLEMS:' + System.lineSeparator() + problems.join(System.lineSeparator()))
+        if (!problems.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    'Textures with holes on opaque models: ' + problems.join('; '))
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkCutoutRenderTypes' }
+
 tasks.named('check') { dependsOn 'checkBlockLoot' }
 
 tasks.named('check') { dependsOn 'checkNoRawCuboidScan' }

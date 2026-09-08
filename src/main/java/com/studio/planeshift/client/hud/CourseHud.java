@@ -178,6 +178,7 @@ public final class CourseHud {
 
         ScorePopups.render(graphics, font);
         // The iris first: the card should be readable through the hole, not behind the black.
+        Letterbox.render(graphics);
         IrisWipe.render(graphics);
         CreditsRoll.render(graphics, font);
         TitleCard.render(graphics, font);

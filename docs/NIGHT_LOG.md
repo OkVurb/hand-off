@@ -1645,3 +1645,29 @@ head would give away that the tether is decoration, and the tether is the mechan
 
 Verified by removing two profiles from a case and watching the test fail.
 388 tests, full build green, jar reinstalled.
+
+## The warp pipe's invisible pixels, and twelve more like it
+Owner reported the pipes looking wrong with see-through pixels. Found it and it was
+worse than the pipes.
+
+pipe_top drew a circle on an empty tile, so the four corners of every pipe mouth had
+no pixels at all -- and a block model with no render_type renders solid, and solid
+ignores alpha. Every pipe in the game had four see-through notches in its rim. Filled
+the tile with the rim colour first: a pipe seen from the side is square, and the round
+part is a fitting on top of it. Regenerated the four colour variants from the fixed
+green.
+
+Then swept for the same fault and found twelve more models drawing textures with
+transparency while declaring no cutout: the vines, the flag pole, the hidden question
+block, the rail, the semisolid platform, and all three of the ground-cover tufts added
+this week -- mine, and I never looked. Nothing catches this: the texture is present,
+the model is valid, the atlas stitches, the client loads without a warning, and the
+game draws holes.
+
+checkCutoutRenderTypes now reads every model, follows its textures, and fails if an
+opaque one has alpha in it. Verified by stripping the render type off a tuft and
+watching the build refuse. Two generator functions were emitting these models, so the
+generators emit the render type now too -- otherwise the next regeneration would have
+quietly undone all of it.
+
+391 tests, full build green, jar reinstalled.

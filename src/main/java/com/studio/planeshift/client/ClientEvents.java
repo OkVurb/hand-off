@@ -90,6 +90,7 @@ public final class ClientEvents {
 
         CameraDirector.tickCameraType();
         CourseMusicManager.tick();
+        com.studio.planeshift.client.hud.Letterbox.tick();
     }
 
     @SubscribeEvent

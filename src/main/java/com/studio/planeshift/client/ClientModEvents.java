@@ -292,6 +292,9 @@ public final class ClientModEvents {
                             com.studio.planeshift.client.hud.TitleCard.show(
                                     payload.world(), payload.level());
                         }));
+        event.register(com.studio.planeshift.common.network.LetterboxPayload.TYPE,
+                (payload, context) -> context.enqueueWork(
+                        () -> com.studio.planeshift.client.hud.Letterbox.show(payload.ticks())));
         event.register(com.studio.planeshift.common.network.CreditsPayload.TYPE,
                 (payload, context) -> context.enqueueWork(
                         com.studio.planeshift.client.hud.CreditsRoll::start));

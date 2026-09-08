@@ -826,9 +826,20 @@ def spring_top(base):
 
 
 def pipe_top(base):
-    """The pipe mouth: a ring with a dark hole, so a warp reads as an opening, not a lid."""
+    """The pipe mouth: a ring with a dark hole, so a warp reads as an opening, not a lid.
+
+    The tile is filled opaque before the ring is drawn, and that is a bug fix rather than a
+    flourish. It used to start from a transparent sheet and draw a circle on it, which left the four
+    corners with no pixels at all -- and the model this sits on is a solid block face with no cutout
+    render type, so those corners rendered as holes straight through the pipe. A player looking at a
+    row of pipes saw the level behind them through four notches on every mouth.
+    """
     img = new()
     d = ImageDraw.Draw(img)
+    # The corners are the rim block the mouth is set into, so they take the rim's own colour rather
+    # than the bright inner ring: a pipe seen from the side is square, and the round part is a
+    # fitting on top of it.
+    d.rectangle([0, 0, S - 1, S - 1], fill=shade(base, 0.86))
     d.ellipse([0, 0, S - 1, S - 1], fill=base + (255,), outline=shade(base, 0.5))
     d.ellipse([2, 2, 13, 13], fill=shade(base, 1.18))
     d.ellipse([4, 4, 11, 11], fill=(22, 40, 24, 255))

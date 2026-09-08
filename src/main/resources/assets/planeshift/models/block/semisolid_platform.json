@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "planeshift:block/semisolid_platform",
     "top": "planeshift:block/semisolid_platform_top",

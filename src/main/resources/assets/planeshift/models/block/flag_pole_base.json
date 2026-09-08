@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "planeshift:block/flag_pole_base",
     "base": "planeshift:block/flag_pole_base",

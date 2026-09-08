@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/cross",
+  "render_type": "minecraft:cutout",
   "textures": {
     "cross": "planeshift:block/course_tuft_snow",
     "particle": "planeshift:block/course_tuft_snow"

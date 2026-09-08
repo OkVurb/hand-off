@@ -109,15 +109,12 @@ public final class CourseCompletionService {
         if (world != null && courseId.equals(world.bossCourseId())) {
             boolean lastWorld = WorldRegistry.worldIndex(world.worldId())
                     == WorldRegistry.worldCount() - 1;
-            // The scene, before the dialogue. §7.8: clearing a castle plays one, and the mod had
-            // the dialogue without the moment that frames it -- Toad simply started talking over
-            // the results screen. The card names what was just done and holds for a beat, which is
-            // the difference between an event and a notification.
-            PacketDistributor.sendToPlayer(player,
-                    new com.studio.planeshift.common.network.TitleCardPayload(
-                            world.displayName(),
-                            lastWorld ? "The castle falls" : "Castle cleared"));
-            ToadDialogueService.begin(player, lastWorld);
+            // The scene. §7.8 asks for one, and the first version of this fired the card and the
+            // dialogue in the same tick, which is a notification with three parts rather than a
+            // scene. CutsceneService spaces them: the room comes apart, a beat of nothing, the
+            // fanfare, the card, another beat, and then Toad. The silences are doing most of the
+            // work.
+            CutsceneService.castleCleared(player, world, lastWorld);
             if (lastWorld) {
                 // The credits, over whatever the player does next. §7.8 asks for them to roll over
                 // a *playable* level, so nothing here locks input, pauses the world or opens a

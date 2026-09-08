@@ -112,6 +112,7 @@ public final class ServerEvents {
             LeafFlightService.tick(player);
             CourseTimerService.tick(player);
             CourseProgressService.tick(player);
+            CutsceneService.tick(player, state);
             ToadDialogueService.tick(player);
             CatFormService.tick(player);
             // Ambient weather and theme particles
@@ -286,6 +287,9 @@ public final class ServerEvents {
         FlagPoleBlock.clear(playerId);
         PayloadRateLimiter.forget(playerId);
         PlayerSizeService.forget(playerId);
+        // A scene left running for a player who is gone would hold a letterbox nobody can see
+        // and re-send it to whoever next logs in on that UUID.
+        CutsceneService.clear(player);
         CourseProgressService.removeBar(player);
     }
 

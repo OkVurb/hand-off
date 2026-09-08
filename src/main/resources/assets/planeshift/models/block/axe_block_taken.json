@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "planeshift:block/axe_block_taken",
     "stone": "planeshift:block/course_hard_block",
