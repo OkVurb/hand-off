@@ -942,7 +942,7 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 rightArm.zRot += flap * 0.65F;
                 tail.yRot = Mth.sin(state.ageInTicks * 0.18F) * 0.08F;
             }
-            case BOO -> {
+            case BOO, BIG_BOO -> {
                 body.y += idle * 0.8F;
                 head.y += idle * 0.8F;
                 leftArm.y += -idle * 0.35F;
@@ -975,20 +975,95 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
                 rightArm.yRot -= step * 0.16F;
                 body.y += Math.abs(Mth.sin(phase * 1.35F)) * speed * -0.18F;
             }
-            case PIRANHA_PLANT -> {
+            case PIRANHA_PLANT, MEGA_PIRANHA_PLANT -> {
                 body.zRot = idle * 0.06F;
                 head.zRot = Mth.sin(state.ageInTicks * 0.11F + 0.6F) * 0.09F;
                 jaw.xRot += 0.12F + (Mth.sin(state.ageInTicks * 0.17F) + 1) * 0.08F;
                 leftArm.zRot += idle * 0.12F;
                 rightArm.zRot -= idle * 0.12F;
             }
-            case BOWSER -> {
+            case BOWSER, SUPER_BOWSER -> {
                 walk(step, opposite, 0.42F);
                 body.y += Math.abs(Mth.sin(phase)) * speed * -0.22F;
                 tail.yRot = Mth.sin(state.ageInTicks * 0.08F) * 0.16F;
                 tailTip.yRot = Mth.sin(state.ageInTicks * 0.08F + 0.5F) * 0.22F;
                 jaw.xRot += (Mth.sin(state.ageInTicks * 0.075F) + 1) * 0.035F;
                 shell.xRot = idle * 0.012F;
+            }
+            // Fish. The tail leads and the body follows it, which is the whole read: a fish that
+            // swings its tail and holds its body rigid looks like a fish on a stick.
+            case CHEEP_CHEEP, BIG_CHEEP, DEEP_CHEEP, MEGA_DEEP_CHEEP -> {
+                float beat = Mth.sin(state.ageInTicks * 0.24F);
+                tail.yRot = beat * 0.5F;
+                tailTip.yRot = Mth.sin(state.ageInTicks * 0.24F - 0.5F) * 0.7F;
+                body.yRot += beat * 0.06F;
+                leftArm.zRot += beat * 0.22F;
+                rightArm.zRot -= beat * 0.22F;
+                body.y += Mth.sin(state.ageInTicks * 0.12F) * 0.35F;
+            }
+            // The squid: mantle pulses, tentacles trail behind the pulse rather than with it. A
+            // jellyfish that contracts and extends in unison reads as breathing, not swimming.
+            case BLOOPER -> {
+                float pulse = Mth.sin(state.ageInTicks * 0.2F);
+                body.yScale = 1.0F + pulse * 0.10F;
+                body.xScale = 1.0F - pulse * 0.06F;
+                body.zScale = body.xScale;
+                for (int i = 0; i < details.length; i++) {
+                    details[i].xRot = Mth.sin(state.ageInTicks * 0.2F - 0.8F + i * 0.25F) * 0.34F;
+                }
+                body.y += pulse * 0.5F;
+                head.y += pulse * 0.5F;
+            }
+            // The urchin turns, slowly, and does nothing else. It has no intentions and the
+            // animation must not give it any -- a bob would read as breathing.
+            case URCHIN -> {
+                body.yRot = state.ageInTicks * 0.012F;
+                for (int i = 0; i < details.length; i++) {
+                    details[i].yRot = body.yRot;
+                }
+            }
+            // Fuzz, moving irregularly. Each tuft on its own offset so the outline never repeats,
+            // which is what separates it from the urchin's regular spines at a glance.
+            case FUZZY -> {
+                for (int i = 0; i < details.length; i++) {
+                    float own = state.ageInTicks * (0.18F + (i % 3) * 0.05F) + i * 1.7F;
+                    details[i].xRot = Mth.sin(own) * 0.3F;
+                    details[i].zRot = Mth.cos(own * 0.8F) * 0.3F;
+                }
+                body.y += idle * 0.4F;
+                head.y += idle * 0.4F;
+            }
+            // The Chomp: a jaw that works whether or not it is lunging, and a chain that sways
+            // behind it. A still chain on a moving head is the thing that would give away that the
+            // tether is decoration -- and the tether is the mechanic.
+            case CHAIN_CHOMP -> {
+                float chomp = Math.max(0.0F, Mth.sin(state.ageInTicks * 0.42F));
+                head.xRot += chomp * 0.34F;
+                jaw.xRot += chomp * 0.5F;
+                for (int i = 0; i < details.length; i++) {
+                    details[i].yRot = Mth.sin(state.ageInTicks * 0.16F - i * 0.4F) * 0.2F;
+                }
+                body.y += chomp * -0.6F;
+            }
+            // Wings on a walker. The legs are the Goomba's and the beat is the Paratroopa's,
+            // because the joke of the creature is that it is exactly those two things.
+            case PARA_GOOMBA -> {
+                leftLeg.xRot = opposite;
+                rightLeg.xRot = step;
+                float beat = Mth.sin(state.ageInTicks * 1.1F) * 0.55F;
+                leftWing.zRot -= beat;
+                rightWing.zRot += beat;
+                body.y += Math.abs(beat) * -0.5F;
+            }
+            // The tower bosses. A heavier version of the Koopa walk -- they share its rig -- with
+            // the arm that holds the wand carried forward, so the silhouette says which one is
+            // about to cast even before it does.
+            case KOOPALING -> {
+                walk(step, opposite, 0.6F);
+                rightArm.xRot -= 0.35F + Mth.sin(state.ageInTicks * 0.09F) * 0.1F;
+                head.zRot = idle * 0.05F;
+                tail.yRot = Mth.sin(state.ageInTicks * 0.14F) * 0.18F;
+                body.y += Math.abs(Mth.sin(phase)) * speed * -0.5F;
             }
             case TOAD -> {
                 // Dedicated ToadModel handles the non-hostile shopkeeper.

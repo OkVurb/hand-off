@@ -1623,3 +1623,25 @@ under them, and a couple of roots. Enough to say "cut face of packed earth" rath
 than "brown".
 
 387 tests, full build green, fresh jar installed in the playtest instance.
+
+## Thirteen rigs that never moved
+Eight enemies had animation. Thirteen did not: every fish, the squid, the urchin,
+the Chomp, the Fuzzy, the winged Goomba, the tower bosses and the revived Bowser.
+They rendered, they had textures, they passed every check, and they stood perfectly
+still while the older cast walked around them. Nothing failed, because a static model
+is a valid model -- which is why this needed a test to find rather than a build.
+
+Siblings joined the case that already animates their shared rig instead of getting a
+copy: BIG_BOO with BOO, SUPER_BOWSER with BOWSER, MEGA_PIRANHA_PLANT with
+PIRANHA_PLANT. Same reasoning as sharing the mesh -- two copies of one motion is two
+things to retune.
+
+The new motions each say something. Fish lead with the tail and let the body follow,
+because a fish that swings its tail and holds its body rigid is a fish on a stick.
+The squid's tentacles trail behind its pulse rather than moving with it, or it reads
+as breathing instead of swimming. The urchin only rotates -- it has no intentions and
+a bob would give it some. The Chomp's chain sways, because a still chain on a moving
+head would give away that the tether is decoration, and the tether is the mechanic.
+
+Verified by removing two profiles from a case and watching the test fail.
+388 tests, full build green, jar reinstalled.
