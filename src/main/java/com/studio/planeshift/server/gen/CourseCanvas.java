@@ -199,6 +199,21 @@ public final class CourseCanvas {
         items.add(new ItemDrop(item, x, y, z));
     }
 
+    /**
+     * Records a named position for a test to find the feature by.
+     *
+     * <p>Deliberately not a general facility, and this comment is the fence around it. Seven of the
+     * eight markers this canvas used to record were read by nobody: {@code flag} and
+     * {@code checkpoint} were second copies of {@code Composition.flagX} and
+     * {@code Composition.checkpointX}, which are the real ones, and the rest simply noted where a
+     * hand-built room had put something nothing ever asked about.
+     *
+     * <p>Two rival copies of one quantity is how {@code CameraProfile.damping} and the
+     * {@code cameraSmoothing} config option both ended up dead — neither was applied, so neither
+     * could contradict the other, and the disagreement only surfaced when somebody tried to use
+     * one. If a position has a home on {@code Composition}, put it there; a marker is for something
+     * a test cannot otherwise locate without scanning the whole canvas for it.
+     */
     public void marker(String name, int x, int y, int z) {
         markers.put(name, new BlockPos(x, y, z));
     }

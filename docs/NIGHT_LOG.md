@@ -1527,3 +1527,18 @@ loads and its art resolves.
 What this still does not tell anyone is whether the game is any good. Loading is not
 playing, and nothing in sections 4 to 7 has been played. That needs a person at the
 controls, which is where this stops being something I can do alone.
+
+## Seven markers nothing read
+Swept for leftovers: no unplaced blocks, no unspawned entities, no dead public API
+in the generation package. One real find -- CourseCanvas.marker() had eight call
+sites and one reader. IntroductionNetTest uses intro_net to locate a feature without
+scanning the canvas, which is a fair use. The other seven were dead, and two of them
+were worse than dead: "flag" and "checkpoint" were second copies of
+Composition.flagX and Composition.checkpointX, which are the real ones.
+
+That is the failure this codebase already has a name for -- CameraProfile.damping and
+the cameraSmoothing option, two controls for one quantity, neither applied, unable to
+contradict each other until somebody tried to use one. Removed the seven and put a
+fence around marker() saying what it is for.
+
+385 tests, full build green.

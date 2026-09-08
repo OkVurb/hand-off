@@ -349,8 +349,6 @@ public final class BossArena {
             c.set(SWITCH_X, SWITCH_Y, 0, ModBlocks.ON_OFF_SWITCH.get().defaultBlockState());
         }
 
-        c.marker("flag", FLAG_X, 1, 0);
-        c.marker("boss", 23, 1, 0);
         return c;
     }
 

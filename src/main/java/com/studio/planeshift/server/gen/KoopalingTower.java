@@ -119,7 +119,6 @@ public final class KoopalingTower {
                         boss.setVariant(sibling);
                     }
                 });
-        c.marker("tower_boss_" + sibling.id(), BOSS_X, 1, 0);
 
         // The pole, past the boss.
         BlockState pole = ModBlocks.FLAG_POLE.get().defaultBlockState();
@@ -139,7 +138,6 @@ public final class KoopalingTower {
             }
         }
 
-        c.marker("flag", FLAG_X, 1, 0);
         return c;
     }
 }

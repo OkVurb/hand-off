@@ -130,7 +130,6 @@ public final class ToadHouseRoom {
         // is joined by a fresh copy: a Toad House would gain another Toad on every single visit.
         c.spawn(ModEntities.TOAD.get(), TO - 3 + 0.5D, 1.0D, 0.5D, 90.0F,
                 SegmentLibrary.GENERATED_TAG);
-        c.marker("toad_house", BOX_X[1], BOX_Y, 0);
         return c;
     }
 }

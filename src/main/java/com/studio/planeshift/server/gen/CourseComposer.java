@@ -374,7 +374,6 @@ public final class CourseComposer {
         }
         canvas.set(flagX, floorY + 8, 0, ModBlocks.FLAG_POLE.get().defaultBlockState()
                 .setValue(FlagPoleBlock.PART, FlagPoleBlock.Part.TOP));
-        canvas.marker("flag", flagX, floorY + 1, 0);
 
         int checkpointX = placeCheckpoint(canvas, placed, length);
         placeStarCoins(canvas, placed, ctx);
@@ -677,7 +676,6 @@ public final class CourseComposer {
         }
         int cx = best.x() + 1;
         canvas.set(cx, best.y() + 1, 0, ModBlocks.CHECKPOINT_BEACON.get().defaultBlockState());
-        canvas.marker("checkpoint", cx, best.y() + 1, 0);
         return cx;
     }
 
