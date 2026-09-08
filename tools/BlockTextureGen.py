@@ -1268,6 +1268,25 @@ def dirt(base, seed):
         d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=shade(base, 0.82))
     for cx, cy in ((5, 2), (12, 7), (4, 10), (14, 14)):
         d.point((cx, cy), fill=shade(base, 1.22))
+
+    # Stones set into the soil, each with a lit top edge and a shadow under it.
+    #
+    # The clumps above are the same colour family as the ground they sit in, which reads as
+    # mottling rather than as anything solid. A handful of pebbles that catch light from above is
+    # what tells the eye this is a cut face of packed earth and not a brown surface -- and it is
+    # the block under every grass level in the game, so it is looked at more than any other.
+    stone = (146, 140, 130, 255)
+    for sx, sy, w in ((2, 6, 3), (9, 5, 2), (6, 12, 3), (12, 9, 2)):
+        d.rectangle([sx, sy, sx + w, sy + 1], fill=stone)
+        d.line([(sx, sy), (sx + w, sy)], fill=shade(stone, 1.18))
+        d.line([(sx, sy + 2), (sx + w, sy + 2)], fill=shade(base, 0.62))
+
+    # A root or two, thin and dark, wandering rather than straight.
+    root = shade(base, 0.58)
+    for x0, y0 in ((1, 2), (10, 11)):
+        for i in range(5):
+            d.point((x0 + i, y0 + (i * i) % 3), fill=root)
+
     grain(img, base, seed + 3, 0.13, 2)
     return lit(img, base)
 

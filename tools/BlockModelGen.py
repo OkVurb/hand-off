@@ -249,6 +249,44 @@ def signpost():
     ], "minecraft:cutout")
 
 
+def inset_ledge():
+    """A ledge whose centre is genuinely recessed, not painted to look it.
+
+    The texture already draws a bright lip and a sunk panel, and on a plain cube that reads as a
+    picture of a ledge. Cutting the panel back two pixels gives it a real shadow line that moves
+    with the light, which is the difference between a surface and a photograph of one.
+
+    Full-height on purpose. A thin ledge would change what the player stands on, and every gap in
+    every generated course is sized against a proven jump arc measured from full blocks -- the
+    reachability proof reasons about whole cells. This is a visual depth change with no collision
+    change, which is the only kind that can be made to a block already in fifty courses.
+    """
+    tex = {"particle": t("course_ledge"), "all": t("course_ledge")}
+    return model(tex, [
+        # The frame: the full block, minus the face the panel sits in.
+        box((0, 0, 0), (16, 16, 16), {"*": "#all"}),
+        # The recessed panel, pushed two pixels into the front face.
+        box((3, 3, 2), (13, 13, 3), {"*": "#all"}, shade=False),
+    ])
+
+
+def grate_panel():
+    """A grate as a panel with air behind it, rather than a cube with a grid on the front.
+
+    You are meant to see through this one. A cutout texture on a full cube shows the level behind
+    the holes only where the cube's own back face does not fill them in first, which at this
+    resolution is a grid of dark squares. Thinning the geometry to the front third means the holes
+    are actually holes.
+
+    Still a full-height collision box: it is a floor, and a floor you fall through is a hole with a
+    picture of a floor over it.
+    """
+    tex = {"particle": t("course_grate"), "all": t("course_grate")}
+    return model(tex, [
+        box((0, 0, 0), (16, 16, 5), {"*": "#all"}),
+    ], "minecraft:cutout")
+
+
 def p_switch(pressed):
     """A button. Pressed is genuinely lower, so its state is visible from across the room."""
     name = "p_switch_pressed" if pressed else "p_switch"
@@ -347,6 +385,8 @@ BUILDERS = {
     "course_pillar": pillar,
     "course_lattice": lattice,
     "course_banner": banner,
+    "course_ledge": inset_ledge,
+    "course_grate": grate_panel,
     "signpost": signpost,
     "p_switch": lambda: p_switch(False),
     "p_switch_pressed": lambda: p_switch(True),

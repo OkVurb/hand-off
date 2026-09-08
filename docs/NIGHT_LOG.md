@@ -1603,3 +1603,23 @@ cannot learn from. Derived from the counter the server already ticks rather than
 synced as its own flag -- one source of truth for when the Koopa comes back.
 
 387 tests, full build green.
+
+## Real geometry for two blocks, and the block under every grass level
+The ledge and the grate were both plain cubes with a picture of their shape on the
+front. The ledge now recesses its centre panel two pixels, so the shadow line is real
+and moves with the light rather than being painted; the grate is a panel in the front
+third of its cell, so the holes are actually holes instead of a grid of dark squares
+where the cube's own back face fills them in.
+
+Both keep full-height collision, deliberately. A thin ledge changes what the player
+stands on, and every gap in every generated course is sized against a jump arc
+measured from whole cells -- a visual depth change is the only kind that can safely be
+made to a block already standing in fifty courses.
+
+Also deepened course_dirt, which is the block under every grass level and therefore
+looked at more than any other in the game. Its clumps were the same colour family as
+the soil, which reads as mottling; it now has pebbles with a lit top edge and a shadow
+under them, and a couple of roots. Enough to say "cut face of packed earth" rather
+than "brown".
+
+387 tests, full build green, fresh jar installed in the playtest instance.
