@@ -246,3 +246,15 @@ sequence is not the same as a way around the one requirement the whole run is bu
   wall to it regardless of what is beside it. A chimney has to be built off the route as an alcove
   the player enters and leaves from the same side, which is a segment shape the library does not
   have yet. Not attempted further; the ParCool integration itself does not depend on it.
+
+- **A sixth world, and the bonus-world visual language that needs one.** §5.10's checkered map and
+  §7.3's abstract field both belong to a bonus world. The registry has five and none spare, and the
+  language file has read *"The Star Road has appeared!"* since long before the work plan existed, so
+  the fiction is waiting for a world that does not exist.
+
+  Adding one is not an art change. `isFinalWorld` is "last in ORDERED", so a sixth world moves the
+  star-coin gate, the clown car, Super Bowser and the last castle's whole shape onto it, and every
+  test that counts worlds changes with it. Whether this game has a Star Road is a design decision
+  with a materially different game on either side of it, so it is the owner's to make rather than
+  one to infer from a leftover string. Everything else in §5.10 — the plates, the bolts, the frame —
+  is built and reachable in the P-switch bonus room.

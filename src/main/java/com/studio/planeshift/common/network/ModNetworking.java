@@ -58,6 +58,7 @@ public final class ModNetworking {
         registrar.playToClient(ScorePopupPayload.TYPE, ScorePopupPayload.STREAM_CODEC);
         registrar.playToClient(TitleCardPayload.TYPE, TitleCardPayload.STREAM_CODEC);
         registrar.playToClient(AnnouncementPayload.TYPE, AnnouncementPayload.STREAM_CODEC);
+        registrar.playToClient(CreditsPayload.TYPE, CreditsPayload.STREAM_CODEC);
         registrar.playToClient(PMeterPayload.TYPE, PMeterPayload.STREAM_CODEC);
         registrar.playToClient(CourseResultsPayload.TYPE, CourseResultsPayload.STREAM_CODEC);
         registrar.playToClient(GameOverPayload.TYPE, GameOverPayload.STREAM_CODEC);

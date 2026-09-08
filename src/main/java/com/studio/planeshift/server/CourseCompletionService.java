@@ -118,6 +118,15 @@ public final class CourseCompletionService {
                             world.displayName(),
                             lastWorld ? "The castle falls" : "Castle cleared"));
             ToadDialogueService.begin(player, lastWorld);
+            if (lastWorld) {
+                // The credits, over whatever the player does next. §7.8 asks for them to roll over
+                // a *playable* level, so nothing here locks input, pauses the world or opens a
+                // screen -- the roll is an overlay on the ordinary HUD and the player keeps the
+                // controls. A credits screen is something you wait out; a credits level is a
+                // victory lap you are still driving.
+                PacketDistributor.sendToPlayer(player,
+                        new com.studio.planeshift.common.network.CreditsPayload());
+            }
         }
 
         ProgressionService.leaveCourse(player);

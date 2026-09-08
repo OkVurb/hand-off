@@ -1489,3 +1489,23 @@ with nowhere to appear -- this project's signature bug, dressed as content.
 
 Sections 1-7 are complete but for three items recorded with reasons. 383 tests, 11
 gametests, full build green. Still unplayed.
+
+## Credits, and closing section 8
+The credits roll over a level the player is still driving. That is the entry's whole
+distinction and the earlier note here had it wrong: I had recorded it as needing a
+camera path and an input lock, which is what a cutscene needs. The reference is not
+doing that -- it rolls names over a stage you are still playing. So CreditsRoll is an
+overlay on the ordinary HUD, and a test asserts the class cannot seize input, because
+"do the credits appear" would pass just as happily for the version that takes the
+game away.
+
+Section 8 is finished in the only honest sense: every item on it is built. Two things
+are not work waiting to be picked up. The sagging rope stays out of scope by the
+decision recorded when it was written. And the bonus-world map needs a ruling rather
+than an implementation -- it belongs to a sixth world, isFinalWorld is "last in
+ORDERED", so adding one moves the star-coin gate, the clown car, Super Bowser and the
+last castle onto it. That is a progression change with a materially different game on
+either side, and it is the owner's call. Written up in BACKLOG.
+
+385 tests, 11 gametests, full build green. Still unplayed, which is now the largest
+thing left by a wide margin.

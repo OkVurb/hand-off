@@ -625,9 +625,14 @@ over the results screen. A title card now names the castle and holds for a beat 
 difference between an event and a notification, and the last world's card reads differently from the
 other four.
 
-*Not built:* the playable credits. That is a course that runs itself with the roll over it, which
-means a camera path, an input lock the player can break out of, and a course built to be watched
-rather than played — a set piece, not a screen. Recorded rather than half-done.
+*The credits are built, and they are an overlay.* `CreditsRoll` scrolls over the ordinary HUD while
+the player keeps the controls — nothing locks input, pauses the world or opens a `Screen`, because
+that is the entire distinction the entry draws. A credits screen is something the player waits out;
+a credits level is a victory lap they are still driving. The earlier note here assumed it needed a
+camera path and an input lock, which is what a *cutscene* needs; the reference is not doing that.
+
+A test asserts the class cannot seize input — no `Screen` field, no screen-shaped method — because
+"do the credits appear" would pass just as happily for the version that takes the game away.
 
 **7.9 Shops are architecture, not menus.** *Built.* The Toad house is gold-walled now and its back
 wall carries wide arches with the sky behind them. The openings are the entry: a sealed box with
@@ -681,13 +686,28 @@ world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progre
 6. **7.3 — themed world maps** and **7.8 — the castle scene and credits level.** Presentation work
    that only pays once the rest reads well.
 
-### Two things that are recorded rather than built
+### Section 8 is finished
 
-- **4.9 rope that sags.** Deliberately out of scope: soft geometry with its own collision, where the
-  sag is the mechanic. The cheap version — a flat row of blocks that looks like rope and behaves
-  like floor — is worse than not having it.
-- **Coral on the playfield** (§5.8). `COURSE_CORAL` is solid and built for the layer behind the lane;
-  putting it on the floor walled 108 of 6000 courses. Wants a non-solid fan block of its own.
+Every item that was on this list is built. What remains is one design decision and one deliberate
+exclusion, and neither is work waiting to be picked up.
+
+**The bonus-world map needs a ruling, not an implementation.** §5.10's checkered field and §7.3's
+abstract map both belong to a bonus world, and the registry has five worlds with none spare. The
+language file has said *"The Star Road has appeared!"* since long before this plan existed, so the
+fiction is already there — but adding a sixth world changes what "final world" means, which moves
+the star-coin gate, the last castle's clown car and Super Bowser, and every test that counts worlds.
+That is a progression change, not an art change, and it is the owner's call rather than a thing to
+infer. Recorded in `docs/BACKLOG.md`.
+
+**4.9's sagging rope stays out of scope**, by the decision recorded when it was written: soft
+geometry with its own collision, where the sag is the mechanic. The cheap version — a flat row of
+blocks that looks like rope and behaves like floor — is worse than not having it.
+
+### The one thing left that is not a feature
+
+Nothing in sections 4 to 7 has been played. Every entry above is static measurement plus a green
+build, and the plan's own closing note says why that is not the same as knowing it works. One
+playthrough is worth more than the next item on any list.
 
 ---
 
