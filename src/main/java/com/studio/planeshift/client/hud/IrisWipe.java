@@ -25,6 +25,7 @@ public final class IrisWipe {
 
     private static long startedAtMs;
     private static boolean running;
+    private static boolean closing;
 
     private IrisWipe() {
     }
@@ -33,6 +34,21 @@ public final class IrisWipe {
     public static void open() {
         startedAtMs = System.currentTimeMillis();
         running = true;
+        closing = false;
+    }
+
+    /**
+     * Starts the iris closing, for the end of a course.
+     *
+     * <p>The same circle run backwards, and it needed a different home rather than a different
+     * class: the results screen is a {@code Screen}, and the HUD does not draw underneath one. So
+     * this is called by the screen itself, which is why {@link #render} is public and stateless
+     * about who is calling it.
+     */
+    public static void close() {
+        startedAtMs = System.currentTimeMillis();
+        running = true;
+        closing = true;
     }
 
     /** Cuts it short, for a player who leaves before it finishes. */
@@ -58,6 +74,12 @@ public final class IrisWipe {
         // accelerating rate, so it reads as speeding up; easing out makes the opening feel even.
         float t = age / (float) OPEN_MS;
         float eased = 1.0F - (1.0F - t) * (1.0F - t);
+        if (closing) {
+            // Run backwards, and eased the other way round so the ease is still on the slow end of
+            // the movement. Mirroring the curve as well as the direction would put the slow part
+            // at the start of a close, which reads as hesitation rather than as an ending.
+            eased = 1.0F - t * t;
+        }
         // The final radius has to clear the corners, not the edges, or the last thing the player
         // sees is four black triangles.
         double full = Math.sqrt(cx * cx + cy * cy);

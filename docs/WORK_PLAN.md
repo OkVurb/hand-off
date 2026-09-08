@@ -498,9 +498,19 @@ capped terrain block*, not a bespoke tileset. What makes them read as underwater
 the fluid, coral props and the cast. The fluid exists; the block exists. This is theme, props and
 cast. Multiple palettes observed (green-teal, pale blue-grey), and it combines with castle.
 
-**6.2 Sky.** Cloud as solid walkable terrain, mushroom capsules on stalks, height as the subject.
+**6.2 Sky.** *Built.* Cloud is walkable terrain and the sky world's whole palette; mushroom capsules
+on stalks exist as a segment and as that world's climax tower. `CLOUD_CLIMB` adds the third part —
+a stretch whose *subject* is height, stepping upward the whole way with no ground coming back, and
+nothing catching a fall. Height is only the subject if losing it costs something.
 
-**6.3 Airships.** The playfield is a *vehicle* — a golden ribbed hull with upturned prow and stern
+**6.3 Airships.** *The deck is built*, and it had been built before this session — `AIRSHIP_DECK`
+was already there with a planked hull, a rising prow and stern, a rail, a mast and a cannon. What it
+lacked was a sky: a hull with nothing under it is a wooden floor with a flag on it, so there is a
+cloud sea in the far layer below it now, showing through the gaps at either end.
+
+*Still missing:* the airship **world** — its own palette, skybox and course shape. The deck is the
+part the player stands on and was worth having first. *The original wording:* The playfield is a
+*vehicle* — a golden ribbed hull with upturned prow and stern
 over a cloud sea, under a skull flag. Standard staging for a boss.
 
 **6.4 Water cast.** *Mostly built already:* three fish and a skeletal reskin. The gap was not a
@@ -561,8 +571,13 @@ unlocks a cannon between worlds.
 trees, houses, ponds, volcano cones, ice floes — around the node graph. Ours draws nodes and paths
 on a flat field.
 
-**7.4 Course and map are joined by an iris wipe** at the node just cleared. *The opening half is
-built*, paired with the title card: the course opens from a circle. Drawn as scanlines rather than
+**7.4 Course and map are joined by an iris wipe** at the node just cleared. *Both halves are built
+now.* The closing one lives in `CourseResultsScreen` rather than the HUD, which is what the entry
+was waiting on — a `Screen` draws over the HUD, so the overlay had to be called by the screen
+itself. Run backwards, and eased the other way round so the slow part of the movement stays at the
+end: mirroring the curve as well as the direction would put the hesitation at the start of a close.
+
+*The opening half*, paired with the title card: the course opens from a circle. Drawn as scanlines rather than
 a mask texture — for each row the circle has a known half-width, so the black outside it is two
 fills, needing no texture, shader or blend state, and it cannot be stretched into an oval. Eased
 out, because a circle growing at a constant rate covers area at an accelerating one. The closing
@@ -591,7 +606,15 @@ built, so finishing the game says so on that screen and never again.
 
 **7.8 Clearing a castle plays a scene**, and the credits roll over a *playable* level.
 
-**7.9 Shops are architecture, not menus.** A warm gold room with wide arches and open sky behind the
+**7.9 Shops are architecture, not menus.** *Built.* The Toad house is gold-walled now and its back
+wall carries wide arches with the sky behind them. The openings are the entry: a sealed box with
+three boxes in it is a menu with a floor, and what makes this read as a building the player has
+walked into is being able to see out of it. Wide rather than tall — three across and four high is a
+doorway you could walk through, where a one-block slot is a window, and a window says the room is
+somewhere you are being kept. The arches sit *between* the boxes, because an opening behind one puts
+bright sky behind the thing the player has to read.
+
+*The original wording:* A warm gold room with wide arches and open sky behind the
 openings — bright and welcoming, built nothing like the level interiors on either side.
 
 ---

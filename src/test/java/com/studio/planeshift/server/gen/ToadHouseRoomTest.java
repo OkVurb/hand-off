@@ -43,7 +43,27 @@ class ToadHouseRoomTest {
         // Floor and ceiling over the lane, and a wall behind it...
         assertTrue(c.blocks().containsKey(CourseCanvas.key(10, 0, 0)), "no floor");
         assertTrue(c.blocks().containsKey(CourseCanvas.key(10, 8, 0)), "no ceiling");
-        assertTrue(c.blocks().containsKey(CourseCanvas.key(10, 3, half + 1)), "no back wall");
+        // The back plane is mostly wall, with arches cut through it.
+        //
+        // This used to sample one column and it landed on an arch the moment §7.9 cut them, which
+        // is the test's premise changing rather than the test catching a bug -- the shop is
+        // deliberately open at the back now, because a sealed box with three boxes in it is a menu
+        // with a floor. What still has to hold is that it reads as a room: mostly wall, pierced,
+        // not a colonnade.
+        int wall = 0;
+        int open = 0;
+        for (int x = 0; x <= 24; x++) {
+            for (int y = 1; y <= 4; y++) {
+                if (c.blocks().containsKey(CourseCanvas.key(x, y, half + 1))) {
+                    wall++;
+                } else {
+                    open++;
+                }
+            }
+        }
+        assertTrue(wall > open, "the back of the shop is more opening than wall; that is a "
+                + "colonnade, not a room");
+        assertTrue(open > 0, "the shop has no arches; §7.9 is a room you can see out of");
         // ...and nothing on the side the player looks in from. Walling this would hide the room
         // from the only angle it is ever seen at.
         assertTrue(c.blocks().get(CourseCanvas.key(10, 3, -half - 1)) == null,

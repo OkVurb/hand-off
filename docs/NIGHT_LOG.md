@@ -1422,3 +1422,28 @@ caught by the build, fixed in one line.
 
 Sections 4 and 5 are complete, bar the bonus-world maps, which are 7.3's work rather
 than art direction. 383 tests, 11 gametests.
+
+## 7.9, 7.4, 6.2, 6.3
+The shop is a room you can see out of: gold walls, wide arches in the back plane
+with sky behind them, cut between the boxes rather than behind them so nothing the
+player has to read is silhouetted against bright sky.
+
+That broke ToadHouseRoomTest, which sampled one column for "no back wall" and landed
+on an arch. The premise changed rather than the code being wrong -- the shop is
+deliberately open at the back now -- so the assertion was narrowed to what still has
+to hold: mostly wall, pierced, not a colonnade, and the camera side still open. Said
+plainly here because "I edited a test and it went green" deserves the explanation.
+
+The closing iris went into CourseResultsScreen rather than the HUD, which is exactly
+what the entry was waiting on: a Screen draws over the HUD, so the screen has to call
+the overlay itself. Eased the opposite way round so the slow part stays at the end --
+mirroring the curve as well as the direction puts hesitation at the start of a close.
+
+I wrote a second AIRSHIP_DECK before checking, and the compiler caught it. One
+already existed with a hull, prow, stern, rail, mast and cannon. Deleted mine and
+gave the original the one thing it lacked -- a cloud sea underneath, because a hull
+with nothing under it is a wooden floor with a flag on it. Second time this session
+that check-before-you-build would have saved the work.
+
+CLOUD_CLIMB finishes 6.2: a stretch whose subject is height, with nothing catching a
+fall. 383 tests, full build green.

@@ -38,6 +38,10 @@ public class CourseResultsScreen extends Screen {
         String key = com.studio.planeshift.client.ClientCourseState.takeAnnouncement();
         this.runBanner = key == null ? null : Component.translatable(key);
         this.results = results;
+        // The other half of the iris. A course opens from a circle and now closes into one --
+        // the reference joins its map and its levels this way in both directions, and the closing
+        // half hides the load of the results screen the same way the opening half hides a level's.
+        com.studio.planeshift.client.hud.IrisWipe.close();
     }
 
     @Override
@@ -64,6 +68,10 @@ public class CourseResultsScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
+        // Drawn first so the panel and its banners land on top of the closing circle rather than
+        // being wiped out by it -- the iris is covering the transition into this screen, not the
+        // screen itself.
+        com.studio.planeshift.client.hud.IrisWipe.render(graphics);
 
         int left = this.width / 2 - PANEL_WIDTH / 2;
         int top = panelTop();

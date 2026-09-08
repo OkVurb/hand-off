@@ -45,6 +45,25 @@ public final class ToadHouseRoom {
      */
     private static final int BOX_Y = 4;
 
+    /**
+     * Where the arches are cut, and how high they reach.
+     *
+     * <p>Between the boxes rather than behind them: an opening behind a box puts bright sky
+     * directly behind the one thing in the room the player has to read, and a silhouette is the
+     * hardest shape to tell from another silhouette.
+     */
+    private static final int[] ARCH_SPAN = {5, 6, 10, 11, 15, 16, 20, 21};
+    private static final int ARCH_HEIGHT = 4;
+
+    private static boolean isArch(int x) {
+        for (int at : ARCH_SPAN) {
+            if (at == x) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Where the three boxes stand. Spread so they read as a row of choices, not a cluster. */
     private static final int[] BOX_X = {8, 13, 18};
 
@@ -55,7 +74,7 @@ public final class ToadHouseRoom {
     public static CourseCanvas build() {
         CourseCanvas c = new CourseCanvas();
         BlockState floor = ModBlocks.COURSE_TILE.get().defaultBlockState();
-        BlockState wall = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
+        BlockState wall = ModBlocks.COURSE_TRIM.get().defaultBlockState();
         BlockState trim = ModBlocks.COURSE_HARD_BLOCK.get().defaultBlockState();
 
         for (int x = FROM; x <= TO; x++) {
@@ -63,9 +82,21 @@ public final class ToadHouseRoom {
                 c.set(x, 0, z, floor);
                 c.set(x, CEILING, z, wall);
             }
-            // The back wall. Only the back: the camera looks in from negative Z, so walling that
-            // side would hide the room from the only angle it is ever seen from.
+            // The back wall, with wide arches cut through it.
+            //
+            // §7.9: a shop is architecture, not a menu, and the reference's is a warm gold room
+            // with wide openings and open sky behind them. The openings are the entry -- a sealed
+            // box with three boxes in it is a menu with a floor, and what makes this read as a
+            // building the player has walked into is being able to see out of it.
+            //
+            // Wide rather than tall: three blocks across and four high is a doorway you could walk
+            // through, which is what an arch has to look like. A one-block slot is a window, and a
+            // window says the room is somewhere you are being kept.
+            boolean arch = ARCH_SPAN.length > 0 && isArch(x);
             for (int y = 1; y < CEILING; y++) {
+                if (arch && y <= ARCH_HEIGHT) {
+                    continue;
+                }
                 c.set(x, y, HALF + 1, wall);
             }
         }

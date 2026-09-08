@@ -772,6 +772,42 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * A climb through cloud, where the subject is height.
+     *
+     * <p>§6.2. Cloud is already walkable terrain here and mushroom capsules already exist; what the
+     * sky world did not have was a stretch whose *point* is how far up it goes. The platforms step
+     * upward the whole way and the ground never comes back, so the player reads the segment as a
+     * climb rather than as a walk with bumps in it.
+     *
+     * <p>Nothing catches a fall. That is the entry's own subject — height is only the subject if
+     * losing it costs something — and the guaranteed route is the steps themselves, which the
+     * reachability proof can see.
+     */
+    static final Segment CLOUD_CLIMB = new Segment() {
+        public SegmentSpec spec() {
+            return def("cloud_climb", 18, 6, 2, Tag.CLIMB, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 4, y, ctx);
+            BlockState cloud = ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState();
+            for (int step = 0; step < 6; step++) {
+                int sx = x + 4 + step * 2;
+                int sy = y + 1 + step;
+                for (int i = 0; i < 2; i++) {
+                    c.set(sx + i, sy, 0, cloud);
+                }
+                if (step % 2 == 1) {
+                    c.item(ModItems.COIN.get(), sx + 0.5D, sy + 1.6D, 0.5D);
+                }
+            }
+            // The exit shelf, at the top. A climb that ends in mid-air is a climb the player has to
+            // guess the end of.
+            floor(c, x + 16, 2, y + 6, ctx);
+        }
+    };
+
     /** Pipes with Piranha Plants: timing, not reflexes. */
     static final Segment PIRANHA_PIPES = new Segment() {
         public SegmentSpec spec() {
@@ -2261,6 +2297,7 @@ public final class SegmentLibrary {
         list.add(ENEMY_LINE);
         list.add(LEDGE_PATROL);
         list.add(HAMMER_PERCH);
+        list.add(CLOUD_CLIMB);
         list.add(SCAFFOLD_SPAN);
         list.add(CAPSULE_BEAM);
         list.add(PIPE_LATTICE);
@@ -2409,6 +2446,19 @@ public final class SegmentLibrary {
             BlockState banner = ModBlocks.COURSE_BANNER.get().defaultBlockState();
             for (int h = 1; h <= 4; h++) {
                 c.set(x + 10, y + h, 0, h >= 3 ? banner : rail);
+            }
+
+            // Cloud underneath, in the far layer.
+            //
+            // §6.3 calls the playfield a vehicle, and a hull alone does not say that -- a ship
+            // needs something to be flying over or it is a wooden floor with a flag on it. Below
+            // the deck rather than beside it, so it shows through the gaps the approach and
+            // departure leave at either end.
+            BlockState cloud = ModBlocks.COURSE_CLOUD_BLOCK_FAR.get().defaultBlockState();
+            for (int i = 2; i < 18; i += 3) {
+                for (int w = 0; w < 2; w++) {
+                    c.set(x + i + w, y - 5, CourseDecorator.BACKDROP_Z, cloud);
+                }
             }
 
             // The crew. A deck with nobody on it is a platform with a fence.
