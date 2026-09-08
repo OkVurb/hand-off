@@ -348,8 +348,51 @@ tasks.register('checkTextureAssets') {
             'ModParticles.java': 'particle'
     ]
 
+    /*
+     * Registered things that deliberately draw with somebody else's sheet.
+     *
+     * <p>Not exemptions from having art -- every one of these renders a real texture, and the
+     * value here is that texture, which is checked to exist below. What they are exempt from is
+     * the *naming* rule, and they have to be, because two of this codebase's own rules produce
+     * them:
+     *
+     * <p>Size lives in the registered hitbox (see EnemyRigProfile), so a bigger variant must be a
+     * second entity type. A Big Boo drawn on a second, identical sheet would be a copy of boo.png
+     * that the distinctness check below would then correctly reject -- the naming rule and the
+     * distinctness rule cannot both be satisfied by an honest variant.
+     *
+     * <p>And a prop rendered by BespokeProjectileRenderer is named for what it is, not for the
+     * entity that carries it: the saw entity draws a grinder, the chain ball draws a spiked ball.
+     *
+     * <p>Anything added here must name the sheet it actually uses, so a typo in a renderer
+     * registration still fails the build.
+     */
+    def sharedSheets = [
+            // Oversized variants: same mesh, same sheet, larger rig.
+            'big_boo'           : 'entity/boo.png',
+            'mega_deep_cheep'   : 'entity/deep_cheep.png',
+            'mega_piranha_plant': 'entity/piranha_plant.png',
+            'super_bowser'      : 'entity/bowser.png',
+            // Eight siblings, one per palette; there is no single 'koopaling' sheet by design.
+            'koopaling'         : 'entity/koopaling_larry.png',
+            // Props named for the object rather than the carrier.
+            'saw'               : 'entity/grinder.png',
+            'chain_ball'        : 'entity/spiked_ball.png',
+            'volcanic_bomb'     : 'entity/fire_rock.png',
+            'lava_jet'          : 'entity/ember_bolt.png',
+            // A platform carried by a ghost is a platform: the ghost is particles, not a sheet.
+            'ghost_platform'    : 'entity/moving_platform.png'
+    ]
+
     doLast {
         def problems = []
+
+        // The borrowed sheets have to exist, or this map is a way to delete a texture quietly.
+        sharedSheets.each { name, sheet ->
+            if (!new File(texturesDir, sheet).isFile()) {
+                problems << "${sheet} missing, but '${name}' is registered as drawing with it"
+            }
+        }
 
         coverage.each { sourceName, dirName ->
             def source = new File(registryDir, sourceName)
@@ -367,7 +410,7 @@ tasks.register('checkTextureAssets') {
             }
             names.each { name ->
                 def png = new File(texturesDir, "${dirName}/${name}.png")
-                if (!png.isFile()) {
+                if (!png.isFile() && !sharedSheets.containsKey(name)) {
                     problems << "${dirName}/${name}.png missing for entry '${name}' in ${sourceName}"
                 }
             }
@@ -387,8 +430,25 @@ tasks.register('checkTextureAssets') {
             byDigest[digest] << rel
             pixelsByFile[rel] = f
         }
+        /*
+         * A connected block's mask-15 tile is its flat tile, necessarily.
+         *
+         * <p>ConnectedBlock draws an edge only where the material stops, so mask 15 -- neighbours
+         * on all four sides -- is the interior of a wall and has no edge to draw. It is therefore
+         * the same image as the plain tile, and that is the design working rather than two
+         * textures nobody can tell apart: the player is never choosing between them, the
+         * blockstate is.
+         *
+         * <p>Written as "one flat tile and its own mask 15" rather than as a name list, so a
+         * genuine duplicate between two different blocks still fails.
+         */
+        def connectedInterior = { List<String> files ->
+            files.size() == 2 && files.any { it ==~ /block\/[a-z0-9_]+\.png/ }
+                    && files.any { it ==~ /block\/[a-z0-9_]+_15\.png/ }
+                    && files.collect { it.replaceFirst(/(_15)?\.png$/, '') }.toUnique().size() == 1
+        }
         byDigest.each { digest, files ->
-            if (files.size() > 1) {
+            if (files.size() > 1 && !connectedInterior(files.sort())) {
                 problems << "identical textures, cannot be told apart in game: " + files.sort().join(', ')
             }
         }
@@ -428,6 +488,11 @@ tasks.register('checkTextureAssets') {
                         if (a.px[k] != b.px[k]) differing++
                     }
                     double pct = 100.0d * differing / a.px.length
+                    // Same exemption as the digest check above, and it has to be repeated here
+                    // because a mask-15 tile is not merely near its flat tile, it is that tile.
+                    if (connectedInterior([rels[i], rels[j]].sort())) {
+                        continue
+                    }
                     if (pct < NEAR_DUPLICATE_PERCENT) {
                         problems << String.format(
                                 "near-identical textures (%.1f%% of pixels differ, need %.1f%%): %s, %s",

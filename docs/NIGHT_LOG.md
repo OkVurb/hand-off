@@ -1248,3 +1248,37 @@ initially launched before the baseline finished and hit a report-file lock; retr
 Full build exposed an identical-model false positive for liquid levels, narrowly exempted, then
 stopped at the existing ToadBoxBlock raw cuboid scan. That blocker remains. No runtime playtest.
 Owner requested a pause and local commit; docs/HANDOFF_CLAUDE.md records the exact continuation.
+
+## The full build had been red, and not only for the reported reason
+Picked up a checkpoint (c5597e6a) reporting one blocker: checkNoRawCuboidScan
+flagging ToadBoxBlock. Fixed that -- closeAll walked a 49-cubed box, a hundred and
+seventeen thousand getBlockState calls to find at most three shop boxes, where
+BlockAreaScan skips whole sections that cannot match and hands back immutable
+positions. That is exactly the rule the check exists to enforce.
+
+Then ran ./gradlew build and found checkTextureAssets red too, with eleven
+problems -- five of them predating this session's work. My own process failure: I
+ran the unit suite and the gametests all session and never the full build, so this
+check never spoke.
+
+One was a genuine gap: the STONE effect had no icon. Drawn.
+
+The rest were the check encoding an assumption two of this codebase's own rules
+break. Size lives in the registered hitbox, so an oversized variant must be a second
+entity type -- and a Big Boo given its own copy of boo.png would then fail the
+distinctness check. The naming rule and the distinctness rule cannot both be
+satisfied by an honest variant. Same for props named after the object rather than
+the carrier: the saw entity draws a grinder. Taught the check a sharedSheets map
+that names the sheet each one actually uses, so a typo in a renderer registration
+still fails.
+
+And a connected block's mask-15 tile is its flat tile necessarily -- neighbours on
+all four sides means no edge to draw. Exempted as a shape ("a flat tile and its own
+mask 15") rather than as a name list, so a real duplicate between two blocks still
+fails.
+
+Validated the checkpoint's fluid exemption rather than trusting it: both fluid
+blockstates do carry exactly sixteen level=N variants, and LiquidBlock geometry
+comes from FluidState, so identical baked models are correct there.
+
+Full build green. 377 unit tests, 10 gametests, 0 failures. Still no runtime playtest.

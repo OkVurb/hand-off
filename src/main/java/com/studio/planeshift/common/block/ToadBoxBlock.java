@@ -108,17 +108,26 @@ public class ToadBoxBlock extends Block implements HitFromBelowBlock {
         level.playSound(null, pos, ModSounds.POWER_UP.get(), SoundSource.BLOCKS, 0.9F, 1.0F);
     }
 
-    /** Marks every box within reach as used, including the one that was hit. */
+    /**
+     * Marks every box within reach as used, including the one that was hit.
+     *
+     * <p>Through {@link BlockAreaScan} rather than a raw cuboid walk, which is what the build's
+     * {@code checkNoRawCuboidScan} rule is for and what it caught here. The numbers say why the
+     * rule exists: {@link #CLOSE_RADIUS} is 24, so the box this used to walk is 49 cubed —
+     * a hundred and seventeen thousand {@code getBlockState} calls to find at most three shop
+     * boxes. The scan skips whole chunk sections that cannot contain a match, and skips unloaded
+     * chunks rather than generating terrain to search it.
+     *
+     * <p>It also hands back immutable positions, which removes the {@code immutable()} call the
+     * old loop needed — {@code betweenClosed} reuses one mutable cursor, so without it every box
+     * would have been recorded at the last position the loop visited.
+     */
     private void closeAll(Level level, BlockPos origin) {
-        BlockPos min = origin.offset(-CLOSE_RADIUS, -CLOSE_RADIUS, -CLOSE_RADIUS);
-        BlockPos max = origin.offset(CLOSE_RADIUS, CLOSE_RADIUS, CLOSE_RADIUS);
-        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+        for (BlockPos pos : BlockAreaScan.findMatching(level, origin, CLOSE_RADIUS, CLOSE_RADIUS,
+                state -> state.getBlock() instanceof ToadBoxBlock && !state.getValue(USED))) {
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof ToadBoxBlock && !state.getValue(USED)) {
-                // immutable(): betweenClosed hands out a shared mutable cursor, and setBlock keeps
-                // the reference. Without this every box would be recorded at the last position the
-                // loop visited.
-                level.setBlock(pos.immutable(), state.setValue(USED, true), Block.UPDATE_ALL);
+                level.setBlock(pos, state.setValue(USED, true), Block.UPDATE_ALL);
             }
         }
     }
