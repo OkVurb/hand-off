@@ -218,6 +218,80 @@ tasks.register('checkNoRawCuboidScan') {
     }
 }
 
+/*
+ * Every block the player can hold must drop something when broken.
+ *
+ * Twenty-one blocks had a BlockItem -- so they appear in creative, can be placed, and look like
+ * ordinary blocks -- and no loot table, so breaking one destroyed it silently. Nineteen comparable
+ * blocks did have one, which is what makes this an oversight rather than a design: the pattern was
+ * established and then not followed twenty-one times, because nothing was checking.
+ *
+ * Keyed on the BlockItem rather than on the block. A block with no item cannot be given to the
+ * player at all, so a loot table for it would name an item that does not exist -- the course rail,
+ * the lamps, the climbing pole and the loop trigger are machinery the generator places and the
+ * player never holds, and they are correctly outside this check.
+ */
+tasks.register('checkBlockLoot') {
+    group = 'verification'
+    description = 'Fails if a block with a BlockItem has no loot table.'
+
+    def itemsSrc = file('src/main/java/com/studio/planeshift/common/registry/ModItems.java')
+    def blocksSrc = file('src/main/java/com/studio/planeshift/common/registry/ModBlocks.java')
+    def lootDir = file('src/main/resources/data/planeshift/loot_table/blocks')
+
+    inputs.file(itemsSrc)
+    inputs.file(blocksSrc)
+    inputs.dir(lootDir).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(layout.buildDirectory.file('reports/planeshift/block-loot.txt'))
+
+    doLast {
+        def blockText = blocksSrc.text
+        def constToName = [:]
+        def patterns = [
+            ~/DeferredBlock<[^>]*>\s+([A-Z_0-9]+)\s*=\s*(?:BLOCKS\.)?[A-Za-z]*\(?\s*\n?\s*"([a-z0-9_]+)"/,
+            ~/([A-Z_0-9]+)\s*=\s*courseBlock\(\s*\n?\s*"([a-z0-9_]+)"/,
+            ~/([A-Z_0-9]+)\s*=\s*connectedBlock\(\s*\n?\s*"([a-z0-9_]+)"/
+        ]
+        patterns.each { pattern ->
+            def matcher = pattern.matcher(blockText)
+            while (matcher.find()) {
+                constToName[matcher.group(1)] = matcher.group(2)
+            }
+        }
+
+        def heldMatcher = ~/registerSimpleBlockItem\(ModBlocks\.([A-Z_0-9]+)\)/
+        def held = [] as Set
+        def hm = heldMatcher.matcher(itemsSrc.text)
+        while (hm.find()) {
+            held << hm.group(1)
+        }
+
+        def problems = []
+        held.sort().each { constant ->
+            def name = constToName[constant]
+            if (name == null) {
+                problems << (constant + ' has a BlockItem but no registration name could be parsed')
+                return
+            }
+            if (!new File(lootDir, name + '.json').isFile()) {
+                problems << (name + ' has a BlockItem but no loot table, so breaking it destroys it')
+            }
+        }
+
+        def report = file(layout.buildDirectory.file('reports/planeshift/block-loot.txt'))
+        report.parentFile.mkdirs()
+        report.text = problems.isEmpty()
+                ? ('OK: ' + held.size() + ' held blocks, all with loot tables' + System.lineSeparator())
+                : ('BLOCK LOOT PROBLEMS:' + System.lineSeparator() + problems.join(System.lineSeparator()))
+        if (!problems.isEmpty()) {
+            throw new org.gradle.api.GradleException(
+                    'Blocks the player can hold but not recover: ' + problems.join('; '))
+        }
+    }
+}
+
+tasks.named('check') { dependsOn 'checkBlockLoot' }
+
 tasks.named('check') { dependsOn 'checkNoRawCuboidScan' }
 
 /*

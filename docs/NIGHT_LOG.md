@@ -1565,3 +1565,21 @@ project telling on itself and being ignored.
 Also configured the playtest instance: enhanced-movement's double jump and ledge grab
 off, which is the one pack setting that undermines the level design rather than
 coexisting with it. Fresh jar installed. 385 tests, full build green.
+
+## Twenty-one blocks you could hold but not recover
+Kept looking for unfinished things and found the biggest one yet. Nineteen blocks
+had loot tables. Twenty-one others had a BlockItem -- so they appear in creative, can
+be placed, and look like ordinary blocks -- and no loot table at all, which means
+breaking one destroyed it silently. Bricks, castle stone, grass, sand, ice, snow, the
+trampoline, the axe, the cannon, the Muncher.
+
+That is not a design decision anyone made. The pattern was established nineteen times
+and then not followed twenty-one times, because nothing was checking.
+
+Wrote the missing tables and added checkBlockLoot, keyed on the BlockItem rather than
+the block: a block with no item cannot be given to the player, so a table for it would
+name an item that does not exist. The rail, the lamps, the climbing pole and the loop
+trigger are machinery the generator places and the player never holds, and they are
+correctly outside the check. Verified by deleting a table and watching it fail.
+
+40 held blocks, all covered. 385 tests, full build green.
