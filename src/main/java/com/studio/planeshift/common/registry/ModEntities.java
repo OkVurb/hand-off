@@ -14,6 +14,7 @@ import com.studio.planeshift.common.entity.UrchinEntity;
 import com.studio.planeshift.common.entity.MegaPiranhaPlantEntity;
 import com.studio.planeshift.common.entity.BooEntity;
 import com.studio.planeshift.common.entity.ClownCarEntity;
+import com.studio.planeshift.common.entity.LavaJetEntity;
 import com.studio.planeshift.common.entity.SuperBowserEntity;
 import com.studio.planeshift.common.entity.BoomerangProjectile;
 import com.studio.planeshift.common.entity.BowserEntity;
@@ -380,6 +381,14 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .updateInterval(1)
                     .build(key("saw")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<LavaJetEntity>> LAVA_JET =
+            ENTITY_TYPES.register("lava_jet", () -> EntityType.Builder
+                    .<LavaJetEntity>of(LavaJetEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .build(key("lava_jet")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ClownCarEntity>> CLOWN_CAR =
             ENTITY_TYPES.register("clown_car", () -> EntityType.Builder

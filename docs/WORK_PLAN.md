@@ -199,8 +199,13 @@ in it.
 *The surface emits too.* Podoboos are now placed by the sea rather than by whichever segment
 happened to include one, spaced about a screen apart, and only in columns with six blocks of clear
 air above the lava — a fireball under a solid floor rises, hits the underside of the level and
-falls back, having cost nothing and taught nothing. *Still missing:* vertical geysers and
-horizontal jets from wall nozzles, which are new hazards rather than a placement change.
+falls back, having cost nothing and taught nothing. *Geysers and wall jets are built too*, as one `LavaJetEntity` with a facing — they are one idea, a
+fixed place that is safe most of the time and lethal on a rhythm, and two entities would have meant
+two clocks to keep in step. The wind-up is the design: the column grows over a fixed warm-up before
+it does damage, and it stays drawn while withdrawing, so "visible" and "lethal" are deliberately
+not the same window. The sea alternates them with Podoboos, because a moving threat the player
+tracks and a fixed one they time stop being read at all if either is the only thing the lava ever
+does. *Still to place:* the wall-nozzle orientation is built and nothing generates one yet.
 
 **4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
 *moves* during the level. The strongest vindication of having built the fluid as a fluid.

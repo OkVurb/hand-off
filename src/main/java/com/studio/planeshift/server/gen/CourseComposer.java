@@ -795,10 +795,20 @@ public final class CourseComposer {
         // Placed by the sea rather than by the segments because it belongs to the sea. The spacing
         // is wide: one every eighteen columns is roughly one per screen, so the player meets them
         // as punctuation rather than as a wall of fire.
+        int emitter = 0;
         for (int x = SPAWN_RUN; x < length - 8; x += PODOBOO_SPACING) {
-            if (openAbove(canvas, x, seaY)) {
-                canvas.spawn(com.studio.planeshift.common.registry.ModEntities.PODOBOO.get(), x + 0.5D, seaY + 1.0D, 0.5D, 0.0F,
-                        SegmentLibrary.GENERATED_TAG);
+            if (!openAbove(canvas, x, seaY)) {
+                continue;
+            }
+            // Alternating, so the sea has two things it does rather than one. A Podoboo is a
+            // moving threat the player tracks; a geyser is a fixed one they time. Either alone
+            // becomes a rhythm the player stops reading after the second world.
+            if (emitter++ % 2 == 0) {
+                canvas.spawn(com.studio.planeshift.common.registry.ModEntities.PODOBOO.get(),
+                        x + 0.5D, seaY + 1.0D, 0.5D, 0.0F, SegmentLibrary.GENERATED_TAG);
+            } else {
+                canvas.spawn(com.studio.planeshift.common.registry.ModEntities.LAVA_JET.get(),
+                        x + 0.5D, seaY + 1.0D, 0.5D, 0.0F, SegmentLibrary.GENERATED_TAG);
             }
         }
         for (int x = -FLOOR_MAP_MARGIN; x < length + FLOOR_MAP_MARGIN; x++) {

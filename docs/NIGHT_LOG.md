@@ -1090,3 +1090,18 @@ instead of one that just sits there. About one per screen -- punctuation, not a 
 of fire -- and only where six blocks of clear air mean the player can actually see
 it happen. A fireball under a solid floor rises, hits the underside of the level and
 falls back, having cost nothing and taught nothing. 361 tests, 0 failures.
+
+## Lava jets
+One entity with a facing rather than a geyser class and a wall-jet class: they are
+one idea -- a fixed place that is safe most of the time and lethal on a rhythm --
+and two would have meant two clocks to keep in step.
+
+The wind-up is the whole design. The column grows over a fixed warm-up before it
+can hurt anything, and it stays drawn while withdrawing, so visible and lethal are
+deliberately different windows. Without that it is a trap, and a hazard the player
+cannot read is a death they cannot learn from.
+
+The sea alternates jets with Podoboos: a moving threat the player tracks and a
+fixed one they time. Either alone is a rhythm you stop reading by the second world.
+The sideways orientation is built and nothing places one yet -- recorded, not
+glossed. 362 tests, 0 failures.

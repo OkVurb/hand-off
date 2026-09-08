@@ -15,5 +15,7 @@ public enum ProjectileVisualProfile {
     /** A lump of rock thrown out of an eruption. */
     FIRE_ROCK,
     /** The Koopalings' clown car, hanging over the final castle's approach. */
-    CLOWN_CAR
+    CLOWN_CAR,
+    /** A column of fire out of the lava or a wall nozzle. */
+    LAVA_JET
 }

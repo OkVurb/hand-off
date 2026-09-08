@@ -46,6 +46,7 @@ public final class BespokeProjectileModel extends EntityModel<ProjectileRenderSt
             case SPIKED_BALL -> spikedBall(root);
             case FIRE_ROCK -> fireRock(root);
             case CLOWN_CAR -> clownCar(root);
+            case LAVA_JET -> lavaJet(root);
         }
         return LayerDefinition.create(mesh, 64, 64);
     }
@@ -83,6 +84,20 @@ public final class BespokeProjectileModel extends EntityModel<ProjectileRenderSt
         add(root, "spike_w", 32, 0, -8, -2, -2, 3, 4, 4, PartPose.ZERO);
         add(root, "spike_n", 32, 32, -2, -2, -8, 4, 4, 3, PartPose.ZERO);
         add(root, "spike_s", 32, 32, -2, -2, 5, 4, 4, 3, PartPose.ZERO);
+    }
+
+    /**
+     * A jet: a stack of flame segments, narrowing as it goes.
+     *
+     * <p>Built as one unit of column and scaled by the renderer rather than as a mesh per length,
+     * because the length is a synced float that changes every tick. Segments rather than one long
+     * box so the taper reads -- a fire that is the same width all the way up is a bar, and the
+     * player has to be able to tell this from a firebar at a glance.
+     */
+    private static void lavaJet(PartDefinition root) {
+        add(root, "core", 0, 0, -3, 0, -3, 6, 16, 6, PartPose.ZERO);
+        add(root, "mid", 0, 22, -2, 10, -2, 4, 8, 4, PartPose.ZERO);
+        add(root, "tip", 0, 38, -1, 16, -1, 2, 5, 2, PartPose.ZERO);
     }
 
     /**

@@ -95,7 +95,7 @@ class LavaSeaTest {
      * the level and falls back, having cost nothing and taught nothing.
      */
     @Test
-    @DisplayName("the sea throws fireballs")
+    @DisplayName("the sea throws fireballs and geysers")
     void theSeaEmits() {
         int coursesWithPodoboos = 0;
         for (long seed = 0; seed < 8; seed++) {
@@ -103,7 +103,9 @@ class LavaSeaTest {
             int seaY = deepestLava(canvas);
             long fromTheSea = canvas.entities().stream()
                     .filter(e -> e.type() == com.studio.planeshift.common.registry.ModEntities
-                            .PODOBOO.get())
+                            .PODOBOO.get()
+                            || e.type() == com.studio.planeshift.common.registry.ModEntities
+                            .LAVA_JET.get())
                     .filter(e -> Math.abs(e.y() - (seaY + 1.0D)) < 0.001D)
                     .count();
             if (fromTheSea > 0) {

@@ -28,7 +28,10 @@ class BespokeProjectileModelTest {
             Map.entry(ProjectileVisualProfile.FIRE_ROCK, 3L),
             // Hull, brim, two eyes, propeller and shaft. The eyes are separate boxes rather than
             // paint because the flash comes out of them and has to be locatable before it fires.
-            Map.entry(ProjectileVisualProfile.CLOWN_CAR, 6L));
+            Map.entry(ProjectileVisualProfile.CLOWN_CAR, 6L),
+            // Core, mid and tip. Segments rather than one long box so the taper reads: a fire the
+            // same width all the way up is a bar, and this must not be mistaken for a firebar.
+            Map.entry(ProjectileVisualProfile.LAVA_JET, 3L));
 
     @ParameterizedTest(name = "{0} bakes as a complete projectile mesh")
     @EnumSource(ProjectileVisualProfile.class)
