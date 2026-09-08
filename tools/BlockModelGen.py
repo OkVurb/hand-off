@@ -249,6 +249,34 @@ def signpost():
     ], "minecraft:cutout")
 
 
+def semisolid_platform():
+    """A deck you jump up through, drawn as a deck rather than as a cube.
+
+    The block is already semisolid in code -- solid from above, empty from below, and it drops you
+    through when you crouch -- and it was rendering as a full cube, which says the opposite of all
+    three. A player reads a solid block as something to land on *or* be stopped by, and half of that
+    is wrong here.
+
+    Five pixels of deck at the top of the cell, with a lip under its front edge. The top face stays
+    where it was, so what the player stands on has not moved by a pixel: collision is full-block
+    from above regardless of this geometry, and the standing height is the top of the cell either
+    way. What changes is that the eleven pixels underneath are visibly empty, which is the whole
+    message of the block.
+    """
+    tex = {
+        "particle": t("semisolid_platform"),
+        "top": t("semisolid_platform_top"),
+        "side": t("semisolid_platform"),
+    }
+    return model(tex, [
+        box((0, 11, 0), (16, 16, 16),
+            {"up": "#top", "down": "#side", "*": "#side"}),
+        # A lip along the underside of the leading edge. It catches shadow, which is what stops a
+        # thin deck reading as a floating sheet of paper at this camera distance.
+        box((0, 9, 0), (16, 11, 3), {"*": "#side"}, shade=False),
+    ])
+
+
 def inset_ledge():
     """A ledge whose centre is genuinely recessed, not painted to look it.
 
@@ -386,6 +414,7 @@ BUILDERS = {
     "course_lattice": lattice,
     "course_banner": banner,
     "course_ledge": inset_ledge,
+    "semisolid_platform": semisolid_platform,
     "course_grate": grate_panel,
     "signpost": signpost,
     "p_switch": lambda: p_switch(False),
