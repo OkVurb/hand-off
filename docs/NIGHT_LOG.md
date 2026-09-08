@@ -1208,3 +1208,18 @@ placement used a fixed stride plus a visibility test, which silently becomes "of
 nothing at all" since most of a volcano is solid floor. The pass now walks forward to
 the next visible column instead of skipping the slot. Fixed the placement rather than
 the threshold. 372 tests, 0 failures.
+
+## Things growing on the floor (5.8), and sandstone (4.6)
+Every prop in the decorator sat behind the lane, which is why the walkable surface
+read as a shelf the level is displayed on. Tufts now stand on the floor the player
+runs along: sparse, and only where the floor is the theme's own surface, because
+grass on a girder is the detail that makes a level look generated.
+
+Non-solid and in the reachability proof's passable set -- the rail taught that
+lesson already. Coral was going to cover water and it walled 108 of 6000 courses,
+because COURSE_CORAL is solid and built for the layer behind the lane. Dropped water
+and wrote down why rather than forcing it.
+
+Sandstone joins the castle block on mixed-size masonry. Brick and desert brick keep
+the even module: a quarry and a brickworks differ in exactly whether the pieces come
+out the same size. 373 tests, 0 failures.

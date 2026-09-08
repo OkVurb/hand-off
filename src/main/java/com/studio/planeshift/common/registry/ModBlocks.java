@@ -206,6 +206,29 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> COURSE_GLASS = courseBlock(
             "course_glass", MapColor.COLOR_BLUE, SoundType.GLASS);
 
+    /**
+     * Ground cover that stands on the playfield itself.
+     *
+     * <p>Every decorator prop in this mod sits behind the lane, which is why the walkable surface
+     * reads as a shelf the level is displayed on rather than as ground. The reference puts flowers,
+     * tufts and fences on the surface the player runs along, and the difference is most of what
+     * makes its levels look inhabited rather than assembled.
+     *
+     * <p>No collision, and drawn only in the lower part of its own texture. A decoration on the
+     * floor must never be mistakable for something to stand on or trip over -- the moment the
+     * player has to think about whether a tuft is solid, it has cost more than it gave.
+     */
+    public static final DeferredBlock<Block> COURSE_TUFT = courseBlock(
+            "course_tuft", MapColor.PLANT, SoundType.GRASS, true);
+
+    /** The same, in snow's palette. */
+    public static final DeferredBlock<Block> COURSE_TUFT_SNOW = courseBlock(
+            "course_tuft_snow", MapColor.SNOW, SoundType.GRASS, true);
+
+    /** And in the desert's: dry, pale, and sparser than the green one. */
+    public static final DeferredBlock<Block> COURSE_TUFT_DESERT = courseBlock(
+            "course_tuft_desert", MapColor.SAND, SoundType.GRASS, true);
+
     public static final DeferredBlock<Block> COURSE_CORAL = courseBlock(
             "course_coral", MapColor.COLOR_PINK, SoundType.CORAL_BLOCK);
 
@@ -572,10 +595,25 @@ public final class ModBlocks {
 
     private static DeferredBlock<Block> courseBlock(String name, MapColor mapColor,
                                                      SoundType sound) {
-        return BLOCKS.registerSimpleBlock(name, properties -> properties
-                .mapColor(mapColor)
-                .strength(1.5F, 6.0F)
-                .sound(sound));
+        return courseBlock(name, mapColor, sound, false);
+    }
+
+    /**
+     * As above, optionally as scenery the player passes straight through.
+     *
+     * <p>The flag exists for ground cover. A decoration standing on the walkable surface has to be
+     * non-solid or it is furniture, and it has to say so in one place -- {@code CourseReachability}
+     * keeps its own list of what the player can walk through, and the rail already taught this
+     * project what happens when the two disagree: the block becomes unusable anywhere it matters.
+     */
+    private static DeferredBlock<Block> courseBlock(String name, MapColor mapColor,
+                                                     SoundType sound, boolean scenery) {
+        return BLOCKS.registerSimpleBlock(name, properties -> {
+            var props = properties.mapColor(mapColor).sound(sound);
+            return scenery
+                    ? props.strength(0.2F).noCollision().noOcclusion()
+                    : props.strength(1.5F, 6.0F);
+        });
     }
 
     private ModBlocks() {

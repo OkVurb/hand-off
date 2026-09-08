@@ -67,6 +67,8 @@ public final class CourseDecorator {
         // what scattering props at two depths did -- matches neither.
         backdrop(canvas, ctx, random, from, to, floorAt, margin);
 
+        groundCover(canvas, ctx, random, from, to, floorAt, margin);
+
         for (int x = from; x < to; x += SPACING) {
             int at = x + random.nextInt(SPACING / 2);
             if (at >= to) {
@@ -85,6 +87,65 @@ public final class CourseDecorator {
                 place(canvas, ctx, random, at, floor, side);
             }
         }
+    }
+
+    /**
+     * Scatters ground cover on the surface the player runs along.
+     *
+     * <p>Every other prop in this file is placed <em>behind</em> the lane, and that is why the
+     * walkable surface reads as a shelf the level is displayed on rather than as ground. The
+     * reference puts detail on the playfield itself, and it is most of what makes its levels look
+     * inhabited rather than assembled.
+     *
+     * <p>Placed only where the floor is what the theme's own surface is made of — never on a
+     * platform, a brick or a moving thing. Grass on a girder is the sort of detail that makes a
+     * level look generated, which is the one thing this pass exists to fight.
+     *
+     * <p>Sparse and irregular. A tuft every few blocks is texture; a tuft in every gap is a lawn,
+     * and a lawn is as uniform as bare stone.
+     */
+    private static void groundCover(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
+                                    int from, int to, int[] floorAt, int margin) {
+        BlockState cover = groundCoverFor(ctx);
+        if (cover == null) {
+            return;
+        }
+        BlockState surface = ctx.palette().surface();
+        for (int x = from; x < to; x++) {
+            if (random.nextInt(7) != 0) {
+                continue;
+            }
+            int slot = x + margin;
+            if (slot < 0 || slot >= floorAt.length) {
+                continue;
+            }
+            int floor = floorAt[slot];
+            BlockState under = canvas.get(x, floor, 0);
+            if (under == null || !under.is(surface.getBlock())) {
+                continue;
+            }
+            canvas.setIfEmpty(x, floor + 1, 0, cover);
+        }
+    }
+
+    /**
+     * What grows on this theme's floor, or {@code null} where nothing should.
+     *
+     * <p>Caves and castles get nothing, and that is a decision rather than a gap: a stone floor
+     * with tufts on it is a stone floor somebody has neglected, which says something about the room
+     * that the level is not trying to say.
+     */
+    private static BlockState groundCoverFor(GenContext ctx) {
+        return switch (ctx.theme()) {
+            case GRASS -> ModBlocks.COURSE_TUFT.get().defaultBlockState();
+            case SNOW -> ModBlocks.COURSE_TUFT_SNOW.get().defaultBlockState();
+            case DESERT -> ModBlocks.COURSE_TUFT_DESERT.get().defaultBlockState();
+            // Water gets nothing yet, and the reason is worth recording: COURSE_CORAL is a solid
+            // block built for the layer behind the lane, so putting it on the floor walled the
+            // corridor and the proof rejected 108 of 6000 courses. Coral on the playfield needs a
+            // non-solid fan of its own, which is a block rather than a placement.
+            default -> null;
+        };
     }
 
     private static void place(CourseCanvas canvas, GenContext ctx, RandomGenerator random,

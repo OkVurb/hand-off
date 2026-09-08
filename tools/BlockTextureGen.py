@@ -339,8 +339,11 @@ CONNECTED = {
     # reads as a surface rather than as a cut through a dune.
     "course_sand_block": (lambda: drift((228, 196, 118), 73), (228, 196, 118),
                           {"cap": (244, 222, 164), "cap_rows": 3}),
-    "course_sandstone": (lambda: masonry((214, 182, 118), 81, course=4, mortar=0.78,
-                                         light=False), (214, 182, 118), {}),
+    # Cut stone, so it gets the mixed-size treatment too. Desert brick keeps the even module --
+    # that one is a made brick and this one is quarried, and the difference between a quarry and a
+    # brickworks is exactly whether the pieces come out the same size.
+    "course_sandstone": (lambda: coursed_rubble((214, 182, 118), 81, mortar=0.78,
+                                                light=False), (214, 182, 118), {}),
     # Volcanic rock, with a hot crust where it is exposed to the air above.
     "course_basalt": (lambda: drift((58, 54, 62), 83, flecks=(0.86, 1.12)),
                       (58, 54, 62), {"cap": (128, 64, 40), "cap_rows": 2}),
@@ -982,6 +985,30 @@ def stained_glass(glass, lead):
     return img
 
 
+def tuft(blade, tip):
+    """A few blades rising from the bottom edge, thinning as they go.
+
+    Drawn only in the lower two thirds and anchored to the bottom row, because this sits on the
+    floor the player runs along: anything in the upper third reads as an obstacle at knee height,
+    and the one thing a decoration must never do is look like something you can stand on or trip
+    over.
+
+    Three blades of different heights rather than a bush. At sixteen pixels a mass reads as a
+    lump; separate strokes read as growth.
+    """
+    img = new()
+    d = ImageDraw.Draw(img)
+    for base_x, height, lean in ((3, 9, 1), (7, 12, 0), (11, 7, -1)):
+        for i in range(height):
+            y = S - 1 - i
+            x = base_x + int(lean * (i / 3.0))
+            d.point((x, y), fill=shade(blade, 1.0 - i * 0.02))
+            if i < height - 3:
+                d.point((x + 1, y), fill=shade(blade, 0.86))
+        d.point((base_x + int(lean * (height / 3.0)), S - height), fill=tip)
+    return img
+
+
 def axe():
     """A single-bit axe, head up, seen side on.
 
@@ -1287,6 +1314,9 @@ def build():
     out["coin_ring_block"] = ring((248, 206, 72), True)
     out["coin_ring_block_used"] = ring((132, 132, 138), False)
     out["course_vine"] = vine((66, 142, 56))
+    out["course_tuft"] = tuft((78, 154, 62), (150, 210, 96))
+    out["course_tuft_snow"] = tuft((196, 214, 226), (238, 246, 252))
+    out["course_tuft_desert"] = tuft((176, 156, 90), (216, 200, 132))
     out["course_glass"] = stained_glass((86, 132, 214), (38, 34, 46))
     out["axe_block"] = axe()
 

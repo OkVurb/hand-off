@@ -116,7 +116,13 @@ public final class CourseReachability {
             // expensive to place anywhere the player also has to be. Section 1's whole rule is
             // that a trajectory is shown by real geometry, so the geometry has to be free to sit
             // in the corridor it describes.
-            ModBlocks.COURSE_RAIL.get());
+            ModBlocks.COURSE_RAIL.get(),
+            // Ground cover, for the same reason and taught by the same mistake. These stand on the
+            // floor the player runs along; if the proof called them walls, the only place they are
+            // worth putting would be the only place they could not go.
+            ModBlocks.COURSE_TUFT.get(),
+            ModBlocks.COURSE_TUFT_SNOW.get(),
+            ModBlocks.COURSE_TUFT_DESERT.get());
 
     /**
      * Solid blocks the solver refuses to stand on.

@@ -3,8 +3,10 @@ package com.studio.planeshift.server.gen;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.studio.planeshift.common.course.CourseTheme;
+import com.studio.planeshift.common.registry.ModBlocks;
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -55,5 +57,36 @@ class CourseDecoratorTest {
             }
             assertTrue(!depths.isEmpty(), theme + " generated no scenery at all");
         }
+    }
+
+    /**
+     * Detail stands on the playfield, not only behind it.
+     *
+     * <p>§5.8's complaint was that every prop in this file is placed behind the lane, which makes
+     * the walkable surface read as a shelf the level is displayed on rather than as ground. What is
+     * checked is the lane column specifically — a test that counted props anywhere would have
+     * passed before the change and after it.
+     */
+    @Test
+    @DisplayName("ground cover stands on the lane itself")
+    void detailSitsOnThePlayfield() {
+        int withCover = 0;
+        for (long seed = 0; seed < 12; seed++) {
+            CourseCanvas canvas = CourseComposer.compose(
+                    CourseTheme.GRASS, 480, 2, seed).canvas();
+            for (int x = 0; x < 480; x++) {
+                for (int y = -4; y < 16; y++) {
+                    var state = canvas.get(x, y, 0);
+                    if (state != null && state.is(ModBlocks.COURSE_TUFT.get())) {
+                        withCover++;
+                        x = 480;
+                        break;
+                    }
+                }
+            }
+        }
+        assertTrue(withCover >= 10,
+                "only " + withCover + " of 12 grass courses had anything growing on the floor the "
+                        + "player runs along");
     }
 }

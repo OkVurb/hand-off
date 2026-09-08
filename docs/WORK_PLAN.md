@@ -297,12 +297,13 @@ own casts. Those were the last two places where the shared interiors collapsed s
 **4.6 Terrain is masonry of mixed block sizes.** *The single most visible thing in the reference.*
 Big slabs, half-slabs and squares in two alternating tones; the eye reads the wall, not the grid.
 
-*Built for the castle block*, which is the wall the player sees most: `coursed_rubble` lays three
+*Built for the castle block and the sandstone*, which is the wall the player sees most: `coursed_rubble` lays three
 courses of unequal height, each split into stones whose widths sum to sixteen — that is what keeps
 it seamless, since every row closes exactly at the tile edge while nothing inside repeats at the
 same interval twice. Two tones per stone from a position hash, kept close together so the wall
-reads as one material rather than as chequerwork. `masonry` stays for the brick block, where one
-module is correct. Sandstone and the other coursed blocks have not been converted yet.
+reads as one material rather than as chequerwork. `masonry` stays for the brick and desert-brick blocks, where one module is correct — the difference
+between a quarry and a brickworks is exactly whether the pieces come out the same size. Basalt and
+deepstone keep their granular treatment: they are rock faces rather than built walls.
 
 **4.7 Pipes are structural, and a colour set of at least five.** *The colour set is already built* —
 all five exist as `WarpPipeBlock.Colour` with their own textures, and `SegmentLibrary.pipe()` leans
@@ -363,8 +364,19 @@ themed colour was missing, and is now done. Stained glass in castle back walls i
 **5.7 Background hills carry pattern.** Rounded mounds with chevron and zigzag striping, not flat
 silhouettes. A cloud bank often sits between terrain and far hills.
 
-**5.8 Foreground detail sits on the playfield itself.** Flowers, tufts, fences and coral on the
-walkable surface, not only behind it. Every decorator prop is currently placed behind the lane.
+**5.8 Foreground detail sits on the playfield itself.** *Built.* `groundCover` scatters tufts on the
+lane floor — green in grass, frosted in snow, dry in the desert — sparsely and only where the floor
+is the theme's own surface material, because grass on a girder is exactly the detail that makes a
+level look generated. Caves and castles get none on purpose: a stone floor with tufts on it is a
+stone floor somebody has neglected.
+
+The blocks are non-solid *and* listed in `CourseReachability`'s passable set, which is the lesson
+the rail already taught — a block the world lets you through and the proof does not is unusable in
+the one place it is worth having.
+
+*Water still gets none*, and the reason is recorded rather than glossed: `COURSE_CORAL` is a solid
+block built for the layer behind the lane, so putting it on the floor walled the corridor and the
+proof rejected 108 of 6000 courses. Coral on the playfield needs a non-solid fan of its own.
 
 **5.9 Theme identity can ride on one block's face art.** Forest ground is stacked cut logs seen
 end-on, with concentric growth rings and moss on top. The cheapest kind of identity there is.
