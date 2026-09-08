@@ -1768,3 +1768,25 @@ than a random, so courses still generate identically from a seed.
 
 Verified by reverting the one line and watching the test fail.
 394 tests, full build green, jar reinstalled.
+
+## Scenery standing on air
+
+The background props were never given a floor. Terrain writing fills the lane and nothing
+else — three blocks deep — while every prop is placed two or three blocks further back, so
+bushes, trees, dunes, drifts and hills all had empty air directly beneath them. At this camera
+angle that reads as furniture hanging in the sky, which is most of what "the background makes
+no sense" was actually pointing at; the props themselves were fine.
+
+`backdropGround` now continues the design floor backwards across the decorated band, with the
+same three blocks of fill under it, so the ground the player runs along keeps going instead of
+ending at the edge of the corridor. Only where the floor is a real floor: columns the generator
+left as pits stay open, because a gap should read as a gap from every angle and filling in
+behind one would put a wall across the jump the level is asking for.
+
+Two tests. The first asks whether a backdrop column repeats the lane's own block at the same
+height — counting scenery of any kind would have passed before the change, since the props were
+always there. Verified by disabling the call: 0 of 457 solid columns backed, against 317 with it
+in place. The second pins the other half, that gaps survive; without it the obvious "fix" is to
+fill everything.
+
+396 tests, build green, jar installed.

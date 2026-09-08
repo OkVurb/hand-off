@@ -83,6 +83,8 @@ public final class CourseDecorator {
 
         groundCover(canvas, ctx, random, from, to, floorAt, margin);
 
+        backdropGround(canvas, ctx, from, to, floorAt, margin);
+
         for (int x = from; x < to; x += SPACING) {
             int at = x + random.nextInt(SPACING / 2);
             if (at >= to) {
@@ -160,6 +162,47 @@ public final class CourseDecorator {
             // non-solid fan of its own, which is a block rather than a placement.
             default -> null;
         };
+    }
+
+    /**
+     * Ground for the scenery to stand on.
+     *
+     * <p>Terrain in this game is three blocks deep — {@code ctx.ground} writes the lane and nothing
+     * else — and every prop is placed two or three blocks further back than that. So bushes, trees,
+     * dunes, drifts and hills were all standing on nothing: a hedgerow with its base at floor level
+     * and empty air beneath it, which at this camera angle reads as furniture hanging in the sky.
+     * It is most of why the background "makes no sense" when you actually look at it.
+     *
+     * <p>Laid at the same height as the design floor, so the ground the player runs along continues
+     * backwards instead of ending at the edge of the corridor. Three blocks of fill under it,
+     * matching {@code ctx.ground}, because a one-block shelf seen from slightly above is a shelf.
+     *
+     * <p>Only where the floor is a real floor. Columns that are pits stay open: a gap the player
+     * can fall through should read as a gap from every angle, and filling in behind it would put a
+     * wall across the one thing the level is asking them to jump over.
+     */
+    private static void backdropGround(CourseCanvas canvas, GenContext ctx,
+                                       int from, int to, int[] floorAt, int margin) {
+        BlockState surface = ctx.palette().surface();
+        BlockState fill = ctx.palette().fill();
+        for (int x = from; x < to; x++) {
+            int slot = x + margin;
+            if (slot < 0 || slot >= floorAt.length) {
+                continue;
+            }
+            int floor = floorAt[slot];
+            // A pit is a pit all the way back. isEmpty at the lane centre is how this asks whether
+            // the generator actually built ground here, rather than trusting the design map.
+            if (canvas.isEmpty(x, floor, 0)) {
+                continue;
+            }
+            for (int z = FAR_Z; z <= NEAR_Z; z++) {
+                canvas.setIfEmpty(x, floor, z, surface);
+                for (int depth = 1; depth <= 3; depth++) {
+                    canvas.setIfEmpty(x, floor - depth, z, fill);
+                }
+            }
+        }
     }
 
     private static void place(CourseCanvas canvas, GenContext ctx, RandomGenerator random,

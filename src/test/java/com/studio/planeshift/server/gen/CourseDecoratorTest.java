@@ -110,4 +110,86 @@ class CourseDecoratorTest {
                 "only " + withCover + " of 12 grass courses had anything growing on the floor the "
                         + "player runs along");
     }
+
+    /**
+     * The scenery has ground under it.
+     *
+     * <p>Terrain is three blocks deep — the lane and nothing else — while every prop is placed two
+     * or three blocks further back, so bushes, trees, dunes and hills all stood on air. Seen from
+     * this camera that reads as furniture hanging in the sky, which is most of what "the background
+     * makes no sense" was pointing at.
+     *
+     * <p>Checked by asking whether the backdrop column repeats the lane's own block at the same
+     * height: ground that continues backwards rather than stopping at the edge of the corridor.
+     * Counting scenery of any kind would have passed before the fix, since the props were always
+     * there — it was the floor beneath them that was missing.
+     */
+    @Test
+    @DisplayName("scenery stands on ground rather than on air")
+    void theBackdropHasAFloor() {
+        int length = 480;
+        for (long seed = 0; seed < 6; seed++) {
+            CourseCanvas canvas = CourseComposer.compose(
+                    CourseTheme.GRASS, length, 2, seed).canvas();
+            int backed = 0;
+            int solid = 0;
+            for (int x = 0; x < length; x++) {
+                boolean laneHasGround = false;
+                boolean hasBacking = false;
+                for (int y = -6; y < 8; y++) {
+                    var lane = canvas.get(x, y, 0);
+                    if (lane == null) {
+                        continue;
+                    }
+                    laneHasGround = true;
+                    if (lane.equals(canvas.get(x, y, CourseDecorator.NEAR_Z))) {
+                        hasBacking = true;
+                    }
+                }
+                if (laneHasGround) {
+                    solid++;
+                    if (hasBacking) {
+                        backed++;
+                    }
+                }
+            }
+            assertTrue(backed * 2 >= solid,
+                    "seed " + seed + ": only " + backed + " of " + solid
+                            + " solid columns had anything behind them to stand on");
+        }
+    }
+
+    /**
+     * A pit is a pit all the way back.
+     *
+     * <p>The floor above must not be laid across gaps: filling in behind a hole would put a wall
+     * across the one thing the level is asking the player to jump over, and the hole would stop
+     * reading as a hole. This is the half of the fix that is easy to lose.
+     */
+    @Test
+    @DisplayName("gaps stay open behind the lane too")
+    void pitsAreNotFilledInFromBehind() {
+        int length = 480;
+        int open = 0;
+        for (long seed = 0; seed < 6; seed++) {
+            CourseCanvas canvas = CourseComposer.compose(
+                    CourseTheme.GRASS, length, 2, seed).canvas();
+            for (int x = 0; x < length; x++) {
+                boolean laneClear = true;
+                boolean backClear = true;
+                for (int y = -6; y < 4; y++) {
+                    if (canvas.get(x, y, 0) != null) {
+                        laneClear = false;
+                    }
+                    if (canvas.get(x, y, CourseDecorator.NEAR_Z) != null) {
+                        backClear = false;
+                    }
+                }
+                if (laneClear && backClear) {
+                    open++;
+                }
+            }
+        }
+        assertTrue(open > 0, "every column had ground behind it, so no gap survived the backdrop");
+    }
 }
