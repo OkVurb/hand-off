@@ -12,6 +12,7 @@ import com.studio.planeshift.common.entity.HammerBroEntity;
 import com.studio.planeshift.common.entity.HammerBroGoal;
 import com.studio.planeshift.common.registry.ModBlocks;
 import com.studio.planeshift.common.registry.ModEntities;
+import com.studio.planeshift.common.registry.ModFluids;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.BlockPos;
@@ -43,6 +44,7 @@ public class PlaneShiftGameTests {
     public static final Identifier P_SWITCH_TEST = PlaneShift.id("p_switch_test");
     public static final Identifier ON_OFF_SWITCH_TEST = PlaneShift.id("on_off_switch_test");
     public static final Identifier AIR_DROP_TEST = PlaneShift.id("air_drop_test");
+    public static final Identifier LAVA_FALL_TEST = PlaneShift.id("lava_fall_test");
     public static final Identifier COIN_BRICK_TEST = PlaneShift.id("coin_brick_test");
     public static final Identifier HAMMER_BRO_PERCH_TEST = PlaneShift.id("hammer_bro_perch_test");
     public static final Identifier COURSE_GENERATION_TEST = PlaneShift.id("course_generation_test");
@@ -54,6 +56,7 @@ public class PlaneShiftGameTests {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, P_SWITCH_TEST), PlaneShiftGameTests::testPSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), PlaneShiftGameTests::testOnOffSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), PlaneShiftGameTests::testAirDrop);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, LAVA_FALL_TEST), PlaneShiftGameTests::testLavaFalls);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), PlaneShiftGameTests::testCoinBrick);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), PlaneShiftGameTests::testHammerBroPerch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), PlaneShiftGameTests::testCourseGeneration);
@@ -69,6 +72,7 @@ public class PlaneShiftGameTests {
         event.registerTest(P_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, P_SWITCH_TEST), data));
         event.registerTest(ON_OFF_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), data));
         event.registerTest(AIR_DROP_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), data));
+        event.registerTest(LAVA_FALL_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, LAVA_FALL_TEST), data));
         event.registerTest(COIN_BRICK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), data));
         event.registerTest(HAMMER_BRO_PERCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), data));
         event.registerTest(COURSE_GENERATION_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), data));
@@ -204,6 +208,31 @@ public class PlaneShiftGameTests {
         enemy.tick();
         helper.succeedWhen(() -> helper.assertFalse(enemy.fallingFromDrop(),
                 "Enemy should clear airDropped flag when on ground"));
+    }
+
+    /**
+     * Does the course lava fall?
+     *
+     * <p>Plan entry 2.5 says it cannot, and that the lavafalls in the backdrop are a column of
+     * source blocks working around it. That is an assertion about physics, and physics is the one
+     * thing a unit test on this project cannot answer -- {@code levelDecreasePerBlock} governs
+     * horizontal spread and vanilla handles falling separately, so reading the registration is not
+     * enough to know which way it goes. This is the oracle: put a source in the air over a floor,
+     * let the server tick, and look.
+     */
+    private static void testLavaFalls(GameTestHelper helper) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                helper.setBlock(new BlockPos(1 + dx, 1, 1 + dz), Blocks.STONE);
+            }
+        }
+        BlockPos source = new BlockPos(1, 5, 1);
+        helper.setBlock(source, ModFluids.LAVA_BLOCK.get());
+        helper.succeedWhen(() -> helper.assertTrue(
+                helper.getBlockState(new BlockPos(1, 4, 1))
+                        .getFluidState().getType().isSame(ModFluids.LAVA.get()),
+                "course lava did not fall one block in the time given; the backdrop's column of "
+                        + "source blocks is load-bearing rather than cosmetic"));
     }
 
     private static void testCoinBrick(GameTestHelper helper) {

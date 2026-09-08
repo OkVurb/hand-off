@@ -1152,3 +1152,22 @@ tint exists -- one tint everywhere is the same grey in a warmer hue.
 
 2.5 is the only entry left in the section: the fluids still cannot fall, and the
 lavafall is a column of source blocks. 368 tests, 0 failures.
+
+## 2.5 was wrong, and the game said so
+The entry reasoned from the registration: levelDecreasePerBlock is 8, so a flowing
+block has no level left, so nothing falls. That property governs horizontal spread;
+vanilla handles falling on a separate path. Reading the code was never going to
+settle it.
+
+Wrote lava_fall_test -- source in the air over a floor, tick, look. The lava falls.
+It always has. All 10 gametests pass.
+
+The backdrop's column of source blocks stays, now for a stated reason instead of an
+assumed one: a poured column is generator-visible geometry the reachability proof
+can see, while a flowing fluid exists only at runtime and the proof would be
+reasoning about a level the player never gets. Right answer, wrong reason, worth
+writing down so nobody fixes it back.
+
+Third plan entry wrong about how something is built rather than what it does, and
+the first settled by running the game. Section 2 is complete. 368 unit tests, 10
+gametests, 0 failures.

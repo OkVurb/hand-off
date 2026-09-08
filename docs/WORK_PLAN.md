@@ -98,10 +98,24 @@ replacement reads as coloured glass and a partial mix reads as light in the air.
 touches view distance — that was settled when the underwater fog came out, and for the same reason:
 tinting is a look, shortening the view is a handicap, and vanilla ships them in one object.
 
-**2.5 The custom fluids cannot fall.** *Open — the only entry in this section still standing.* `ModFluids` sets `levelDecreasePerBlock` to 8 so pools stay
-where the generator puts them, and lava visibly pours down cliff faces into the sea below. A column
-of source blocks looks right and costs nothing, but it is a workaround for a property chosen for
-other reasons, not the fluid behaving like a fluid.
+**2.5 ~~The custom fluids cannot fall.~~ The premise was false, and a gametest says so.** The entry
+reasoned from the registration: `levelDecreasePerBlock` is 8, therefore a flowing block has no level
+left, therefore nothing falls. But that property governs *horizontal* spread — vanilla handles
+downward flow on a separate path — so reading the registration was never enough to know which way it
+went.
+
+`lava_fall_test` puts a source in the air over a floor, lets the server tick, and looks. The lava
+falls. It has always fallen.
+
+*What that changes:* the backdrop's column of source blocks is not a workaround for a broken fluid.
+It stays anyway, and now for a stated reason rather than an assumed one — a poured column is
+generator-visible geometry that `CourseReachability` can see, while a flowing fluid exists only at
+runtime and the proof would be reasoning about a level that is not the level the player gets. The
+right answer, arrived at for the wrong reason, which is worth writing down so nobody "fixes" it back.
+
+*Method note:* this is the third plan entry to be wrong about **how** something is built rather than
+about what it does, and the first to be settled by running the game instead of reading the code. The
+unit suite cannot answer a physics question; `runGameTestServer` can.
 
 ---
 
