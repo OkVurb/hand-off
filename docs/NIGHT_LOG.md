@@ -1542,3 +1542,26 @@ contradict each other until somebody tried to use one. Removed the seven and put
 fence around marker() saying what it is for.
 
 385 tests, full build green.
+
+## Project review: two silent lies
+Reviewed the whole project rather than a diff. Clean on the big sweeps -- no
+unplaced blocks, no unspawned entity types, no dead public API in generation. Two
+real faults, both the same species: code that could not tell you it had stopped
+working.
+
+HungerService held a reflective handle on FoodData.exhaustionLevel, resolved by
+field name, wrapped in a bare catch that returned null. On any mapping where that
+field is named differently the service quietly did nothing and said nothing. It also
+did not need to exist: exhaustion matters only because it eventually drains
+saturation and food, and both are being set to maximum every tick anyway. Deleted
+the reflection, kept the two setters, wrote down why.
+
+The HUD's control hints printed "[SPACE]" and "[SHIFT]" as literal text. Correct for
+a default install, a lie for anyone who has rebound anything -- and the players most
+likely to have rebound jump are the ones who most need the hint. They read the actual
+bindings now. The comment above them already called it "a real TODO", which is the
+project telling on itself and being ignored.
+
+Also configured the playtest instance: enhanced-movement's double jump and ledge grab
+off, which is the one pack setting that undermines the level design rather than
+coexisting with it. Fresh jar installed. 385 tests, full build green.

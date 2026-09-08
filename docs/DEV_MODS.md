@@ -88,3 +88,18 @@ wrong.
 **Boss Music Mod** — not usable, and not needed. It is a datapack keyed to the ender dragon and the
 wither by name, with no hook for other bosses. PlaneShift has its own boss track and its own
 proximity trigger; the fix there was in this mod, not in that one.
+
+## Instance configuration, applied 2026-09-08
+
+**enhanced-movement: Double Jump and Ledge Grab turned off** in
+`config/enhancedmovement.json` (a `.bak` of the original sits beside it). This is the one setting in
+the pack that materially undermines the mod rather than merely coexisting with it: every gap in a
+generated course is sized against a proven jump arc, and `CourseReachability` proves completability
+against that arc. A free second jump does not make courses unbeatable — it makes every gap free and
+every secret trivially reachable, which is deleting the level design and keeping the scenery. Its
+dash was already off; the afterimages are harmless and left alone.
+
+**Everything else was left as shipped.** ParCool's stamina is handled in code by `ParCoolBridge`
+rather than by config, so its own numbers stay untouched and it behaves normally outside courses.
+The rest of the pack is performance, rendering and convenience mods that do not touch anything this
+one owns — checked, not assumed.

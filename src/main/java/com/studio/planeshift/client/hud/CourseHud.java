@@ -271,9 +271,10 @@ public final class CourseHud {
     /**
      * Bedrock-style control hints in the bottom corners.
      *
-     * <p>Static text rather than the live keybinds: {@code minecraft.options.keyJump.getTranslatedKeyMessage()}
-     * would follow a rebind, and this does not. Left as-is because it is what was written, but a
-     * player who has remapped jump is being told the wrong key, so this is a real TODO.
+     * <p>Reads the player's actual bindings. This used to print "[SPACE]" and "[SHIFT]" as literal
+     * text, which is correct for a default install and a lie for anyone who has rebound anything —
+     * and the players most likely to have rebound jump are the ones who most need the hint. The
+     * options object knows what the keys are; asking it costs one call per label.
      */
     private static void renderKeybindHints(GuiGraphics graphics, Font font, Minecraft minecraft, float hudScale) {
         int usableWidth = (int) (graphics.guiWidth() / hudScale);
@@ -283,17 +284,25 @@ public final class CourseHud {
         int bottomY = usableHeight - 15;
         
         // Bottom Left: Movement/Jump
-        graphics.drawString(font, "Jump [SPACE]", 10, bottomY - 12, 0xFFFFFFFF, true);
-        graphics.drawString(font, "Crouch / Warp [SHIFT]", 10, bottomY, 0xFFFFFFFF, true);
-        
+        graphics.drawString(font, "Jump " + key(minecraft.options.keyJump),
+                10, bottomY - 12, 0xFFFFFFFF, true);
+        graphics.drawString(font, "Crouch / Warp " + key(minecraft.options.keyShift),
+                10, bottomY, 0xFFFFFFFF, true);
+
         // Bottom Right: Actions
-        String runStr = "Action / Run [L-CLICK]";
+        String runStr = "Action / Run " + key(minecraft.options.keyAttack);
         int runWidth = font.width(runStr);
         graphics.drawString(font, runStr, usableWidth - runWidth - 10, bottomY - 12, 0xFFFFFFFF, true);
-        
-        String useStr = "Use [R-CLICK]";
+
+        String useStr = "Use " + key(minecraft.options.keyUse);
         int useWidth = font.width(useStr);
         graphics.drawString(font, useStr, usableWidth - useWidth - 10, bottomY, 0xFFFFFFFF, true);
+    }
+
+    /** A binding's current key, bracketed, so the hint follows a rebind instead of guessing. */
+    private static String key(net.minecraft.client.KeyMapping mapping) {
+        return "[" + mapping.getTranslatedKeyMessage().getString().toUpperCase(java.util.Locale.ROOT)
+                + "]";
     }
 
     /**
