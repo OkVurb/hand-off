@@ -1709,3 +1709,22 @@ vanilla's push-apart stacks them. They turn away from each other now, which is t
 reference's answer and the only one that needs no enemy to know another's speed.
 
 392 tests, full build green, jar reinstalled.
+
+## Hills made of bush, and a frame made of hazard tape
+Two art faults the owner called out, both mine.
+
+The backdrop's hills were built from COURSE_HEDGE_DISTANT -- the hedge texture hazed
+back -- so every silhouette on the horizon was leaf blobs. A mound of bush, not a
+hill. At that distance a hill has no texture at all: it has a lighter top where the
+light lands, a darker base, and the shape does the rest. COURSE_HILL_DISTANT is that,
+almost featureless on purpose, because anything with a repeat becomes a pattern the
+moment the hill is wider than one block. The hedge keeps its own job, which is being
+the crown of a tree.
+
+The bonus frame was diagonal yellow stripes on red, which is hazard tape. Tiled up a
+column it made something nobody could name, and it was loud enough to pull the eye off
+the room it was framing. A frame is furniture: legible at the edge of vision, invisible
+at the centre of attention. One colour now, a lit top edge, a shadowed bottom, one
+inset accent line.
+
+392 tests, full build green, jar reinstalled.

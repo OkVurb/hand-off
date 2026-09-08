@@ -316,6 +316,17 @@ public final class ModBlocks {
                     .noOcclusion()
                     .sound(SoundType.CHAIN));
 
+    /**
+     * The mass a far hill is made of.
+     *
+     * <p>Hills used to be built from {@code COURSE_HEDGE_DISTANT}, so every silhouette on the
+     * horizon was made of leaf blobs — a mound of bush rather than a hill. At that distance a hill
+     * has no texture; it has a lighter top and a darker base and the shape does the rest. The hedge
+     * keeps its own job, which is being the crown of a tree.
+     */
+    public static final DeferredBlock<Block> COURSE_HILL_DISTANT = courseBlock(
+            "course_hill_distant", MapColor.PLANT, SoundType.GRASS);
+
     public static final DeferredBlock<Block> COURSE_HEDGE_DISTANT_BAND = courseBlock(
             "course_hedge_distant_band", MapColor.PLANT, SoundType.GRASS);
 

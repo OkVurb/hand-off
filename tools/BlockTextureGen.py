@@ -405,6 +405,29 @@ def shade_image(img, factor):
     return out
 
 
+def hill_mass(base, seed):
+    """A far hill: a smooth mass with a faint vertical gradient and nothing else.
+
+    The backdrop's hills were built from the *hedge* texture hazed back, so every silhouette on the
+    horizon was made of leaf blobs -- a mound of bush rather than a hill. At this distance a hill
+    has no texture at all; what it has is a slightly lighter top where the light lands and a
+    slightly darker base, and the shape does the rest.
+
+    Deliberately almost featureless. Anything with a repeat in it becomes a pattern the moment the
+    hill is more than one block wide, and a patterned horizon is the thing aerial perspective is
+    supposed to remove.
+    """
+    img = new()
+    d = ImageDraw.Draw(img)
+    for y in range(S):
+        f = 1.06 - (y / float(S)) * 0.16
+        d.line([(0, y), (S - 1, y)], fill=shade(base, f))
+    # Two faint creases, off-centre and unequal, so a wide hill is not a flat wall of colour.
+    d.line([(4, 3), (5, S - 1)], fill=shade(base, 0.95))
+    d.line([(11, 0), (10, S - 4)], fill=shade(base, 1.03))
+    return img
+
+
 def distant(img, haze=(186, 214, 236), amount=0.46):
     """Push a texture back into the distance.
 
@@ -1118,16 +1141,25 @@ def bonus_plate(plate, bolt):
 
 
 def bonus_border(band, stripe):
-    """The chunky primary-coloured frame around a bonus playfield.
+    """The frame around a bonus playfield: a solid band with a lit edge.
 
-    Solid and loud, and the one place in this mod where a block is allowed to be a pure primary.
-    It is a frame rather than scenery: its whole job is to say where the bonus room stops.
+    The first version was diagonal yellow stripes on red, which is hazard tape. Tiled up a column
+    it produced something nobody could name -- a barber pole with spikes -- and it was loud enough
+    to pull the eye off the room it was supposed to be framing. A frame is furniture: it has to be
+    legible at the edge of vision and invisible at the centre of attention.
+
+    So: one colour, a lit top edge and a shadowed bottom one, and a single accent line inset from
+    the face. That still reads as manufactured next to stone and brick, which is all §5.10 asked
+    for.
     """
-    img = new()
+    img = plain(band[:3], 63, 0.03)
     d = ImageDraw.Draw(img)
-    d.rectangle([0, 0, S - 1, S - 1], fill=band)
-    for i in range(-S, S, 6):
-        d.line([(i, 0), (i + S, S - 1)], fill=stripe, width=2)
+    d.line([(0, 0), (S - 1, 0)], fill=shade(band[:3], 1.28))
+    d.line([(0, 1), (S - 1, 1)], fill=shade(band[:3], 1.12))
+    d.line([(0, S - 1), (S - 1, S - 1)], fill=shade(band[:3], 0.66))
+    # One accent stripe, inset, running the length of the band rather than across it.
+    d.line([(0, 6), (S - 1, 6)], fill=stripe)
+    d.line([(0, 7), (S - 1, 7)], fill=shade(stripe[:3], 0.8))
     return img
 
 
@@ -1410,6 +1442,7 @@ def build():
     # The third layer. Pushed back harder than the "far" set, because it sits a block further
     # away again and the whole point of a third band is that the eye can tell it from the second.
     out["course_hedge_distant"] = distant(out["course_hedge"], amount=0.68)
+    out["course_hill_distant"] = distant(hill_mass((96, 150, 92), 64), amount=0.62)
     # The banding drawn inside a far hill. Hazed to exactly the same distance as the mass it sits
     # in -- a stripe in an unhazed colour would read as a foreground object standing in front of
     # the hill rather than as a pattern on it -- and then darkened, which is the only difference.

@@ -344,7 +344,7 @@ public final class CourseDecorator {
      */
     private static int hill(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                             int x, int floor) {
-        BlockState mass = distantMass(ctx);
+        BlockState mass = hillMass(ctx);
         BlockState stripe = ModBlocks.COURSE_HEDGE_DISTANT_BAND.get().defaultBlockState();
         int width = 7 + random.nextInt(7);
         int peak = 3 + random.nextInt(3);
@@ -472,6 +472,19 @@ public final class CourseDecorator {
         return (ctx.theme() == CourseTheme.LAVA
                 ? ModBlocks.COURSE_HEDGE_DISTANT_WARM.get()
                 : ModBlocks.COURSE_HEDGE_DISTANT.get()).defaultBlockState();
+    }
+
+    /**
+     * What a background hill is made of, as opposed to what a tree's crown is made of.
+     *
+     * <p>These were the same block, and the hill was the one that suffered: a hill built out of
+     * hedge is a mound of leaves. They are separate now, and {@link #tree} keeps the hedge because
+     * a crown genuinely is foliage.
+     */
+    private static BlockState hillMass(GenContext ctx) {
+        return ctx.theme() == CourseTheme.LAVA
+                ? ModBlocks.COURSE_HEDGE_DISTANT_WARM.get().defaultBlockState()
+                : ModBlocks.COURSE_HILL_DISTANT.get().defaultBlockState();
     }
 
     private static BlockState distantTrunk(GenContext ctx) {
