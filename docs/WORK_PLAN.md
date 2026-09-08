@@ -473,7 +473,17 @@ which is the sky world's material and said nothing about a forest.
 *The original wording:* Forest ground is stacked cut logs seen
 end-on, with concentric growth rings and moss on top. The cheapest kind of identity there is.
 
-**5.10 Bonus worlds have their own visual language, levels included.** The playfield is framed by a
+**5.10 Bonus worlds have their own visual language, levels included.** *Built for the bonus room.*
+`P_SWITCH_BONUS_ROOM` is now framed in a loud primary border and backed with flat bolted plates in
+pastel pink and blue. Every other block in this mod is a material — stone, sand, timber, ice — and
+these are deliberately manufactured, because that contrast is how the reference says "you have
+stepped outside the game" without a word of text. The grain and mortar every other texture spends
+its pixels on is exactly what these must not have; the bolts are the only detail, and they are what
+stop a flat plate reading as an untextured error.
+
+*Not built:* the abstract checkered world maps, which belong with §7.3's map work rather than here.
+
+*The original wording:* The playfield is framed by a
 chunky primary-coloured border and built from flat untextured plates with bolts, in pastel pink and
 blue — nothing is a rock or a brick. Their maps are abstract checkered fields, each world taking its
 own checker colour. That framing is what marks a bonus world as outside the game rather than as
@@ -600,8 +610,8 @@ world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progre
 | 1 — the trajectory rule | **Complete.** Five forms, all built as geometry. |
 | 2 — corrections | **Complete.** 2.5 turned out to be a false premise; a gametest says so. |
 | 3 — bosses | **Complete.** |
-| 4 — structure | 4.1–4.3, 4.5, 4.6 done. **Left: 4.4, 4.7, 4.8.** 4.9 out of scope by decision. |
-| 5 — art direction | 5.1, 5.3, 5.5–5.8 done. **Left: 5.2 (partly), 5.4, 5.9, 5.10.** |
+| 4 — structure | **Complete.** 4.9 (sagging rope) out of scope by decision, recorded below. |
+| 5 — art direction | **Complete**, except the bonus-world *maps*, which are §7.3's work. |
 | 6 — missing content | 6.1, 6.4–6.9 done. **Left: 6.2, 6.3.** |
 | 7 — interface | 7.1, 7.2, 7.5–7.7 done. **Left: 7.3, 7.4 (half), 7.8, 7.9.** |
 

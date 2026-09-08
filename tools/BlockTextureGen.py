@@ -1078,6 +1078,45 @@ def log_end(bark, wood, ring, moss):
     return img
 
 
+def bonus_plate(plate, bolt):
+    """A flat untextured plate with bolts at the corners.
+
+    The bonus-world language: nothing in these rooms is a rock or a brick. Every other block in the
+    mod is a material -- stone, sand, timber -- and this one is deliberately manufactured, because
+    the reference uses that contrast to say "you have stepped outside the game" without a word of
+    text.
+
+    Flat on purpose. The grain, fleck and mortar that every other texture here spends its pixels on
+    are exactly what this must not have; the bolts are the only detail, and they are what stop it
+    reading as an untextured error.
+    """
+    img = new()
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], fill=plate)
+    # A soft bevel: one lighter row at the top, one darker at the bottom. Enough to seat the
+    # plate in a wall of them without giving it a texture.
+    d.line([(0, 0), (S - 1, 0)], fill=shade(plate, 1.12))
+    d.line([(0, S - 1), (S - 1, S - 1)], fill=shade(plate, 0.86))
+    for bx, by in ((2, 2), (S - 3, 2), (2, S - 3), (S - 3, S - 3)):
+        d.point((bx, by), fill=bolt)
+        d.point((bx + 1, by), fill=shade(bolt, 0.8))
+    return img
+
+
+def bonus_border(band, stripe):
+    """The chunky primary-coloured frame around a bonus playfield.
+
+    Solid and loud, and the one place in this mod where a block is allowed to be a pure primary.
+    It is a frame rather than scenery: its whole job is to say where the bonus room stops.
+    """
+    img = new()
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], fill=band)
+    for i in range(-S, S, 6):
+        d.line([(i, 0), (i + S, S - 1)], fill=stripe, width=2)
+    return img
+
+
 def axe():
     """A single-bit axe, head up, seen side on.
 
@@ -1263,6 +1302,9 @@ def build():
     out["course_wood_block"] = planks((150, 106, 62), 12)
     out["course_tile"] = tiles((214, 210, 200), (168, 166, 160), 13)
     out["course_crate"] = crate((162, 118, 68), 14)
+    out["course_bonus_plate_pink"] = bonus_plate((236, 168, 196, 255), (156, 96, 124, 255))
+    out["course_bonus_plate_blue"] = bonus_plate((166, 198, 240, 255), (92, 122, 168, 255))
+    out["course_bonus_border"] = bonus_border((222, 66, 60, 255), (250, 214, 76, 255))
     out["course_ledge"] = inset_ledge((214, 206, 190, 255), (150, 140, 126, 255),
                                       (96, 88, 80, 255))
     out["course_log_end"] = log_end((92, 62, 38, 255), (168, 126, 78, 255),

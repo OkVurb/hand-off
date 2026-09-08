@@ -1373,6 +1373,34 @@ public final class SegmentLibrary {
 
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 16, y, ctx);
+            // §5.10: a bonus room is built out of manufactured plates, not out of the world's own
+            // rock, and it is framed. The contrast is the whole message -- every other room in the
+            // game is made of a material, so a room made of painted panels reads as outside the
+            // game before the player has done anything in it.
+            BlockState pink = ModBlocks.COURSE_BONUS_PLATE_PINK.get().defaultBlockState();
+            BlockState blue = ModBlocks.COURSE_BONUS_PLATE_BLUE.get().defaultBlockState();
+            BlockState border = ModBlocks.COURSE_BONUS_BORDER.get().defaultBlockState();
+
+            // The frame: floor and ceiling bands, and a post at each end. Chunky, because a thin
+            // frame reads as trim on the room rather than as the edge of one.
+            for (int i = 0; i < 16; i++) {
+                c.set(x + i, y, 0, border);
+                c.set(x + i, y + 7, 0, border);
+            }
+            // The uprights go in the back row, not the lane. A frame standing in a three-wide
+            // corridor is a doorway with no door in it, and the reachability proof reads the lane
+            // centre -- it rejected every course containing this segment until the posts moved.
+            for (int h = 1; h <= 6; h++) {
+                c.set(x, y + h, ctx.halfWidth(), border);
+                c.set(x + 15, y + h, ctx.halfWidth(), border);
+            }
+            // Plates behind the playfield, alternating so the wall is a pattern rather than a slab.
+            for (int i = 1; i < 15; i++) {
+                for (int h = 1; h <= 6; h++) {
+                    c.set(x + i, y + h, ctx.halfWidth(), (i + h) % 2 == 0 ? pink : blue);
+                }
+            }
+
             c.set(x + 3, y + 1, 0, ModBlocks.P_SWITCH.get().defaultBlockState());
             BlockState brick = ModBlocks.BRICK_BLOCK.get().defaultBlockState();
             for (int i = 0; i < 8; i++) {

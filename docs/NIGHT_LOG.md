@@ -1407,3 +1407,18 @@ tested, and both fluids that exist have their own still and flow art. Tar and po
 are missing fluids, not missing treatment, so they are content and recorded as such.
 
 Left in 5: 5.10, the bonus-world visual language. 383 unit tests, 11 gametests.
+
+## 5.10 — the bonus room stops being made of rock
+Framed in a loud primary border, backed with flat bolted plates in pastel pink and
+blue. The contrast is the whole message: every other block in this mod is a material,
+so a room built from painted panels reads as outside the game before the player has
+done anything in it. The plates are flat on purpose -- the grain and mortar every
+other texture spends its pixels on is exactly what these must not have, and the bolts
+are the only thing stopping a flat plate reading as an untextured error.
+
+The frame's uprights had to move to the back row. Standing in the lane they were a
+doorway with no door, and the proof rejected every course containing the segment --
+caught by the build, fixed in one line.
+
+Sections 4 and 5 are complete, bar the bonus-world maps, which are 7.3's work rather
+than art direction. 383 tests, 11 gametests.

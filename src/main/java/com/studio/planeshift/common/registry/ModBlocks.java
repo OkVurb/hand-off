@@ -247,6 +247,28 @@ public final class ModBlocks {
      * from the things it is drawn among, by the player and by the build.
      */
     /**
+     * The bonus room's own materials: flat plates with bolts, and a loud frame.
+     *
+     * <p>§5.10. Every other block in this mod is a material — stone, sand, timber, ice — and these
+     * are deliberately manufactured, because that contrast is how the reference says "you have
+     * stepped outside the game" without a word of text. The grain and mortar every other texture
+     * here spends its pixels on is exactly what these must not have.
+     *
+     * <p>The border is the one place a block in this mod is allowed to be a pure primary. It is a
+     * frame rather than scenery: its whole job is to say where the bonus room stops.
+     */
+    public static final DeferredBlock<Block> COURSE_BONUS_PLATE_PINK = courseBlock(
+            "course_bonus_plate_pink", MapColor.COLOR_PINK, SoundType.METAL);
+
+    /** The other plate. Two colours, so a wall of them is a pattern rather than a slab. */
+    public static final DeferredBlock<Block> COURSE_BONUS_PLATE_BLUE = courseBlock(
+            "course_bonus_plate_blue", MapColor.COLOR_LIGHT_BLUE, SoundType.METAL);
+
+    /** The frame around a bonus playfield. */
+    public static final DeferredBlock<Block> COURSE_BONUS_BORDER = courseBlock(
+            "course_bonus_border", MapColor.COLOR_RED, SoundType.METAL);
+
+    /**
      * A thin ledge with a sunk centre panel.
      *
      * <p>§4.8's parts kit. The lip is the point: it is the brightest row on the block, so the
