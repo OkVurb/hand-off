@@ -1447,3 +1447,25 @@ that check-before-you-build would have saved the work.
 
 CLOUD_CLIMB finishes 6.2: a stretch whose subject is height, with nothing catching a
 fall. 383 tests, full build green.
+
+## 7.3 and 7.8 — sections 6 and 7 closed out
+The map already drew per-theme fields and scenery; what the entry named and it
+lacked were houses and ponds. Added to the grass world, cycled so the map has a few
+of each rather than one of everything in every corner. Those two are the shapes that
+say somebody lives here -- clouds and trees say what every world's scenery says.
+
+The castle scene: the mod had Toad's dialogue without the moment that frames it, so
+he simply started talking over the results screen. A title card now names the castle
+and holds for a beat first. That is the difference between an event and a
+notification.
+
+Two things left undone on purpose, both recorded in the plan rather than fudged.
+The bonus-world checkered map has no bonus world to belong to -- five named worlds
+and none outside the run -- so it would be art with nowhere to draw it. And the
+playable credits roll is a course that runs itself with a camera path and an input
+lock: a set piece, not a screen, and not something to half-build at the end of a
+batch.
+
+Sections 1 through 7 are now complete but for the airship world, the playable
+credits and the bonus-world map. 383 tests, 11 gametests, full build green. None of
+it has been played.

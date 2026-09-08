@@ -109,6 +109,14 @@ public final class CourseCompletionService {
         if (world != null && courseId.equals(world.bossCourseId())) {
             boolean lastWorld = WorldRegistry.worldIndex(world.worldId())
                     == WorldRegistry.worldCount() - 1;
+            // The scene, before the dialogue. §7.8: clearing a castle plays one, and the mod had
+            // the dialogue without the moment that frames it -- Toad simply started talking over
+            // the results screen. The card names what was just done and holds for a beat, which is
+            // the difference between an event and a notification.
+            PacketDistributor.sendToPlayer(player,
+                    new com.studio.planeshift.common.network.TitleCardPayload(
+                            world.displayName(),
+                            lastWorld ? "The castle falls" : "Castle cleared"));
             ToadDialogueService.begin(player, lastWorld);
         }
 

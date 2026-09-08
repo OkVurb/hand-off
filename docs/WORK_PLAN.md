@@ -567,9 +567,18 @@ Background and lane interact.
 **7.2 Secret exits and cannons do not know about each other.** A secret exit is precisely what
 unlocks a cannon between worlds.
 
-**7.3 World maps are themed terrain.** Built from each world's own materials with dense scenery —
-trees, houses, ponds, volcano cones, ice floes — around the node graph. Ours draws nodes and paths
-on a flat field.
+**7.3 World maps are themed terrain.** *Built.* Each world's map draws its own field colour and its
+own scenery: dunes, ice floes, volcano cones with a lit crater, bare trees, stalagmites, weed beds,
+banked cloud — and, in the grass world, the two the entry names by name, houses and ponds. Those two
+are the ones that say somebody lives here; clouds and trees say what every world's scenery says.
+
+Placed from a fixed arithmetic sequence rather than a random source, so the map looks the same every
+visit. A map whose furniture moves is one nobody can build a mental image of, and being picturable is
+the whole argument for a map over a list of buttons.
+
+*Not built:* the abstract checkered field for bonus worlds (§5.10's other half). There is no bonus
+world in the registry to give one to — five named worlds, none of them outside the run — so the
+field would be art with nowhere to draw it.
 
 **7.4 Course and map are joined by an iris wipe** at the node just cleared. *Both halves are built
 now.* The closing one lives in `CourseResultsScreen` rather than the HUD, which is what the entry
@@ -604,7 +613,15 @@ packet because that one already fills all eight `StreamCodec.composite` slots an
 would mean a hand-written codec. Latched on the client and taken once when the results screen is
 built, so finishing the game says so on that screen and never again.
 
-**7.8 Clearing a castle plays a scene**, and the credits roll over a *playable* level.
+**7.8 Clearing a castle plays a scene**, and the credits roll over a *playable* level. *The scene is
+built.* The mod had the Toad dialogue without the moment that frames it — he simply started talking
+over the results screen. A title card now names the castle and holds for a beat first, which is the
+difference between an event and a notification, and the last world's card reads differently from the
+other four.
+
+*Not built:* the playable credits. That is a course that runs itself with the roll over it, which
+means a camera path, an input lock the player can break out of, and a course built to be watched
+rather than played — a set piece, not a screen. Recorded rather than half-done.
 
 **7.9 Shops are architecture, not menus.** *Built.* The Toad house is gold-walled now and its back
 wall carries wide arches with the sky behind them. The openings are the entry: a sealed box with
@@ -635,8 +652,8 @@ world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progre
 | 3 — bosses | **Complete.** |
 | 4 — structure | **Complete.** 4.9 (sagging rope) out of scope by decision, recorded below. |
 | 5 — art direction | **Complete**, except the bonus-world *maps*, which are §7.3's work. |
-| 6 — missing content | 6.1, 6.4–6.9 done. **Left: 6.2, 6.3.** |
-| 7 — interface | 7.1, 7.2, 7.5–7.7 done. **Left: 7.3, 7.4 (half), 7.8, 7.9.** |
+| 6 — missing content | **Complete**, except the airship *world* (palette, skybox, course shape); its deck is built. |
+| 7 — interface | **Complete**, except the playable credits roll in 7.8 and the bonus-world map in 7.3 — both recorded with reasons. |
 
 ### What to do next, and why in this order
 

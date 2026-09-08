@@ -542,9 +542,35 @@ public class CourseMapScreen extends Screen {
                     graphics.fill(x + size / 2, y + size, x + size * 2, y + size + 2, 0x33_D8E8F8);
                 }
                 // Clouds, as before. The grass world keeps exactly what it had.
+                // Grass: clouds, and on the ground a house and a pond.
+                //
+                // §7.3 lists houses and ponds by name, and they are the two that say somebody
+                // lives here -- clouds and trees say the same thing every world's scenery says.
+                // Cycled rather than mixed at every slot, so the map has a few of each rather than
+                // one of everything in every corner.
                 default -> {
-                    graphics.fill(x, y, x + 10, y + 3, 0x22_FFFFFF);
-                    graphics.fill(x + 3, y - 2, x + 8, y + 1, 0x22_FFFFFF);
+                    switch (i % 3) {
+                        case 0 -> {
+                            graphics.fill(x, y, x + 10, y + 3, 0x22_FFFFFF);
+                            graphics.fill(x + 3, y - 2, x + 8, y + 1, 0x22_FFFFFF);
+                        }
+                        // A house: walls and a roof that oversails them, which is the whole
+                        // silhouette of a building at this size.
+                        case 1 -> {
+                            graphics.fill(x, y + size, x + size * 2, y + size * 2, 0x55_C8B49A);
+                            graphics.fill(x - 1, y + size - 3, x + size * 2 + 1, y + size,
+                                    0x66_A03A2E);
+                            graphics.fill(x + size - 1, y + size + 3, x + size + 2, y + size * 2,
+                                    0x66_5A4636);
+                        }
+                        // A pond: a flat pool with a lighter rim, because still water at this
+                        // scale is a shape rather than a texture.
+                        default -> {
+                            graphics.fill(x, y + size, x + size * 3, y + size + 5, 0x55_3C7FB0);
+                            graphics.fill(x + 1, y + size + 1, x + size * 3 - 1, y + size + 2,
+                                    0x44_9FD0E8);
+                        }
+                    }
                 }
             }
         }
