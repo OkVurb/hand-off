@@ -85,11 +85,20 @@ Drawing nothing is a third case alongside wall and skyline.
 angular crystalline cliffs; volcano is steep cones; desert is flat-topped pyramids. Rounded versus
 angular is one of the clearest per-world reads in the reference.
 
-**2.4 Aerial perspective desaturates toward grey.** The volcano tints the *whole scene* warm orange,
-foreground included — the air itself is hot. The current implementation cannot express a warm key
-over the whole frame.
+**2.4 Aerial perspective desaturates toward grey.** ~~The current implementation cannot express a
+warm key over the whole frame.~~ *Fixed.* The haze lived in the far-layer block palette, so it could
+only ever reach things that were far away — which is why the entry says "foreground included".
+`CourseAtmosphere` sets the fog **colour** per theme instead: hot orange over lava, pale blue over
+snow, yellow dust in the desert, green-black in a ghost house, near-nothing underground so the empty
+void behind cave terrain stays empty. Fog colour is Minecraft's own name for what colour the air is,
+and it is mixed into the whole frame by the renderer without anything being drawn over the world.
 
-**2.5 The custom fluids cannot fall.** `ModFluids` sets `levelDecreasePerBlock` to 8 so pools stay
+Two deliberate limits. It blends 55% toward the key rather than replacing it, because a full
+replacement reads as coloured glass and a partial mix reads as light in the air. And it never
+touches view distance — that was settled when the underwater fog came out, and for the same reason:
+tinting is a look, shortening the view is a handicap, and vanilla ships them in one object.
+
+**2.5 The custom fluids cannot fall.** *Open — the only entry in this section still standing.* `ModFluids` sets `levelDecreasePerBlock` to 8 so pools stay
 where the generator puts them, and lava visibly pours down cliff faces into the sea below. A column
 of source blocks looks right and costs nothing, but it is a workaround for a property chosen for
 other reasons, not the fluid behaving like a fluid.

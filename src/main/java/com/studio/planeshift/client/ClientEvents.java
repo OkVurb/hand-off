@@ -98,6 +98,11 @@ public final class ClientEvents {
     }
 
     @SubscribeEvent
+    public static void onComputeFogColor(ViewportEvent.ComputeFogColor event) {
+        com.studio.planeshift.client.render.CourseAtmosphere.onComputeFogColor(event);
+    }
+
+    @SubscribeEvent
     public static void onComputeFov(ViewportEvent.ComputeFov event) {
         CameraDirector.onComputeFov(event);
     }

@@ -1134,3 +1134,21 @@ platform test searched a wide height band and passed with the horizontal track
 removed -- it was finding the lift's cable, a different telegraph on a different
 platform. True and meaningless. Narrowed to the block directly underneath, where it
 fails properly. 366 tests, 0 failures.
+
+## Section 2, all but one
+2.1, 2.2 and 2.3 were already built -- three wall motifs per course, caves that
+draw no backdrop at all, and per-theme hill profiles. Checked rather than assumed.
+
+2.4 was real and now done. The haze lived in the far-layer block palette, so it
+could only reach things that were far away, which is exactly what "foreground
+included" was pointing at. CourseAtmosphere sets fog colour per theme instead --
+Minecraft's own name for what colour the air is, mixed into the whole frame with
+nothing drawn over the world. Blends 55% rather than replacing, because a full
+replacement is coloured glass. Never touches view distance: that was settled when
+the underwater fog came out.
+
+The test checks the themes are distinguishable from each other, not merely that a
+tint exists -- one tint everywhere is the same grey in a warmer hue.
+
+2.5 is the only entry left in the section: the fluids still cannot fall, and the
+lavafall is a column of source blocks. 368 tests, 0 failures.
