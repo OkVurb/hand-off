@@ -201,7 +201,9 @@ class BossArenaTest {
         CourseCanvas c = BossArena.build(WorldRegistry.allWorlds().size() - 1);
         List<String> holes = new ArrayList<>();
         for (int x = -4; x <= 50; x++) {
-            for (int z = 2; z <= 7; z++) {
+            // Negative: behind the player is the far side from the camera, and this test used to
+            // scan the near side. It passed on a ledge built where the boss never stands.
+            for (int z = -7; z <= -2; z++) {
                 if (!c.blocks().containsKey(CourseCanvas.key(x, 0, z))) {
                     holes.add(x + "," + z);
                 }
@@ -214,9 +216,9 @@ class BossArenaTest {
     @Test
     void ordinaryCastlesAreNotWidened() {
         CourseCanvas c = BossArena.build(0);
-        assertTrue(c.blocks().containsKey(CourseCanvas.key(0, 1, 2)),
+        assertTrue(c.blocks().containsKey(CourseCanvas.key(0, 1, -2)),
                 "an ordinary castle keeps its wall one block off the lane");
-        assertTrue(!c.blocks().containsKey(CourseCanvas.key(0, 0, 5)),
+        assertTrue(!c.blocks().containsKey(CourseCanvas.key(0, 0, -5)),
                 "an ordinary castle has no backdrop ledge, because it has no background boss");
     }
 
@@ -259,7 +261,7 @@ class BossArenaTest {
                 c.blocks().get(CourseCanvas.key(40, 8, 0)).getBlock(),
                 "the switch should sit beside the top tread");
         assertEquals(ModBlocks.ON_OFF_BLOCK.get(),
-                c.blocks().get(CourseCanvas.key(39, 0, 5)).getBlock(),
+                c.blocks().get(CourseCanvas.key(39, 0, -5)).getBlock(),
                 "the ledge the switch turns off should be what the boss stands on");
         // The one that actually matters, and it reads both heights back out of the canvas rather
         // than restating them: a check written as two literals passes whatever the arena does. The
@@ -273,7 +275,7 @@ class BossArenaTest {
                 if (ModBlocks.ON_OFF_SWITCH.get().equals(block(c, x, y, 0))) {
                     switchY = y;
                 }
-                if (ModBlocks.ON_OFF_BLOCK.get().equals(block(c, x, y, 5))) {
+                if (ModBlocks.ON_OFF_BLOCK.get().equals(block(c, x, y, -5))) {
                     ledgeY = y;
                 }
             }

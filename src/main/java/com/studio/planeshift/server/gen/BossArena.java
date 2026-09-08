@@ -268,12 +268,12 @@ public final class BossArena {
         // the player to stone unless they are behind something, and this is the something.
         for (int at : APPROACH_PILLARS) {
             for (int y = 1; y <= 12; y++) {
-                c.set(at, y, HALF, castle);
+                c.set(at, y, -HALF, castle);
             }
         }
         for (int at : PILLARS) {
             for (int y = 1; y <= 12; y++) {
-                c.set(at, y, HALF, castle);
+                c.set(at, y, -HALF, castle);
             }
         }
 
@@ -287,7 +287,15 @@ public final class BossArena {
         // this project's own characteristic bug wearing boss armour. The wall moves back to make
         // room for him rather than the ledge being squeezed in front of it, so he stands in the
         // room the player can see rather than in a slot behind its wall.
-        int back = last ? BACKDROP_HALF : HALF + 1;
+        // Negative, because that is where behind is.
+        //
+        // This wall, the ledge under it and the windows in it were all built at positive Z on the
+        // belief that positive was the far side. It is not: CourseService builds the rail with
+        // lookPositive = true, so the camera is at positive Z. The arena's back wall was standing
+        // between the camera and the room, and the ledge added to stop Super Bowser falling out of
+        // the world was on the opposite side from where BackgroundBossGoal actually puts him -- so
+        // he still had nothing to stand on, and the fix for that bug never worked.
+        int back = -(last ? BACKDROP_HALF : HALF + 1);
         if (last) {
             // The ledge is ON/OFF blocks, switched on, rather than stone.
             //
@@ -298,7 +306,7 @@ public final class BossArena {
             BlockState ledge = ModBlocks.ON_OFF_BLOCK.get().defaultBlockState()
                     .setValue(OnOffBlock.ON, true);
             for (int x = -4; x <= END; x++) {
-                for (int z = HALF + 1; z < back; z++) {
+                for (int z = back + 1; z <= -(HALF + 1); z++) {
                     c.set(x, 0, z, ledge);
                 }
             }

@@ -1728,3 +1728,24 @@ at the centre of attention. One colour now, a lit top edge, a shadowed bottom, o
 inset accent line.
 
 392 tests, full build green, jar reinstalled.
+
+## The same sign error, everywhere else
+Having found that the camera sits at positive Z, went looking for everything else
+built on the opposite belief. There was a lot, and all of it was mine.
+
+Every "back row" placement in SegmentLibrary used +halfWidth: the scaffold's posts,
+the pipe lattice, the bonus room's frame and its plates, the capsule beam's posts.
+All of them stood between the camera and the player. That is the grate and the hedge
+blocks the owner saw at play level.
+
+Worse, the boss arena. Its back wall was at +Z, so the castle's wall stood in front of
+the room it encloses. And the ledge I added to stop Super Bowser falling out of the
+world was on the opposite side from where BackgroundBossGoal actually puts him -- which
+means that fix never worked, and the last boss has been falling into the void since I
+"fixed" it. The test passed because it scanned the same wrong side.
+
+Three tests were reading positive Z and are corrected. This is the third time this
+session that a test agreed with the bug because it was written from the same
+misunderstanding as the code.
+
+392 tests, full build green, jar reinstalled.

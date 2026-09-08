@@ -650,9 +650,9 @@ public final class SegmentLibrary {
             for (int offset : new int[] {3, 8, 13}) {
                 int px = x + offset;
                 for (int h = 1; h < height; h++) {
-                    c.set(px, y + h, back, post);
+                    c.set(px, y + h, -back, post);
                 }
-                c.set(px, y + height, back, beam);
+                c.set(px, y + height, -back, beam);
             }
             // The deck, running the middle of the span. Short of the posts at either end so the
             // player steps onto it from a jump rather than walking up a ramp that is not there.
@@ -707,7 +707,7 @@ public final class SegmentLibrary {
             // Two posts holding it up, in the back row so the corridor underneath stays open.
             for (int px : new int[] {4, 11}) {
                 for (int h = 1; h < 5; h++) {
-                    c.set(x + px, y + h, ctx.halfWidth(), post);
+                    c.set(x + px, y + h, -ctx.halfWidth(), post);
                 }
             }
 
@@ -754,16 +754,16 @@ public final class SegmentLibrary {
             int[] tall = {5, 3, 6, 4};
             for (int i = 0; i < at.length; i++) {
                 for (int h = 1; h <= tall[i]; h++) {
-                    c.set(x + at[i], y + h, ctx.halfWidth(), pipe);
+                    c.set(x + at[i], y + h, -ctx.halfWidth(), pipe);
                 }
             }
             // Horizontals joining them at two heights, in the back row: this is the wall the level
             // is built against, and it must not stand in the lane.
             for (int i = 2; i <= 14; i++) {
-                c.set(x + i, y + 3, ctx.halfWidth(), pipe);
+                c.set(x + i, y + 3, -ctx.halfWidth(), pipe);
             }
             for (int i = 6; i <= 10; i++) {
-                c.set(x + i, y + 6, ctx.halfWidth(), pipe);
+                c.set(x + i, y + 6, -ctx.halfWidth(), pipe);
             }
             // Something to do in front of it, or the segment is a backdrop the player walks past.
             platform(c, x + 5, 3, y + 3, ctx);
@@ -1512,13 +1512,13 @@ public final class SegmentLibrary {
             // corridor is a doorway with no door in it, and the reachability proof reads the lane
             // centre -- it rejected every course containing this segment until the posts moved.
             for (int h = 1; h <= 6; h++) {
-                c.set(x, y + h, ctx.halfWidth(), border);
-                c.set(x + 15, y + h, ctx.halfWidth(), border);
+                c.set(x, y + h, -ctx.halfWidth(), border);
+                c.set(x + 15, y + h, -ctx.halfWidth(), border);
             }
             // Plates behind the playfield, alternating so the wall is a pattern rather than a slab.
             for (int i = 1; i < 15; i++) {
                 for (int h = 1; h <= 6; h++) {
-                    c.set(x + i, y + h, ctx.halfWidth(), (i + h) % 2 == 0 ? pink : blue);
+                    c.set(x + i, y + h, -ctx.halfWidth(), (i + h) % 2 == 0 ? pink : blue);
                 }
             }
 
