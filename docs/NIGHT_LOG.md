@@ -1105,3 +1105,14 @@ The sea alternates jets with Podoboos: a moving threat the player tracks and a
 fixed one they time. Either alone is a rhythm you stop reading by the second world.
 The sideways orientation is built and nothing places one yet -- recorded, not
 glossed. 362 tests, 0 failures.
+
+## Wall nozzles, placed the same hour they were noticed
+The sideways jet orientation was built and nothing generated one -- this project's
+signature failure, so I placed it immediately rather than logging it. NOZZLE_CORRIDOR
+puts jets in short pillars they visibly come out of: a column of fire starting in
+mid-air is an effect, one coming out of a hole in a wall is plumbing, and players
+read plumbing as something that will do it again. Facing each other at different
+heights, so the safe moment is a place rather than a pause.
+
+The test was checked against a build with the segment unregistered and it failed
+there, so it is testing generation rather than the class existing. 363 tests, 0 failures.

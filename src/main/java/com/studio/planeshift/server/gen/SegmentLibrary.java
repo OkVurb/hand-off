@@ -6,6 +6,7 @@ import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
 import com.studio.planeshift.common.block.WarpPipeBlock;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.entity.LavaJetEntity;
 import com.studio.planeshift.common.registry.ModEntities;
 import com.studio.planeshift.common.registry.ModItems;
 import java.util.ArrayList;
@@ -1591,6 +1592,50 @@ public final class SegmentLibrary {
      * justification for this hazard is the erupting background the theme already draws, and without
      * that it is just an unexplained thing landing on you.
      */
+    /**
+     * A corridor between two nozzle walls that fire across it.
+     *
+     * <p>This exists because {@code LavaJetEntity}'s sideways orientation was built and nothing in
+     * the game generated one — the project's own characteristic bug, finished and unreachable, so
+     * it is placed in the same breath as being noticed.
+     *
+     * <p>The nozzles sit in pillars the jets visibly come out of. A column of fire starting in
+     * mid-air is an effect; one coming out of a hole in a wall is plumbing, and the player reads
+     * plumbing as something that will do it again.
+     *
+     * <p>Facing each other from either side, at different heights, so the safe moment is a place
+     * rather than a pause: crouch-height fire on one side and head-height on the other means the
+     * player is choosing where to stand and not merely when to run. The floor is unbroken, for the
+     * same reason the saw corridor's is — the reachability proof cannot see a moving hazard, so a
+     * crossing that depended on one would prove passable and play as a wall.
+     */
+    static final Segment NOZZLE_CORRIDOR = new Segment() {
+        public SegmentSpec spec() {
+            return def("nozzle_corridor", 16, 0, 3, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            BlockState wall = ctx.palette().fill();
+
+            // Two nozzle pillars on the left, two on the right, alternating along the run.
+            int[] posts = {4, 8, 12};
+            for (int i = 0; i < posts.length; i++) {
+                int px = x + posts[i];
+                boolean fromWest = i % 2 == 0;
+                // Low on one side, high on the other. The pillar is short, so it is a nozzle in
+                // the wall rather than a column standing in the corridor.
+                int height = fromWest ? 2 : 4;
+                for (int h = 1; h <= height; h++) {
+                    c.set(px, y + h, fromWest ? -1 : 1, wall);
+                }
+                LavaJetEntity.spawnInto(c, px + 0.5D, y + height, fromWest ? -0.5D : 1.5D,
+                        fromWest);
+            }
+            coinTrail(c, x + 2, 12, y + 2, 1);
+        }
+    };
+
     static final Segment ERUPTION_FIELD = new Segment() {
         public SegmentSpec spec() {
             return def("eruption_field", 16, 3, 2, Tag.OVERHEAD);
@@ -2025,6 +2070,7 @@ public final class SegmentLibrary {
         list.add(CLIMB_POLE);
         list.add(SAW_CORRIDOR);
         list.add(CHAIN_BALL_HALL);
+        list.add(NOZZLE_CORRIDOR);
         list.add(ERUPTION_FIELD);
         list.add(GHOST_CROSSING);
         list.add(AIRSHIP_DECK);

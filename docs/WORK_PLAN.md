@@ -205,7 +205,10 @@ two clocks to keep in step. The wind-up is the design: the column grows over a f
 it does damage, and it stays drawn while withdrawing, so "visible" and "lethal" are deliberately
 not the same window. The sea alternates them with Podoboos, because a moving threat the player
 tracks and a fixed one they time stop being read at all if either is the only thing the lava ever
-does. *Still to place:* the wall-nozzle orientation is built and nothing generates one yet.
+does. The wall nozzles are placed too, in `NOZZLE_CORRIDOR`: jets in short pillars they
+visibly come out of, facing each other from either side at different heights, so the safe moment is
+a *place* rather than a pause. Volcano only — a jet of fire out of a wall needs the wall to be part
+of a volcano, or it is a flamethrower in a meadow. §4.3 is complete.
 
 **4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
 *moves* during the level. The strongest vindication of having built the fluid as a fluid.

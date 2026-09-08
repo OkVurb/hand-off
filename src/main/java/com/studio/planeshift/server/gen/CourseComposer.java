@@ -518,6 +518,11 @@ public final class CourseComposer {
         if (segment == SegmentLibrary.ERUPTION_FIELD) {
             return theme == CourseTheme.LAVA;
         }
+        // Volcano only, for the same reason: a jet of fire out of a wall needs the wall to be part
+        // of a volcano. In a grass level it is a flamethrower in a meadow.
+        if (segment == SegmentLibrary.NOZZLE_CORRIDOR) {
+            return theme == CourseTheme.LAVA;
+        }
         // An airship moored in a meadow is a shipwreck.
         if (segment == SegmentLibrary.AIRSHIP_DECK) {
             return theme == CourseTheme.SKY;

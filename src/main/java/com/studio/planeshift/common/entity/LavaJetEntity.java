@@ -176,6 +176,27 @@ public class LavaJetEntity extends Entity {
         output.putInt("Facing", entityData.get(FACING));
     }
 
+    /**
+     * Places a sideways jet on a canvas, aimed across the lane.
+     *
+     * <p>Here rather than in the segment because the facing is stored as a synced int and the
+     * mapping from "points east" to 1 belongs with the entity that reads it. A caller that had to
+     * know the encoding would be a second place for it to be written down.
+     */
+    public static void spawnInto(com.studio.planeshift.server.gen.CourseCanvas canvas,
+                                 double x, double y, double z, boolean eastward) {
+        canvas.spawn(com.studio.planeshift.common.registry.ModEntities.LAVA_JET.get(), x, y, z,
+                0.0F, com.studio.planeshift.server.gen.SegmentLibrary.GENERATED_TAG,
+                entity -> {
+                    if (entity instanceof LavaJetEntity jet) {
+                        jet.setDirection(eastward ? Direction.EAST : Direction.WEST);
+                        // Just past the far wall, so the corridor is fully swept and the player
+                        // cannot stand in the last half block and be missed.
+                        jet.setReach(3.0F);
+                    }
+                });
+    }
+
     @Override
     public boolean isPickable() {
         return false;
