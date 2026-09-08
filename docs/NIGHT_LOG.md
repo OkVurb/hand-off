@@ -1358,3 +1358,22 @@ own fill. The guard stands in the code; the reason it is untested is written dow
 
 Both surviving assertions verified by switching the feature off and watching them
 fail. 381 tests.
+
+## 4.8 — scaffolding and grate
+SCAFFOLD_SPAN: posts in the back row of the lane, a beam across their tops, a deck
+of COURSE_GRATE between them. The library already had raised walkways; what it did
+not have was one that is visibly built rather than extruded from the terrain or
+floating with nothing under it.
+
+The deck is see-through and it is the only floor in the mod that is. That is the
+whole reason the block exists: standing on it, the player can see the coins and the
+enemy below before deciding whether to drop off the end, so "is there anything down
+there" stops being a gamble. Put a coin trail and an enemy under it, because a
+window onto an empty room is just a floor with holes.
+
+Posts sit in the back row for the reason the boss arena's pillars do -- the
+reachability proof reads the lane centre, so a post in the middle is a wall.
+
+Test verified by unregistering the segment and watching it fail. Full build green,
+381 tests. Remaining in 4.8: thin ledges with inset centres, capsule beams,
+pole-mounted switch blocks.

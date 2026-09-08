@@ -1020,6 +1020,26 @@ def tuft(blade, tip):
     return img
 
 
+def grate(metal, shadow):
+    """A metal grid you can see the level through.
+
+    Open squares rather than a drawn grid on a solid face: this is walked on and stood under, and
+    the point of a grate in this genre is that the player can see what is below before they commit
+    to dropping through a gap in the floor above it.
+
+    The bars are one pixel and the holes are three, which at this size is the widest opening that
+    still reads as a floor rather than as a hazard to fall through.
+    """
+    img = new()
+    d = ImageDraw.Draw(img)
+    for i in range(0, S, 4):
+        d.line([(i, 0), (i, S - 1)], fill=metal)
+        d.line([(0, i), (S - 1, i)], fill=metal)
+        # A shadow line under each bar, so the grid has thickness instead of reading as wire.
+        d.line([(0, i + 1), (S - 1, i + 1)], fill=shadow)
+    return img
+
+
 def axe():
     """A single-bit axe, head up, seen side on.
 
@@ -1205,6 +1225,7 @@ def build():
     out["course_wood_block"] = planks((150, 106, 62), 12)
     out["course_tile"] = tiles((214, 210, 200), (168, 166, 160), 13)
     out["course_crate"] = crate((162, 118, 68), 14)
+    out["course_grate"] = grate((168, 172, 184, 255), (96, 100, 112, 255))
     out["course_trim"] = trim((198, 176, 132), 15)
     out["course_pillar"] = pillar((206, 200, 186), 16)
     out["course_pillar_top"] = pillar_top((206, 200, 186), 17)

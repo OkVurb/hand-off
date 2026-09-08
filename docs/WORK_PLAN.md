@@ -310,11 +310,20 @@ all five exist as `WarpPipeBlock.Colour` with their own textures, and `SegmentLi
 each theme on one of them so a pipe reads as belonging to the world it is in. What remains is the
 structural half: whole levels built as pipe lattices rather than pipes as furniture.
 
-**4.8 Platforms come from a parts kit.** *Partly true already:* semisolid platforms, pillars and
+**4.8 Platforms come from a parts kit.** *Post-and-beam scaffolding, grate panels and mushroom
+capsules are built; thin ledges with inset centres, capsule beams and pole-mounted switch blocks are
+not.* *Partly true already:* semisolid platforms, pillars and
 trim are registered and placed. What is missing is the specific shapes — capsule beams, mushroom
 caps on stalks, thin ledges with inset centres. Post-and-beam scaffolding in open air, thin ledges with
 dark inset centres, capsule beams, metal grate panels, pole-mounted switch blocks. Not all cubes,
 and not all extruded from terrain.
+
+*Scaffolding and grate panels are built.* `SCAFFOLD_SPAN` stands posts in the back row of the lane,
+beams them across the top and decks the span with `COURSE_GRATE` — a raised walkway that is visibly
+*built*, where every other elevated surface here is either extruded from terrain or floating with
+nothing holding it up. The deck is see-through on purpose and it is the only floor in the mod that
+is: a player on it can see the coins and the enemy underneath before deciding whether to drop off
+the end, which turns "is there anything down there" from a gamble into a look.
 
 *Mushroom capsules on stalks are built* — `MUSHROOM_STALKS`, and it needed no new block: a pillar
 is a stalk and a semisolid platform is a cap. What it adds is a shape the library did not have, a

@@ -246,6 +246,25 @@ public final class ModBlocks {
      * banding switched off because they were counting trees. A pattern needs to be distinguishable
      * from the things it is drawn among, by the player and by the build.
      */
+    /**
+     * A metal grate: floor you can see through.
+     *
+     * <p>From §4.8's parts kit, and the one item on that list that changes what the player knows
+     * rather than what the level looks like. Every other floor in this mod is opaque, so a drop is
+     * a decision made blind; standing on a grate, the room below is visible before the player
+     * commits to it.
+     *
+     * <p>Solid and opaque-free rather than semisolid. It is a floor, not a platform to jump up
+     * through -- a grate you could pass upward through would be a hole with a picture of a floor
+     * over it, which is the opposite of what it is for.
+     */
+    public static final DeferredBlock<Block> COURSE_GRATE = BLOCKS.registerSimpleBlock(
+            "course_grate", properties -> properties
+                    .mapColor(MapColor.METAL)
+                    .strength(1.5F, 6.0F)
+                    .noOcclusion()
+                    .sound(SoundType.CHAIN));
+
     public static final DeferredBlock<Block> COURSE_HEDGE_DISTANT_BAND = courseBlock(
             "course_hedge_distant_band", MapColor.PLANT, SoundType.GRASS);
 

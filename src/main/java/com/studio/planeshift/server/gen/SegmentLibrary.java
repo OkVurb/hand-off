@@ -617,6 +617,54 @@ public final class SegmentLibrary {
         }
     }
 
+    /**
+     * Post-and-beam scaffolding in open air, decked with grate.
+     *
+     * <p>From §4.8's parts kit. What it adds is not a shape the library lacked -- it has raised
+     * walkways -- but a raised walkway that is visibly <em>built</em>: posts standing on the floor,
+     * a beam across their tops, and a deck you can see the ground through. Every other elevated
+     * surface here is either extruded from the terrain or floating with nothing holding it up.
+     *
+     * <p>The deck is grate specifically. A player on it can see the coins and the enemy underneath
+     * before deciding whether to drop off the end, which turns "is there anything down there" from
+     * a gamble into a look. That is the whole reason the block exists.
+     *
+     * <p>The ground route stays open underneath. The posts sit in the back row of the lane for the
+     * same reason the boss arena's pillars do: a post in the middle of a three-wide corridor is a
+     * wall, and the reachability proof reads the lane centre.
+     */
+    static final Segment SCAFFOLD_SPAN = new Segment() {
+        public SegmentSpec spec() {
+            return def("scaffold_span", 16, 0, 2, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            BlockState post = ModBlocks.COURSE_PILLAR.get().defaultBlockState();
+            BlockState beam = ModBlocks.COURSE_TRIM.get().defaultBlockState();
+            BlockState deck = ModBlocks.COURSE_GRATE.get().defaultBlockState();
+
+            int height = 4;
+            int back = ctx.halfWidth();
+            for (int offset : new int[] {3, 8, 13}) {
+                int px = x + offset;
+                for (int h = 1; h < height; h++) {
+                    c.set(px, y + h, back, post);
+                }
+                c.set(px, y + height, back, beam);
+            }
+            // The deck, running the middle of the span. Short of the posts at either end so the
+            // player steps onto it from a jump rather than walking up a ramp that is not there.
+            for (int i = 3; i <= 13; i++) {
+                c.set(x + i, y + height, 0, deck);
+            }
+            // Something worth looking down at, which is what makes a see-through floor mean
+            // anything. Under the deck, reachable only by dropping off it.
+            coinTrail(c, x + 6, 5, y + 1, 1);
+            mob(c, cast(ctx).get(0), x + 10, y + 1, -90.0F);
+        }
+    };
+
     /** Pipes with Piranha Plants: timing, not reflexes. */
     static final Segment PIRANHA_PIPES = new Segment() {
         public SegmentSpec spec() {
@@ -2078,6 +2126,7 @@ public final class SegmentLibrary {
         list.add(ENEMY_LINE);
         list.add(LEDGE_PATROL);
         list.add(HAMMER_PERCH);
+        list.add(SCAFFOLD_SPAN);
         list.add(MUSHROOM_STALKS);
         list.add(CHOMP_POST);
         list.add(PIRANHA_PIPES);
