@@ -45,7 +45,7 @@ public class LanePatrolGoal extends Goal {
 
     @Override
     public void start() {
-        lane = mob.getDirection();
+        lane = alongTheLane(mob.getDirection());
     }
 
     @Override
@@ -63,6 +63,31 @@ public class LanePatrolGoal extends Goal {
         }
         Vec3 ahead = mob.position().add(Vec3.atLowerCornerOf(lane.getUnitVec3i()).scale(2.0D));
         mob.getMoveControl().setWantedPosition(ahead.x, mob.getY(), ahead.z, speedModifier);
+    }
+
+    /**
+     * Forces a patrol direction onto the axis the course actually runs along.
+     *
+     * <p>The lane runs east-west and is three blocks deep; this goal used to take its heading
+     * straight from {@code mob.getDirection()}, which is whatever yaw the thing was spawned with.
+     * Seven spawns in the segment library pass a yaw of zero, which is *south* — so those enemies
+     * set off across the corridor, hit its side after one block, turned, hit the other side, and
+     * spent their whole lives oscillating in a one-block space. They never patrolled, and a group
+     * of them ends up in a heap, which is exactly what a playtest showed.
+     *
+     * <p>Fixed here rather than at the seven call sites, because the call sites are not wrong about
+     * anything except a number: a goal that patrols a lane should decide what "along" means, and
+     * then no future spawn can get it wrong either.
+     *
+     * <p>Which way it faces when it has to choose is taken from its block position rather than a
+     * random, so a course generates identically every time — the same rule the rest of generation
+     * follows.
+     */
+    private Direction alongTheLane(Direction spawned) {
+        if (spawned.getAxis() == Direction.Axis.X) {
+            return spawned;
+        }
+        return (mob.blockPosition().getX() & 1) == 0 ? Direction.EAST : Direction.WEST;
     }
 
     private boolean shouldTurn() {

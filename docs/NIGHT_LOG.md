@@ -1749,3 +1749,22 @@ session that a test agreed with the bug because it was written from the same
 misunderstanding as the code.
 
 392 tests, full build green, jar reinstalled.
+
+## Patrollers that never patrolled
+The pile-up had a second cause, and it is the better explanation of the two.
+
+LanePatrolGoal seeded its heading from mob.getDirection() -- whatever yaw the thing
+was spawned with. Seven spawns in the segment library pass a yaw of zero, which is
+south, across a corridor three blocks deep. Those enemies set off sideways, hit the
+wall after one block, turned, hit the other wall, and spent their entire lives
+oscillating in a one-block space. They never patrolled at all. A group of them
+oscillating in the same square is exactly the heap in the screenshot.
+
+Fixed in the goal rather than at the seven call sites. The call sites are not wrong
+about anything except a number, and a goal whose job is patrolling a lane should be
+the thing that decides what "along" means -- then no future spawn can get it wrong
+either. The tie-break when it has to choose a side comes from block position rather
+than a random, so courses still generate identically from a seed.
+
+Verified by reverting the one line and watching the test fail.
+394 tests, full build green, jar reinstalled.
