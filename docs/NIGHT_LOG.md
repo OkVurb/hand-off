@@ -1583,3 +1583,23 @@ trigger are machinery the generator places and the player never holds, and they 
 correctly outside the check. Verified by deleting a table and watching it fail.
 
 40 held blocks, all covered. 385 tests, full build green.
+
+## A shell is a clock now
+Went looking for depth in code that already existed rather than new features, and
+the honest finding is that most of it is not thin -- the Goomba's minimalism is
+argued for in its own comment, the Koopa shell already slides, kills other enemies
+and counts combos, and the power-up javadocs match what the services actually do.
+
+One real gap: shellSince counted up every tick and nothing read it. A stomped Koopa
+stayed a shell forever, which makes a room of them a checklist rather than a
+situation -- clear them in any order and none of them come back. Now it stands up
+after twelve seconds, which turns the shell into a decision: kick it, use it, or
+leave it and it walks again.
+
+The wobble is the part that matters. Forty ticks of rocking before it emerges, which
+is the only warning a player standing on a shell gets. Without it this is an enemy
+appearing under their feet, and a hazard the player cannot read is a death they
+cannot learn from. Derived from the counter the server already ticks rather than
+synced as its own flag -- one source of truth for when the Koopa comes back.
+
+387 tests, full build green.

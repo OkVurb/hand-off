@@ -64,6 +64,8 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
         // Anything that withdraws into a shell, not just a Koopa. The tower bosses do it too.
         state.inShell = (entity instanceof com.studio.planeshift.common.entity.ShellSpinner s)
                 && s.spinning();
+        state.wobbling = entity instanceof com.studio.planeshift.common.entity.KoopaEntity koopa
+                && koopa.wobbling();
         state.koopalingVariant =
                 entity instanceof com.studio.planeshift.common.entity.KoopalingEntity boss
                         ? boss.variant().ordinal() : -1;
@@ -72,6 +74,13 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
     @Override
     protected void scale(CourseEnemyRenderState state, PoseStack poseStack) {
         super.scale(state, poseStack);
+        if (state.wobbling) {
+            // A rock rather than a shake. The shell tips side to side about its base, which is
+            // what a turtle getting its feet under it looks like -- a vibration would read as the
+            // game stuttering, and the player has to be able to tell this from lag.
+            float rock = (float) Math.sin(state.ageInTicks * 1.1F) * 11.0F;
+            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(rock));
+        }
         // The side camera commonly frames 20-30 blocks, at which a collision-accurate small mob
         // is a couple of featureless pixels, so the art is drawn larger than it is built.
         //

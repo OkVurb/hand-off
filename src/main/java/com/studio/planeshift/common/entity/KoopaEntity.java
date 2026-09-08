@@ -55,6 +55,20 @@ public class KoopaEntity extends CourseEnemyEntity implements ShellSpinner {
     private static final double KICK_REACH = 1.4D;
     /** Damage a sliding shell deals to whatever it runs into. */
     private static final float SHELL_DAMAGE = 20.0F;
+    /**
+     * How long a parked shell stays a shell.
+     *
+     * <p>Twelve seconds. Long enough to be a resource the player can walk back to and use, short
+     * enough that a room cannot be cleared by stomping everything once and then strolling through
+     * it. The reference's is shorter, but its rooms are smaller: at this camera distance a shell
+     * that popped in five seconds would be back before the player had finished dealing with what
+     * else is on screen.
+     */
+    private static final int RECOVERY_TICKS = 240;
+
+    /** How long the shell rocks before it stands up. The only warning the player gets. */
+    private static final int WOBBLE_TICKS = 40;
+
     /** Ticks a freshly-created shell ignores kicks, so the stomp that made it cannot kick it. */
     private static final int KICK_GRACE_TICKS = 10;
 
@@ -145,7 +159,45 @@ public class KoopaEntity extends CourseEnemyEntity implements ShellSpinner {
         } else {
             // A parked shell does not drift; it waits to be kicked.
             setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
+            tickRecovery();
         }
+    }
+
+    /**
+     * A shell left alone long enough stands back up.
+     *
+     * <p>Without this a stomped Koopa is permanently neutralised, and the shell stops being a
+     * decision. In the reference it is one: kick it now, carry it, or leave it and it walks again.
+     * That clock is what makes a room full of Koopas a situation rather than a checklist — clearing
+     * them in the wrong order means the first one is back before the last one is down.
+     *
+     * <p>The wobble is not decoration. {@link #WOBBLE_TICKS} before it emerges the shell starts
+     * rocking, which is the only warning a player standing on top of one gets. Without a tell this
+     * is a shell that becomes an enemy under their feet, and the project's own rule is that a
+     * hazard the player cannot read is a death they cannot learn from.
+     */
+    private void tickRecovery() {
+        if (shellSince < 0 || shellSince < RECOVERY_TICKS) {
+            return;
+        }
+        entityData.set(IN_SHELL, false);
+        entityData.set(SLIDING, false);
+        shellSince = -1;
+        kickerUuid = null;
+        shellCombo = 0;
+        playSound(net.minecraft.sounds.SoundEvents.TURTLE_SHAMBLE, 0.7F, 1.4F);
+    }
+
+    /**
+     * Whether the shell is visibly rocking, about to stand up.
+     *
+     * <p>Read by the renderer. Deliberately derived rather than synced: it is a pure function of a
+     * counter the server already ticks, and a second synced boolean saying the same thing is the
+     * kind of rival copy this codebase has been bitten by twice.
+     */
+    public boolean wobbling() {
+        return inShell() && !sliding() && shellSince >= 0
+                && shellSince >= RECOVERY_TICKS - WOBBLE_TICKS;
     }
 
     private void tickSlide() {

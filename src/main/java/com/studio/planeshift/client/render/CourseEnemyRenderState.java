@@ -19,6 +19,15 @@ public class CourseEnemyRenderState extends LivingEntityRenderState {
     public boolean inShell;
 
     /**
+     * Whether a parked shell is rocking, about to stand up.
+     *
+     * <p>The only warning a player standing on a shell gets that it is about to become an enemy
+     * again. Derived on the server from a counter it already ticks rather than synced as its own
+     * flag, so there is one source of truth for when the Koopa comes back.
+     */
+    public boolean wobbling;
+
+    /**
      * Which tower boss this is, or -1 for anything that is not one.
      *
      * <p>All eight siblings are one entity type with one rig, so the sheet is the only thing that
