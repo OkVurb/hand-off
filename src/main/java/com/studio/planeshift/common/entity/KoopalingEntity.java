@@ -83,9 +83,25 @@ public class KoopalingEntity extends CourseEnemyEntity implements ShellSpinner {
      */
     private static final double DASH_SPEED = 0.42D;
 
+    /**
+     * How long a boss lies stunned after running itself into a wall.
+     *
+     * <p>The wiki's description of these fights turns on this and the mod had no version of it:
+     * the boss charges, misses, hits the wall, and is briefly helpless. That is where the player's
+     * hit comes from. Without it a charge is a thing to dodge and nothing more, and the fight has
+     * no rhythm -- the player waits for a gap in an attack pattern rather than making one.
+     *
+     * <p>Long enough to cross the room and land a stomp, and no longer. A stun the player cannot
+     * reach is the same as no stun; one they can stomp twice from turns the fight into a wall the
+     * boss keeps running into.
+     */
+    private static final int STUN_TICKS = 42;
+
     private int attackCooldown = ATTACK_INTERVAL;
     private int hopCooldown;
+    private int stunTicks;
     private int dashTicks;
+    private boolean bounced;
     private double dashDirection = 1.0D;
 
     public KoopalingEntity(EntityType<? extends Monster> type, Level level) {
@@ -139,6 +155,25 @@ public class KoopalingEntity extends CourseEnemyEntity implements ShellSpinner {
         return STOMP_DAMAGE;
     }
 
+    /**
+     * Knocks the boss out for a moment.
+     *
+     * <p>Also ends any dash in progress. A shell that carried on spinning while its owner was
+     * stunned would be two states at once, and the shell is the one the renderer draws -- so the
+     * player would be told the boss was mid-attack while the code had it helpless.
+     */
+    private void stun() {
+        stunTicks = STUN_TICKS;
+        dashTicks = 0;
+        entityData.set(DASHING, false);
+        playSound(net.minecraft.sounds.SoundEvents.PLAYER_ATTACK_CRIT, 0.8F, 0.7F);
+    }
+
+    /** Whether the boss is currently helpless. Read by the renderer and by nothing else. */
+    public boolean stunned() {
+        return stunTicks > 0;
+    }
+
     /** {@inheritDoc} The shell shows only while the dash is running. */
     @Override
     public boolean spinning() {
@@ -163,6 +198,7 @@ public class KoopalingEntity extends CourseEnemyEntity implements ShellSpinner {
         boolean landed = super.hurtServer(level, source, amount);
         if (landed && isAlive()) {
             dashTicks = DASH_TICKS;
+            bounced = false;
             entityData.set(DASHING, true);
             // Away from whatever hit it, so the dash reads as recoil and never as a lunge at the
             // player who has just landed a stomp and is still in the air above it.
@@ -197,16 +233,33 @@ public class KoopalingEntity extends CourseEnemyEntity implements ShellSpinner {
         if (dashTicks > 0) {
             dashTicks--;
             if (horizontalCollision) {
+                if (bounced) {
+                    // Second wall. It has crossed the room and come back; running into something
+                    // twice is how a thing that cannot see where it is going ends up stunned, and
+                    // ending the dash here is what stops it rattling between two walls forever.
+                    stun();
+                    return;
+                }
                 // Bounce off the arena wall rather than grinding against it. The reference bosses
                 // cross the room and come back, which is what makes the dash a thing to dodge
                 // twice instead of a thing that leaves.
                 dashDirection = -dashDirection;
+                bounced = true;
             }
             setDeltaMovement(DASH_SPEED * dashDirection, getDeltaMovement().y, 0.0D);
             hurtMarked = true;
             if (dashTicks == 0) {
                 entityData.set(DASHING, false);
             }
+            return;
+        }
+
+        // Stunned: nothing at all, which is the point. A boss that kept aiming while helpless
+        // would be helpless in name only.
+        if (stunTicks > 0) {
+            stunTicks--;
+            setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
+            hurtMarked = true;
             return;
         }
 
@@ -253,6 +306,11 @@ public class KoopalingEntity extends CourseEnemyEntity implements ShellSpinner {
                 double dx = Math.signum(target.getX() - getX());
                 setDeltaMovement(dx * 0.24D, getDeltaMovement().y, getDeltaMovement().z);
                 hurtMarked = true;
+                if (horizontalCollision) {
+                    // Into the wall, and helpless for a moment. This is the opening: the player
+                    // does not wait for a gap in the pattern, they make one by not being there.
+                    stun();
+                }
             }
             default -> {
             }

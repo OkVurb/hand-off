@@ -127,7 +127,19 @@ unit suite cannot answer a physics question; `runGameTestServer` can.
 stands behind the play lane, and reaches forward into it with fire, punches and grabs while the
 player works across small platforms over lava. **The most 2.5D-native idea in the reference, and the
 one this project is best placed to take** — the Z axis already exists and the fight is built on it.
-Every boss in the mod is lane-sized and lane-bound.
+~~Every boss in the mod is lane-sized and lane-bound.~~
+
+*Built.* `SuperBowserEntity` stands in the backdrop and now **reaches into the lane** — the wiki's
+phase two is dodging claws and fire, and the claw is a real lunge across the depth gap rather than
+a hitbox that appears. The wind-up is three times the strike and the boss is visibly leaning out of
+the backdrop through all of it, which makes the telegraph the same kind of thing as every other one
+in this mod: a real movement of a real object.
+
+Two constraints fell out of the staging. `BackgroundBossGoal` holds depth every tick, so it had to
+be taught to let go — `ReachesIn` is one boolean, because the goal needs to know only whether to
+keep its hands off, and where the boss is going is the boss's business. And the swipe tracks depth
+only, never sideways: a claw that followed the player along the lane would be unavoidable, and the
+whole point of a fixed reach is that stepping out of it works.
 
 **3.2 ~~Bosses fly.~~ Wrong — checked against the wiki, not the footage.** In NSMB2 the Koopalings
 fight **on the ground**, in a castle room: Roy charges, the walls close in, he stuns himself on
@@ -144,6 +156,14 @@ times.
 *And the mod already has most of this.* `KoopaEntity` implements a shell state -- the renderer even
 reads `inShell()` for it. A Koopaling spin-dash is that mechanic at boss scale and speed, not a new
 one. The staging was never the gap and neither, it turns out, is the hard part of the moveset.
+
+*The self-stun, built.* "He stuns himself on them" was the half of this entry with no implementation
+at all, and it is the half that makes the fight a fight: a charge that misses ends in the wall and
+leaves the boss helpless for two seconds, which is where the player's hit comes from. Without it the
+player waits for a gap in an attack pattern; with it they *make* one by not being where the boss is
+going. The shell dash stuns on its second wall too — a thing that cannot see where it is going, that
+has already crossed the room once, running into something again — which also stops it rattling
+between two walls forever.
 
 **3.3 The clown car is a hazard on the walk-in, not a fight.** ~~Corrected against the wiki~~ —
 corrected twice. The first version read a contact sheet as "this is how the Koopalings fight". The

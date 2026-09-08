@@ -106,6 +106,13 @@ public class BackgroundBossGoal extends Goal {
         boss.getNavigation().moveTo(target, FOLLOW_SPEED);
         boss.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
+        // A boss that is reaching into the lane owns its own depth this tick. Without this the
+        // hold below would drag it back into the backdrop mid-swing, and the attack would exist
+        // in the code and never once be visible.
+        if (boss instanceof ReachesIn reacher && reacher.reachingIn()) {
+            return;
+        }
+
         // Ease onto the held depth. Done on position rather than through pathing because the
         // navigator does not know about the plane and would happily walk the boss into the lane.
         Vec3 pos = boss.position();

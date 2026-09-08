@@ -1171,3 +1171,21 @@ writing down so nobody fixes it back.
 Third plan entry wrong about how something is built rather than what it does, and
 the first settled by running the game. Section 2 is complete. 368 unit tests, 10
 gametests, 0 failures.
+
+## Section 3 finished: the two moves that were missing
+3.2's "he stuns himself on them" had no implementation, and it is the half that
+makes the fight a fight. A charge that misses now ends in the wall and leaves the
+boss helpless for two seconds. Without it the player waits for a gap in a pattern;
+with it they make one by not being where the boss is going. The shell dash stuns on
+its second wall too, which also stops it rattling between two walls forever.
+
+3.1's "reaches forward into the lane" is built as a real lunge across the depth
+gap rather than a hitbox that appears. Wind-up is three times the strike and the
+boss leans visibly out of the backdrop through all of it. BackgroundBossGoal holds
+depth every tick, so it had to be taught to let go -- ReachesIn is one boolean,
+because the goal only needs to know whether to keep its hands off. The swipe tracks
+depth and never sideways: a claw that followed you along the lane would be
+unavoidable, and a fixed reach only works if stepping out of it does.
+
+Tested as timings rather than behaviour -- neither move runs without a level, and
+the numbers are the fight. 371 unit tests, 10 gametests, 0 failures.

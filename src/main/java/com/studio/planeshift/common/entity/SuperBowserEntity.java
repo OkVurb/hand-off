@@ -29,10 +29,79 @@ import net.minecraft.world.level.Level;
  * player has just spent a fight learning to read that and the point of the transformation is that
  * the thing they learned now arrives with more reach and more health, not that they start over.
  */
-public class SuperBowserEntity extends BowserEntity {
+public class SuperBowserEntity extends BowserEntity implements ReachesIn {
 
     public SuperBowserEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
+    }
+
+    /**
+     * Ticks in a full swipe: wind-up, strike, and the withdrawal.
+     *
+     * <p>The wind-up is most of it. The wiki's phase two is dodging claws and fire, and a claw the
+     * player cannot see coming is not something they dodge -- it is something that happens to them.
+     * So the boss leans visibly out of the backdrop first, and the lean is the telegraph: a real
+     * movement of a real object, which is the same rule the rest of the mod follows about showing
+     * a hazard's reach.
+     */
+    private static final int WIND_UP = 22;
+    private static final int STRIKE = 6;
+    private static final int WITHDRAW = 14;
+    private static final int SWIPE_CYCLE = 96;
+
+    /** How far into the lane the claw comes, as a fraction of the backdrop gap. */
+    private static final double LUNGE = 0.85D;
+
+    /** How wide a stretch of lane the claw covers. */
+    private static final double SWIPE_RADIUS = 2.6D;
+
+    private static final float CLAW_DAMAGE = 6.0F;
+
+    private int swipeClock;
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>True from the first frame of the wind-up to the last of the withdrawal, so the goal keeps
+     * its hands off for the whole movement rather than only while the claw is out. Yielding just
+     * for the strike would make the boss snap forward and snap back, which reads as a teleport.
+     */
+    @Override
+    public boolean reachingIn() {
+        return swipeClock > 0 && swipeClock <= WIND_UP + STRIKE + WITHDRAW;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level().isClientSide() || !isAlive()) {
+            return;
+        }
+        swipeClock = (swipeClock + 1) % SWIPE_CYCLE;
+        if (!reachingIn()) {
+            return;
+        }
+        net.minecraft.world.entity.player.Player target =
+                level().getNearestPlayer(this, 24.0D);
+        if (target == null) {
+            return;
+        }
+        // Depth only. The boss does not chase along the lane while swinging -- a claw that
+        // followed the player sideways would be unavoidable, and the whole point of a fixed reach
+        // is that stepping out of it works.
+        double toward = swipeClock <= WIND_UP
+                ? swipeClock / (double) WIND_UP
+                : swipeClock <= WIND_UP + STRIKE
+                        ? 1.0D
+                        : 1.0D - (swipeClock - WIND_UP - STRIKE) / (double) WITHDRAW;
+        double gap = target.getZ() - getZ();
+        setPos(getX(), getY(), getZ() + gap * LUNGE * toward * 0.25D);
+
+        if (swipeClock > WIND_UP && swipeClock <= WIND_UP + STRIKE
+                && level() instanceof net.minecraft.server.level.ServerLevel server
+                && Math.abs(target.getX() - getX()) < SWIPE_RADIUS) {
+            target.hurtServer(server, damageSources().mobAttack(this), CLAW_DAMAGE);
+        }
     }
 
     /**
