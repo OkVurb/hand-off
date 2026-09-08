@@ -1,5 +1,9 @@
 # Next Claude / ChatGPT / Codex Session Prompt — PlaneShift
 
+> **For work driven by the reference footage, use `docs/HANDOFF_ASTRA.md` instead.** It is the
+> current, self-contained handoff: what to read, how this codebase wants to be worked on, and what
+> §8 of the work plan says to do next. This file remains the older rules-only prompt.
+
 > **State and backlog live in exactly two files.** Current state: `PROGRESS.md`. Backlog:
 > `docs/MISSING_MECHANICS.md` (103 items, tagged [new]/[extend]/[fix]). Playtest instance and mod
 > rules: `docs/PLAYTEST_INSTANCE.md`. This file carries *rules only* — do not restate state here,

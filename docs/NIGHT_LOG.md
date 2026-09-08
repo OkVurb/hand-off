@@ -1223,3 +1223,19 @@ and wrote down why rather than forcing it.
 Sandstone joins the castle block on mixed-size masonry. Brick and desert brick keep
 the even module: a quarry and a brickworks differ in exactly whether the pieces come
 out the same size. 373 tests, 0 failures.
+
+## Handoff
+Rewrote the work plan's ordering: all eight items on the original list are built,
+so it was a finished checklist masquerading as a plan. Replaced with a status table
+(1-3 complete, 4-7 partial) and a new ordering by cost against reach -- hue
+families first because it is a palette table with the widest effect, the expensive
+and self-contained ones last.
+
+Wrote docs/HANDOFF_ASTRA.md: a self-contained prompt for the next agent. Reading
+order, the build-and-count incantation, the baseline numbers, and the five rules
+that actually matter here -- verify a test by breaking what it covers, check before
+you build, telegraphs are physical, the reachability proof reads z=0 so noCollision
+is not enough, register and place in the same change.
+
+Ends by pointing out the thing none of this fixes: nobody has played it.
+373 tests, 0 failures.

@@ -496,20 +496,53 @@ openings — bright and welcoming, built nothing like the level interiors on eit
 
 ## 8. Ordering
 
-Grouped by what unblocks what, and by cost against payoff.
+**The original ordering is spent.** All eight items on it are built: the background boss (3.1),
+per-face block treatment (5.1), the shipped-code corrections (2.1–2.5), trajectory rendering (§1),
+world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progression links
+(7.1, 7.2). Sections **1, 2 and 3 are complete**. What follows replaces it.
 
-1. **3.1 — the boss in the background plane.** No new terrain, no new theme, no new art pipeline.
-   Move the boss off the lane and give it reach. The one thing this project has that a 2D reference
-   does not.
-2. **5.1 — per-face block treatment.** The machinery exists and is unused. One change, every theme.
-3. **2.1 to 2.5 — fix the shipped code** while the findings are fresh.
-4. **1 — trajectory rendering.** One shared concern; do it before adding the hazards in 6.6, not
-   after.
-5. **4.5 — tint interiors by world.** One theme becomes six without new art.
-6. **6.1 — water.** Much cheaper than previously scoped.
-7. **4.1 — sub-environments within a course.** The big structural one. Needs composer work and a
-   reachability re-proof across environment joins.
-8. **7.1 and 7.2 — progression links.** Small, self-contained, high payoff for how the game reads.
+### Status by section
+
+| Section | State |
+|---|---|
+| 1 — the trajectory rule | **Complete.** Five forms, all built as geometry. |
+| 2 — corrections | **Complete.** 2.5 turned out to be a false premise; a gametest says so. |
+| 3 — bosses | **Complete.** |
+| 4 — structure | 4.1–4.3, 4.5, 4.6 done. **Left: 4.4, 4.7, 4.8.** 4.9 out of scope by decision. |
+| 5 — art direction | 5.1, 5.5, 5.6, 5.8 done. **Left: 5.2 (partly), 5.3, 5.4, 5.7, 5.9, 5.10.** |
+| 6 — missing content | 6.1, 6.4–6.9 done. **Left: 6.2, 6.3.** |
+| 7 — interface | 7.1, 7.2, 7.5–7.7 done. **Left: 7.3, 7.4 (half), 7.8, 7.9.** |
+
+### What to do next, and why in this order
+
+1. **5.3 — one hue family per world.** Cheapest thing with the widest reach: it is a palette table,
+   no new mechanics, and it is the entry the reference confirms hardest. Everything else in §5 looks
+   better once the families are right.
+2. **5.7 — pattern on the background hills.** `profile()` already gives each theme its own silhouette
+   shape; this adds striping inside it. Same file, same pass, no new systems.
+3. **4.8 — the rest of the parts kit.** Post-and-beam scaffolding, thin ledges with inset centres,
+   capsule beams, grate panels. Each is a segment or a block, none of them interact, and they can be
+   done one at a time and shipped one at a time.
+4. **7.9 — the shop as architecture.** `ToadHouseRoom` exists and is a wooden box; the reference's is
+   a warm gold room with wide arches and open sky behind them. One room, hand-built, high payoff for
+   how the game reads between courses.
+5. **7.4 — the closing half of the iris.** The opening is built. The closing one needs a home,
+   because the results screen is a `Screen` and the HUD does not draw under it.
+6. **4.4 — water level as a variable.** The most interesting thing left, and the most expensive: it
+   needs runtime block editing over a marked band and a story for what the reachability proof is
+   told about a floor that moves.
+7. **6.3 — airships.** A whole theme: hull geometry, a cloud sea, a skull flag. Large, self-contained,
+   and the last big *content* gap.
+8. **7.3 — themed world maps** and **7.8 — the castle scene and credits level.** Presentation work
+   that only pays once the rest reads well.
+
+### Two things that are recorded rather than built
+
+- **4.9 rope that sags.** Deliberately out of scope: soft geometry with its own collision, where the
+  sag is the mechanic. The cheap version — a flat row of blocks that looks like rope and behaves
+  like floor — is worse than not having it.
+- **Coral on the playfield** (§5.8). `COURSE_CORAL` is solid and built for the layer behind the lane;
+  putting it on the floor walled 108 of 6000 courses. Wants a non-solid fan block of its own.
 
 ---
 
