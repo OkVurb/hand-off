@@ -572,7 +572,11 @@ tasks.register('checkBlockModels') {
                         }
                     }
                 }
-                if (variants.size() > 1 && looks.toUnique().size() == 1) {
+                // LiquidBlock geometry is drawn from FluidState, not these empty baked models.
+                // Keep reference validation above; exempt only the two registered fluids' levels.
+                boolean fluidLevels = f.name in ['course_water_block.json', 'course_lava_block.json']
+                        && variants.keySet().every { it ==~ /level=([0-9]|1[0-5])/ }
+                if (!fluidLevels && variants.size() > 1 && looks.toUnique().size() == 1) {
                     problems << "${f.name} has ${variants.size()} variants that all render " +
                             "identically as '${looks[0].split(/\|/)[0]}', so its states cannot be " +
                             "told apart in game"

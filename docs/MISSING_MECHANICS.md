@@ -17,6 +17,10 @@ Conventions used below:
 
 ## Movement and physics (1–15)
 
+Visual follow-up (WORK_PLAN 5.3, 2026-09-07): cave ledges/structural accents now follow desert,
+snow, lava and ghost-world materials. Palette unification remains partial; review pipes, props
+and background together in the client before marking it complete.
+
 The 2.5D rail, coyote time, jump buffering, ground pound, crouch and the Glider float already
 exist in `PlaneMovementAssists` and `AirMoveService`. These do not.
 

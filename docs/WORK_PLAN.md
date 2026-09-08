@@ -346,6 +346,11 @@ moon over teal terrain.
 **5.3 A world is one hue family plus one or two rare accents.** *Confirmed hard by the gold
 underground*, one olive-and-gold family across walls, ledges, pipes and terrain.
 
+*Partial, 2026-09-07:* cave structural accents and ledges now use their world's existing sandstone,
+ice, basalt or ghost-beam material. Previously only floors/fill followed the world while these
+repeated surfaces reverted to shared brick/castle blocks. This does not finish the entry: pipe,
+prop and background families still need a joint visual review before moving to 5.7.
+
 **5.4 Each fluid has its own surface treatment.** Four liquids, four different edges: lava has a
 bright crust, water a clean ripple, tar hangs in drip lobes, poison grows pink crystalline spikes.
 Whatever draws the top of a fluid has to be per-fluid art.

@@ -1,5 +1,9 @@
 # PlaneShift — Continuation Handoff
 
+Current checkpoint (2026-09-07): see docs/HANDOFF_CLAUDE.md and PROGRESS.md. Unit tests: 377
+passing on a forced rerun; full build blocked by checkNoRawCuboidScan in ToadBoxBlock. The older
+green status below is historical.
+
 **Project root:** `C:\Dev\PlaneShift`  
 **Date:** 2026-08-31  
 **Status:** `BUILD SUCCESSFUL` — all checks pass. Verified at runtime: `runServer` reaches `Done` with zero errors and `runClient` loaded an integrated world, generated course 1, rendered the fixed side camera/skybox/course art, and exited cleanly.

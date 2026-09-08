@@ -6,8 +6,8 @@
 
 ## Current State
 
-**Last updated:** 2026-09-01 (Devin session)
-**Build status:** GREEN — `.\gradlew build` passes; new `checkEntityRenderers` verified by deliberate failure
+**Last updated:** 2026-09-07 (Codex paused at owner request)
+**Build status:** RED — `checkNoRawCuboidScan` flags existing `ToadBoxBlock.betweenClosed`; 377 unit tests rerun, zero failures/errors. See `docs/HANDOFF_CLAUDE.md`.
 **GameTest status:** GREEN — `runGameTestServer` reports all 7 required tests passed
 **Server launch:** GREEN — `.\gradlew runServer` reaches `Done (6.296s)!`
 **Client launch:** GREEN — course 1 generated and rendered with the fixed side camera and skybox
@@ -15,6 +15,22 @@
 **Open branches:** `devin/work`
 
 ## What Was Done This Session
+
+### Codex — partial world palette pass, paused
+
+Started from clean `81a910c8`. Baseline rerun counted 373 passing unit tests. Cave structural
+accents and platforms now use existing sandstone, ice, basalt or ghost-beam materials in their
+respective worlds. Four new palette cases failed against the old code and passed after the change;
+the complete rerun counted 377 tests, zero failures/errors. WORK_PLAN 5.3 remains partial.
+
+Full build exposed two existing guard failures. `checkBlockModels` rejected identical level
+models for custom liquids; added a narrow fluid-level exception while retaining model-reference
+checks. That check passes now, but the full build stops at `ToadBoxBlock.betweenClosed` in
+`checkNoRawCuboidScan`. No client or gametest run this session. Owner requested an immediate
+commit and Claude handoff; do not treat this checkpoint as release-ready.
+
+Next: resolve the raw-scan failure, run full build, validate the fluid-check exception with negative
+fixtures, then resume WORK_PLAN 5.3. Shared files changed: GenContext.java and build.gradle.
 
 ### Devin session — entity-renderer build check + air-drop GameTest
 
@@ -212,6 +228,7 @@ first-person hand render.
 
 | Date | Agent | Summary |
 |------|-------|---------|
+| 2026-09-07 | Codex | Partial cave hue families; 377 passing unit tests; full build blocked by ToadBoxBlock raw scan; paused for Claude. |
 | 2026-09-01 | Gemini | Fixes: Death animation (94), Flagpole slide (96), Conveyor jump momentum (14), Short course variations (72), Graphical reserve item HUD. Cleared Ghost House Loop (already done). |
 | 2026-09-01 | Gemini | Fixes from MISSING_MECHANICS: 100 coins awards 1-Up sound/popup, reserve box correctly stashes a duplicate power-up, climbable tag added for vines, course difficulty scales by world ID, star coins spawned. |
 | 2026-09-01 | Claude | Play-test round 2: head bumps fixed, hitboxes shrunk, ground enemies patrol instead of chase, coin bricks, 3D coin, per-world biome, world-seeded layouts, Hammer Bro perch, F6 tester menu, air-drop immunity; wrote docs/MISSING_MECHANICS.md |

@@ -1239,3 +1239,12 @@ is not enough, register and place in the same change.
 
 Ends by pointing out the thing none of this fixes: nobody has played it.
 373 tests, 0 failures.
+
+## Codex checkpoint — 2026-09-07
+
+Partial 5.3: cave structures now follow their world's existing materials. Four new tests failed
+against the original palette; the full rerun then counted 377 passing tests. A focused run was
+initially launched before the baseline finished and hit a report-file lock; retried sequentially.
+Full build exposed an identical-model false positive for liquid levels, narrowly exempted, then
+stopped at the existing ToadBoxBlock raw cuboid scan. That blocker remains. No runtime playtest.
+Owner requested a pause and local commit; docs/HANDOFF_CLAUDE.md records the exact continuation.

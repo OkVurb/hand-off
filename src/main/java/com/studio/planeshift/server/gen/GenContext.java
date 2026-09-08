@@ -163,11 +163,17 @@ public final class GenContext {
          */
         static Palette forTheme(CourseTheme theme, CourseTheme world) {
             if (theme == CourseTheme.UNDERGROUND) {
+                // Repeated ledges and pillars belong to the same family as the cave floor.
+                // Rewards and hazards keep their identity colours; these are ordinary structure.
+                boolean worldStructure = world == CourseTheme.DESERT || world == CourseTheme.SNOW
+                        || world == CourseTheme.LAVA || world == CourseTheme.GHOST_HOUSE;
                 return new Palette(
                         undergroundSurface(world),
                         undergroundFill(world),
-                        ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
+                        worldStructure ? undergroundSurface(world)
+                                : ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
+                        worldStructure ? undergroundSurface(world)
+                                : ModBlocks.COURSE_CASTLE_BLOCK.get().defaultBlockState(),
                         null);
             }
             return switch (theme) {
