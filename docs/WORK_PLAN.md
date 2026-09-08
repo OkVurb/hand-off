@@ -36,6 +36,28 @@ It showed up five separate ways before it was obvious:
 A hazard shows its reach *before* it reaches you; a platform shows its path *before* you commit to
 the jump.
 
+**Status: complete.** All five forms are built, and all five are geometry.
+
+| Form | Where | Built as |
+|---|---|---|
+| Sweep circle | Firebars | The fireballs themselves are the reach |
+| Rail line | Buzzsaws | `COURSE_RAIL` laid through the level |
+| Tether with an anchor | Chain Chomp | Chain links and a post, both real |
+| Swing arc | Chain balls | The chain is real geometry |
+| Wire with an anchor | Lifts and crossings | A rail run under a travelling platform; a cable and a bracket above a hanging one |
+
+The last two were the gap. Moving platforms travelled with nothing to show where they went, so a
+player on the near bank had to guess how far one would come rather than read it. `MOVING_CROSSING`
+now lays a rail run under the sweep and `LIFT_SHAFT` hangs its lift from a visible cable with a
+bracket at the top — the bracket being the more important half, since it says how high the thing
+goes before the player has waited to find out. `GHOST_CROSSING` deliberately has neither: a ghost
+does not run on a track, and the thing carrying it is its own telegraph.
+
+One correction fell out of this. `COURSE_RAIL` is declared `noCollision`, so the world always let
+the player walk through it, but `CourseReachability` kept its own list and the rail was not on it —
+making the one block the mod draws paths with expensive to place anywhere the player also stands,
+which is the exact opposite of what this section needs. Now passable, and tested.
+
 **But the telegraph is always a physical object, never an overlay.** This is the part the first
 implementation got wrong. A grinder's route is visible because the *track is really there*; a spiked
 ball's arc is visible because the *chain is really there*; a fire bar's reach is the fireballs

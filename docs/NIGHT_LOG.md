@@ -1116,3 +1116,21 @@ heights, so the safe moment is a place rather than a pause.
 
 The test was checked against a build with the segment unregistered and it failed
 there, so it is testing generation rather than the class existing. 363 tests, 0 failures.
+
+## Section 1 finished
+Five telegraph forms, five built as geometry. The gap was platforms: they moved
+with nothing showing where they went, so the player had to guess how far one would
+come. MOVING_CROSSING lays a rail run under the sweep; LIFT_SHAFT hangs its lift
+from a cable with a bracket at the top, and the bracket is the more important half
+-- it says how high the thing goes before you have waited to find out. GHOST_CROSSING
+gets neither on purpose: a ghost does not run on a track.
+
+Fell out of it: COURSE_RAIL is noCollision but was not in the reachability proof's
+passable set, so the one block the mod draws paths with read as a wall to the
+solver. Fixed and tested.
+
+Two tests written, both checked against sabotaged builds. The first version of the
+platform test searched a wide height band and passed with the horizontal track
+removed -- it was finding the lift's cable, a different telegraph on a different
+platform. True and meaningless. Narrowed to the block directly underneath, where it
+fails properly. 366 tests, 0 failures.

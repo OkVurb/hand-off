@@ -591,6 +591,21 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * Lays the visible track a moving platform runs along.
+     *
+     * <p>Shared rather than repeated because the rule it serves is shared: every moving thing in
+     * this game shows its own path, and it shows it with real blocks. Two segments writing their
+     * own loop would be two places for the track to drift out of step with the band the platform
+     * actually sweeps -- and the band is what the reachability proof trusts.
+     */
+    private static void railRun(CourseCanvas c, int from, int to, int y) {
+        BlockState rail = ModBlocks.COURSE_RAIL.get().defaultBlockState();
+        for (int x = from; x <= to; x++) {
+            c.setIfEmpty(x, y, 0, rail);
+        }
+    }
+
     /** Pipes with Piranha Plants: timing, not reflexes. */
     static final Segment PIRANHA_PIPES = new Segment() {
         public SegmentSpec spec() {
@@ -632,6 +647,11 @@ public final class SegmentLibrary {
             }
             floor(c, x + 13, 5, y, ctx);
             c.spawn(ModEntities.MOVING_PLATFORM.get(), x + 6.5D, y + 2, 0.5D, 0.0F, GENERATED_TAG);
+            // The track it runs on, laid as blocks, exactly as the saw's is. Section 1: a moving
+            // thing shows its path, and it shows it by the path being really there. A player
+            // standing on the near bank can see how far the platform will come before deciding
+            // whether to wait -- which is the difference between timing a jump and guessing.
+            railRun(c, x + 4, x + 13, y + 1);
             // The platform sweeps along the lane; declare the band so the reachability proof knows
             // the pit is crossable rather than treating the crossing as a wall.
             c.movingSurface(x + 4, x + 13, y + 2);
@@ -661,6 +681,9 @@ public final class SegmentLibrary {
             }
             floor(c, x + 13, 5, y, ctx);
             c.spawn(ModEntities.GHOST_PLATFORM.get(), x + 6.5D, y + 2, 0.5D, 0.0F, GENERATED_TAG);
+            // No rail here, and that is the difference rather than an omission: this platform is
+            // carried by a ghost, and a ghost does not run on a track. What shows its path is the
+            // thing underneath it, which is why the ghost is drawn at all.
             c.movingSurface(x + 4, x + 13, y + 2);
         }
     };
@@ -674,6 +697,14 @@ public final class SegmentLibrary {
         public void build(CourseCanvas c, int x, int y, GenContext ctx) {
             floor(c, x, 4, y, ctx);
             c.spawn(ModEntities.MOVING_PLATFORM.get(), x + 5.5D, y + 2, 0.5D, 0.0F, GENERATED_TAG);
+            // The cable this lift hangs from, and the bracket at the top of it. A hanging platform
+            // in the reference always has a visible wire and a visible anchor, and the anchor is
+            // the more important half: it says how high the thing goes before the player has
+            // waited to find out.
+            for (int h = 2; h <= 8; h++) {
+                c.setIfEmpty(x + 5, y + h, 0, ModBlocks.COURSE_RAIL.get().defaultBlockState());
+            }
+            c.setIfEmpty(x + 5, y + 9, 0, ModBlocks.COURSE_TRIM.get().defaultBlockState());
             // A vertical lift: the sweep is a column, so declare a surface at each height it
             // reaches. This is the one segment where the platform is the only route, which is
             // exactly why the declaration has to be right.

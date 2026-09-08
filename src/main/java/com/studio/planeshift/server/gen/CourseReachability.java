@@ -103,7 +103,20 @@ public final class CourseReachability {
             // A shift gate is a doorway the player walks through to change plane. Its VoxelShape
             // is a 2/16 panel and passing through it is the entire point, so treating it as rock
             // makes the solver refuse routes that are not merely possible but intended.
-            ModBlocks.SHIFT_GATE.get());
+            // The rail. It is declared noCollision, so the world already lets the player walk
+            // straight through it -- the proof was the only thing treating it as a wall, and that
+            // disagreement made the one block the mod uses to draw a moving thing's path
+            // expensive to place anywhere the player also has to be. Section 1's whole rule is
+            // that a trajectory is shown by real geometry, so the geometry has to be free to sit
+            // in the corridor it describes.
+            ModBlocks.SHIFT_GATE.get(),
+            // The rail. It is declared noCollision, so the world already lets the player walk
+            // straight through it -- the proof was the only thing treating it as a wall, and that
+            // disagreement made the one block the mod uses to draw a moving thing's path
+            // expensive to place anywhere the player also has to be. Section 1's whole rule is
+            // that a trajectory is shown by real geometry, so the geometry has to be free to sit
+            // in the corridor it describes.
+            ModBlocks.COURSE_RAIL.get());
 
     /**
      * Solid blocks the solver refuses to stand on.
