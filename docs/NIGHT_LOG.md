@@ -1189,3 +1189,22 @@ unavoidable, and a fixed reach only works if stepping out of it does.
 
 Tested as timings rather than behaviour -- neither move runs without a level, and
 the numbers are the fight. 371 unit tests, 10 gametests, 0 failures.
+
+## Courses can descend into water now (4.1, 4.2)
+The sub-environment machinery already existed and was only ever a cave. The entry's
+own wording is "outdoor to cave to outdoor, or dry ledge then a descent into water",
+so the interior stretch is now flooded one time in three. That is also the cheapest
+crossbreed in 4.2: water stops being a place you travel to and becomes something
+that happened to part of a level you were already in.
+
+Two things it broke, both usefully. WaterCourseTest said "no other theme floods" --
+true when written, and exactly the partition 4.2 says does not exist. Narrowed to
+what was really being protected: a dry course may have a wet stretch but must never
+be wet end to end or flood its spawn apron.
+
+And LavaSeaTest failed because one extra RNG draw shifted every seed, dropping sea
+emitters from 6 of 8 courses to 4. That was not churn -- it exposed that emitter
+placement used a fixed stride plus a visibility test, which silently becomes "often
+nothing at all" since most of a volcano is solid floor. The pass now walks forward to
+the next visible column instead of skipping the slot. Fixed the placement rather than
+the threshold. 372 tests, 0 failures.

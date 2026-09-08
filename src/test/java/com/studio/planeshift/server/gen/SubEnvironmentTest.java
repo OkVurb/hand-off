@@ -78,4 +78,40 @@ class SubEnvironmentTest {
         }
         return false;
     }
+
+    /**
+     * Some courses descend into water rather than into a cave.
+     *
+     * <p>The entry's own wording is "outdoor to cave to outdoor; <em>or</em> dry ledge, then a
+     * descent into water", and only the first was built -- which made the middle of every course
+     * the same kind of change. It is also the cheapest crossbreed in §4.2: water stops being a
+     * place the player travels to and becomes something that happened to part of a level they were
+     * already in.
+     */
+    @Test
+    @DisplayName("and some of them descend into water instead")
+    void someCoursesFlood() {
+        int sunken = 0;
+        for (long seed = 0; seed < 40; seed++) {
+            CourseCanvas canvas = CourseComposer.compose(
+                    CourseTheme.GRASS, 720, 3, seed).canvas();
+            boolean wet = false;
+            for (int x = 0; x < 720 && !wet; x++) {
+                for (int y = -8; y < 20; y++) {
+                    var state = canvas.get(x, y, 0);
+                    if (state != null && state.getBlock()
+                            == com.studio.planeshift.common.registry.ModFluids.WATER_BLOCK.get()) {
+                        wet = true;
+                        break;
+                    }
+                }
+            }
+            if (wet) {
+                sunken++;
+            }
+        }
+        assertTrue(sunken > 0, "no grass course in forty seeds had a flooded stretch");
+        assertTrue(sunken < 40, "every grass course flooded; a transition that happens every time "
+                + "stops being an event, which is the rule the cave stretch already follows");
+    }
 }

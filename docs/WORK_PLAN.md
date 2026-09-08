@@ -239,14 +239,25 @@ was written.
 
 ## 4. Structure
 
-**4.1 One course passes through several sub-environments.** *Confirmed four times across different
-worlds.* Outdoor to cave to outdoor; or dry ledge, then a descent into water. `CourseComposer`
-builds one theme per course. The largest structural gap, and it changes what a theme is: a course
-wants an *ordered sequence* of environments.
+**4.1 One course passes through several sub-environments.** *Built.* `CourseComposer` runs a second
+`GenContext` over a middle span with its own theme, palette, cast and backdrop — two thirds of
+courses descend, and not every one, because a transition that happens every time stops being an
+event. The stretch is a cave most of the time and **a flooded descent one time in three**, which is
+the other half of the entry's own wording and was the piece missing until now.
 
 **4.2 Themes crossbreed.** Ghost house with ice-block platforms inside. Castle interiors flooded,
 god rays raking down between the arches. Volcano levels set against sky. The theme list is not a
 partition.
+
+*Begun, by the cheapest route there is:* the sunken sub-environment above means a grass course can
+have water in the middle of it. Water stops being a place the player travels to and becomes
+something that happened to part of a level they were already in.
+
+This broke an existing test, correctly. `WaterCourseTest` asserted "no other theme floods", which
+was true when written and is exactly the partition this entry says does not exist. Narrowed to the
+invariant that was really being protected — a dry course may have a wet *stretch*, but must never be
+wet end to end, and must never flood its own spawn apron. A stretch is a change of scene; the whole
+level underwater is a different level.
 
 **4.3 A lava sea, not lava pits.** *Confirmed across worlds.* A continuous band across the whole
 bottom, crossed on narrow bridges — and it emits: fireballs out of its own surface, vertical

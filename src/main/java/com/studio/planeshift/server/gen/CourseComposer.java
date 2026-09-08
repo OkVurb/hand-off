@@ -168,7 +168,20 @@ public final class CourseComposer {
          * per-world interior work built and had nothing to call it. Sharing the same
          * RandomGenerator keeps the whole course deterministic from one seed.
          */
-        GenContext interior = new GenContext(CourseTheme.UNDERGROUND, worldTheme,
+        /*
+         * What the interior stretch actually is.
+         *
+         * <p>A cave most of the time, and sometimes a flooded stretch instead. Both are in the
+         * reference -- outdoor to cave to outdoor, or a dry ledge and then a descent into water --
+         * and building only the first made the middle of every course the same kind of change.
+         *
+         * <p>A sunken stretch is also the cheapest theme crossbreed there is, which is the other
+         * entry this closes: water is not a place the player goes to, it is something that happens
+         * to part of a level they were already in.
+         */
+        boolean sunkenInterior = random.nextInt(3) == 0;
+        GenContext interior = new GenContext(
+                sunkenInterior ? CourseTheme.WATER : CourseTheme.UNDERGROUND, worldTheme,
                 difficulty, random, halfWidth);
         CourseCanvas canvas = new CourseCanvas();
 
@@ -380,6 +393,12 @@ public final class CourseComposer {
         // part that makes it a water level.
         if (theme == CourseTheme.WATER) {
             flood(canvas, ctx, floorAt, SPAWN_RUN, contentEnd);
+        } else if (interiorAllowed && sunkenInterior) {
+            // Only the interior span. Flooding to the same ceiling as a full water course would
+            // put the surface line above the dry ground either side of it, which is a wall of
+            // water rather than a pool -- so this fills the sunken stretch and stops at its edges,
+            // and the surface line the player swims down to is the join between the two.
+            flood(canvas, interior, floorAt, caveFrom, caveTo);
         }
 
         // Decorated in spans, so the cave gets a cave's backdrop and the surface gets a sky. One
@@ -802,18 +821,29 @@ public final class CourseComposer {
         // as punctuation rather than as a wall of fire.
         int emitter = 0;
         for (int x = SPAWN_RUN; x < length - 8; x += PODOBOO_SPACING) {
-            if (!openAbove(canvas, x, seaY)) {
+            // Walk forward until a column that can actually show what it is doing, rather than
+            // skipping the slot. A fixed stride plus a visibility test is a stride that silently
+            // becomes "sometimes nothing at all": most of a volcano course is solid floor, so the
+            // exact columns the stride lands on are usually the wrong ones. Half of eight seeds
+            // came out with no sea emitters at all this way, which the test caught. Same fix as
+            // the roaming pass's extra retries -- the pass trying harder at the job it has.
+            int at = x;
+            while (at < length - 8 && at < x + PODOBOO_SPACING && !openAbove(canvas, at, seaY)) {
+                at++;
+            }
+            if (!openAbove(canvas, at, seaY)) {
                 continue;
             }
+            x = at;
             // Alternating, so the sea has two things it does rather than one. A Podoboo is a
             // moving threat the player tracks; a geyser is a fixed one they time. Either alone
             // becomes a rhythm the player stops reading after the second world.
             if (emitter++ % 2 == 0) {
                 canvas.spawn(com.studio.planeshift.common.registry.ModEntities.PODOBOO.get(),
-                        x + 0.5D, seaY + 1.0D, 0.5D, 0.0F, SegmentLibrary.GENERATED_TAG);
+                        at + 0.5D, seaY + 1.0D, 0.5D, 0.0F, SegmentLibrary.GENERATED_TAG);
             } else {
                 canvas.spawn(com.studio.planeshift.common.registry.ModEntities.LAVA_JET.get(),
-                        x + 0.5D, seaY + 1.0D, 0.5D, 0.0F, SegmentLibrary.GENERATED_TAG);
+                        at + 0.5D, seaY + 1.0D, 0.5D, 0.0F, SegmentLibrary.GENERATED_TAG);
             }
         }
         for (int x = -FLOOR_MAP_MARGIN; x < length + FLOOR_MAP_MARGIN; x++) {
