@@ -508,8 +508,14 @@ was already there with a planked hull, a rising prow and stern, a rail, a mast a
 lacked was a sky: a hull with nothing under it is a wooden floor with a flag on it, so there is a
 cloud sea in the far layer below it now, showing through the gaps at either end.
 
-*Still missing:* the airship **world** — its own palette, skybox and course shape. The deck is the
-part the player stands on and was worth having first. *The original wording:* The playfield is a
+*The fleet, built:* `AIRSHIP_RIGGING` — two stern sections with open air between them and ratlines
+strung across — and `AIRSHIP_BATTERY`, three cannons behind a one-block bulwark the player can drop
+behind but not hide behind. All three airship segments are gated to the sky world, because an
+airship moored in a meadow is a shipwreck.
+
+*Deliberately not a new theme.* A dedicated airship `CourseTheme` would need a world to use it, and
+the registry has five worlds with none spare — it would be a palette, a skybox and a cast with
+nowhere to appear, which is this project's signature bug. The sky world hosts the fleet instead. *The original wording:* The playfield is a
 *vehicle* — a golden ribbed hull with upturned prow and stern
 over a cloud sea, under a skull flag. Standard staging for a boss.
 
@@ -652,7 +658,7 @@ world-tinted interiors (4.5), water (6.1), sub-environments (4.1) and the progre
 | 3 — bosses | **Complete.** |
 | 4 — structure | **Complete.** 4.9 (sagging rope) out of scope by decision, recorded below. |
 | 5 — art direction | **Complete**, except the bonus-world *maps*, which are §7.3's work. |
-| 6 — missing content | **Complete**, except the airship *world* (palette, skybox, course shape); its deck is built. |
+| 6 — missing content | **Complete.** The airship fleet lives in the sky world; a separate theme would have no world to use it. |
 | 7 — interface | **Complete**, except the playable credits roll in 7.8 and the bonus-world map in 7.3 — both recorded with reasons. |
 
 ### What to do next, and why in this order

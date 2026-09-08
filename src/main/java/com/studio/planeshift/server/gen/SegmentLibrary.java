@@ -808,6 +808,91 @@ public final class SegmentLibrary {
         }
     };
 
+    /**
+     * The gap between two ships, crossed on rigging.
+     *
+     * <p>§6.3's remaining half is the airship *world*, and the honest version of that is not a new
+     * theme — the sky world already hosts the deck and an airship moored in a meadow is a shipwreck.
+     * What a fleet needs is what happens *between* hulls, and this is it: two stern sections with
+     * open air between them and ratlines to climb.
+     *
+     * <p>The ratlines are the climbing pole material, which is already climbable and already known
+     * to the reachability proof. Nothing new had to be taught to the solver for this to be a route
+     * rather than a wall — the same reason the pole segment was built on the vine wall's skeleton.
+     *
+     * <p>The drop underneath is real. This is the sky world, where §6.2's whole subject is height,
+     * and rigging strung over a floor would be a ladder in a corridor.
+     */
+    static final Segment AIRSHIP_RIGGING = new Segment() {
+        public SegmentSpec spec() {
+            return def("airship_rigging", 18, 0, 3, Tag.CLIMB, Tag.GAP);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            BlockState plank = ModBlocks.COURSE_WOOD_BLOCK.get().defaultBlockState();
+            BlockState rope = ModBlocks.COURSE_CLIMB_POLE.get().defaultBlockState();
+
+            // Two decks, one either side of the gap.
+            for (int i = 0; i < 5; i++) {
+                lane(c, ctx, x + i, y, plank);
+                lane(c, ctx, x + 13 + i, y, plank);
+            }
+            // Masts on the inner ends, with rigging strung between them. The player climbs one,
+            // crosses along the top, and comes down the other.
+            for (int h = 1; h <= 5; h++) {
+                c.set(x + 4, y + h, 0, rope);
+                c.set(x + 13, y + h, 0, rope);
+            }
+            for (int i = 4; i <= 13; i++) {
+                c.set(x + i, y + 5, 0, plank);
+            }
+
+            // Stepped planking across the gap, under the rigging.
+            //
+            // Without it the only crossing is the climb, and the reachability proof cannot model
+            // climbing -- a rope is passable to it, which means it is not something to stand on,
+            // which means the gap is a hole. Forty-two of six thousand courses were rejected for
+            // exactly that. This is the same fix CLIMB_POLE already carries: the guaranteed route
+            // is geometry the solver can see, and the rigging above is the shortcut for a player
+            // who would rather go over the top.
+            for (int step = 0; step < 3; step++) {
+                for (int i = 0; i < 2; i++) {
+                    c.set(x + 6 + step * 2 + i, y + 1 + step, 0,
+                            ModBlocks.SEMISOLID_PLATFORM.get().defaultBlockState());
+                }
+            }
+            coinTrail(c, x + 6, 6, y + 6, 1);
+        }
+    };
+
+    /**
+     * A cannon battery behind a bulwark.
+     *
+     * <p>The other thing a fleet needs: a deck that shoots back. Three cannons in a row with a low
+     * wall in front of them, so the player is crossing a firing line rather than meeting one gun.
+     *
+     * <p>The bulwark is one block high — cover the player can drop behind, not a wall they have to
+     * climb. A battery you can simply stand behind is a corridor with decoration; a battery whose
+     * cover you have to leave to make progress is the encounter.
+     */
+    static final Segment AIRSHIP_BATTERY = new Segment() {
+        public SegmentSpec spec() {
+            return def("airship_battery", 16, 0, 3, Tag.ENEMY, Tag.OVERHEAD);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            BlockState rail = ModBlocks.COURSE_TRIM.get().defaultBlockState();
+            for (int i = 0; i < 3; i++) {
+                int at = x + 4 + i * 4;
+                c.set(at, y + 1, 0, ModBlocks.BULLET_BILL_CANNON.get().defaultBlockState());
+                // The bulwark, one short of the cannon so the muzzle is not buried in it.
+                c.set(at - 2, y + 1, 0, rail);
+            }
+            coinTrail(c, x + 2, 12, y + 3, 1);
+        }
+    };
+
     /** Pipes with Piranha Plants: timing, not reflexes. */
     static final Segment PIRANHA_PIPES = new Segment() {
         public SegmentSpec spec() {
@@ -2339,6 +2424,8 @@ public final class SegmentLibrary {
         list.add(ERUPTION_FIELD);
         list.add(GHOST_CROSSING);
         list.add(AIRSHIP_DECK);
+        list.add(AIRSHIP_RIGGING);
+        list.add(AIRSHIP_BATTERY);
         list.add(MUSIC_STEPS);
         list.add(DRESSED_HALL);
         list.add(SEMISOLID_TIERS);

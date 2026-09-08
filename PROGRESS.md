@@ -6,15 +6,32 @@
 
 ## Current State
 
-**Last updated:** 2026-09-08 (Claude — §5.7 finished in the main tree)
-**Build status:** GREEN — full `.\gradlew build` passes; 381 unit tests, zero failures/errors
-**GameTest status:** Not run this session. The 10 passing gametests are historical, not re-verified.
-**Server launch:** Not run this session; no `src/main/resources/data/` files were touched.
-**Client launch:** Not run this session. **Nothing in §5.7 has been looked at in-game.**
+**Last updated:** 2026-09-08 (Claude — sections 1–7 of the work plan complete)
+**Build status:** GREEN — full `.\gradlew build` passes; 383 unit tests, zero failures/errors
+**GameTest status:** 11 passing, re-verified this session.
+**Server launch:** Not run this session.
+**Client launch:** Not run this session. **None of sections 4–7 has been looked at in-game.**
 **Open PRs:** None
 **Open branches:** `devin/work`, `claude/work`
 
 ## What Was Done This Session
+
+### Claude — work plan sections 4, 5, 6 and 7 finished
+
+Sections 1–3 were already complete. This session closed the rest: the tide (4.4), pipe lattices
+(4.7), the parts kit (4.8), cut-log platforms (5.9), the bonus room's painted panels (5.10), a cloud
+climb and the airship fleet (6.2, 6.3), the shop's arches (7.9), the closing iris (7.4), houses and
+ponds on the map (7.3) and a castle-clear card (7.8).
+
+**Three things are recorded rather than built**, with reasons, in `docs/WORK_PLAN.md`: the playable
+credits roll (a set piece with a camera path and an input lock, not a screen), the bonus-world
+checkered map (no bonus world exists to give one to), and 4.9's sagging rope (out of scope by an
+earlier decision).
+
+**The largest remaining gap is that none of it has been played.** Every claim in sections 4–7 is
+static measurement plus a green build.
+
+### Earlier this session
 
 ### Claude — WORK_PLAN §5.7 finished (pattern on the background hills)
 

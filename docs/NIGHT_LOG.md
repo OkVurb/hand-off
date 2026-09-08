@@ -1469,3 +1469,23 @@ batch.
 Sections 1 through 7 are now complete but for the airship world, the playable
 credits and the bonus-world map. 383 tests, 11 gametests, full build green. None of
 it has been played.
+
+## The airship fleet, and a rope the proof could not read
+AIRSHIP_RIGGING and AIRSHIP_BATTERY, both gated to the sky world -- an airship
+moored in a meadow is a shipwreck. The rigging is two sterns with air between them
+and ratlines across; the battery is three cannons behind a one-block bulwark the
+player can drop behind but not hide behind.
+
+The rigging failed 42 of 6000 courses on its first build, and correctly. The only
+crossing was the climb, and the reachability proof cannot model climbing -- a rope is
+passable to it, which means it is not something to stand on, which means the gap is a
+hole. Added stepped planking under the rigging, which is the same fix CLIMB_POLE
+already carries: the guaranteed route is geometry the solver can see, and the climb
+is the shortcut.
+
+Deliberately did not add an airship CourseTheme. It would need a world to use it and
+the registry has five with none spare, so it would be a palette, a skybox and a cast
+with nowhere to appear -- this project's signature bug, dressed as content.
+
+Sections 1-7 are complete but for three items recorded with reasons. 383 tests, 11
+gametests, full build green. Still unplayed.
