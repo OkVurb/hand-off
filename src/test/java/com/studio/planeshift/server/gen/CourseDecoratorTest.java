@@ -25,10 +25,30 @@ class CourseDecoratorTest {
         // The lane is +/- GenContext.LANE_HALF_WIDTH around z=0, and scenery starts beyond it with
         // a clear column in between: flush against the play plane, scenery reads as level geometry
         // and the player will try to stand on it.
-        assertTrue(CourseDecorator.NEAR_Z > GenContext.LANE_HALF_WIDTH + 0,
+        //
+        // Measured as a distance, not as a coordinate. These constants used to be positive and the
+        // test compared them directly, which quietly encoded the side as well as the gap -- and the
+        // side was wrong. The camera sits on the positive side of the depth axis, so scenery at
+        // +2 was between the camera and the course, drawn over the level it was meant to be behind.
+        assertTrue(Math.abs(CourseDecorator.NEAR_Z) > GenContext.LANE_HALF_WIDTH,
                 "decoration would sit inside the lane");
-        assertTrue(CourseDecorator.NEAR_Z - GenContext.LANE_HALF_WIDTH >= 1,
+        assertTrue(Math.abs(CourseDecorator.NEAR_Z) - GenContext.LANE_HALF_WIDTH >= 1,
                 "decoration needs a clear column between it and the play plane");
+    }
+
+    /**
+     * Scenery is behind the player, on the far side from the camera.
+     *
+     * <p>The bug this was written for: every depth constant here was positive, and
+     * {@code CourseService} builds its rail with {@code lookPositive = true}, so positive is where
+     * the camera is. Hills, trees, the backdrop wall and half the props were all drawn in front of
+     * the course.
+     */
+    @Test
+    void decorationSitsBehindTheCourse() {
+        assertTrue(CourseDecorator.NEAR_Z < 0 && CourseDecorator.FAR_Z < 0
+                        && CourseDecorator.BACKDROP_Z < 0,
+                "scenery is on the camera's side of the lane, so it draws over the level");
     }
 
     @Test
@@ -36,9 +56,10 @@ class CourseDecoratorTest {
         // CourseWriter clears a fixed half-width around the lane. Anything drawn beyond that would
         // be written into terrain that was never cleared, which is how a course ends up with
         // scenery embedded in a hillside.
-        assertTrue(CourseDecorator.FAR_Z <= 3,
+        assertTrue(Math.abs(CourseDecorator.FAR_Z) <= 3,
                 "decoration must stay inside CourseWriter's cleared half-width");
-        assertTrue(CourseDecorator.FAR_Z >= CourseDecorator.NEAR_Z);
+        assertTrue(Math.abs(CourseDecorator.FAR_Z) >= Math.abs(CourseDecorator.NEAR_Z),
+                "the far band must be at least as far back as the near one");
     }
 
     /** Every theme actually decorates: an undecorated theme is the bug this class exists to fix. */

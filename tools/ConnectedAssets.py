@@ -24,6 +24,7 @@ BITS = [("up", 1), ("down", 2), ("west", 4), ("east", 8)]
 BLOCKS = [
     "course_castle_block",
     "course_grass_block",
+    "course_dirt_block",
     "course_sand_block",
     "course_sandstone",
     "course_basalt",
@@ -55,9 +56,30 @@ def blockstate(name):
     return {"variants": variants}
 
 
-def model(name, mask):
+def model(name, mask, has_top):
+    """One mask's model.
+
+    Blocks with a distinct top face get ``cube_bottom_top`` rather than ``cube_all``, and that is a
+    bug fix rather than a refinement. Grass shipped with ``cube_all``, so every face -- including the
+    one you look down on -- drew the *side* art: a dirt tile with a green band along its top edge.
+    Standing on a grass block you saw dirt with a stripe near one edge, and the grass top texture
+    that has existed all along was drawn by nothing.
+
+    The mask belongs to the sides only. Connection edges are drawn where the material stops in the
+    plane the camera sees, and the top face of a block does not have those edges -- it has grass on
+    it or it does not.
+    """
     texture = "planeshift:block/%s_%d" % (name, mask)
-    return {"parent": "minecraft:block/cube_all", "textures": {"all": texture}}
+    if not has_top:
+        return {"parent": "minecraft:block/cube_all", "textures": {"all": texture}}
+    return {
+        "parent": "minecraft:block/cube_bottom_top",
+        "textures": {
+            "top": "planeshift:block/%s_top" % name,
+            "bottom": "planeshift:block/%s" % name,
+            "side": texture,
+        },
+    }
 
 
 def write(path, payload):
@@ -77,13 +99,20 @@ def main():
 
     for name in BLOCKS:
         write(os.path.join(states, name + ".json"), blockstate(name))
+        has_top = os.path.isfile(os.path.join(root, "textures", "block", name + "_top.png"))
         for mask in range(16):
-            write(os.path.join(models, "%s_%d.json" % (name, mask)), model(name, mask))
+            write(os.path.join(models, "%s_%d.json" % (name, mask)), model(name, mask, has_top))
         # The plain model stays: it is the item icon, and the fallback for anything that places
         # this block without going through getStateForPlacement.
         write(os.path.join(models, name + ".json"),
-              {"parent": "minecraft:block/cube_all",
-               "textures": {"all": "planeshift:block/" + name}})
+              model(name, None, False) if False else
+              ({"parent": "minecraft:block/cube_bottom_top",
+                "textures": {"top": "planeshift:block/%s_top" % name,
+                             "bottom": "planeshift:block/" + name,
+                             "side": "planeshift:block/" + name}}
+               if has_top else
+               {"parent": "minecraft:block/cube_all",
+                "textures": {"all": "planeshift:block/" + name}}))
 
     print("wrote %d blockstates and %d models"
           % (len(BLOCKS), len(BLOCKS) * 17))

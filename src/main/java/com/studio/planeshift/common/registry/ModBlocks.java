@@ -52,7 +52,15 @@ public final class ModBlocks {
     /** Bright, durable terrain tiles used by the generated 2.5D courses. */
     public static final DeferredBlock<ConnectedBlock> COURSE_GRASS_BLOCK = connectedBlock(
             "course_grass_block", MapColor.GRASS, SoundType.GRASS);
-    public static final DeferredBlock<Block> COURSE_DIRT_BLOCK = courseBlock(
+    /**
+     * The fill under every grass level, and the most-repeated surface in the game.
+     *
+     * <p>A {@link ConnectedBlock} for that reason. It was a plain block, so a wall of it drew the
+     * same sixteen pixels over and over with a hard seam at every boundary -- the exact grid the
+     * connected machinery exists to remove, on the one block that shows it most. Grass and sand had
+     * been converted and the block underneath them had not.
+     */
+    public static final DeferredBlock<ConnectedBlock> COURSE_DIRT_BLOCK = connectedBlock(
             "course_dirt_block", MapColor.DIRT, SoundType.GRAVEL);
     public static final DeferredBlock<Block> COURSE_CLOUD_BLOCK = courseBlock(
             "course_cloud_block", MapColor.SNOW, SoundType.WOOL);

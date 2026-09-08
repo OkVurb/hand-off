@@ -877,6 +877,18 @@ public final class BespokeEnemyModel extends EntityModel<CourseEnemyRenderState>
         // code: retune either rig and the renderer would have gone on dragging the shell back to a
         // number the model no longer used.
         shell.y = shelled ? shellRestY + SHELL_SETTLE : shellRestY;
+        // A shell on the ground lies down.
+        //
+        // It was only dropped a few pixels, so a withdrawn Koopa read as a shell standing on its
+        // edge -- which is what a shell does for the half second it is spinning and never what it
+        // does at rest. Tipped a quarter turn so the opening faces the camera and the flat of it
+        // is on the floor.
+        //
+        // And while it slides it spins about that same axis, fast. A shell crossing a room without
+        // rolling is a box being pushed, and the spin is most of what says this thing is dangerous
+        // rather than merely in the way.
+        shell.xRot = shelled ? Mth.HALF_PI : 0.0F;
+        shell.zRot = state.sliding ? state.ageInTicks * 0.9F : 0.0F;
 
         switch (profile) {
             case GOOMBA -> {

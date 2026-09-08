@@ -142,6 +142,26 @@ public class KoopaEntity extends CourseEnemyEntity implements ShellSpinner {
         return 0.0F;
     }
 
+    /**
+     * A shell cannot be hurt.
+     *
+     * <p>The reference is unambiguous: a Koopa in its shell is invulnerable, and what removes it is
+     * falling out of the level. That is not a detail — it is what makes the shell a *thing* rather
+     * than an enemy in a weaker state. A shell you could destroy with a fireball would be a Koopa
+     * that takes two hits, and the whole point of the object is that it survives to be used.
+     *
+     * <p>The out-of-world case is let through, or a kicked shell that ran off the edge of a course
+     * would live forever at the bottom of the world, ticking.
+     */
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level,
+                              net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (inShell() && !source.is(net.minecraft.world.damagesource.DamageTypes.FELL_OUT_OF_WORLD)) {
+            return false;
+        }
+        return super.hurtServer(level, source, amount);
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -206,6 +226,20 @@ public class KoopaEntity extends CourseEnemyEntity implements ShellSpinner {
         }
         ServerLevel serverLevel = (ServerLevel) level();
         Vec3 velocity = getDeltaMovement();
+
+        // Re-drive the shell to full speed every tick.
+        //
+        // It was kicked once and then left to the world's own friction, so it slowed to a stop
+        // after a few blocks -- a shell that runs out of energy is a rolling ball, and a shell is
+        // supposed to be a projectile that happens to be alive. Direction is kept and only the
+        // magnitude is restored, so the bounce below still decides where it goes.
+        if (velocity.horizontalDistanceSqr() > 1.0E-6) {
+            Vec3 flat = new Vec3(velocity.x, 0.0D, velocity.z).normalize().scale(SHELL_SPEED);
+            velocity = new Vec3(flat.x, velocity.y, flat.z);
+            setDeltaMovement(velocity);
+            hurtMarked = true;
+        }
+
         if (horizontalCollision) {
             // Check for breakable bricks or question blocks in the path of the shell
             if (velocity.lengthSqr() > 1.0E-4) {

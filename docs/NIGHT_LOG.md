@@ -1671,3 +1671,41 @@ generators emit the render type now too -- otherwise the next regeneration would
 quietly undone all of it.
 
 391 tests, full build green, jar reinstalled.
+
+## Playtest found six real bugs, and one of them was structural
+The owner played it and sent screenshots. Everything below is something that shipped
+green and looked wrong the moment anyone stood in front of it.
+
+**The backdrop was on the camera's side.** CourseService builds its rail with
+lookPositive = true, so the camera sits at positive Z and everything behind the player
+is negative. Every depth constant in CourseDecorator was positive: hills, trees, the
+backdrop wall and half the props were all drawn between the camera and the course.
+Two tests passed on it because they compared the constants directly and so encoded
+the side along with the gap; they measure distance now.
+
+**Grass blocks had no grass on top.** The connected models used cube_all, so every
+face drew the side art -- dirt with a green band near one edge. course_grass_block_top
+has existed all along and was drawn by nothing. Connected models with a _top texture
+use cube_bottom_top now.
+
+**Dirt tiled visibly.** It was the one fill under every grass level and was never
+converted to a ConnectedBlock, so it drew the same sixteen pixels with a hard seam at
+every boundary. Converted. The pebbles I added last night made it worse -- bright grey
+on brown is the highest-contrast thing on the tile, so it was what the eye used to see
+the grid. Toned to near the soil colour.
+
+**Kicked shells stopped.** tickSlide set velocity once and let the world's friction
+take it, so a shell died after a few blocks. Speed is re-driven every tick now, keeping
+direction so the bounce still steers it.
+
+**Shells could be killed and stood on edge.** A shell in the reference is invulnerable
+and what removes it is falling out of the level -- that is what makes it an object
+rather than a weakened enemy. And it lay on its edge because the model only dropped it
+a few pixels; it is tipped flat now, and spins while sliding.
+
+**Enemies piled up.** Structural rather than random: the lane is three wide, everything
+walks the same axis, and a faster enemy behind a slower one has nowhere to go, so
+vanilla's push-apart stacks them. They turn away from each other now, which is the
+reference's answer and the only one that needs no enemy to know another's speed.
+
+392 tests, full build green, jar reinstalled.

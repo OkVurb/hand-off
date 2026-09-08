@@ -66,6 +66,8 @@ public class CourseEnemyRenderer<T extends CourseEnemyEntity>
                 && s.spinning();
         state.wobbling = entity instanceof com.studio.planeshift.common.entity.KoopaEntity koopa
                 && koopa.wobbling();
+        state.sliding = entity instanceof com.studio.planeshift.common.entity.KoopaEntity slider
+                && slider.sliding();
         state.koopalingVariant =
                 entity instanceof com.studio.planeshift.common.entity.KoopalingEntity boss
                         ? boss.variant().ordinal() : -1;

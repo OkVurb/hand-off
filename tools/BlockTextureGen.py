@@ -337,6 +337,9 @@ CONNECTED = {
                            (124, 88, 58), {"cap": (88, 158, 62), "cap_rows": 4}),
     # Sand is lighter where the wind has been at it and darker in the body, so an exposed top
     # reads as a surface rather than as a cut through a dune.
+    # The fill under every grass level. No cap: it is what grass sits on, and a dirt block with
+    # its own green top would put a second lawn halfway down a cliff face.
+    "course_dirt_block": (lambda: dirt((124, 88, 58), 26), (124, 88, 58), {}),
     "course_sand_block": (lambda: drift((228, 196, 118), 73), (228, 196, 118),
                           {"cap": (244, 222, 164), "cap_rows": 3}),
     # Cut stone, so it gets the mixed-size treatment too. Desert brick keeps the even module --
@@ -1286,7 +1289,10 @@ def dirt(base, seed):
     # mottling rather than as anything solid. A handful of pebbles that catch light from above is
     # what tells the eye this is a cut face of packed earth and not a brown surface -- and it is
     # the block under every grass level in the game, so it is looked at more than any other.
-    stone = (146, 140, 130, 255)
+    # Close to the soil rather than against it. The first version used a light grey, which at
+    # this size is the highest-contrast thing on the tile and so is the thing the eye uses to see
+    # the grid -- a detail that makes tiling more obvious is worse than no detail.
+    stone = (118, 100, 86, 255)
     for sx, sy, w in ((2, 6, 3), (9, 5, 2), (6, 12, 3), (12, 9, 2)):
         d.rectangle([sx, sy, sx + w, sy + 1], fill=stone)
         d.line([(sx, sy), (sx + w, sy)], fill=shade(stone, 1.18))
@@ -1359,7 +1365,13 @@ def build():
     out["course_ice_block"] = ice((176, 216, 240))
     out["course_grass_block_top"] = grass_top((88, 158, 62), 24)
     out["course_grass_block"] = grass_side((124, 88, 58), (88, 158, 62), 25)
-    out["course_dirt"] = dirt((124, 88, 58), 26)
+    # The flat tile for the connected set, under the block's own registration name.
+    #
+    # The block is course_dirt_block and its art was course_dirt, which is the naming drift this
+    # project has already been caught by once -- the connected generator keys models on the block
+    # name, so the mask tiles resolved and the plain one did not exist at all. Same image, correct
+    # name, and the old file stays because other models still point at it.
+    out["course_dirt_block"] = dirt((124, 88, 58), 26)
     out["semisolid_platform"] = semisolid((178, 132, 74), 29)
     out["semisolid_platform_top"] = semisolid_top((198, 152, 92), 30)
     out["keyhole"] = keyhole((126, 126, 138), (26, 24, 30, 255), 41)

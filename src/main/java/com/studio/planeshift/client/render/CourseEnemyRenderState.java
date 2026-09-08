@@ -27,6 +27,9 @@ public class CourseEnemyRenderState extends LivingEntityRenderState {
      */
     public boolean wobbling;
 
+    /** Whether a shell is mid-slide, so the renderer can spin it rather than carry it. */
+    public boolean sliding;
+
     /**
      * Which tower boss this is, or -1 for anything that is not one.
      *

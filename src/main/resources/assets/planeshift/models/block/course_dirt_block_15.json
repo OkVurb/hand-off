@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "planeshift:block/course_dirt_block"
+    "all": "planeshift:block/course_dirt_block_15"
   }
 }

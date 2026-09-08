@@ -1,1 +1,52 @@
-{"variants": {"": { "model": "planeshift:block/course_dirt_block" }}}
+{
+  "variants": {
+    "down=false,east=false,up=false,west=false": {
+      "model": "planeshift:block/course_dirt_block_0"
+    },
+    "down=false,east=false,up=true,west=false": {
+      "model": "planeshift:block/course_dirt_block_1"
+    },
+    "down=true,east=false,up=false,west=false": {
+      "model": "planeshift:block/course_dirt_block_2"
+    },
+    "down=true,east=false,up=true,west=false": {
+      "model": "planeshift:block/course_dirt_block_3"
+    },
+    "down=false,east=false,up=false,west=true": {
+      "model": "planeshift:block/course_dirt_block_4"
+    },
+    "down=false,east=false,up=true,west=true": {
+      "model": "planeshift:block/course_dirt_block_5"
+    },
+    "down=true,east=false,up=false,west=true": {
+      "model": "planeshift:block/course_dirt_block_6"
+    },
+    "down=true,east=false,up=true,west=true": {
+      "model": "planeshift:block/course_dirt_block_7"
+    },
+    "down=false,east=true,up=false,west=false": {
+      "model": "planeshift:block/course_dirt_block_8"
+    },
+    "down=false,east=true,up=true,west=false": {
+      "model": "planeshift:block/course_dirt_block_9"
+    },
+    "down=true,east=true,up=false,west=false": {
+      "model": "planeshift:block/course_dirt_block_10"
+    },
+    "down=true,east=true,up=true,west=false": {
+      "model": "planeshift:block/course_dirt_block_11"
+    },
+    "down=false,east=true,up=false,west=true": {
+      "model": "planeshift:block/course_dirt_block_12"
+    },
+    "down=false,east=true,up=true,west=true": {
+      "model": "planeshift:block/course_dirt_block_13"
+    },
+    "down=true,east=true,up=false,west=true": {
+      "model": "planeshift:block/course_dirt_block_14"
+    },
+    "down=true,east=true,up=true,west=true": {
+      "model": "planeshift:block/course_dirt_block_15"
+    }
+  }
+}

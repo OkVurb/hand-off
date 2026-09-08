@@ -29,13 +29,20 @@ public final class CourseDecorator {
     /**
      * Nearest depth decoration may occupy.
      *
-     * <p>Two, against a lane half-width of one. The gap of one column matters: scenery flush
-     * against the play plane reads as part of the level and the player will try to stand on it.
+     * <p>Negative, and that sign is the whole of a bug this shipped with. {@code CourseService}
+     * builds its rail with {@code lookPositive = true}, so the camera sits on the <em>positive</em>
+     * side of the depth axis and everything behind the player is negative. Every constant here was
+     * positive, which put the hills, the trees, the backdrop wall and half the props between the
+     * camera and the course — scenery drawn over the level it was supposed to be behind.
+     *
+     * <p>Two columns back rather than one, against a lane half-width of one. The gap matters:
+     * scenery flush against the play plane reads as part of the level and the player will try to
+     * stand on it.
      */
-    public static final int NEAR_Z = 2;
+    public static final int NEAR_Z = -2;
 
-    /** Furthest depth for ordinary props. */
-    public static final int FAR_Z = 3;
+    /** Furthest depth for ordinary props. Behind, for the reason above. */
+    public static final int FAR_Z = -3;
 
     /**
      * The backdrop plane: big silhouettes outdoors, a decorated wall indoors.
@@ -44,7 +51,7 @@ public final class CourseDecorator {
      * they are rather than by how far back they sit. CourseWriter's clear width was widened to 4
      * to cover this, or scenery from a previous visit would survive behind the new course.
      */
-    public static final int BACKDROP_Z = 4;
+    public static final int BACKDROP_Z = -4;
 
     /** How far apart decoration clusters are placed, before jitter. */
     private static final int SPACING = 9;
@@ -157,7 +164,14 @@ public final class CourseDecorator {
 
     private static void place(CourseCanvas canvas, GenContext ctx, RandomGenerator random,
                               int x, int floorY, int side) {
-        int z = side * (random.nextInt(2) == 0 ? NEAR_Z : FAR_Z);
+        // The side argument varies which *band* a prop lands in, not which side of the lane.
+        //
+        // It used to multiply the depth, so half of every course's scenery was placed at positive
+        // Z -- in front of the play plane, between the camera and the level. In a game with a free
+        // camera that is merely asymmetry; in a side-on one it is a tree standing over the course.
+        // Both bands are behind the player now, and the variation that comment wanted is which of
+        // the two a given prop uses.
+        int z = (side < 0 || random.nextInt(2) == 0) ? NEAR_Z : FAR_Z;
         // Whether this prop is on the back plane, so it can be drawn as distance rather than
         // merely placed at a distance. Two depths existed in the geometry and none in the image.
         boolean far = Math.abs(z) == FAR_Z;
