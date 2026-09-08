@@ -45,6 +45,7 @@ public class PlaneShiftGameTests {
     public static final Identifier ON_OFF_SWITCH_TEST = PlaneShift.id("on_off_switch_test");
     public static final Identifier AIR_DROP_TEST = PlaneShift.id("air_drop_test");
     public static final Identifier LAVA_FALL_TEST = PlaneShift.id("lava_fall_test");
+    public static final Identifier TIDE_TEST = PlaneShift.id("tide_test");
     public static final Identifier COIN_BRICK_TEST = PlaneShift.id("coin_brick_test");
     public static final Identifier HAMMER_BRO_PERCH_TEST = PlaneShift.id("hammer_bro_perch_test");
     public static final Identifier COURSE_GENERATION_TEST = PlaneShift.id("course_generation_test");
@@ -57,6 +58,7 @@ public class PlaneShiftGameTests {
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), PlaneShiftGameTests::testOnOffSwitch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), PlaneShiftGameTests::testAirDrop);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, LAVA_FALL_TEST), PlaneShiftGameTests::testLavaFalls);
+            helper.register(ResourceKey.create(Registries.TEST_FUNCTION, TIDE_TEST), PlaneShiftGameTests::testTideStaysInItsPool);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), PlaneShiftGameTests::testCoinBrick);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), PlaneShiftGameTests::testHammerBroPerch);
             helper.register(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), PlaneShiftGameTests::testCourseGeneration);
@@ -73,6 +75,7 @@ public class PlaneShiftGameTests {
         event.registerTest(ON_OFF_SWITCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, ON_OFF_SWITCH_TEST), data));
         event.registerTest(AIR_DROP_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, AIR_DROP_TEST), data));
         event.registerTest(LAVA_FALL_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, LAVA_FALL_TEST), data));
+        event.registerTest(TIDE_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, TIDE_TEST), data));
         event.registerTest(COIN_BRICK_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COIN_BRICK_TEST), data));
         event.registerTest(HAMMER_BRO_PERCH_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, HAMMER_BRO_PERCH_TEST), data));
         event.registerTest(COURSE_GENERATION_TEST, new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, COURSE_GENERATION_TEST), data));
@@ -233,6 +236,38 @@ public class PlaneShiftGameTests {
                         .getFluidState().getType().isSame(ModFluids.LAVA.get()),
                 "course lava did not fall one block in the time given; the backdrop's column of "
                         + "source blocks is load-bearing rather than cosmetic"));
+    }
+
+    /**
+     * The tide cannot climb out of its pool.
+     *
+     * <p>{@code TideService} runs at runtime, so the reachability proof -- which is run against the
+     * generated canvas -- cannot see anything it does. The only safe kind of invisible change is
+     * one that cannot break a route, and the rule that guarantees it is that a layer is only ever
+     * added on top of water that is already there. Dry ground next to a pool must stay dry however
+     * long the tide runs.
+     *
+     * <p>Asserted here rather than in a unit test because it is a statement about blocks in a
+     * world, and the unit suite has no world.
+     */
+    private static void testTideStaysInItsPool(GameTestHelper helper) {
+        for (int dx = 0; dx <= 4; dx++) {
+            for (int dz = 0; dz <= 2; dz++) {
+                helper.setBlock(new BlockPos(dx, 1, dz), Blocks.STONE);
+            }
+        }
+        // A pool two columns wide, and dry stone beside it.
+        BlockPos wet = new BlockPos(1, 2, 1);
+        helper.setBlock(wet, ModFluids.WATER_BLOCK.get());
+        BlockPos dry = new BlockPos(3, 2, 1);
+
+        helper.succeedWhen(() -> {
+            helper.assertTrue(helper.getBlockState(dry.above()).isAir(),
+                    "the tide put water above dry ground; it can leave its pool, and the "
+                            + "reachability proof cannot see it do so");
+            helper.assertTrue(helper.getBlockState(dry).isAir(),
+                    "the tide flooded dry ground beside the pool");
+        });
     }
 
     private static void testCoinBrick(GameTestHelper helper) {

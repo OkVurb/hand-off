@@ -6,6 +6,7 @@ import com.studio.planeshift.common.course.CourseTheme;
 import com.studio.planeshift.common.entity.MovingPlatformEntity;
 import com.studio.planeshift.common.block.WarpPipeBlock;
 import com.studio.planeshift.common.registry.ModBlocks;
+import com.studio.planeshift.common.block.OnOffBlock;
 import com.studio.planeshift.common.entity.LavaJetEntity;
 import com.studio.planeshift.common.registry.ModEntities;
 import com.studio.planeshift.common.registry.ModItems;
@@ -662,6 +663,112 @@ public final class SegmentLibrary {
             // anything. Under the deck, reachable only by dropping off it.
             coinTrail(c, x + 6, 5, y + 1, 1);
             mob(c, cast(ctx).get(0), x + 10, y + 1, -90.0F);
+        }
+    };
+
+    /**
+     * A capsule beam on posts, with the switch that turns it on mounted where you can see it.
+     *
+     * <p>The rest of §4.8's parts kit. Three shapes the library did not have, in the one segment
+     * that gives all three a reason to exist together: a beam with rounded ends rather than a slab
+     * cut square, ledges with a lip to judge the landing against, and a switch on a pole rather
+     * than set in a wall.
+     *
+     * <p>The pole is the part worth arguing for. An ON/OFF switch flush in a wall is furniture the
+     * player walks past; on a post at head height in open air it is visibly the thing this room is
+     * about, and its height says it is meant to be hit rather than stood on.
+     *
+     * <p>The ON/OFF blocks are the beam's own span, so throwing the switch removes the high road
+     * and leaves the ledges. Both routes exist at all times in the geometry, which is what keeps
+     * the reachability proof honest -- the switch changes which one is convenient, never whether
+     * the segment can be crossed.
+     */
+    static final Segment CAPSULE_BEAM = new Segment() {
+        public SegmentSpec spec() {
+            return def("capsule_beam", 16, 0, 2, Tag.BLOCKS);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 16, y, ctx);
+            BlockState post = ModBlocks.COURSE_PILLAR.get().defaultBlockState();
+            BlockState cap = ModBlocks.COURSE_TRIM.get().defaultBlockState();
+            BlockState span = ModBlocks.ON_OFF_BLOCK.get().defaultBlockState()
+                    .setValue(OnOffBlock.ON, true);
+            BlockState ledge = ModBlocks.COURSE_LEDGE.get().defaultBlockState();
+
+            // The beam: rounded ends in trim, a straight run between them.
+            int high = y + 5;
+            c.set(x + 4, high, 0, cap);
+            for (int i = 5; i <= 10; i++) {
+                c.set(x + i, high, 0, span);
+            }
+            c.set(x + 11, high, 0, cap);
+
+            // Two posts holding it up, in the back row so the corridor underneath stays open.
+            for (int px : new int[] {4, 11}) {
+                for (int h = 1; h < 5; h++) {
+                    c.set(x + px, y + h, ctx.halfWidth(), post);
+                }
+            }
+
+            // Ledges stepping up to the beam, and on past it. These are the route that survives
+            // the switch being thrown.
+            c.set(x + 2, y + 2, 0, ledge);
+            c.set(x + 3, y + 3, 0, ledge);
+            c.set(x + 12, y + 3, 0, ledge);
+            c.set(x + 13, y + 2, 0, ledge);
+
+            // The switch, on its own pole, past the beam so it is a choice rather than a gate.
+            for (int h = 1; h <= 2; h++) {
+                c.set(x + 14, y + h, 0, post);
+            }
+            c.set(x + 14, y + 3, 0, ModBlocks.ON_OFF_SWITCH.get().defaultBlockState());
+
+            coinTrail(c, x + 5, 6, y + 6, 1);
+        }
+    };
+
+    /**
+     * A lattice of pipes, built as structure rather than as furniture.
+     *
+     * <p>§4.7's other half. The colour set was already there; what was missing is the reference's
+     * habit of building whole stretches <em>out of</em> pipes -- verticals standing in a row with
+     * horizontals crossing them, the level assembled from plumbing rather than decorated with it.
+     *
+     * <p>Every pipe here is scenery: none of them are entrances. That is deliberate and it is the
+     * rule that makes the lattice readable at all. A wall of pipes where three are doors and nine
+     * are walls teaches the player to test all twelve, which is not a puzzle, it is a chore. The
+     * warp pipes that go somewhere have their own segments and stand alone in them.
+     */
+    static final Segment PIPE_LATTICE = new Segment() {
+        public SegmentSpec spec() {
+            return def("pipe_lattice", 18, 0, 2, Tag.PIPE, Tag.CLIMB);
+        }
+
+        public void build(CourseCanvas c, int x, int y, GenContext ctx) {
+            floor(c, x, 18, y, ctx);
+            BlockState pipe = pipe(ctx);
+
+            // Verticals of three heights, so the top edge is a skyline rather than a shelf.
+            int[] at = {2, 6, 10, 14};
+            int[] tall = {5, 3, 6, 4};
+            for (int i = 0; i < at.length; i++) {
+                for (int h = 1; h <= tall[i]; h++) {
+                    c.set(x + at[i], y + h, ctx.halfWidth(), pipe);
+                }
+            }
+            // Horizontals joining them at two heights, in the back row: this is the wall the level
+            // is built against, and it must not stand in the lane.
+            for (int i = 2; i <= 14; i++) {
+                c.set(x + i, y + 3, ctx.halfWidth(), pipe);
+            }
+            for (int i = 6; i <= 10; i++) {
+                c.set(x + i, y + 6, ctx.halfWidth(), pipe);
+            }
+            // Something to do in front of it, or the segment is a backdrop the player walks past.
+            platform(c, x + 5, 3, y + 3, ctx);
+            platform(c, x + 11, 3, y + 5, ctx);
+            coinTrail(c, x + 6, 6, y + 5, 1);
         }
     };
 
@@ -2127,6 +2234,8 @@ public final class SegmentLibrary {
         list.add(LEDGE_PATROL);
         list.add(HAMMER_PERCH);
         list.add(SCAFFOLD_SPAN);
+        list.add(CAPSULE_BEAM);
+        list.add(PIPE_LATTICE);
         list.add(MUSHROOM_STALKS);
         list.add(CHOMP_POST);
         list.add(PIRANHA_PIPES);

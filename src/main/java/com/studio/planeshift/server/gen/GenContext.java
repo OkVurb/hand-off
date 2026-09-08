@@ -177,11 +177,17 @@ public final class GenContext {
                         null);
             }
             return switch (theme) {
+                // Platforms are cut logs seen end-on.
+                //
+                // §5.9: theme identity can ride on one block's face art, and this is the entry's
+                // own example. The grass world's raised surfaces were cloud, which is the sky
+                // world's material and said nothing about a forest; log ends say where you are
+                // without a single new tileset.
                 case GRASS -> new Palette(
                         ModBlocks.COURSE_GRASS_BLOCK.get().defaultBlockState(),
                         ModBlocks.COURSE_DIRT_BLOCK.get().defaultBlockState(),
                         ModBlocks.BRICK_BLOCK.get().defaultBlockState(),
-                        ModBlocks.COURSE_CLOUD_BLOCK.get().defaultBlockState(),
+                        ModBlocks.COURSE_LOG_END.get().defaultBlockState(),
                         null);
                 case DESERT -> new Palette(
                         ModBlocks.COURSE_SAND_BLOCK.get().defaultBlockState(),

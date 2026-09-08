@@ -247,6 +247,27 @@ public final class ModBlocks {
      * from the things it is drawn among, by the player and by the build.
      */
     /**
+     * A thin ledge with a sunk centre panel.
+     *
+     * <p>§4.8's parts kit. The lip is the point: it is the brightest row on the block, so the
+     * surface the player lands on is the lightest thing about it from any distance. A ledge drawn
+     * as one flat colour gives the eye nothing to judge a jump against except its outline, which is
+     * the first thing lost when the camera is far enough back to show a whole room.
+     */
+    public static final DeferredBlock<Block> COURSE_LEDGE = courseBlock(
+            "course_ledge", MapColor.STONE, SoundType.STONE);
+
+    /**
+     * Forest floor: cut logs seen end-on, mossed across the top.
+     *
+     * <p>§5.9, and the entry calls it the cheapest kind of identity there is — one block's face art
+     * doing what a whole tileset would otherwise have to. Two log ends per tile rather than one,
+     * because a single centred ring tiles into a grid of bullseyes and reads as spots.
+     */
+    public static final DeferredBlock<Block> COURSE_LOG_END = courseBlock(
+            "course_log_end", MapColor.WOOD, SoundType.WOOD);
+
+    /**
      * A metal grate: floor you can see through.
      *
      * <p>From §4.8's parts kit, and the one item on that list that changes what the player knows

@@ -1040,6 +1040,44 @@ def grate(metal, shadow):
     return img
 
 
+def inset_ledge(rim, face, inset):
+    """A thin ledge: a bright top lip, a body, and a darker panel sunk into the middle.
+
+    The reference's ledges are not slabs of one colour -- they have a lip you land on and a recessed
+    centre, and the lip is what the player actually reads when judging a jump. Drawn with the top
+    two rows brightest so the landing surface is the lightest thing on the block from any distance.
+    """
+    img = plain(face, 51, 0.04)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, 1], fill=rim)
+    d.line([(0, 2), (S - 1, 2)], fill=shade(rim, 0.86))
+    # The sunk panel, inset from every edge so the frame reads as thickness.
+    d.rectangle([3, 5, S - 4, S - 3], fill=inset)
+    d.line([(3, 5), (S - 4, 5)], fill=shade(inset, 0.72))
+    d.line([(3, 5), (3, S - 3)], fill=shade(inset, 0.72))
+    return img
+
+
+def log_end(bark, wood, ring, moss):
+    """Cut logs seen end-on: concentric rings, with moss across the top.
+
+    The cheapest kind of theme identity there is -- one block's face art doing what a whole tileset
+    would otherwise have to. Two logs per tile rather than one, because a single ring centred in a
+    16x16 tiles into a grid of bullseyes and reads as spots.
+    """
+    img = plain(bark, 57, 0.05)
+    d = ImageDraw.Draw(img)
+    for cx, cy, r in ((4, 5, 4), (11, 11, 4)):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=wood, outline=bark)
+        d.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], outline=ring)
+        d.point((cx, cy), fill=ring)
+    # Moss on the top rows: this is ground, and the reference's forest floor is always green on top.
+    d.rectangle([0, 0, S - 1, 2], fill=moss)
+    for x in range(0, S, 3):
+        d.point((x, 3), fill=moss)
+    return img
+
+
 def axe():
     """A single-bit axe, head up, seen side on.
 
@@ -1225,6 +1263,10 @@ def build():
     out["course_wood_block"] = planks((150, 106, 62), 12)
     out["course_tile"] = tiles((214, 210, 200), (168, 166, 160), 13)
     out["course_crate"] = crate((162, 118, 68), 14)
+    out["course_ledge"] = inset_ledge((214, 206, 190, 255), (150, 140, 126, 255),
+                                      (96, 88, 80, 255))
+    out["course_log_end"] = log_end((92, 62, 38, 255), (168, 126, 78, 255),
+                                    (124, 88, 52, 255), (88, 152, 64, 255))
     out["course_grate"] = grate((168, 172, 184, 255), (96, 100, 112, 255))
     out["course_trim"] = trim((198, 176, 132), 15)
     out["course_pillar"] = pillar((206, 200, 186), 16)

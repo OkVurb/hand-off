@@ -286,7 +286,20 @@ visibly come out of, facing each other from either side at different heights, so
 a *place* rather than a pause. Volcano only — a jet of fire out of a wall needs the wall to be part
 of a volcano, or it is a flamethrower in a meadow. §4.3 is complete.
 
-**4.4 Water level is a variable.** A flooded tower shows a surface line partway up the room that
+**4.4 Water level is a variable.** *Built.* `TideService` moves the surface of a pool up and down
+one layer on a four-hundred-tick cycle. A pool at a fixed height is scenery the player swims through
+once; a pool that rises is a clock, and everything in the room has to be read against it.
+
+*The rule that makes it safe is the interesting part.* The tide runs at runtime, so
+`CourseReachability` — which is run against the generated canvas — cannot see anything it does. The
+only safe kind of invisible change is one that cannot break a route, so a layer is **only ever added
+on top of water that is already there**. Water is passable and swimmable to the solver, so a column
+that gains a layer stays crossable, and a column that loses one returns to exactly the geometry that
+was proved. It also means the tide cannot climb out of its pool: the layer above dry land has no
+water under it. A gametest asserts that, because it is a statement about blocks in a world and the
+unit suite has no world.
+
+*The original wording:* A flooded tower shows a surface line partway up the room that
 *moves* during the level. The strongest vindication of having built the fluid as a fluid.
 
 **4.5 Interiors are tinted by world.** *Built.* `Palette.forTheme(theme, world)` cuts a cave from
@@ -305,14 +318,23 @@ reads as one material rather than as chequerwork. `masonry` stays for the brick 
 between a quarry and a brickworks is exactly whether the pieces come out the same size. Basalt and
 deepstone keep their granular treatment: they are rock faces rather than built walls.
 
-**4.7 Pipes are structural, and a colour set of at least five.** *The colour set is already built* —
+**4.7 Pipes are structural, and a colour set of at least five.** *Both halves are built now.*
+`PIPE_LATTICE` builds a stretch out of plumbing rather than decorating it with plumbing: verticals
+of three heights so the top edge is a skyline rather than a shelf, horizontals joining them, and
+platforms in front so it is a place rather than a backdrop. Every pipe in it is scenery and none are
+entrances — a wall where three of twelve pipes are doors teaches the player to test all twelve,
+which is a chore rather than a puzzle. *The colour set was already built* —
 all five exist as `WarpPipeBlock.Colour` with their own textures, and `SegmentLibrary.pipe()` leans
 each theme on one of them so a pipe reads as belonging to the world it is in. What remains is the
 structural half: whole levels built as pipe lattices rather than pipes as furniture.
 
-**4.8 Platforms come from a parts kit.** *Post-and-beam scaffolding, grate panels and mushroom
-capsules are built; thin ledges with inset centres, capsule beams and pole-mounted switch blocks are
-not.* *Partly true already:* semisolid platforms, pillars and
+**4.8 Platforms come from a parts kit.** *Built, all of it.* Post-and-beam scaffolding with a grate
+deck, mushroom capsules on stalks, and — in `CAPSULE_BEAM` — a beam with rounded ends, thin ledges
+with a lip to judge a landing against, and an ON/OFF switch on a pole. The pole is the part worth
+arguing for: a switch flush in a wall is furniture the player walks past, and one at head height in
+open air is visibly what the room is about. The beam's span is the ON/OFF blocks, so throwing the
+switch removes the high road and leaves the ledges — both routes exist in the geometry at all times,
+which is what keeps the reachability proof honest. *Partly true already:* semisolid platforms, pillars and
 trim are registered and placed. What is missing is the specific shapes — capsule beams, mushroom
 caps on stalks, thin ledges with inset centres. Post-and-beam scaffolding in open air, thin ledges with
 dark inset centres, capsule beams, metal grate panels, pole-mounted switch blocks. Not all cubes,
@@ -347,7 +369,12 @@ and a surf band at the waterline; tower ice hangs icicles off the underside. **T
 up/down/east/west property set `ConnectedBlock` already declares**, currently used only to hide
 seams on castle stone. Applying it lands across every theme at once.
 
-**5.2 Sky is per-world data, not one gradient with a brightness knob.** At least six palettes:
+**5.2 Sky is per-world data, not one gradient with a brightness knob.** *Built.* Eight skyboxes,
+one per theme, each authored rather than tinted — `ThemeAssetTest` asserts every theme has one,
+which is how the two missing ones (water and sky) were found. Water is drawn from *inside* the
+water, with no horizon at all.
+
+*The original wording:* At least six palettes:
 pastel pink-lavender over snow; bright cyan with cumulus over airships; cream and gold over high
 desert; saturated sunset orange with magenta bands; toxic green over volcanoes; night with a glowing
 moon over teal terrain.
@@ -386,7 +413,12 @@ fires on `LAVA` and `LAVA` draws a back wall rather than a skyline. And `Segment
 by reading `Colour.values()` into an unused local under a comment claiming pipe colour came from the
 course seed; neither the local nor the seeding ever did anything.
 
-**5.4 Each fluid has its own surface treatment.** Four liquids, four different edges: lava has a
+**5.4 Each fluid has its own surface treatment.** *Done for the fluids that exist.* Lava and water
+each carry their own animated still and flow art, four distinct sheets. Tar and poison are not
+missing *treatment* — they are missing fluids, which is content rather than art direction, and they
+belong in §6 if they are ever wanted. Recorded rather than left looking unfinished.
+
+*The original wording:* Four liquids, four different edges: lava has a
 bright crust, water a clean ripple, tar hangs in drip lobes, poison grows pink crystalline spikes.
 Whatever draws the top of a fluid has to be per-fluid art.
 
@@ -433,7 +465,12 @@ the one place it is worth having.
 block built for the layer behind the lane, so putting it on the floor walled the corridor and the
 proof rejected 108 of 6000 courses. Coral on the playfield needs a non-solid fan of its own.
 
-**5.9 Theme identity can ride on one block's face art.** Forest ground is stacked cut logs seen
+**5.9 Theme identity can ride on one block's face art.** *Built.* `COURSE_LOG_END` is the grass
+world's platform material — cut logs seen end-on, two per tile because a single centred ring tiles
+into a grid of bullseyes, mossed across the top. The grass world's raised surfaces used to be cloud,
+which is the sky world's material and said nothing about a forest.
+
+*The original wording:* Forest ground is stacked cut logs seen
 end-on, with concentric growth rings and moss on top. The cheapest kind of identity there is.
 
 **5.10 Bonus worlds have their own visual language, levels included.** The playfield is framed by a

@@ -1377,3 +1377,33 @@ reachability proof reads the lane centre, so a post in the middle is a wall.
 Test verified by unregistering the segment and watching it fail. Full build green,
 381 tests. Remaining in 4.8: thin ledges with inset centres, capsule beams,
 pole-mounted switch blocks.
+
+## Section 4 finished, and most of 5
+Batched the coding and built once at the end, on the owner's instruction. Six
+entries in one pass.
+
+4.4, the tide: a pool's surface moves one layer on a four-hundred-tick cycle. The
+safety rule is the design -- the tide runs at runtime and the reachability proof
+reads the generated canvas, so it can never see this. The only safe invisible change
+is one that cannot break a route, so a layer is only ever added on top of water that
+is already there. That also stops the tide climbing out of its pool, which a gametest
+now asserts, because it is a claim about blocks in a world and the unit suite has no
+world.
+
+4.7's structural half: PIPE_LATTICE builds a stretch out of plumbing instead of
+decorating with it. No pipe in it is an entrance -- a wall where three of twelve
+pipes are doors teaches the player to test all twelve, which is a chore.
+
+4.8 finished: capsule beam with rounded ends, inset ledges, and an ON/OFF switch on
+a pole. The beam's span is ON/OFF blocks, so throwing the switch takes away the high
+road and leaves the ledges; both routes are in the geometry at all times, which is
+what keeps the proof honest.
+
+5.9: cut logs are the grass world's platform material. They used to be cloud -- the
+sky world's block, saying nothing about a forest.
+
+5.2 and 5.4 audited rather than built: eight authored skyboxes already exist and are
+tested, and both fluids that exist have their own still and flow art. Tar and poison
+are missing fluids, not missing treatment, so they are content and recorded as such.
+
+Left in 5: 5.10, the bonus-world visual language. 383 unit tests, 11 gametests.

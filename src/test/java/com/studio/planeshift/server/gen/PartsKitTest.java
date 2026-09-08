@@ -38,4 +38,29 @@ class PartsKitTest {
                 "no grass course in thirty seeds contained a grate deck; the block is registered "
                         + "and nothing places it");
     }
+
+    /** The capsule beam's parts all reach a course: ledge, beam and the switch on its pole. */
+    @Test
+    @DisplayName("ledges, beams and pole-mounted switches all get placed")
+    void therestOfTheKitReachesCourses() {
+        boolean ledge = false;
+        boolean logs = false;
+        for (long seed = 0; seed < 30 && !(ledge && logs); seed++) {
+            CourseCanvas canvas = CourseComposer.compose(CourseTheme.GRASS, LENGTH, 3, seed).canvas();
+            for (int x = 0; x < LENGTH; x++) {
+                for (int y = -4; y < 24; y++) {
+                    var state = canvas.get(x, y, 0);
+                    if (state == null) {
+                        continue;
+                    }
+                    ledge |= state.is(ModBlocks.COURSE_LEDGE.get());
+                    logs |= state.is(ModBlocks.COURSE_LOG_END.get());
+                }
+            }
+        }
+        assertTrue(ledge, "no inset ledge in thirty grass courses; the block is registered and "
+                + "nothing places it");
+        assertTrue(logs, "no cut-log platform in thirty grass courses, so §5.9's identity block is "
+                + "art nobody sees");
+    }
 }

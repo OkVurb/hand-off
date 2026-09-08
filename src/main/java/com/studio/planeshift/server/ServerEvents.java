@@ -95,6 +95,7 @@ public final class ServerEvents {
             PlayerSizeService.apply(player, state);
             AirMoveService.tick(player);
             com.studio.planeshift.server.integration.ParCoolBridge.tick(player, state);
+            TideService.tick(player, state);
 
             if (!CourseCompletionService.SLIDING_PLAYERS.isEmpty()) {
                 var uuid = player.getUUID();

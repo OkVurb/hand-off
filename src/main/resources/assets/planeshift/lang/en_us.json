@@ -346,6 +346,8 @@
   "block.planeshift.toad_box": "Toad House Box",
   "entity.planeshift.koopaling": "Koopaling",
   "item.planeshift.koopaling_spawn_egg": "Koopaling Spawn Egg",
+  "block.planeshift.course_ledge": "Inset Ledge",
+  "block.planeshift.course_log_end": "Cut Logs",
   "block.planeshift.course_grate": "Metal Grate",
   "block.planeshift.course_hedge_distant_band": "Distant Hedge Band",
   "block.planeshift.course_hedge_far": "Distant Hedge",
